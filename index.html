@@ -278,10 +278,18 @@
       <option value="">전국</option>
       <option>서울</option><option>경기</option><option>인천</option>
       <option>부산</option><option>대구</option><option>광주</option>
-      <option>대전</option><option>울산</option><option>제주</option>
+      <option>대전</option><option>울산</option><option>세종</option>
+      <option>강원</option><option>충북</option><option>충남</option>
+      <option>전북</option><option>전남</option><option>경북</option>
+      <option>경남</option><option>제주</option>
+    </select>
+    <select id="place-commercial">
+      <option value="">상권 자동순회</option>
     </select>
     <select id="place-cat">
-      <option value="술집">전체 술집</option>
+      <option value="">전체</option>
+      <option value="맛집">맛집</option>
+      <option value="술집">술집</option>
       <option value="이자카야">이자카야</option>
       <option value="와인바">와인바</option>
       <option value="위스키바">위스키바</option>
@@ -290,6 +298,12 @@
       <option value="한식주점">한식주점</option>
       <option value="요리주점">요리주점</option>
       <option value="막걸리">막걸리</option>
+    </select>
+    <select id="place-age">
+      <option value="30">최근 30일</option>
+      <option value="60" selected>60일</option>
+      <option value="90">90일</option>
+      <option value="180">6개월</option>
     </select>
     <button class="btn" id="place-refresh">갱신</button>
     <span id="place-loading" style="display:none"><span class="loading"></span></span>
@@ -657,46 +671,80 @@
   }
 
   
-  async function loadPlace(){
+    // 상권 매핑 (시도 → 상권 리스트)
+  const PLACE_COMMERCIALS = {
+    '서울': ['홍대','강남','연남','성수','이태원','잠실','익선동','압구정','한남','신사','망원','합정','명동','종로','신촌','건대','청담','서촌','북촌','여의도'],
+    '경기': ['판교','분당','일산','수원','광교','평촌','안산','하남'],
+    '부산': ['해운대','광안리','서면','전포','남포동'],
+    '대구': ['동성로','중구','수성'],
+    '인천': ['송도','구월동'],
+    '대전': ['둔산','유성'],
+    '광주': ['상무지구','충장로'],
+    '울산': ['삼산','성남동'],
+    '강원': ['강릉','속초','춘천'],
+    '충북': ['청주'],
+    '충남': ['천안','아산'],
+    '전북': ['전주'],
+    '전남': ['여수','순천'],
+    '경북': ['포항','경주'],
+    '경남': ['창원','진주','통영','거제'],
+    '제주': ['제주시','서귀포']
+  };
+  function populatePlaceCommercials(){
     const region = document.getElementById('place-region').value;
+    const sel = document.getElementById('place-commercial');
+    if (!sel) return;
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">상권 자동순회</option>' + (PLACE_COMMERCIALS[region]||[]).map(c => `<option>${c}</option>`).join('');
+    if ([...sel.options].some(o => o.value === cur)) sel.value = cur;
+  }
+
+  async function loadPlace(){
+    const region = document.getElementById('place-region').value || '서울';
+    const commercial = document.getElementById('place-commercial')?.value || '';
     const cat = document.getElementById('place-cat').value;
+    const maxAge = document.getElementById('place-age')?.value || '60';
     const grid = document.getElementById('place-grid'), empty = document.getElementById('place-empty'), loading = document.getElementById('place-loading');
     grid.innerHTML=''; empty.style.display='none'; loading.style.display='inline';
     try {
-      // 지역 + 카테고리로 여러 검색 (각각 최대 5개씩)
-      const queries = [
-        `${region?region+' ':''}${cat}`,
-        `${region?region+' ':''}신규 ${cat}`,
-      ];
-      const seen = new Set(); const all = [];
-      const rs = await Promise.all(queries.map(q => apiPlace(q, 'comment', 5).catch(()=>({items:[]}))));
-      rs.forEach(r => {
-        (r.items||[]).forEach(it => {
-          const k = it.title + '|' + it.address;
-          if(seen.has(k)) return; seen.add(k);
-          if(region && (it.address||'').indexOf(region)===-1 && (it.roadAddress||'').indexOf(region)===-1) return;
-          all.push(it);
-        });
-      });
-      document.getElementById('cnt-place').textContent = all.length;
-      if(all.length === 0) empty.style.display='block';
-      else all.forEach(it => {
+      const params = new URLSearchParams();
+      params.set('region', region);
+      if (commercial) params.set('commercial', commercial);
+      if (cat) params.set('cat', cat);
+      params.set('maxAge', maxAge);
+      params.set('display', '30');
+      const r = await fetch('./api/place_new?' + params.toString());
+      if (!r.ok) throw new Error('place_new ' + r.status);
+      const data = await r.json();
+      const items = data.items || [];
+      document.getElementById('cnt-place').textContent = items.length;
+      if (items.length === 0) {
+        empty.textContent = `신규 매장 없음 (후보 ${data.candidates||0}개 중 ${maxAge}일 이내 0개)`;
+        empty.style.display='block';
+      } else items.forEach(it => {
         const card = document.createElement('div');
-        const name = stripTags(it.title);
-        const blob = name + ' ' + it.category + ' ' + it.address;
+        const name = it.name;
+        const blob = name + ' ' + (it.category||'') + ' ' + (it.address||'');
         const cm = isClient(blob);
         card.className = 'card' + (cm ? ' client' : '');
+        card.dataset.store = name;
         const placeUrl = `https://map.naver.com/p/search/${encodeURIComponent(name)}`;
-        const region2 = extractRegion(it.address + ' ' + it.roadAddress);
+        const region2 = extractRegion((it.address||''));
+        const ageDays = it.age_days;
+        const newBadge = ageDays !== null && ageDays !== undefined
+          ? `<span class="badge cat-a">🆕 ${it.badge} · ${ageDays}일</span>`
+          : `<span class="badge cat-a">🆕 ${it.badge}</span>`;
         card.innerHTML = `
           <div class="title">${name}</div>
           <div class="meta">
+            ${newBadge}
             ${cm?`<span class="badge client">거래중·${cm}</span>`:''}
             ${region2?`<span class="badge region">${region2}</span>`:''}
             <span class="badge cat">📍 플레이스</span>
             <span>${stripTags(it.category||'')}</span>
+            ${it.first_blog_date?`<span>📅 ${it.first_blog_date}</span>`:''}
           </div>
-          <div class="desc">${stripTags(it.roadAddress||it.address||'')}${it.telephone?' · '+it.telephone:''}</div>
+          <div class="desc">${stripTags(it.address||'')}${it.telephone?' · '+it.telephone:''}${it.source_query?` <small style="color:#888">검색: ${it.source_query}</small>`:''}</div>
           <div class="actions">
             <a href="${placeUrl}" target="_blank" rel="noopener">📍 플레이스 ↗</a>
             <button class="btn small ghost" data-store="${name}">⭐ 추적</button>
@@ -706,7 +754,7 @@
       });
       applyFilter('place');
     } catch(e) { empty.textContent='오류: '+e.message; empty.style.display='block'; }
-    finally { loading.style.display='none'; }
+    finally{ loading.style.display='none'; }
   }
 
   async function refreshWatch(){
@@ -805,6 +853,8 @@
   document.getElementById('fr-refresh').addEventListener('click',loadFranchise);
   document.getElementById('yt-refresh').addEventListener('click',loadYouTube);
   document.getElementById('place-refresh').addEventListener('click',loadPlace);
+  document.getElementById('place-region').addEventListener('change', populatePlaceCommercials);
+  populatePlaceCommercials();
   document.getElementById('watch-refresh').addEventListener('click',refreshWatch);
   document.getElementById('watch-add-btn').addEventListener('click',()=>{
     const i = document.getElementById('watch-add'); addWatch(i.value); i.value=''; renderWatch();
