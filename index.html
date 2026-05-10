@@ -147,6 +147,8 @@
     <div class="row">
       <button class="btn small" id="client-save">저장</button>
       <button class="btn small ghost" id="client-clear">초기화</button>
+      <input type="file" id="client-file" accept=".json,.txt" style="display:none">
+      <button class="btn small ghost" id="client-file-btn" style="background:#eaf2e8;color:#3d6033;border-color:#3d6033">📁 파일 임포트</button>
       <span style="font-size:10.5px;color:#888" id="client-saved"></span>
     </div>
   </div>
@@ -337,7 +339,18 @@
   function isClient(text){
     if(!state.clients||state.clients.length===0) return null;
     const b=(text||'').toLowerCase();
-    for(const c of state.clients){ if(c && b.indexOf(c.toLowerCase())!==-1) return c; }
+    for(const c of state.clients){
+      if(!c) continue;
+      if(typeof c === 'object' && c.n){
+        if(b.indexOf(c.n.toLowerCase()) === -1) continue;
+        if(c.n.length < 5){
+          const aMatch = (c.d && b.indexOf(c.d.toLowerCase())!==-1) || (c.g && b.indexOf(c.g.toLowerCase())!==-1) || (c.r && b.indexOf(c.r.toLowerCase())!==-1);
+          if(!aMatch) continue;
+        }
+        return c.d ? c.n+' ('+c.d+')' : c.n;
+      }
+      if(typeof c === 'string' && b.indexOf(c.toLowerCase())!==-1) return c;
+    }
     return null;
   }
   function applyFilter(tab){
@@ -700,7 +713,7 @@
 
   // 거래처 입력
   function renderClientCount(){ document.getElementById('client-count').textContent=(state.clients.length||0)+'개'; }
-  document.getElementById('client-list').value = (state.clients||[]).join('\n');
+  document.getElementById('client-list').value = (state.clients||[]).map(c => typeof c==='object' ? c.n : c).join('\n');
   renderClientCount();
   document.getElementById('client-save').addEventListener('click',()=>{
     const lines = document.getElementById('client-list').value.split('\n').map(s=>s.trim()).filter(s=>s);
@@ -714,6 +727,20 @@
     else if(tab==='youtube') loadYouTube();
     else if(tab==='place') loadPlace();
     document.querySelectorAll('.tab').forEach(t=>{ if(t.dataset.tab!==tab) delete t.dataset.loaded; });
+  });
+  document.getElementById('client-file-btn').addEventListener('click',()=>document.getElementById('client-file').click());
+  document.getElementById('client-file').addEventListener('change', async e => {
+    const f = e.target.files[0]; if(!f) return;
+    const text = await f.text();
+    let imported = [];
+    try { const j = JSON.parse(text); if(Array.isArray(j)) imported = j.filter(x => x && (typeof x==='string' || x.n)); } catch(_){}
+    if(imported.length === 0) imported = text.split('\n').map(s => s.trim()).filter(s => s);
+    state.clients = imported; save(); renderClientCount();
+    document.getElementById('client-list').value = imported.map(c => typeof c==='object' ? c.n : c).join('\n');
+    document.getElementById('client-saved').textContent = '✅ '+imported.length+'개 임포트 완료';
+    const tab = document.querySelector('.tab.active').dataset.tab;
+    if(tab==='new') loadNew(); else if(tab==='hot') loadHot(); else if(tab==='franchise') loadFranchise(); else if(tab==='youtube') loadYouTube(); else if(tab==='place') loadPlace();
+    document.querySelectorAll('.tab').forEach(t => { if(t.dataset.tab !== tab) delete t.dataset.loaded; });
   });
   document.getElementById('client-clear').addEventListener('click',()=>{
     if(!confirm('거래처 명단 모두 삭제?')) return;
