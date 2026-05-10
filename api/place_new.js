@@ -87,7 +87,7 @@ export default async function handler(req, res) {
           const key = (it.id || it.name) + '|' + (it.fullAddress || '');
           if (seen.has(key)) continue;
           seen.add(key);
-          all.push({ ...it, source_query: q });
+          all.push({ ...it, name: it.name, address: it.fullAddress, category: it.categoryName, source_query: q });
         }
       } catch(e) { stats.push({ q, error: e.message }); }
     }
