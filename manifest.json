@@ -1,0 +1,19 @@
+{
+    "name": "세왕상사 신규업장 모니터",
+    "short_name": "세왕상사 모니터",
+    "description": "전국 신규 오픈 주류 업장 모니터링 (세왕상사)",
+    "start_url": "./",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#fafaf7",
+    "theme_color": "#2f3640",
+    "lang": "ko-KR",
+    "icons": [
+          {
+                  "src": "icon.svg",
+                  "sizes": "any",
+                  "type": "image/svg+xml",
+                  "purpose": "any maskable"
+          }
+    ]
+}
