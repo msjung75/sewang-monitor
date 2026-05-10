@@ -1,7 +1,6 @@
-// '신규 오픈' 매장 수집 — Naver Open API local + 매장별 첫 블로그 후기로 등록일 검증
-// Vercel 환경변수: NAVER_CLIENT_ID, NAVER_CLIENT_SECRET
-// Input: GET ?region=서울&commercial=홍대&cat=이자카야&maxAge=30
-// Output: { items: [{name, address, badge, age_days, first_blog_date, ...}, ...] }
+// 진짜 "신규 오픈" 매장 수집 — m.search.naver.com HTML의 Apollo state에서
+// "newOpening":true 플래그 직접 추출 (Naver 고유 신규 오픈 배지와 동일 기준)
+// Input: GET ?region=서울&commercial=홍대&cat=이자카야
 
 const COMMERCIALS = {
   '서울': ['홍대','강남','연남','성수','이태원','잠실','익선동','압구정','한남','신사','망원','합정','명동','종로','신촌','건대','청담','서촌','북촌','여의도'],
@@ -9,7 +8,7 @@ const COMMERCIALS = {
   '부산': ['해운대','광안리','서면','전포','남포동'],
   '대구': ['동성로','중구','수성'],
   '인천': ['송도','구월동'],
-  '대전': ['둔산','유성'],
+  '대전': ['둘산','유성'],
   '광주': ['상무지구','충장로'],
   '울산': ['삼산','성남동'],
   '강원': ['강릉','속초','춘천'],
@@ -22,38 +21,47 @@ const COMMERCIALS = {
   '제주': ['제주시','서귀포']
 };
 
-function stripTags(s) { return (s || '').replace(/<\/?[^>]+>/g, ''); }
+const UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1';
 
-async function searchLocal(query, headers) {
-  const url = `https://openapi.naver.com/v1/search/local.json?query=${encodeURIComponent(query)}&sort=comment&display=15`;
-  const r = await fetch(url, { headers });
-  if (!r.ok) return [];
-  const data = await r.json();
-  return (data.items || []).map(it => ({ ...it, _source: query }));
+// HTML에서 "newOpening":true 인 Place 객체 추출
+function extractNewOpens(html) {
+  const out = [];
+  const seen = new Set();
+  const decode = (s) => s.replace(/\\u002F/g, '/').replace(/\\u0026/g, '&').replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+  let pos = 0;
+  while (true) {
+    const idx = html.indexOf('"newOpening":true', pos);
+    if (idx === -1) break;
+    pos = idx + 17;
+    // 이 idx 기준으로 뒤로 3000자, 앞으로 3000자 윈도우 추출
+    const ctx = html.substring(Math.max(0, idx - 3000), Math.min(html.length, idx + 3000));
+    // 윈도우 내에서 name, fullAddress, id, categoryName 등 추출
+    const findField = (pattern) => { const m = ctx.match(pattern); return m ? decode(m[1]) : null; };
+    const name = findField(/"name":"([^"\\]{1,80}(?:\\.[^"\\]{0,80})*)"/);
+    const id = findField(/"id":"(\d{6,})"/);
+    const fullAddress = findField(/"fullAddress":"([^"\\]{1,200}(?:\\.[^"\\]{0,200})*)"/);
+    const categoryName = findField(/"categoryName":"([^"\\]{1,80})"/);
+    const visitorReviewCount = findField(/"visitorReviewCount":"?([\d]+)/);
+    if (!name) continue;
+    const key = (id || name) + '|' + (fullAddress || '');
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push({ id, name, fullAddress, categoryName, visitorReviewCount, badge: '신규 오픈', newOpening: true });
+  }
+  return out;
 }
 
-async function getStoreAge(storeName, headers) {
-  const blogUrl = `https://openapi.naver.com/v1/search/blog.json?query=${encodeURIComponent(storeName)}&sort=sim&display=20`;
-  try {
-    const r = await fetch(blogUrl, { headers });
-    if (!r.ok) return { ageDays: null, firstYmd: null, postCount: 0 };
-    const data = await r.json();
-    const dates = (data.items || []).map(it => it.postdate).filter(d => d && /^\d{8}$/.test(d));
-    if (dates.length === 0) return { ageDays: null, firstYmd: null, postCount: 0 };
-    const firstYmd = [...dates].sort()[0];
-    const firstDate = new Date(Number(firstYmd.slice(0,4)), Number(firstYmd.slice(4,6))-1, Number(firstYmd.slice(6,8)));
-    return { ageDays: Math.floor((Date.now() - firstDate) / 86400000), firstYmd, postCount: dates.length };
-  } catch(e) { return { ageDays: null, firstYmd: null, postCount: 0 }; }
+async function searchNaver(query) {
+  const url = `https://m.search.naver.com/search.naver?where=m&query=${encodeURIComponent(query)}`;
+  const r = await fetch(url, { headers: { 'User-Agent': UA, 'Accept-Language': 'ko-KR,ko;q=0.9' } });
+  if (!r.ok) return { items: [], err: 'fetch ' + r.status };
+  const html = await r.text();
+  return { items: extractNewOpens(html), htmlLen: html.length };
 }
 
 export default async function handler(req, res) {
-  const { region = '서울', commercial = '', cat = '', query = '', maxAge = '30', display = '20' } = req.query;
-  const id = process.env.NAVER_CLIENT_ID;
-  const secret = process.env.NAVER_CLIENT_SECRET;
-  if (!id || !secret) return res.status(500).json({ error: 'NAVER env 미설정' });
-  const headers = { 'X-Naver-Client-Id': id, 'X-Naver-Client-Secret': secret };
-  const maxAgeDays = Math.max(1, Math.min(365, Number(maxAge) || 30));
-  const want = Math.max(1, Math.min(50, Number(display) || 20));
+  const { region = '서울', commercial = '', cat = '', query = '', display = '30' } = req.query;
+  const want = Math.max(1, Math.min(50, Number(display) || 30));
 
   const queries = [];
   if (query) queries.push(query);
@@ -61,67 +69,38 @@ export default async function handler(req, res) {
     queries.push(`${commercial} 신상 ${cat || '맛집'}`);
     if (!cat) queries.push(`${commercial} 신상 술집`);
   } else if (region && COMMERCIALS[region]) {
-    const tops = COMMERCIALS[region].slice(0, 5);
     queries.push(`${region} 신상 ${cat || '맛집'}`);
-    for (const c of tops) queries.push(`${c} 신상 ${cat || '맛집'}`);
-  } else queries.push(`${region} 신상 ${cat || '맛집'}`);
+    for (const c of COMMERCIALS[region].slice(0, 6)) queries.push(`${c} 신상 ${cat || '맛집'}`);
+  } else {
+    queries.push(`${region} 신상 ${cat || '맛집'}`);
+  }
 
   try {
-    const allPlaces = [];
+    const all = [];
     const seen = new Set();
-    const queryStats = [];
-    for (const q of queries.slice(0, 8)) {
+    const stats = [];
+    for (const q of queries.slice(0, 7)) {
       try {
-        const places = await searchLocal(q, headers);
-        queryStats.push({ q, found: places.length });
-        for (const p of places) {
-          const name = stripTags(p.title);
-          const key = name + '|' + (p.roadAddress || p.address || '');
+        const r = await searchNaver(q);
+        stats.push({ q, found: r.items.length, htmlLen: r.htmlLen, err: r.err });
+        for (const it of r.items) {
+          const key = (it.id || it.name) + '|' + (it.fullAddress || '');
           if (seen.has(key)) continue;
           seen.add(key);
-          allPlaces.push({ ...p, _name: name });
+          all.push({ ...it, source_query: q });
         }
-      } catch(e) { queryStats.push({ q, error: e.message }); }
+      } catch(e) { stats.push({ q, error: e.message }); }
     }
-
-    const results = [];
-    let idx = 0;
-    const concurrency = 5;
-    const worker = async () => {
-      while (idx < allPlaces.length && results.length < want * 2) {
-        const place = allPlaces[idx++];
-        const storeName = place._name;
-        const ageInfo = await getStoreAge(storeName, headers);
-        const isNewOpen = ageInfo.postCount === 0 || (ageInfo.ageDays !== null && ageInfo.ageDays <= maxAgeDays);
-        if (!isNewOpen) continue;
-        results.push({
-          name: storeName, address: place.roadAddress || place.address,
-          category: place.category, telephone: place.telephone,
-          mapx: place.mapx, mapy: place.mapy, link: place.link,
-          first_blog_date: ageInfo.firstYmd ? `${ageInfo.firstYmd.slice(0,4)}-${ageInfo.firstYmd.slice(4,6)}-${ageInfo.firstYmd.slice(6,8)}` : null,
-          age_days: ageInfo.ageDays, post_count: ageInfo.postCount,
-          badge: ageInfo.postCount === 0 ? '신규 등록' : '신규 오픈',
-          source_query: place._source
-        });
-      }
-    };
-    const ws = [];
-    for (let i = 0; i < concurrency; i++) ws.push(worker());
-    await Promise.all(ws);
-
-    results.sort((a, b) => {
-      if (a.age_days === null && b.age_days === null) return 0;
-      if (a.age_days === null) return -1;
-      if (b.age_days === null) return 1;
-      return a.age_days - b.age_days;
-    });
-    const final = results.slice(0, want);
 
     res.setHeader('Cache-Control', 's-maxage=600, stale-while-revalidate=120');
     return res.status(200).json({
-      region, commercial, cat, maxAgeDays,
-      queries_run: queries.length, candidates: allPlaces.length, new_count: final.length,
-      items: final, stats: queryStats
+      region, commercial, cat,
+      queries_run: queries.length,
+      new_count: all.length,
+      items: all.slice(0, want),
+      stats
     });
-  } catch (e) { return res.status(500).json({ error: e.message }); }
+  } catch (e) {
+    return res.status(500).json({ error: e.message });
+  }
 }
