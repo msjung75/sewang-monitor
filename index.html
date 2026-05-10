@@ -75,6 +75,10 @@
   .filter-row .filter-btn.active { background: #2f3640; color: #fff; border-color: #2f3640; }
   .filter-row .filter-btn[data-f="client"].active { background: #d44a4a; border-color: #d44a4a; }
   .filter-row .filter-btn[data-f="prospect"].active { background: #3d6033; border-color: #3d6033; }
+  .filter-row .filter-btn[data-f="cat-A"].active { background: #2e7d32; border-color: #2e7d32; color:#fff; }
+  .filter-row .filter-btn[data-f="cat-B"].active { background: #6a1b9a; border-color: #6a1b9a; color:#fff; }
+  .badge.cat-a { background: #c8e6c9; color: #1b5e20; border: 1px solid #2e7d32; }
+  .badge.cat-b { background: #e1bee7; color: #4a148c; border: 1px solid #6a1b9a; }
   .panel { padding: 10px 12px; }
   .grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
   .card {
@@ -190,6 +194,8 @@
     <button class="filter-btn active" data-f="all">전체</button>
     <button class="filter-btn" data-f="client">거래처</button>
     <button class="filter-btn" data-f="prospect">신규영업</button>
+    <button class="filter-btn" data-f="cat-A">🆕 A 신규</button>
+    <button class="filter-btn" data-f="cat-B">📈 B 가속</button>
   </div>
   <div class="panel"><div class="grid" id="new-grid"></div>
     <div class="empty" id="new-empty" style="display:none">결과가 없습니다.</div>
@@ -361,9 +367,53 @@
     if(!grid) return;
     grid.querySelectorAll('.card').forEach(c=>{
       const isC=c.classList.contains('client');
-      let show=true; if(f==='client') show=isC; else if(f==='prospect') show=!isC;
+      const cat=c.dataset.category||'';
+      let show=true;
+      if(f==='client') show=isC;
+      else if(f==='prospect') show=!isC;
+      else if(f==='cat-A') show=cat==='A';
+      else if(f==='cat-B') show=cat==='B';
       c.style.display=show?'':'none';
     });
+  }
+
+  // 카테고리 분류 (A 신규/B 가속/C 안정) — 매장당 /api/age 호출 + localStorage 캐시 24h
+  async function enrichNewCardsWithCategory(){
+    const grid=document.getElementById('new-grid');
+    if(!grid) return;
+    const cards=Array.from(grid.querySelectorAll('.card'));
+    const seen=new Set();
+    const targets=cards.filter(c=>{ const s=c.dataset.store; if(!s||seen.has(s)) return false; seen.add(s); return true; });
+    const concurrency=4; let idx=0;
+    const worker=async()=>{
+      while(idx<targets.length){
+        const card=targets[idx++]; const store=card.dataset.store;
+        try{
+          const ckey='age_v1:'+store; let info=null;
+          try{ const raw=localStorage.getItem(ckey); if(raw){ const o=JSON.parse(raw); if(o&&o.t&&(Date.now()-o.t)<86400000) info=o.d; } }catch(e){}
+          if(!info){
+            const r=await fetch('./api/age?store='+encodeURIComponent(store));
+            if(!r.ok) continue;
+            info=await r.json();
+            try{ localStorage.setItem(ckey,JSON.stringify({t:Date.now(),d:info})); }catch(e){}
+          }
+          if(!info||!info.category) continue;
+          grid.querySelectorAll('.card[data-store="'+store.replace(/"/g,'\\"')+'"]').forEach(c=>{
+            c.dataset.category=info.category;
+            if(c.querySelector('.badge.cat-marker')) return;
+            const meta=c.querySelector('.meta'); if(!meta) return;
+            const span=document.createElement('span');
+            if(info.category==='A'){ span.className='badge cat-a cat-marker'; span.textContent='🆕 신규'; span.title='등록 '+info.age_days+'일'; }
+            else if(info.category==='B'){ span.className='badge cat-b cat-marker'; span.textContent='📈 가속 '+info.acceleration+'x'; span.title=info.age_days+'일·4주 '+info.count_4w+'건'; }
+            else return;
+            meta.insertBefore(span, meta.firstChild);
+          });
+          applyFilter('new');
+        }catch(e){}
+      }
+    };
+    const ws=[]; for(let i=0;i<concurrency;i++) ws.push(worker());
+    await Promise.all(ws);
   }
 
   // API 호출 (Vercel 서버리스 프록시 경유)
@@ -403,7 +453,7 @@
     const source = opts.source || (item.bloggername?'블로그':item.pubDate?'뉴스':'');
     const blob = title+' '+desc;
     const cm = isClient(blob);
-    const card = document.createElement('div'); card.className='card'+(cm?' client':'');
+    const card = document.createElement('div'); card.className='card'+(cm?' client':''); card.dataset.store=storeName;
     const titleHtml = (item.title||'').replace(/<\/?b>/g,'<b>') || title;
     card.innerHTML = `
       <div class="title">${titleHtml}</div>
@@ -529,6 +579,7 @@
       if(top.length===0) empty.style.display='block';
       else top.forEach(it=>grid.appendChild(renderCard(it,{cat:it._cat})));
       applyFilter('new');
+      enrichNewCardsWithCategory();
     }catch(e){ empty.textContent='오류: '+e.message; empty.style.display='block'; }
     finally{ loading.style.display='none'; }
   }
