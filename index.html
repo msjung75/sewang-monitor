@@ -954,16 +954,20 @@
     document.getElementById('kpi-client').textContent = clientCount;
     document.getElementById('kpi-watch').textContent = watchCount;
     const byRegion = {}; cards.forEach(c => { if (c.region) byRegion[c.region] = (byRegion[c.region]||0)+1; });
-    const regionLabels = Object.keys(byRegion).sort((a,b)=>byRegion[b]-byRegion[a]).slice(0,10);
-    makeChart('chart-region', 'bar', { labels: regionLabels, datasets: [{ label: '매장 수', data: regionLabels.map(r=>byRegion[r]), backgroundColor: '#3d6033' }] });
+    const regionLabels = Object.keys(byRegion).filter(r => byRegion[r] > 0).sort((a,b)=>byRegion[b]-byRegion[a]).slice(0,10);
+    const regionCanvas = document.getElementById('chart-region');
+    if (regionCanvas) regionCanvas.style.height = Math.max(80, regionLabels.length * 32) + 'px';
+    makeChart('chart-region', 'bar', { labels: regionLabels, datasets: [{ label: '매장 수', data: regionLabels.map(r=>byRegion[r]), backgroundColor: '#3d6033' }] }, { indexAxis: 'y', scales: { x: { beginAtZero: true, ticks: { precision: 0 } }, y: { ticks: { autoSkip: false } } } });
     const byTab = {}; cards.forEach(c => { byTab[c.tab] = (byTab[c.tab]||0)+1; });
     const tabLabel = { new: '🆕 신규', hot: '🔥 인기', franchise: '🏪 프차', youtube: '📺 유튜브', place: '📍 플레이스' };
     const tabKeys = Object.keys(byTab);
     makeChart('chart-tab', 'doughnut', { labels: tabKeys.map(k=>tabLabel[k]||k), datasets: [{ data: tabKeys.map(k=>byTab[k]), backgroundColor: ['#2e7d32','#d44a4a','#6a1b9a','#1976d2','#ef6c00'] }] });
     makeChart('chart-client', 'doughnut', { labels: ['거래처','신규영업'], datasets: [{ data: [clientCount, cards.length - clientCount], backgroundColor: ['#d44a4a','#3d6033'] }] });
     const byComm = {}; cards.forEach(c => { const co = extractCommercial(c.title); if (co) byComm[co] = (byComm[co]||0)+1; });
-    const commLabels = Object.keys(byComm).sort((a,b)=>byComm[b]-byComm[a]).slice(0,10);
-    makeChart('chart-commercial', 'bar', { labels: commLabels, datasets: [{ label: '매장 수', data: commLabels.map(r=>byComm[r]), backgroundColor: '#6a1b9a' }] });
+    const commLabels = Object.keys(byComm).filter(r => byComm[r] > 0).sort((a,b)=>byComm[b]-byComm[a]).slice(0,10);
+    const commCanvas = document.getElementById('chart-commercial');
+    if (commCanvas) commCanvas.style.height = Math.max(80, commLabels.length * 32) + 'px';
+    makeChart('chart-commercial', 'bar', { labels: commLabels, datasets: [{ label: '매장 수', data: commLabels.map(r=>byComm[r]), backgroundColor: '#6a1b9a' }] }, { indexAxis: 'y', scales: { x: { beginAtZero: true, ticks: { precision: 0 } }, y: { ticks: { autoSkip: false } } } });
     const recs = cards
       .filter(c => !c.isClient)
       .map(c => ({ ...c, score: (c.category==='B'?100:0) + (c.category==='A'?50:0) + (c.tab==='place'?20:0) + (c.tab==='hot'?15:0) }))
