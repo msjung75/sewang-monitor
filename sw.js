@@ -1,6 +1,6 @@
 // 정적 파일 캐시 (PWA 오프라인 기본 대응)
 // CACHE 버전 bump—대시보드 탭 제대로 노출되도록 핵시 갱신
-const CACHE = 'sewang-pwa-v3-dashboard';
+const CACHE = 'sewang-pwa-v4-compact';
 const FILES = ['./','./index.html','./manifest.json','./icon.svg'];
 
 self.addEventListener('install', e => {
