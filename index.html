@@ -136,6 +136,28 @@
     background: #fde8e8; color: #a83232; padding: 1px 7px; border-radius: 999px;
     font-size: 10.5px; margin-left: 4px; font-weight: 600;
   }
+  /* 대시보드 컴팩트 */
+  .dash-panel { padding: 8px; }
+  .kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 10px; }
+  @media (min-width: 720px) { .kpi-grid { grid-template-columns: repeat(4, 1fr); } }
+  .kpi-card { background:#fff; padding: 8px 10px; border-radius: 8px; border: 1px solid #e7e5df; }
+  .kpi-lbl { font-size: 11px; color: #888; }
+  .kpi-val { font-size: 20px; font-weight: 700; line-height: 1.15; margin-top: 2px; }
+  .chart-grid { display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 10px; }
+  @media (min-width: 720px) { .chart-grid { grid-template-columns: 1fr 1fr; } }
+  .chart-card { background:#fff; padding: 8px 10px; border-radius: 8px; border: 1px solid #e7e5df; }
+  .chart-lbl { font-size: 11px; color: #666; margin-bottom: 4px; }
+  .chart-wrap { position: relative; }
+  .chart-wrap.doughnut-wrap { height: 180px; }
+  .chart-wrap.region-wrap, .chart-wrap.commercial-wrap { height: 200px; }
+  .chart-wrap canvas { max-height: 100%; }
+  .rec-card { background:#fff; padding: 8px 10px; border-radius: 8px; border: 1px solid #e7e5df; }
+  .rec-title { font-size: 12px; font-weight: 600; color: #333; margin-bottom: 6px; }
+  .rec-list .rec-item { padding: 6px 0; border-bottom: 1px solid #f0eee8; font-size: 12px; display:flex; align-items:center; gap:6px; }
+  .rec-list .rec-item:last-child { border-bottom: none; }
+  .rec-item .rec-tag { background:#f5f0e8; color:#333; padding:1px 5px; border-radius:3px; font-size:10px; flex:0 0 auto; }
+  .rec-item .rec-name { font-weight:600; }
+  .rec-item .rec-reg { color:#888; font-size:11px; margin-left:auto; }
 </style>
 </head>
 <body>
@@ -171,22 +193,26 @@
 
 <div class="pane active" id="pane-dashboard">
   <div class="controls">
-    <button class="btn" id="dash-refresh">전체 갱신</button>
-    <span style="color:#888;font-size:12px">모든 탭 합산</span>
+    <button class="btn" id="dash-refresh">갱신</button>
+    <span id="dash-status" style="color:#888;font-size:11px"></span>
   </div>
-  <div class="panel">
-    <div class="kpi-row" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:12px">
-      <div class="kpi" style="background:#fff;padding:12px;border-radius:8px;border:1px solid #e7e5df"><div style="font-size:11px;color:#888">🆕 신규 매장</div><div id="kpi-new" style="font-size:24px;font-weight:700;color:#2e7d32">·</div></div>
-      <div class="kpi" style="background:#fff;padding:12px;border-radius:8px;border:1px solid #e7e5df"><div style="font-size:11px;color:#888">📈 가속 매장</div><div id="kpi-accel" style="font-size:24px;font-weight:700;color:#6a1b9a">·</div></div>
-      <div class="kpi" style="background:#fff;padding:12px;border-radius:8px;border:1px solid #e7e5df"><div style="font-size:11px;color:#888">🏷️ 거래처 매칭</div><div id="kpi-client" style="font-size:24px;font-weight:700;color:#d44a4a">·</div></div>
-      <div class="kpi" style="background:#fff;padding:12px;border-radius:8px;border:1px solid #e7e5df"><div style="font-size:11px;color:#888">⭐ 추적</div><div id="kpi-watch" style="font-size:24px;font-weight:700;color:#333">·</div></div>
+  <div class="panel dash-panel">
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="kpi-lbl">🆕 신규</div><div class="kpi-val" id="kpi-new" style="color:#2e7d32">·</div></div>
+      <div class="kpi-card"><div class="kpi-lbl">📈 가속</div><div class="kpi-val" id="kpi-accel" style="color:#6a1b9a">·</div></div>
+      <div class="kpi-card"><div class="kpi-lbl">🏷️ 거래처</div><div class="kpi-val" id="kpi-client" style="color:#d44a4a">·</div></div>
+      <div class="kpi-card"><div class="kpi-lbl">⭐ 추적</div><div class="kpi-val" id="kpi-watch" style="color:#333">·</div></div>
     </div>
-    <div class="chart-block" style="background:#fff;padding:12px;border-radius:8px;border:1px solid #e7e5df;margin-bottom:10px"><div style="font-size:12px;color:#666;margin-bottom:6px">시도별 노출 매장 수</div><canvas id="chart-region" height="160"></canvas></div>
-    <div class="chart-block" style="background:#fff;padding:12px;border-radius:8px;border:1px solid #e7e5df;margin-bottom:10px"><div style="font-size:12px;color:#666;margin-bottom:6px">탭별 매장 분포</div><canvas id="chart-tab" height="160"></canvas></div>
-    <div class="chart-block" style="background:#fff;padding:12px;border-radius:8px;border:1px solid #e7e5df;margin-bottom:10px"><div style="font-size:12px;color:#666;margin-bottom:6px">거래처 vs 신규영업</div><canvas id="chart-client" height="160"></canvas></div>
-    <div class="chart-block" style="background:#fff;padding:12px;border-radius:8px;border:1px solid #e7e5df;margin-bottom:10px"><div style="font-size:12px;color:#666;margin-bottom:6px">상권별 핫스팟 Top 10</div><canvas id="chart-commercial" height="180"></canvas></div>
-    <div class="rec-block" style="background:#fff;padding:12px;border-radius:8px;border:1px solid #e7e5df"><div style="font-size:13px;color:#333;font-weight:600;margin-bottom:8px">🎯 영업 추천 Top 5 (가속·신규 + 미거래)</div><div id="rec-list"></div></div>
-    <div id="dash-status" style="font-size:11px;color:#888;margin-top:8px"></div>
+    <div class="chart-grid">
+      <div class="chart-card"><div class="chart-lbl">시도별</div><div class="chart-wrap region-wrap"><canvas id="chart-region"></canvas></div></div>
+      <div class="chart-card"><div class="chart-lbl">탭별 분포</div><div class="chart-wrap doughnut-wrap"><canvas id="chart-tab"></canvas></div></div>
+      <div class="chart-card"><div class="chart-lbl">거래처 vs 신규영업</div><div class="chart-wrap doughnut-wrap"><canvas id="chart-client"></canvas></div></div>
+      <div class="chart-card"><div class="chart-lbl">상권 Top 10</div><div class="chart-wrap commercial-wrap"><canvas id="chart-commercial"></canvas></div></div>
+    </div>
+    <div class="rec-card">
+      <div class="rec-title">🎯 영업 추천 Top 5</div>
+      <div id="rec-list" class="rec-list"></div>
+    </div>
   </div>
 </div>
 
@@ -907,7 +933,17 @@
     const ctx = document.getElementById(id);
     if (!ctx) return null;
     if (__charts[id]) { try{ __charts[id].destroy(); }catch(e){} }
-    __charts[id] = new Chart(ctx, { type, data, options: Object.assign({ responsive: true, maintainAspectRatio: false, plugins: { legend: { display: type !== 'bar' } } }, options||{}) });
+    const isDoughnut = type === 'doughnut' || type === 'pie';
+    const baseOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: isDoughnut ? { position: 'right', labels: { boxWidth: 10, font: { size: 10 }, padding: 8 } } : { display: false },
+        tooltip: { titleFont: { size: 10 }, bodyFont: { size: 11 } }
+      }
+    };
+    if (isDoughnut) baseOptions.cutout = '62%';
+    __charts[id] = new Chart(ctx, { type, data, options: Object.assign(baseOptions, options||{}) });
     return __charts[id];
   }
   function collectCards(){
@@ -954,20 +990,20 @@
     document.getElementById('kpi-client').textContent = clientCount;
     document.getElementById('kpi-watch').textContent = watchCount;
     const byRegion = {}; cards.forEach(c => { if (c.region) byRegion[c.region] = (byRegion[c.region]||0)+1; });
-    const regionLabels = Object.keys(byRegion).filter(r => byRegion[r] > 0).sort((a,b)=>byRegion[b]-byRegion[a]).slice(0,10);
-    const regionCanvas = document.getElementById('chart-region');
-    if (regionCanvas) regionCanvas.style.height = Math.max(80, regionLabels.length * 32) + 'px';
-    makeChart('chart-region', 'bar', { labels: regionLabels, datasets: [{ label: '매장 수', data: regionLabels.map(r=>byRegion[r]), backgroundColor: '#3d6033' }] }, { indexAxis: 'y', scales: { x: { beginAtZero: true, ticks: { precision: 0 } }, y: { ticks: { autoSkip: false } } } });
+    const regionLabels = Object.keys(byRegion).filter(r => byRegion[r] > 0).sort((a,b)=>byRegion[b]-byRegion[a]).slice(0,8);
+    const regionWrap = document.querySelector('.region-wrap');
+    if (regionWrap) regionWrap.style.height = Math.max(120, regionLabels.length * 24 + 24) + 'px';
+    makeChart('chart-region', 'bar', { labels: regionLabels, datasets: [{ data: regionLabels.map(r=>byRegion[r]), backgroundColor: '#3d6033', barThickness: 14 }] }, { indexAxis: 'y', scales: { x: { beginAtZero: true, ticks: { precision: 0, font: { size: 10 } } }, y: { ticks: { autoSkip: false, font: { size: 11 } } } } });
     const byTab = {}; cards.forEach(c => { byTab[c.tab] = (byTab[c.tab]||0)+1; });
     const tabLabel = { new: '🆕 신규', hot: '🔥 인기', franchise: '🏪 프차', youtube: '📺 유튜브', place: '📍 플레이스' };
     const tabKeys = Object.keys(byTab);
     makeChart('chart-tab', 'doughnut', { labels: tabKeys.map(k=>tabLabel[k]||k), datasets: [{ data: tabKeys.map(k=>byTab[k]), backgroundColor: ['#2e7d32','#d44a4a','#6a1b9a','#1976d2','#ef6c00'] }] });
     makeChart('chart-client', 'doughnut', { labels: ['거래처','신규영업'], datasets: [{ data: [clientCount, cards.length - clientCount], backgroundColor: ['#d44a4a','#3d6033'] }] });
     const byComm = {}; cards.forEach(c => { const co = extractCommercial(c.title); if (co) byComm[co] = (byComm[co]||0)+1; });
-    const commLabels = Object.keys(byComm).filter(r => byComm[r] > 0).sort((a,b)=>byComm[b]-byComm[a]).slice(0,10);
-    const commCanvas = document.getElementById('chart-commercial');
-    if (commCanvas) commCanvas.style.height = Math.max(80, commLabels.length * 32) + 'px';
-    makeChart('chart-commercial', 'bar', { labels: commLabels, datasets: [{ label: '매장 수', data: commLabels.map(r=>byComm[r]), backgroundColor: '#6a1b9a' }] }, { indexAxis: 'y', scales: { x: { beginAtZero: true, ticks: { precision: 0 } }, y: { ticks: { autoSkip: false } } } });
+    const commLabels = Object.keys(byComm).filter(r => byComm[r] > 0).sort((a,b)=>byComm[b]-byComm[a]).slice(0,8);
+    const commWrap = document.querySelector('.commercial-wrap');
+    if (commWrap) commWrap.style.height = Math.max(120, commLabels.length * 24 + 24) + 'px';
+    makeChart('chart-commercial', 'bar', { labels: commLabels, datasets: [{ data: commLabels.map(r=>byComm[r]), backgroundColor: '#6a1b9a', barThickness: 14 }] }, { indexAxis: 'y', scales: { x: { beginAtZero: true, ticks: { precision: 0, font: { size: 10 } } }, y: { ticks: { autoSkip: false, font: { size: 11 } } } } });
     const recs = cards
       .filter(c => !c.isClient)
       .map(c => ({ ...c, score: (c.category==='B'?100:0) + (c.category==='A'?50:0) + (c.tab==='place'?20:0) + (c.tab==='hot'?15:0) }))
@@ -975,10 +1011,11 @@
       .sort((a,b)=>b.score-a.score).slice(0,5);
     const recList = document.getElementById('rec-list');
     if (recList) {
-      recList.innerHTML = recs.length === 0 ? '<div style="color:#888;font-size:12px">추천 매장 없음</div>' :
+      recList.innerHTML = recs.length === 0 ? '<div style="color:#888;font-size:12px">추천 없음 — 갱신 후 다시 확인</div>' :
         recs.map(r => {
           const tag = r.category==='B' ? '📈 가속' : r.category==='A' ? '🆕 신규' : (tabLabel[r.tab]||r.tab);
-          return '<div style="padding:8px;border-bottom:1px solid #f0eee8;font-size:13px"><span style="background:#f5f0e8;color:#333;padding:2px 6px;border-radius:3px;font-size:11px;margin-right:6px">'+tag+'</span><strong>'+r.title+'</strong><span style="color:#888;margin-left:6px">'+(r.region||'')+'</span></div>';
+          const name = (r.title||'').length > 28 ? (r.title||'').substring(0,28)+'…' : r.title;
+          return '<div class="rec-item"><span class="rec-tag">'+tag+'</span><span class="rec-name">'+name+'</span><span class="rec-reg">'+(r.region||'')+'</span></div>';
         }).join('');
     }
   }
