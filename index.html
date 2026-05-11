@@ -9,6 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="apple-touch-icon" href="icon.svg">
 <link rel="manifest" href="manifest.json">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <title>세왕상사 신규업장 모니터</title>
 <style>
   :root { color-scheme: light; }
@@ -159,7 +160,8 @@
 </details>
 
 <div class="tabs" id="tabs">
-  <div class="tab active" data-tab="new">🆕 신규 <span class="count" id="cnt-new">·</span></div>
+  <div class="tab active" data-tab="dashboard">📊 대시보드</div>
+  <div class="tab" data-tab="new">🆕 신규 <span class="count" id="cnt-new">·</span></div>
   <div class="tab" data-tab="hot">🔥 인기 <span class="count" id="cnt-hot">·</span></div>
   <div class="tab" data-tab="franchise">🏪 프랜차이즈 <span class="count" id="cnt-franchise">·</span></div>
   <div class="tab" data-tab="youtube">📺 유튜브 <span class="count" id="cnt-youtube">·</span></div>
@@ -167,7 +169,28 @@
   <div class="tab" data-tab="watch">⭐ 추적 <span class="count" id="cnt-watch">·</span></div>
 </div>
 
-<div class="pane active" id="pane-new">
+<div class="pane active" id="pane-dashboard">
+  <div class="controls">
+    <button class="btn" id="dash-refresh">전체 갱신</button>
+    <span style="color:#888;font-size:12px">모든 탭 합산</span>
+  </div>
+  <div class="panel">
+    <div class="kpi-row" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:12px">
+      <div class="kpi" style="background:#fff;padding:12px;border-radius:8px;border:1px solid #e7e5df"><div style="font-size:11px;color:#888">🆕 신규 매장</div><div id="kpi-new" style="font-size:24px;font-weight:700;color:#2e7d32">·</div></div>
+      <div class="kpi" style="background:#fff;padding:12px;border-radius:8px;border:1px solid #e7e5df"><div style="font-size:11px;color:#888">📈 가속 매장</div><div id="kpi-accel" style="font-size:24px;font-weight:700;color:#6a1b9a">·</div></div>
+      <div class="kpi" style="background:#fff;padding:12px;border-radius:8px;border:1px solid #e7e5df"><div style="font-size:11px;color:#888">🏷️ 거래처 매칭</div><div id="kpi-client" style="font-size:24px;font-weight:700;color:#d44a4a">·</div></div>
+      <div class="kpi" style="background:#fff;padding:12px;border-radius:8px;border:1px solid #e7e5df"><div style="font-size:11px;color:#888">⭐ 추적</div><div id="kpi-watch" style="font-size:24px;font-weight:700;color:#333">·</div></div>
+    </div>
+    <div class="chart-block" style="background:#fff;padding:12px;border-radius:8px;border:1px solid #e7e5df;margin-bottom:10px"><div style="font-size:12px;color:#666;margin-bottom:6px">시도별 노출 매장 수</div><canvas id="chart-region" height="160"></canvas></div>
+    <div class="chart-block" style="background:#fff;padding:12px;border-radius:8px;border:1px solid #e7e5df;margin-bottom:10px"><div style="font-size:12px;color:#666;margin-bottom:6px">탭별 매장 분포</div><canvas id="chart-tab" height="160"></canvas></div>
+    <div class="chart-block" style="background:#fff;padding:12px;border-radius:8px;border:1px solid #e7e5df;margin-bottom:10px"><div style="font-size:12px;color:#666;margin-bottom:6px">거래처 vs 신규영업</div><canvas id="chart-client" height="160"></canvas></div>
+    <div class="chart-block" style="background:#fff;padding:12px;border-radius:8px;border:1px solid #e7e5df;margin-bottom:10px"><div style="font-size:12px;color:#666;margin-bottom:6px">상권별 핫스팟 Top 10</div><canvas id="chart-commercial" height="180"></canvas></div>
+    <div class="rec-block" style="background:#fff;padding:12px;border-radius:8px;border:1px solid #e7e5df"><div style="font-size:13px;color:#333;font-weight:600;margin-bottom:8px">🎯 영업 추천 Top 5 (가속·신규 + 미거래)</div><div id="rec-list"></div></div>
+    <div id="dash-status" style="font-size:11px;color:#888;margin-top:8px"></div>
+  </div>
+</div>
+
+<div class="pane" id="pane-new">
   <div class="controls">
     <select id="new-region">
       <option value="">전국</option>
@@ -339,6 +362,7 @@
   state.watchList = state.watchList || [];
   state.clients = state.clients || [];
   state.tabFilters = state.tabFilters || {};
+  if (state.includeFranchise === undefined) state.includeFranchise = false;
   function save(){ localStorage.setItem(STATE_KEY, JSON.stringify(state)); }
 
   function stripTags(s){ return (s||'').replace(/<[^>]+>/g,''); }
@@ -373,6 +397,16 @@
     }
     return null;
   }
+  const EXCLUDED_FRANCHISES = ['스타벅스','이디야','메가커피','컴포즈','빽다방','할리스','투썸','폴바셋','커피빈','매머드','더벤티','카페베네','엔젤리너스','파스쿠찌','탐앤탐스','맥도날드','롯데리아','KFC','버거킹','맘스터치','써브웨이','파파이스','노브랜드버거','프랭크버거','파리바게뜨','뚜레쥬르','던킨','크리스피크림','베스킨라빈스','나뚜루','설빙','미스터도넛','김밥천국','김가네','고봉민김밥','죠스떡볶이','신전떡볶이','두끼떡볶이','GS25','이마트24','세븐일레븐','미니스톱','샐러디'];
+  const EXCLUDED_CATS = ['커피','카페','베이커리','분식','김밥','떡볶이','편의점','디저트','도넛','아이스크림','햄버거'];
+  function isExcludedFranchise(text){
+    if(state.includeFranchise) return false;
+    const t = (text||'').toLowerCase();
+    if (EXCLUDED_FRANCHISES.some(f => t.indexOf(f.toLowerCase())!==-1)) return true;
+    if (EXCLUDED_CATS.some(c => t.indexOf(c)!==-1)) return true;
+    return false;
+  }
+
   function applyFilter(tab){
     const f = state.tabFilters[tab]||'all';
     const grid = document.getElementById(
@@ -380,6 +414,8 @@
     );
     if(!grid) return;
     grid.querySelectorAll('.card').forEach(c=>{
+      if (isExcludedFranchise(c.textContent)) { c.style.display='none'; c.dataset.excluded='1'; return; }
+      c.dataset.excluded='';
       const isC=c.classList.contains('client');
       const cat=c.dataset.category||'';
       let show=true;
@@ -792,7 +828,8 @@
         else if(tab==='franchise') loadFranchise();
         else if(tab==='youtube') loadYouTube();
         else if(tab==='place') loadPlace();
-      }
+        else if(tab==='dashboard') loadDashboard();
+      } else if(tab==='dashboard') loadDashboard();
     });
   });
 
@@ -863,8 +900,98 @@
     if(e.key==='Enter'){ addWatch(e.target.value); e.target.value=''; renderWatch(); }
   });
 
+  // ===== 대시보드 =====
+  let __charts = {};
+  function makeChart(id, type, data, options){
+    if (!window.Chart) return null;
+    const ctx = document.getElementById(id);
+    if (!ctx) return null;
+    if (__charts[id]) { try{ __charts[id].destroy(); }catch(e){} }
+    __charts[id] = new Chart(ctx, { type, data, options: Object.assign({ responsive: true, maintainAspectRatio: false, plugins: { legend: { display: type !== 'bar' } } }, options||{}) });
+    return __charts[id];
+  }
+  function collectCards(){
+    const out = [];
+    const sources = [['new','new-grid'],['hot','hot-grid'],['franchise','fr-grid'],['youtube','yt-grid'],['place','place-grid']];
+    sources.forEach(([tab, gridId]) => {
+      const grid = document.getElementById(gridId);
+      if (!grid) return;
+      grid.querySelectorAll('.card').forEach(c => {
+        const text = c.textContent || '';
+        if (isExcludedFranchise(text)) return;
+        const title = (c.querySelector('.title')||{}).textContent || '';
+        const regionBadge = c.querySelector('.badge.region');
+        const region = regionBadge ? regionBadge.textContent.trim() : '';
+        out.push({ tab, title: title.trim(), region, isClient: c.classList.contains('client'), category: c.dataset.category||'', store: c.dataset.store||title.trim() });
+      });
+    });
+    return out;
+  }
+  const DASH_COMMERCIALS = ['홍대','강남','연남','성수','이태원','잠실','익선동','압구정','한남','신사','망원','합정','명동','종로','신촌','건대','청담','서촌','북촌','여의도','판교','분당','일산','수원','광교','평촌','해운대','광안리','서면','전포','남포동','동성로','송도','구월동','둔산','유성','상무지구','강릉','속초','춘천','청주','천안','전주','여수','순천','포항','경주','창원','진주','통영','제주시','서귀포'];
+  function extractCommercial(text){ for (const c of DASH_COMMERCIALS) if (text.indexOf(c) !== -1) return c; return null; }
+  async function loadDashboard(){
+    const status = document.getElementById('dash-status');
+    if (status) status.textContent = '⏳ 데이터 집계 중...';
+    const pending = [];
+    if (!document.querySelector('#new-grid .card') && typeof loadNew === 'function') pending.push(loadNew());
+    if (!document.querySelector('#hot-grid .card') && typeof loadHot === 'function') pending.push(loadHot());
+    if (!document.querySelector('#fr-grid .card') && typeof loadFranchise === 'function') pending.push(loadFranchise());
+    if (!document.querySelector('#yt-grid .card') && typeof loadYouTube === 'function') pending.push(loadYouTube());
+    if (!document.querySelector('#place-grid .card') && typeof loadPlace === 'function') pending.push(loadPlace());
+    await Promise.allSettled(pending);
+    await new Promise(r => setTimeout(r, 2000));
+    renderDashboard();
+    if (status) status.textContent = '✅ ' + new Date().toLocaleString('ko-KR');
+  }
+  function renderDashboard(){
+    const cards = collectCards();
+    const accel = cards.filter(c => c.category === 'B').length;
+    const newCount = cards.filter(c => c.tab === 'new' || c.tab === 'place').length;
+    const clientCount = cards.filter(c => c.isClient).length;
+    const watchCount = (state.watchList || []).length;
+    document.getElementById('kpi-new').textContent = newCount;
+    document.getElementById('kpi-accel').textContent = accel;
+    document.getElementById('kpi-client').textContent = clientCount;
+    document.getElementById('kpi-watch').textContent = watchCount;
+    const byRegion = {}; cards.forEach(c => { if (c.region) byRegion[c.region] = (byRegion[c.region]||0)+1; });
+    const regionLabels = Object.keys(byRegion).sort((a,b)=>byRegion[b]-byRegion[a]).slice(0,10);
+    makeChart('chart-region', 'bar', { labels: regionLabels, datasets: [{ label: '매장 수', data: regionLabels.map(r=>byRegion[r]), backgroundColor: '#3d6033' }] });
+    const byTab = {}; cards.forEach(c => { byTab[c.tab] = (byTab[c.tab]||0)+1; });
+    const tabLabel = { new: '🆕 신규', hot: '🔥 인기', franchise: '🏪 프차', youtube: '📺 유튜브', place: '📍 플레이스' };
+    const tabKeys = Object.keys(byTab);
+    makeChart('chart-tab', 'doughnut', { labels: tabKeys.map(k=>tabLabel[k]||k), datasets: [{ data: tabKeys.map(k=>byTab[k]), backgroundColor: ['#2e7d32','#d44a4a','#6a1b9a','#1976d2','#ef6c00'] }] });
+    makeChart('chart-client', 'doughnut', { labels: ['거래처','신규영업'], datasets: [{ data: [clientCount, cards.length - clientCount], backgroundColor: ['#d44a4a','#3d6033'] }] });
+    const byComm = {}; cards.forEach(c => { const co = extractCommercial(c.title); if (co) byComm[co] = (byComm[co]||0)+1; });
+    const commLabels = Object.keys(byComm).sort((a,b)=>byComm[b]-byComm[a]).slice(0,10);
+    makeChart('chart-commercial', 'bar', { labels: commLabels, datasets: [{ label: '매장 수', data: commLabels.map(r=>byComm[r]), backgroundColor: '#6a1b9a' }] });
+    const recs = cards
+      .filter(c => !c.isClient)
+      .map(c => ({ ...c, score: (c.category==='B'?100:0) + (c.category==='A'?50:0) + (c.tab==='place'?20:0) + (c.tab==='hot'?15:0) }))
+      .filter((c,i,a)=>a.findIndex(x=>x.title===c.title)===i)
+      .sort((a,b)=>b.score-a.score).slice(0,5);
+    const recList = document.getElementById('rec-list');
+    if (recList) {
+      recList.innerHTML = recs.length === 0 ? '<div style="color:#888;font-size:12px">추천 매장 없음</div>' :
+        recs.map(r => {
+          const tag = r.category==='B' ? '📈 가속' : r.category==='A' ? '🆕 신규' : (tabLabel[r.tab]||r.tab);
+          return '<div style="padding:8px;border-bottom:1px solid #f0eee8;font-size:13px"><span style="background:#f5f0e8;color:#333;padding:2px 6px;border-radius:3px;font-size:11px;margin-right:6px">'+tag+'</span><strong>'+r.title+'</strong><span style="color:#888;margin-left:6px">'+(r.region||'')+'</span></div>';
+        }).join('');
+    }
+  }
+  setTimeout(() => {
+    const dashBtn = document.getElementById('dash-refresh');
+    if (dashBtn) dashBtn.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => delete t.dataset.loaded);
+      document.querySelector('.tab[data-tab="new"]').dataset.loaded = '1';
+      loadNew();
+      loadDashboard();
+    });
+  }, 200);
+
   document.getElementById('cnt-watch').textContent = state.watchList.length;
+  document.querySelector('.tab[data-tab="new"]').dataset.loaded = '1';
   loadNew();
+  loadDashboard();
 
   // 서비스 워커 (기본 캐시 - 오프라인 대응)
   if('serviceWorker' in navigator){
