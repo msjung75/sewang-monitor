@@ -163,7 +163,7 @@
 <body>
 
 <header class="top">
-  <h1>세왕상사 · 신규업장 모니터</h1>
+  <h1>세왅상사 · 신규업장 모니터</h1>
   <div class="sub">전국 · 매일 자동 수집</div>
 </header>
 
@@ -402,7 +402,11 @@
   function extractRegion(t){ for(const r of REGIONS){ if((t||'').indexOf(r)!==-1) return r; } return null; }
   function extractStoreName(t){
     t = stripTags(t); const m=t.match(/^\[[^\]]+\]\s*([^\s,|·-]+)/);
-    if(m) return m[1]; return t.split(/[|·,()-]/)[0].trim().slice(0,30);
+    let cand = m ? m[1] : t.split(/[|·,()-]/)[0].trim().slice(0,30);
+    if(!cand || cand.length < 2 || cand.length > 22) return '';
+    if(/^(추천|찐|꼭|진짜|핫플|맛집|분위기|신상|신규|오픈|솔직|후기|리뷰|굄)/.test(cand)) return '';
+    if(/[°✦✩❄🍷🍻🍺]/.test(cand)) return '';
+    return cand;
   }
   function toast(m){ const t=document.getElementById('toast'); t.textContent=m;
     t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1800); }
@@ -465,7 +469,7 @@
       while(idx<targets.length){
         const card=targets[idx++]; const store=card.dataset.store;
         try{
-          const ckey='age_v1:'+store; let info=null;
+          const ckey='store_age_v1:'+store; let info=null;
           try{ const raw=localStorage.getItem(ckey); if(raw){ const o=JSON.parse(raw); if(o&&o.t&&(Date.now()-o.t)<86400000) info=o.d; } }catch(e){}
           if(!info){
             const r=await fetch('./api/age?store='+encodeURIComponent(store));
@@ -815,8 +819,69 @@
         grid.appendChild(card);
       });
       applyFilter('place');
+      enrichPlaceCardsWithAge(maxAge);
     } catch(e) { empty.textContent='오류: '+e.message; empty.style.display='block'; }
     finally{ loading.style.display='none'; }
+  }
+
+  async function enrichPlaceCardsWithAge(maxAgeStr){
+    const grid = document.getElementById('place-grid');
+    if(!grid) return;
+    const maxAge = maxAgeStr ? parseInt(maxAgeStr, 10) : null;
+    const cards = Array.from(grid.querySelectorAll('.card'));
+    const seen = new Set();
+    const targets = cards.filter(c=>{ const s=c.dataset.store; if(!s||seen.has(s)) return false; seen.add(s); return true; });
+    const concurrency = 4; let idx = 0;
+    let hiddenByAge = 0;
+    const worker = async()=>{
+      while(idx < targets.length){
+        const card = targets[idx++]; const store = card.dataset.store;
+        try{
+          const ckey = 'place_age_v1:'+store;
+          let info = null;
+          try{ const raw = localStorage.getItem(ckey); if(raw){ const o = JSON.parse(raw); if(o&&o.t&&(Date.now()-o.t)<86400000) info = o.d; } }catch(e){}
+          if(!info){
+            const r = await fetch('./api/age?store='+encodeURIComponent(store));
+            if(!r.ok) continue;
+            info = await r.json();
+            try{ localStorage.setItem(ckey, JSON.stringify({t:Date.now(), d:info})); }catch(e){}
+          }
+          if(!info || info.age_days === null || info.age_days === undefined) continue;
+          const sel = '.card[data-store="'+store.replace(/"/g,'\\"')+'"]';
+          const sameCards = grid.querySelectorAll(sel);
+          if(maxAge && info.age_days > maxAge){
+            sameCards.forEach(c=>{ c.style.display='none'; c.dataset.agedOut='1'; });
+            hiddenByAge++;
+            continue;
+          }
+          sameCards.forEach(c=>{
+            const meta = c.querySelector('.meta'); if(!meta) return;
+            if(meta.querySelector('.badge.age-marker')) return;
+            const ageBadge = document.createElement('span');
+            ageBadge.className = 'badge age-marker';
+            ageBadge.style.cssText = 'background:#e8f4fd;color:#0366d6;';
+            ageBadge.textContent = '🗓 '+info.age_days+'일';
+            ageBadge.title = '첫 블로그 '+(info.first_blog_date||'?');
+            meta.appendChild(ageBadge);
+            if(info.acceleration && info.acceleration >= 1.5){
+              const accel = document.createElement('span');
+              accel.className = 'badge accel-marker';
+              accel.style.cssText = 'background:#fff3cd;color:#856404;';
+              accel.textContent = '📈 '+info.acceleration+'x';
+              accel.title = '4주 '+info.count_4w+'건 / 12주 평균';
+              meta.appendChild(accel);
+            }
+          });
+        }catch(e){}
+      }
+    };
+    const ws=[]; for(let i=0;i<concurrency;i++) ws.push(worker());
+    await Promise.all(ws);
+    if(hiddenByAge > 0){
+      const visible = grid.querySelectorAll('.card:not([data-aged-out="1"])').length;
+      const cntEl = document.getElementById('cnt-place');
+      if(cntEl) cntEl.textContent = visible;
+    }
   }
 
   async function refreshWatch(){
@@ -963,7 +1028,7 @@
     });
     return out;
   }
-  const DASH_COMMERCIALS = ['홍대','강남','연남','성수','이태원','잠실','익선동','압구정','한남','신사','망원','합정','명동','종로','신촌','건대','청담','서촌','북촌','여의도','판교','분당','일산','수원','광교','평촌','해운대','광안리','서면','전포','남포동','동성로','송도','구월동','둔산','유성','상무지구','강릉','속초','춘천','청주','천안','전주','여수','순천','포항','경주','창원','진주','통영','제주시','서귀포'];
+  const DASH_COMMERCIALS = ['홍대','강남','연남','성수','이태원','잠실','익선동','압구정','한남','신사','망원','합정','명동','종로','신촌','건대','청담','서촌','북촌','여의도','판교','분당','일산','수원','광교','평촌','안산','하남','해운대','광안리','서면','전포','남포동','동성로','송도','구월동','둔산','유성','상무지구','강릉','속초','춘천','청주','천안','전주','여수','순천','포항','경주','창원','진주','통영','제주시','서귀포'];
   function extractCommercial(text){ for (const c of DASH_COMMERCIALS) if (text.indexOf(c) !== -1) return c; return null; }
   async function loadDashboard(){
     const status = document.getElementById('dash-status');
