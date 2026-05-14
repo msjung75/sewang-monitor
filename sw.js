@@ -1,6 +1,6 @@
 // 정적 파일 캐시 (PWA 오프라인 기본 대응)
-// CACHE 버전 bump—대시보드 탭 제대로 노출되도록 핵시 갱신
-const CACHE = 'sewang-pwa-v4-compact';
+// CACHE 버전 bump—대시보드 탭 제대로 노출되도�핵시 갑신
+const CACHE = 'sewang-pwa-v5-categorymap';
 const FILES = ['./','./index.html','./manifest.json','./icon.svg'];
 
 self.addEventListener('install', e => {
@@ -19,7 +19,7 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   // API 요청은 항상 네트워크
   if (e.request.url.includes('/api/')) return;
-  // index.html은 항상 네트워크 우선 (신규 배포 즉시 반영), 실패 시 캐시 fallback
+  // index.html 은 항상 네트워크 우선 (신규배포 즉시 반영), 실펨 시 캐시 fallback
   const url = new URL(e.request.url);
   if (e.request.mode === 'navigate' || url.pathname === '/' || url.pathname.endsWith('/index.html')) {
     e.respondWith(
