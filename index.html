@@ -1107,3 +1107,84 @@
 </script>
 </body>
 </html>
+
+
+<script>
+/* === 인스타 탭 (Apify instagram-scraper 연동) - 독립 추가 블록, 기존 코드 수정 없음 === */
+(function(){
+  function esc(s){return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  var tabs=document.getElementById('tabs');
+  if(!tabs||document.getElementById('pane-instagram'))return;
+  var btn=document.createElement('div');
+  btn.className='tab'; btn.dataset.tab='instagram';
+  btn.innerHTML='📸 인스타 <span class="count" id="cnt-instagram">·</span>';
+  tabs.appendChild(btn);
+  var paneParent=document.getElementById('pane-dashboard').parentNode;
+  var pane=document.createElement('div');
+  pane.className='pane'; pane.id='pane-instagram';
+  pane.innerHTML=''
+    +'<div style="margin-bottom:12px">'
+    +'<input id="insta-tags" type="text" placeholder="해시태그 콤마 구분 (예: 강남이자카야,홍대와인바,와인바)" value="강남이자카야,홍대와인바,와인바" style="width:100%;padding:10px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;box-sizing:border-box">'
+    +'<div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">'
+    +'<button type="button" data-k="강남이자카야,홍대와인바,성수펍,연남위스키바" class="insta-chip">지역+업종</button>'
+    +'<button type="button" data-k="와인바,위스키바,이자카야,호프,펍" class="insta-chip">주류 카테고리</button>'
+    +'<button type="button" data-k="사케추천,하이볼맛집,와인추천,수제맥주" class="insta-chip">주류 브랜드</button>'
+    +'<button type="button" id="insta-refresh" style="margin-left:auto;padding:8px 16px;background:#0f172a;color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer">▶ 인스타 분석</button>'
+    +'</div></div>'
+    +'<div id="insta-status" style="font-size:13px;color:#6b7280;margin-bottom:10px"></div>'
+    +'<h3 style="font-size:15px;margin:14px 0 8px">📈 인스타 핫매장 랭킹</h3>'
+    +'<div id="insta-ranking" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px"></div>'
+    +'<h3 style="font-size:15px;margin:18px 0 8px">🆕 최신 게시물</h3>'
+    +'<div id="insta-feed" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px"></div>';
+  paneParent.appendChild(pane);
+  pane.querySelectorAll('.insta-chip').forEach(function(c){
+    c.style.cssText='background:#eef2ff;color:#4338ca;font-size:12px;padding:6px 10px;border-radius:14px;border:none;cursor:pointer;font-weight:500';
+    c.addEventListener('click',function(){document.getElementById('insta-tags').value=c.dataset.k;});
+  });
+  btn.addEventListener('click',function(){
+    document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active');});
+    document.querySelectorAll('.pane').forEach(function(x){x.classList.remove('active');});
+    btn.classList.add('active'); pane.classList.add('active');
+    if(!btn.dataset.loaded){btn.dataset.loaded='1';loadInstagram();}
+  });
+  document.getElementById('insta-refresh').addEventListener('click',loadInstagram);
+  var loading=false;
+  function loadInstagram(){
+    if(loading)return; loading=true;
+    var tags=document.getElementById('insta-tags').value.trim();
+    var status=document.getElementById('insta-status');
+    var rank=document.getElementById('insta-ranking');
+    var feed=document.getElementById('insta-feed');
+    var cnt=document.getElementById('cnt-instagram');
+    if(!tags){status.textContent='해시태그를 입력하세요.';loading=false;return;}
+    status.textContent='인스타그램 수집 중... (20~40초 소요)'; rank.innerHTML=''; feed.innerHTML='';
+    fetch('./api/instagram?tags='+encodeURIComponent(tags)+'&limit=20')
+      .then(function(r){return r.json();})
+      .then(function(d){
+        if(d.error){status.textContent='오류: '+d.error;return;}
+        status.textContent='✓ 게시물 '+d.count+'건 → 매장 '+d.ranking.length+'곳 집계';
+        if(cnt)cnt.textContent=d.ranking.length;
+        rank.innerHTML=d.ranking.map(function(g,i){
+          return '<div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:12px">'
+            +'<div style="font-size:12px;color:#9d174d;font-weight:700">#'+(i+1)+' · 📸 '+g.posts+'건</div>'
+            +'<div style="font-weight:700;margin:4px 0">'+esc(g.name)+'</div>'
+            +'<div style="font-size:12px;color:#374151">❤ '+(g.likes||0).toLocaleString()+' · 💬 '+(g.comments||0).toLocaleString()+'</div>'
+            +'<a href="https://map.naver.com/p/search/'+encodeURIComponent(g.name)+'" target="_blank" style="display:inline-block;margin-top:8px;font-size:12px;color:#2563eb">네이버에서 찾기 →</a>'
+            +'</div>';
+        }).join('')||'<div style="color:#6b7280">위치태그가 있는 매장이 없습니다.</div>';
+        var fd=d.feed.slice().sort(function(a,b){return new Date(b.timestamp)-new Date(a.timestamp);});
+        feed.innerHTML=fd.map(function(p){
+          return '<div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:12px">'
+            +'<div style="font-weight:700;font-size:13px">@'+esc(p.user)+'</div>'
+            +(p.location?'<div style="font-size:12px;color:#6b7280">📍 '+esc(p.location)+'</div>':'')
+            +'<div style="font-size:12px;color:#374151;margin:6px 0">❤ '+(p.likes||0).toLocaleString()+' · 💬 '+(p.comments||0)+'</div>'
+            +'<div style="font-size:12px;color:#4b5563;line-height:1.4">'+esc(p.caption)+'</div>'
+            +'<a href="'+esc(p.url)+'" target="_blank" style="display:inline-block;margin-top:6px;font-size:12px;color:#2563eb">인스타에서 보기 →</a>'
+            +'</div>';
+        }).join('');
+      })
+      .catch(function(e){status.textContent='오류: '+e.message;})
+      .then(function(){loading=false;});
+  }
+})();
+</script>
