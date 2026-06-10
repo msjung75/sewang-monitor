@@ -1,1190 +1,1217 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#2f3640">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="세왕상사 모니터">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<link rel="apple-touch-icon" href="icon.svg">
-<link rel="manifest" href="manifest.json">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<title>세왕상사 신규업장 모니터</title>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#090d1a">
+<title>세왕 신규업장 모니터</title>
+<link rel="manifest" href="/manifest.json">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
-  :root { color-scheme: light; }
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Noto Sans KR", sans-serif;
-    background: #fafaf7;
-    color: #1f1f1f;
-    font-size: 14px;
-    line-height: 1.5;
-    padding-top: env(safe-area-inset-top);
-    padding-bottom: env(safe-area-inset-bottom);
-  }
-  header.top {
-    padding: 12px 14px 6px;
-    border-bottom: 1px solid #e7e5df;
-    background: #fff;
-    position: sticky; top: 0; z-index: 5;
-  }
-  header.top h1 { margin: 0 0 2px; font-size: 16px; font-weight: 700; }
-  header.top .sub { color: #6b6b6b; font-size: 11.5px; }
-  .tabs {
-    display: flex; gap: 2px; padding: 6px 8px 0; background: #fff;
-    border-bottom: 1px solid #e7e5df; overflow-x: auto;
-    position: sticky; top: 50px; z-index: 4;
-    -webkit-overflow-scrolling: touch;
-  }
-  .tab {
-    padding: 6px 10px; border-radius: 8px 8px 0 0; cursor: pointer;
-    font-size: 12px; color: #555; border: 1px solid transparent;
-    border-bottom: none; white-space: nowrap; user-select: none;
-  }
-  .tab.active { background: #fafaf7; color: #111; border-color: #e7e5df; font-weight: 600; }
-  .tab .count {
-    display: inline-block; min-width: 16px; text-align: center;
-    background: #efece4; color: #6b6b6b; border-radius: 9px;
-    padding: 0 5px; margin-left: 4px; font-size: 10px;
-  }
-  .controls {
-    display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 12px;
-    align-items: center; background: #fff; border-bottom: 1px solid #e7e5df;
-  }
-  .controls label { font-size: 11.5px; color: #555; }
-  .controls select, .controls input {
-    border: 1px solid #d8d5cd; background: #fff; padding: 5px 8px;
-    border-radius: 6px; font-size: 12px; color: #1f1f1f;
-  }
-  .btn {
-    border: 1px solid #2f3640; background: #2f3640; color: #fff;
-    padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 12px;
-  }
-  .btn.ghost { background: #fff; color: #2f3640; }
-  .btn.small { padding: 3px 8px; font-size: 11.5px; }
-  .filter-row {
-    display: flex; gap: 4px; padding: 0 12px 6px; background: #fff;
-    border-bottom: 1px solid #e7e5df; flex-wrap: wrap; align-items: center;
-  }
-  .filter-row .filter-btn {
-    padding: 3px 9px; border-radius: 999px; cursor: pointer;
-    font-size: 11px; border: 1px solid #d8d5cd; background: #fff;
-    color: #555;
-  }
-  .filter-row .filter-btn.active { background: #2f3640; color: #fff; border-color: #2f3640; }
-  .filter-row .filter-btn[data-f="client"].active { background: #d44a4a; border-color: #d44a4a; }
-  .filter-row .filter-btn[data-f="prospect"].active { background: #3d6033; border-color: #3d6033; }
-  .filter-row .filter-btn[data-f="cat-A"].active { background: #2e7d32; border-color: #2e7d32; color:#fff; }
-  .filter-row .filter-btn[data-f="cat-B"].active { background: #6a1b9a; border-color: #6a1b9a; color:#fff; }
-  .badge.cat-a { background: #c8e6c9; color: #1b5e20; border: 1px solid #2e7d32; }
-  .badge.cat-b { background: #e1bee7; color: #4a148c; border: 1px solid #6a1b9a; }
-  .panel { padding: 10px 12px; }
-  .grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
-  .card {
-    background: #fff; border: 1px solid #e7e5df; border-radius: 10px;
-    padding: 10px 12px; display: flex; flex-direction: column; gap: 5px;
-  }
-  .card.client { border-color: #f4c5c5; box-shadow: inset 4px 0 0 #d44a4a; }
-  .card.client .title::before { content: "🏷️ "; color: #d44a4a; }
-  .card .title { font-weight: 600; font-size: 13.5px; line-height: 1.35; color: #111; word-break: keep-all; }
-  .card .title b { color: #b08a36; font-weight: 600; }
-  .card .meta { display: flex; flex-wrap: wrap; gap: 6px; font-size: 11px; color: #6b6b6b; }
-  .card .meta .badge { background: #f4f1e8; color: #6b5a2a; padding: 1px 7px; border-radius: 999px; }
-  .card .meta .badge.region { background: #eaf2e8; color: #3d6033; }
-  .card .meta .badge.cat { background: #ece8f5; color: #4d3f7a; }
-  .card .meta .badge.client { background: #fde8e8; color: #a83232; font-weight: 700; }
-  .card .desc { font-size: 12px; color: #444; line-height: 1.5;
-    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
-  }
-  .card .desc b { color: #b08a36; }
-  .card .actions { display: flex; gap: 6px; margin-top: 4px; align-items: center; justify-content: space-between; }
-  .card .actions a { font-size: 11px; color: #5a4a1a; text-decoration: none; }
-  .card .yt-thumb { width: 100%; aspect-ratio: 16/9; background: #efece4 center/cover no-repeat; border-radius: 6px; margin: -2px 0 4px; }
-  .card .yt-stats { display: flex; gap: 10px; font-size: 11px; color: #555; flex-wrap: wrap; }
-  .card .yt-stats .views { font-weight: 600; color: #b04545; }
-  .empty { text-align: center; padding: 30px 16px; color: #888; font-size: 13px; }
-  .loading {
-    display: inline-block; width: 12px; height: 12px;
-    border: 2px solid #d8d5cd; border-top-color: #2f3640; border-radius: 50%;
-    animation: spin 0.8s linear infinite; vertical-align: middle;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .toast {
-    position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
-    background: #2f3640; color: #fff; padding: 8px 14px; border-radius: 6px;
-    font-size: 12px; z-index: 999; opacity: 0; transition: opacity 0.2s;
-    pointer-events: none;
-  }
-  .toast.show { opacity: 1; }
-  .pane { display: none; }
-  .pane.active { display: block; }
-  details.clients {
-    background: #fff; border: 1px solid #e7e5df; border-radius: 8px;
-    padding: 8px 12px; margin: 8px 12px;
-  }
-  details.clients summary { cursor: pointer; font-weight: 600; font-size: 12.5px; }
-  details.clients .body { padding-top: 8px; }
-  details.clients textarea {
-    width: 100%; min-height: 80px; padding: 6px 8px;
-    border: 1px solid #d8d5cd; border-radius: 6px; font-family: inherit;
-    font-size: 12px; resize: vertical; box-sizing: border-box;
-  }
-  details.clients .row { display: flex; gap: 6px; margin-top: 6px; align-items: center; flex-wrap: wrap; }
-  details.clients .client-count {
-    background: #fde8e8; color: #a83232; padding: 1px 7px; border-radius: 999px;
-    font-size: 10.5px; margin-left: 4px; font-weight: 600;
-  }
-  /* 대시보드 컴팩트 */
-  .dash-panel { padding: 8px; }
-  .kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 10px; }
-  @media (min-width: 720px) { .kpi-grid { grid-template-columns: repeat(4, 1fr); } }
-  .kpi-card { background:#fff; padding: 8px 10px; border-radius: 8px; border: 1px solid #e7e5df; }
-  .kpi-lbl { font-size: 11px; color: #888; }
-  .kpi-val { font-size: 20px; font-weight: 700; line-height: 1.15; margin-top: 2px; }
-  .chart-grid { display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 10px; }
-  @media (min-width: 720px) { .chart-grid { grid-template-columns: 1fr 1fr; } }
-  .chart-card { background:#fff; padding: 8px 10px; border-radius: 8px; border: 1px solid #e7e5df; }
-  .chart-lbl { font-size: 11px; color: #666; margin-bottom: 4px; }
-  .chart-wrap { position: relative; }
-  .chart-wrap.doughnut-wrap { height: 180px; }
-  .chart-wrap.region-wrap, .chart-wrap.commercial-wrap { height: 200px; }
-  .chart-wrap canvas { max-height: 100%; }
-  .rec-card { background:#fff; padding: 8px 10px; border-radius: 8px; border: 1px solid #e7e5df; }
-  .rec-title { font-size: 12px; font-weight: 600; color: #333; margin-bottom: 6px; }
-  .rec-list .rec-item { padding: 6px 0; border-bottom: 1px solid #f0eee8; font-size: 12px; display:flex; align-items:center; gap:6px; }
-  .rec-list .rec-item:last-child { border-bottom: none; }
-  .rec-item .rec-tag { background:#f5f0e8; color:#333; padding:1px 5px; border-radius:3px; font-size:10px; flex:0 0 auto; }
-  .rec-item .rec-name { font-weight:600; }
-  .rec-item .rec-reg { color:#888; font-size:11px; margin-left:auto; }
+:root {
+  --bg: #090d1a;
+  --surface: #111827;
+  --surface2: #1a2035;
+  --border: #1e2d45;
+  --border2: #2a3a55;
+  --c1: #00d4ff;
+  --c2: #7c3aed;
+  --c3: #10b981;
+  --c4: #f59e0b;
+  --c5: #ef4444;
+  --txt: #e2e8f0;
+  --txt2: #94a3b8;
+  --txt3: #4b5e7a;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overscroll-behavior:none}
+body{
+  background:var(--bg);
+  color:var(--txt);
+  font-family:-apple-system,'Noto Sans KR',BlinkMacSystemFont,'Segoe UI',sans-serif;
+  font-size:14px;
+  line-height:1.5;
+}
+
+/* ===== HEADER ===== */
+.hdr{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  background:rgba(9,13,26,0.92);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  padding:10px 16px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.hdr-logo{display:flex;align-items:center;gap:9px}
+.hdr-badge{
+  width:34px;height:34px;
+  background:linear-gradient(135deg,#00d4ff,#7c3aed);
+  border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:17px;
+  box-shadow:0 0 16px rgba(0,212,255,0.3);
+}
+.hdr-title{font-size:16px;font-weight:800;letter-spacing:-0.3px;
+  background:linear-gradient(90deg,#00d4ff,#a78bfa);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hdr-meta{font-size:10px;color:var(--txt3);text-align:right}
+
+/* ===== BOTTOM NAV ===== */
+.bnav{
+  position:fixed;bottom:0;left:0;right:0;z-index:200;
+  background:rgba(9,13,26,0.95);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border-top:1px solid var(--border);
+  display:flex;
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+.bnav-btn{
+  flex:1;padding:8px 2px 6px;
+  background:none;border:none;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  color:var(--txt3);font-size:9px;font-weight:500;
+  transition:color .2s;
+}
+.bnav-btn .ico{font-size:20px;line-height:1}
+.bnav-btn.on{color:var(--c1)}
+.bnav-btn.on .ico{filter:drop-shadow(0 0 6px rgba(0,212,255,0.6))}
+
+/* ===== SCROLL AREA ===== */
+.main{
+  padding-top:58px;
+  padding-bottom:calc(64px + env(safe-area-inset-bottom,0px));
+  min-height:100vh;
+  overflow-y:auto;
+}
+.page{display:none;padding:14px 14px 4px}
+.page.on{display:block}
+
+/* ===== CARDS ===== */
+.card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:14px;
+  margin-bottom:12px;
+}
+.card-title{
+  font-size:11px;font-weight:600;
+  color:var(--txt2);text-transform:uppercase;letter-spacing:.6px;
+  margin-bottom:12px;display:flex;align-items:center;gap:6px;
+}
+
+/* ===== STAT GRID ===== */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.stat{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:14px;padding:14px 14px 12px;
+  position:relative;overflow:hidden;cursor:default;
+}
+.stat::after{
+  content:'';position:absolute;
+  top:0;left:0;right:0;height:2px;
+}
+.stat.c1::after{background:linear-gradient(90deg,var(--c1),#0088ff)}
+.stat.c2::after{background:linear-gradient(90deg,var(--c2),#a855f7)}
+.stat.c3::after{background:linear-gradient(90deg,var(--c3),#34d399)}
+.stat.c4::after{background:linear-gradient(90deg,var(--c4),#fbbf24)}
+.stat-n{font-size:30px;font-weight:900;line-height:1;margin-bottom:3px}
+.stat.c1 .stat-n{color:var(--c1)}
+.stat.c2 .stat-n{color:#a78bfa}
+.stat.c3 .stat-n{color:var(--c3)}
+.stat.c4 .stat-n{color:var(--c4)}
+.stat-l{font-size:11px;color:var(--txt2)}
+.stat-glow{
+  position:absolute;bottom:-20px;right:-10px;
+  width:60px;height:60px;border-radius:50%;
+  opacity:.06;
+}
+.stat.c1 .stat-glow{background:var(--c1)}
+.stat.c2 .stat-glow{background:var(--c2)}
+.stat.c3 .stat-glow{background:var(--c3)}
+.stat.c4 .stat-glow{background:var(--c4)}
+
+/* ===== SEARCH BTN ===== */
+.srch-btn{
+  width:100%;padding:13px 16px;
+  background:linear-gradient(135deg,rgba(0,212,255,.12),rgba(124,58,237,.12));
+  border:1px solid rgba(0,212,255,.25);
+  border-radius:12px;color:var(--c1);
+  font-size:14px;font-weight:700;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  margin-bottom:14px;transition:all .2s;
+}
+.srch-btn:active{transform:scale(.98);opacity:.9}
+
+/* ===== CHIP ROWS ===== */
+.chips{
+  display:flex;gap:7px;overflow-x:auto;
+  padding-bottom:6px;margin-bottom:10px;
+  scrollbar-width:none;
+}
+.chips::-webkit-scrollbar{display:none}
+.chip{
+  flex-shrink:0;padding:5px 12px;border-radius:20px;
+  font-size:11px;font-weight:500;cursor:pointer;
+  border:1px solid var(--border2);color:var(--txt2);
+  background:var(--surface2);transition:all .2s;
+}
+.chip.on{
+  background:rgba(0,212,255,.12);
+  border-color:rgba(0,212,255,.4);
+  color:var(--c1);
+}
+
+/* ===== STORE CARD ===== */
+.sc{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:13px;padding:13px;margin-bottom:10px;
+  cursor:pointer;transition:border-color .2s,transform .1s;
+  position:relative;overflow:hidden;
+}
+.sc:active{transform:scale(.99);border-color:var(--c1)}
+.sc-new-glow{
+  position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--c1),transparent);
+}
+.sc-name{font-size:14px;font-weight:700;margin-bottom:5px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sc-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:7px}
+.tag{
+  font-size:9px;padding:2px 7px;border-radius:20px;font-weight:600;
+  letter-spacing:.2px;
+}
+.t-new{background:rgba(0,212,255,.12);color:var(--c1);border:1px solid rgba(0,212,255,.25)}
+.t-cat{background:rgba(124,58,237,.15);color:#a78bfa;border:1px solid rgba(124,58,237,.25)}
+.t-reg{background:rgba(16,185,129,.12);color:var(--c3);border:1px solid rgba(16,185,129,.2)}
+.t-fr{background:rgba(245,158,11,.12);color:var(--c4);border:1px solid rgba(245,158,11,.2)}
+.sc-desc{
+  font-size:11px;color:var(--txt2);line-height:1.5;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  margin-bottom:8px;
+}
+.sc-foot{display:flex;justify-content:space-between;align-items:center}
+.sc-date{font-size:10px;color:var(--txt3)}
+.sc-track-btn{
+  font-size:10px;padding:4px 10px;
+  background:rgba(0,212,255,.08);
+  border:1px solid rgba(0,212,255,.2);
+  border-radius:6px;color:var(--c1);cursor:pointer;
+  font-weight:600;transition:all .2s;
+}
+.sc-track-btn.tracked{
+  background:rgba(124,58,237,.15);
+  border-color:rgba(124,58,237,.3);color:#a78bfa;
+}
+
+/* ===== CHART ===== */
+.chart-box{position:relative;height:210px;margin-top:4px}
+
+/* ===== RANK TABLE ===== */
+.rtbl{width:100%;border-collapse:collapse;font-size:12px}
+.rtbl th{padding:7px 6px;color:var(--txt3);font-weight:500;
+  border-bottom:1px solid var(--border);font-size:10px;text-align:left}
+.rtbl td{padding:10px 6px;border-bottom:1px solid rgba(30,45,69,.5)}
+.rtbl tr:last-child td{border-bottom:none}
+.rn{font-size:10px;color:var(--txt3);width:18px}
+
+/* ===== PROGRESS BAR ===== */
+.prog-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.prog-label{font-size:11px;color:var(--txt2);width:70px;flex-shrink:0}
+.prog-bar-wrap{flex:1;height:6px;background:var(--surface2);border-radius:3px;overflow:hidden}
+.prog-bar{height:100%;border-radius:3px;transition:width .5s}
+.prog-val{font-size:11px;color:var(--txt);width:28px;text-align:right;flex-shrink:0}
+
+/* ===== TRACKED STATUS ===== */
+.st-badge{font-size:9px;padding:2px 7px;border-radius:10px;font-weight:600}
+.st-new{background:rgba(239,68,68,.12);color:#f87171}
+.st-active{background:rgba(16,185,129,.12);color:var(--c3)}
+.st-pass{background:rgba(75,85,99,.2);color:var(--txt3)}
+
+/* ===== NOTE INPUT ===== */
+.note-input{
+  width:100%;background:var(--surface2);
+  border:1px solid var(--border2);color:var(--txt);
+  border-radius:8px;padding:7px 10px;font-size:11px;
+  margin-top:8px;outline:none;
+}
+.note-input:focus{border-color:var(--c1)}
+.note-input::placeholder{color:var(--txt3)}
+
+/* ===== STATUS SELECT ===== */
+.st-select{
+  background:var(--surface2);border:1px solid var(--border2);
+  color:var(--txt);border-radius:7px;padding:3px 8px;
+  font-size:10px;outline:none;cursor:pointer;
+}
+
+/* ===== EMPTY STATE ===== */
+.empty{
+  text-align:center;padding:44px 20px;color:var(--txt3);
+}
+.empty .eico{font-size:44px;margin-bottom:12px}
+.empty .etxt{font-size:13px;line-height:1.6}
+
+/* ===== SPINNER ===== */
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{
+  display:inline-block;width:15px;height:15px;
+  border:2px solid rgba(0,212,255,.2);
+  border-top-color:var(--c1);
+  border-radius:50%;animation:spin .7s linear infinite;
+  vertical-align:middle;
+}
+
+/* ===== SECTION DIVIDER ===== */
+.sdiv{
+  font-size:11px;font-weight:600;color:var(--txt3);
+  text-transform:uppercase;letter-spacing:.5px;
+  margin:14px 0 8px;padding-left:2px;
+  display:flex;align-items:center;gap:8px;
+}
+.sdiv::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ===== ALERT BANNER ===== */
+.alert-banner{
+  background:linear-gradient(135deg,rgba(0,212,255,.08),rgba(124,58,237,.08));
+  border:1px solid rgba(0,212,255,.2);
+  border-radius:12px;padding:12px 14px;
+  margin-bottom:12px;font-size:12px;
+  display:flex;align-items:center;gap:10px;
+}
+.alert-banner .aico{font-size:20px;flex-shrink:0}
+
+/* ===== BADGE COUNT ===== */
+.bc{
+  min-width:16px;height:16px;padding:0 4px;
+  background:var(--c5);border-radius:8px;
+  font-size:9px;font-weight:700;color:#fff;
+  display:inline-flex;align-items:center;justify-content:center;
+  margin-left:4px;
+}
+
+/* ===== REGION MAP ===== */
+.reg-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
+  margin-top:4px;
+}
+.reg-item{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:10px;padding:10px 8px;text-align:center;
+  cursor:pointer;transition:all .2s;
+}
+.reg-item:active{border-color:var(--c1)}
+.reg-name{font-size:12px;font-weight:600;margin-bottom:3px}
+.reg-cnt{font-size:20px;font-weight:900;color:var(--c1)}
+.reg-sub{font-size:9px;color:var(--txt3);margin-top:1px}
+
+/* ===== PULSE ANIMATION ===== */
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.pulse{animation:pulse 1.5s ease infinite}
 </style>
 </head>
 <body>
 
-<header class="top">
-  <h1>세왅상사 · 신규업장 모니터</h1>
-  <div class="sub">전국 · 매일 자동 수집</div>
-</header>
-
-<details class="clients" id="clients-panel">
-  <summary>🏷️ 거래처 명단 <span class="client-count" id="client-count">0개</span></summary>
-  <div class="body">
-    <textarea id="client-list" placeholder="매장명을 한 줄에 하나씩"></textarea>
-    <div class="row">
-      <button class="btn small" id="client-save">저장</button>
-      <button class="btn small ghost" id="client-clear">초기화</button>
-      <input type="file" id="client-file" accept=".json,.txt" style="display:none">
-      <button class="btn small ghost" id="client-file-btn" style="background:#eaf2e8;color:#3d6033;border-color:#3d6033">📁 파일 임포트</button>
-      <span style="font-size:10.5px;color:#888" id="client-saved"></span>
+<!-- ===== HEADER ===== -->
+<div class="hdr">
+  <div class="hdr-logo">
+    <div class="hdr-badge">🍶</div>
+    <div>
+      <div class="hdr-title">세왕 신규업장 모니터</div>
+      <div style="font-size:9px;color:var(--txt3);margin-top:1px">주류도매 영업지원 시스템</div>
     </div>
   </div>
-</details>
-
-<div class="tabs" id="tabs">
-  <div class="tab active" data-tab="dashboard">📊 대시보드</div>
-  <div class="tab" data-tab="new">🆕 신규 <span class="count" id="cnt-new">·</span></div>
-  <div class="tab" data-tab="hot">🔥 인기 <span class="count" id="cnt-hot">·</span></div>
-  <div class="tab" data-tab="franchise">🏪 프랜차이즈 <span class="count" id="cnt-franchise">·</span></div>
-  <div class="tab" data-tab="youtube">📺 유튜브 <span class="count" id="cnt-youtube">·</span></div>
-  <div class="tab" data-tab="place">📍 네이버플레이스 <span class="count" id="cnt-place">·</span></div>
-  <div class="tab" data-tab="watch">⭐ 추적 <span class="count" id="cnt-watch">·</span></div>
+  <div class="hdr-meta">
+    <div id="hdr-time" style="font-size:11px;color:var(--c1)">--</div>
+    <div id="hdr-date" style="font-size:9px;color:var(--txt3)">--</div>
+  </div>
 </div>
 
-<div class="pane active" id="pane-dashboard">
-  <div class="controls">
-    <button class="btn" id="dash-refresh">갱신</button>
-    <span id="dash-status" style="color:#888;font-size:11px"></span>
-  </div>
-  <div class="panel dash-panel">
-    <div class="kpi-grid">
-      <div class="kpi-card"><div class="kpi-lbl">🆕 신규</div><div class="kpi-val" id="kpi-new" style="color:#2e7d32">·</div></div>
-      <div class="kpi-card"><div class="kpi-lbl">📈 가속</div><div class="kpi-val" id="kpi-accel" style="color:#6a1b9a">·</div></div>
-      <div class="kpi-card"><div class="kpi-lbl">🏷️ 거래처</div><div class="kpi-val" id="kpi-client" style="color:#d44a4a">·</div></div>
-      <div class="kpi-card"><div class="kpi-lbl">⭐ 추적</div><div class="kpi-val" id="kpi-watch" style="color:#333">·</div></div>
+<!-- ===== MAIN ===== -->
+<div class="main">
+
+<!-- ======= PAGE: 대시보드 ======= -->
+<div class="page on" id="pg-home">
+
+  <!-- Stats -->
+  <div class="stat-grid">
+    <div class="stat c1">
+      <div class="stat-n" id="s-new">-</div>
+      <div class="stat-l">오늘 신규오픈</div>
+      <div class="stat-glow"></div>
     </div>
-    <div class="chart-grid">
-      <div class="chart-card"><div class="chart-lbl">시도별</div><div class="chart-wrap region-wrap"><canvas id="chart-region"></canvas></div></div>
-      <div class="chart-card"><div class="chart-lbl">탭별 분포</div><div class="chart-wrap doughnut-wrap"><canvas id="chart-tab"></canvas></div></div>
-      <div class="chart-card"><div class="chart-lbl">거래처 vs 신규영업</div><div class="chart-wrap doughnut-wrap"><canvas id="chart-client"></canvas></div></div>
-      <div class="chart-card"><div class="chart-lbl">상권 Top 10</div><div class="chart-wrap commercial-wrap"><canvas id="chart-commercial"></canvas></div></div>
+    <div class="stat c2">
+      <div class="stat-n" id="s-week">-</div>
+      <div class="stat-l">이번주 수집</div>
+      <div class="stat-glow"></div>
     </div>
-    <div class="rec-card">
-      <div class="rec-title">🎯 영업 추천 Top 5</div>
-      <div id="rec-list" class="rec-list"></div>
+    <div class="stat c3">
+      <div class="stat-n" id="s-fr">-</div>
+      <div class="stat-l">프랜차이즈 확장</div>
+      <div class="stat-glow"></div>
+    </div>
+    <div class="stat c4">
+      <div class="stat-n" id="s-tr">-</div>
+      <div class="stat-l">추적 매장</div>
+      <div class="stat-glow"></div>
+  2 </div>
+  </div>
+
+  <!-- Quick refresh -->
+  <button class="srch-btn" onclick="refreshAll(this)">
+    <span id="home-ico">🔄</span> 전체 업데이트
+  </button>
+
+  <!-- Alert -->
+  <div class="alert-banner" id="home-alert" style="display:none">
+    <span class="aico">🆕</span>
+    <div id="home-alert-txt"></div>
+  </div>
+
+  <!-- 업종 분포 차트 -->
+  <div class="card">
+    <div class="card-title">📊 업종별 분포</div>
+    <div class="chart-box"><canvas id="chart-home-cat"></canvas></div>
+  </div>
+
+  <!-- 지역별 카운트 -->
+  <div class="sdiv">📍 지역별 오픈 현황</div>
+  <div class="reg-grid" id="home-regions"></div>
+
+  <!-- 최신 오픈 -->
+  <div class="sdiv">🆕 최신 신규오픈 매장</div>
+  <div id="home-latest"></div>
+
+</div>
+
+<!-- ======= PAGE: 신규오픈 ======= -->
+<div class="page" id="pg-new">
+
+  <!-- 기간 필터 -->
+  <div class="chips" id="chip-days">
+    <div class="chip on" data-v="7">최근 7일</div>
+    <div class="chip" data-v="14">14일</div>
+    <div class="chip" data-v="30">30일</div>
+    <div class="chip" data-v="90">3개월</div>
+  </div>
+
+  <!-- 지역 필터 -->
+  <div class="chips" id="chip-region">
+    <div class="chip on" data-v="">🇰🇷 전국</div>
+    <div class="chip" data-v="서울">서울</div>
+    <div class="chip" data-v="경기">경기</div>
+    <div class="chip" data-v="부산">부산</div>
+    <div class="chip" data-v="인천">인천</div>
+    <div class="chip" data-v="대구">대구</div>
+    <div class="chip" data-v="광주">광주</div>
+    <div class="chip" data-v="대전">대전</div>
+    <div class="chip" data-v="울산">울산</div>
+    <div class="chip" data-v="강원">강원</div>
+    <div class="chip" data-v="제주">제주</div>
+  </div>
+
+  <!-- 업종 필터 -->
+  <div class="chips" id="chip-cat">
+    <div class="chip on" data-v="">전체 업종</div>
+    <div class="chip" data-v="포차">포차/주점</div>
+    <div class="chip" data-v="이자카야">이자카야</div>
+    <div class="chip" data-v="고기">고기집</div>
+    <div class="chip" data-v="치킨">치킨/호프</div>
+    <div class="chip" data-v="펍">펍/바</div>
+    <div class="chip" data-v="광주">광주</div>
+    <div class="chip" data-v="다이닝">레스토랑</div>
+    <div class="chip" data-v="해산물">해산물</div>
+    <div class="chip" data-v="한식">한식</div>
+  </div>
+
+  <button class="srch-btn" onclick="loadNew(this)">
+    <span id="new-ico">🔍</span> 신규 업장 검색
+  </button>
+
+  <div id="new-count" style="font-size:11px;color:var(--txt3);margin-bottom:10px;text-align:center"></div>
+  <div id="new-list"></div>
+
+</div>
+
+<!-- ======= PAGE: 업종분석 ======= -->
+<div class="page" id="pg-analysis">
+
+  <div class="card">
+    <div class="card-title">🍺 업종 분포</div>
+    <div class="chart-box"><canvas id="chart-cat-doughnut"></canvas></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🗺️ 지역별 오픈 수</div>
+    <div class="chart-box"><canvas id="chart-region-bar"></canvas></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📈 개인 vs 프랜차이즈</div>
+    <div id="analysis-prog"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🏆 주목 신규 매장 TOP 10</div>
+    <table class="rtbl" id="tbl-top">
+      <tr><td colspan="3" style="color:var(--txt3);text-align:center;padding:24px;font-size:12px">신규오픈 탭에서 검색 후 확인 가능</td></tr>
+    </table>
+  </div>
+
+</div>
+
+<!-- ======= PAGE: 프랜차이즈 ======= -->
+<div class="page" id="pg-fr">
+
+  <!-- 기간 필터 -->
+  <div class="chips" id="chip-fr-days">
+    <div class="chip on" data-v="7">최근 7일</div>
+    <div class="chip" data-v="30">30일</div>
+    <div class="chip" data-v="90">3개월</div>
+  </div>
+
+  <button class="srch-btn" onclick="loadFranchise(this)">
+    <span id="fr-ico">📡</span> 프랜차이즈 확장 스캔
+  </button>
+
+  <div class="card">
+    <div class="card-title">📈 확장 중인 브랜드 TOP 15</div>
+    <table class="rtbl" id="tbl-brand">
+      <tr><td colspan="3" style="color:var(--txt3);text-align:center;padding:24px;font-size:12px">스캔 버튼을 눌러주세요</td></tr>
+    </table>
+  </div>
+
+  <div class="sdiv">🏪 신규 출점 매장</div>
+  <div id="fr-list"></div>
+
+</div>
+
+<!-- ======= PAGE: 추적매장 ======= -->
+<div class="page" id="pg-track">
+
+  <div class="card" style="margin-bottom:12px">
+    <div style="font-size:12px;color:var(--txt2);margin-bottom:10px">
+      신규오픈 탭에서 <strong style="color:var(--c1)">+ 추적</strong> 버튼으로 매장을 추가하세요.<br>
+      상태를 업데이트하고 메모를 남길 수 있습니다.
+    </div>
+    <div style="display:flex;gap:8px">
+      <button onclick="exportTracked()" style="flex:1;padding:9px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.25);color:var(--c3);border-radius:9px;font-size:11px;font-weight:600;cursor:pointer">📤 내보내기</button>
+      <button onclick="clearTracked()" style="flex:1;padding:9px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);color:#f87171;border-radius:9px;font-size:11px;font-weight:600;cursor:pointer">🗑️ 전체삭제</button>
     </div>
   </div>
+
+  <!-- 상태별 필터 -->
+  <div class="chips" id="chip-track">
+    <div class="chip on" data-v="">전체</div>
+    <div class="chip" data-v="new">연락필요</div>
+    <div class="chip" data-v="active">거래중</div>
+    <div class="chip" data-v="pass">패스</div>
+  </div>
+
+  <div id="track-list"></div>
+
 </div>
 
-<div class="pane" id="pane-new">
-  <div class="controls">
-    <select id="new-region">
-      <option value="">전국</option>
-      <option>서울</option><option>경기</option><option>인천</option>
-      <option>부산</option><option>대구</option><option>광주</option>
-      <option>대전</option><option>울산</option><option>제주</option>
-      <option>강원</option><option>충북</option><option>충남</option>
-      <option>전북</option><option>전남</option><option>경북</option>
-      <option>경남</option>
-    </select>
-    <select id="new-cat">
-      <option value="술집|이자카야|와인바|호프|펍|위스키바|막걸리|포차|요리주점|한식주점">전체 주류</option>
-      <option value="이자카야|일본식주점">이자카야</option>
-      <option value="와인바|와인">와인바</option>
-      <option value="위스키바|위스키">위스키</option>
-      <option value="호프|펍|크래프트맥주|수제맥주">호프/맥주</option>
-      <option value="포차|요리주점|한식주점">포차</option>
-      <option value="막걸리|전통주">막걸리</option>
-    </select>
-    <button class="btn" id="new-refresh">갱신</button>
-    <span id="new-loading" style="display:none"><span class="loading"></span></span>
-  </div>
-  <div class="filter-row" data-tab="new">
-    <button class="filter-btn active" data-f="all">전체</button>
-    <button class="filter-btn" data-f="client">거래처</button>
-    <button class="filter-btn" data-f="prospect">신규영업</button>
-    <button class="filter-btn" data-f="cat-A">🆕 A 신규</button>
-    <button class="filter-btn" data-f="cat-B">📈 B 가속</button>
-  </div>
-  <div class="panel"><div class="grid" id="new-grid"></div>
-    <div class="empty" id="new-empty" style="display:none">결과가 없습니다.</div>
-  </div>
-</div>
+</div><!-- /main -->
 
-<div class="pane" id="pane-hot">
-  <div class="controls">
-    <select id="hot-region">
-      <option value="">전국</option>
-      <option>서울</option><option>경기</option><option>부산</option>
-      <option>대구</option><option>광주</option><option>대전</option>
-    </select>
-    <input id="hot-keyword" placeholder="핫플 술집" value="" style="flex:1;min-width:120px">
-    <button class="btn" id="hot-refresh">갱신</button>
-    <span id="hot-loading" style="display:none"><span class="loading"></span></span>
-  </div>
-  <div class="filter-row" data-tab="hot">
-    <button class="filter-btn active" data-f="all">전체</button>
-    <button class="filter-btn" data-f="client">거래처</button>
-    <button class="filter-btn" data-f="prospect">신규영업</button>
-  </div>
-  <div class="panel"><div class="grid" id="hot-grid"></div>
-    <div class="empty" id="hot-empty" style="display:none">결과 없음</div>
-  </div>
-</div>
-
-<div class="pane" id="pane-franchise">
-  <div class="controls">
-    <select id="fr-keyword" style="flex:1">
-      <option value="프랜차이즈 가맹점 오픈">전체 가맹점</option>
-      <option value="이자카야 프랜차이즈 가맹">이자카야</option>
-      <option value="포차 프랜차이즈 가맹점">포차</option>
-      <option value="와인바 프랜차이즈 가맹">와인바</option>
-      <option value="수제맥주 펍 프랜차이즈">수제맥주</option>
-      <option value="치킨 프랜차이즈 신규 출점">치킨</option>
-    </select>
-    <button class="btn" id="fr-refresh">갱신</button>
-    <span id="fr-loading" style="display:none"><span class="loading"></span></span>
-  </div>
-  <div class="filter-row" data-tab="franchise">
-    <button class="filter-btn active" data-f="all">전체</button>
-    <button class="filter-btn" data-f="client">거래처</button>
-    <button class="filter-btn" data-f="prospect">신규영업</button>
-  </div>
-  <div class="panel"><div class="grid" id="fr-grid"></div>
-    <div class="empty" id="fr-empty" style="display:none">결과 없음</div>
-  </div>
-</div>
-
-<div class="pane" id="pane-youtube">
-  <div class="controls">
-    <select id="yt-keyword" style="flex:1;min-width:120px">
-      <option value="신규오픈 술집">신규오픈 술집</option>
-      <option value="새로 오픈한 이자카야">신규 이자카야</option>
-      <option value="와인바 신규오픈 추천">와인바 신규</option>
-      <option value="신상 맛집 술집 리뷰">신상 술집</option>
-      <option value="서울 핫플 술집">서울 핫플</option>
-    </select>
-    <select id="yt-order">
-      <option value="date">최신</option>
-      <option value="viewCount">조회수</option>
-    </select>
-    <button class="btn" id="yt-refresh">갱신</button>
-    <span id="yt-loading" style="display:none"><span class="loading"></span></span>
-  </div>
-  <div class="filter-row" data-tab="youtube">
-    <button class="filter-btn active" data-f="all">전체</button>
-    <button class="filter-btn" data-f="client">거래처</button>
-    <button class="filter-btn" data-f="prospect">신규영업</button>
-  </div>
-  <div class="panel"><div class="grid" id="yt-grid"></div>
-    <div class="empty" id="yt-empty" style="display:none">결과 없음 (YouTube API 키 미설정 시 빈 결과)</div>
-  </div>
-</div>
-
-<div class="pane" id="pane-place">
-  <div class="controls">
-    <select id="place-region">
-      <option value="">전국</option>
-      <option>서울</option><option>경기</option><option>인천</option>
-      <option>부산</option><option>대구</option><option>광주</option>
-      <option>대전</option><option>울산</option><option>세종</option>
-      <option>강원</option><option>충북</option><option>충남</option>
-      <option>전북</option><option>전남</option><option>경북</option>
-      <option>경남</option><option>제주</option>
-    </select>
-    <select id="place-commercial">
-      <option value="">상권 자동순회</option>
-    </select>
-    <select id="place-cat">
-      <option value="">전체</option>
-      <option value="맛집">맛집</option>
-      <option value="술집">술집</option>
-      <option value="이자카야">이자카야</option>
-      <option value="와인바">와인바</option>
-      <option value="위스키바">위스키바</option>
-      <option value="호프집">호프집</option>
-      <option value="포차">포차</option>
-      <option value="한식주점">한식주점</option>
-      <option value="요리주점">요리주점</option>
-      <option value="막걸리">막걸리</option>
-    </select>
-    <select id="place-age">
-      <option value="30">최근 30일</option>
-      <option value="60" selected>60일</option>
-      <option value="90">90일</option>
-      <option value="180">6개월</option>
-    </select>
-    <button class="btn" id="place-refresh">갱신</button>
-    <span id="place-loading" style="display:none"><span class="loading"></span></span>
-  </div>
-  <div class="filter-row" data-tab="place">
-    <button class="filter-btn active" data-f="all">전체</button>
-    <button class="filter-btn" data-f="client">거래처</button>
-    <button class="filter-btn" data-f="prospect">신규영업</button>
-  </div>
-  <div class="panel"><div class="grid" id="place-grid"></div>
-    <div class="empty" id="place-empty" style="display:none">결과 없음</div>
-  </div>
-</div>
-
-<div class="pane" id="pane-watch">
-  <div class="controls">
-    <input id="watch-add" placeholder="추적 매장명 직접 추가" style="flex:1;min-width:140px">
-    <button class="btn" id="watch-add-btn">추가</button>
-    <button class="btn ghost" id="watch-refresh">전체 갱신</button>
-    <span id="watch-loading" style="display:none"><span class="loading"></span></span>
-  </div>
-  <div class="panel"><div class="grid" id="watch-grid"></div>
-    <div class="empty" id="watch-empty" style="display:none">추적 매장이 없습니다. 다른 탭의 ⭐버튼으로 추가하거나 위에서 직접 입력하세요.</div>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
+<!-- ===== BOTTOM NAV ===== -->
+<nav class="bnav">
+  <button class="bnav-btn on" data-pg="home">
+    <span class="ico">🏠</span>대시보드
+  </button>
+  <button class="bnav-btn" data-pg="new">
+    <span class="ico">🆕</span>신규오픈
+  </button>
+  <button class="bnav-btn" data-pg="analysis">
+    <span class="ico">🍊</span>업종분석
+  </button>
+  <button class="bnav-btn" data-pg="fr">
+    <span class="ico">🏪</span>프�data-pg="track">
+    <span class="ico">📌</span>추적매장
+  </button>
+</nav>
 
 <script>
-(function(){
-  const STATE_KEY = 'sewang-pwa-v1';
-  const state = JSON.parse(localStorage.getItem(STATE_KEY) || '{}');
-  state.watchList = state.watchList || [];
-  state.clients = state.clients || [];
-  state.tabFilters = state.tabFilters || {};
-  if (state.includeFranchise === undefined) state.includeFranchise = false;
-  function save(){ localStorage.setItem(STATE_KEY, JSON.stringify(state)); }
+// ============================================================
+// STATE
+// ============================================================
+const KEY = 'sewang-v3';
+let ST = { tracked: [], stores: [], lastFetch: null };
+try { const s = localStorage.getItem(KEY); if(s) ST = {...ST, ...JSON.parse(s)}; } catch(e){}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(ST)); }catch(e){} }
 
-  function stripTags(s){ return (s||'').replace(/<[^>]+>/g,''); }
-  function fmtDate(s){
-    if(!s) return '';
-    if(/^\d{8}$/.test(s)) return s.slice(4,6)+'.'+s.slice(6,8);
-    try { const d = new Date(s); if(isNaN(d)) return s;
-      return d.toLocaleDateString('ko-KR',{month:'2-digit',day:'2-digit'}); } catch(e){ return s; }
-  }
-  const REGIONS = ['서울','경기','인천','부산','대구','광주','대전','울산','세종','강원','충북','충남','전북','전남','경북','경남','제주'];
-  function extractRegion(t){ for(const r of REGIONS){ if((t||'').indexOf(r)!==-1) return r; } return null; }
-  function extractStoreName(t){
-    t = stripTags(t); const m=t.match(/^\[[^\]]+\]\s*([^\s,|·-]+)/);
-    let cand = m ? m[1] : t.split(/[|·,()-]/)[0].trim().slice(0,30);
-    if(!cand || cand.length < 2 || cand.length > 22) return '';
-    if(/^(추천|찐|꼭|진짜|핫플|맛집|분위기|신상|신규|오픈|솔직|후기|리뷰|굄)/.test(cand)) return '';
-    if(/[°✦✩❄🍷🍻🍺]/.test(cand)) return '';
-    return cand;
-  }
-  function toast(m){ const t=document.getElementById('toast'); t.textContent=m;
-    t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1800); }
-  function isClient(text){
-    if(!state.clients||state.clients.length===0) return null;
-    const b=(text||'').toLowerCase();
-    for(const c of state.clients){
-      if(!c) continue;
-      if(typeof c === 'object' && c.n){
-        if(b.indexOf(c.n.toLowerCase()) === -1) continue;
-        if(c.n.length < 5){
-          const aMatch = (c.d && b.indexOf(c.d.toLowerCase())!==-1) || (c.g && b.indexOf(c.g.toLowerCase())!==-1) || (c.r && b.indexOf(c.r.toLowerCase())!==-1);
-          if(!aMatch) continue;
-        }
-        return c.d ? c.n+' ('+c.d+')' : c.n;
-      }
-      if(typeof c === 'string' && b.indexOf(c.toLowerCase())!==-1) return c;
-    }
-    return null;
-  }
-  const EXCLUDED_FRANCHISES = ['스타벅스','이디야','메가커피','컴포즈','빽다방','할리스','투썸','폴바셋','커피빈','매머드','더벤티','카페베네','엔젤리너스','파스쿠찌','탐앤탐스','맥도날드','롯데리아','KFC','버거킹','맘스터치','써브웨이','파파이스','노브랜드버거','프랭크버거','파리바게뜨','뚜레쥬르','던킨','크리스피크림','베스킨라빈스','나뚜루','설빙','미스터도넛','김밥천국','김가네','고봉민김밥','죠스떡볶이','신전떡볶이','두끼떡볶이','GS25','이마트24','세븐일레븐','미니스톱','샐러디'];
-  const EXCLUDED_CATS = ['커피','카페','베이커리','분식','김밥','떡볶이','편의점','디저트','도넛','아이스크림','햄버거'];
-  function isExcludedFranchise(text){
-    if(state.includeFranchise) return false;
-    const t = (text||'').toLowerCase();
-    if (EXCLUDED_FRANCHISES.some(f => t.indexOf(f.toLowerCase())!==-1)) return true;
-    if (EXCLUDED_CATS.some(c => t.indexOf(c)!==-1)) return true;
-    return false;
-  }
+// ============================================================
+// CATEGORY & REGION DEFS
+// ============================================================
+const CATS = [
+  {id:'pocha',    lb:'포차/주점',   kw:['포차','포장마차','이자카야','주점','술집','야키토리','꼬치','닭꼬치','오뎅','선술집','이자','이자카']},
+  {id:'meat',     lb:'고기집',      kw:['고기','삼겹살','갈비','소고기','돼지','오겹살','흑돼지','양꼬치','스테이크','정육','한우','뒷고기']},
+  {id:'chicken',  lb:'치킨/호프',   kw:['치킨','호프','맥주','통닭','프라이드','양념치킨','닭강정','비어','beer']},
+  {id:'pub',      lb:'펍/바/와인',  kw:['펍','바 ','와인바','위스키바','칵테일바','브루어리','루프탑바','craft']},
+  {id:'dining',   lb:'레스토랑',    kw:['레스토랑','다이닝','비스트로','이탈리안','파스타','피자','프렌치','양식','파인다이닝','오마카세']},
+  {id:'korean',   lb:'한식/백반',   kw:['한식','백반','가정식','찌개','국밥','해장','설렁탕','순대','족발','보쌈','된장','청국장']},
+  {id:'seafood',  lb:'해산물/횟집', kw:['회','횟집','수산','해산물','해물','낙지','오징어','꼬막','굴','조개','생선']},
+  {id:'other',    lb:'기타',        kw:[]},
+];
 
-  function applyFilter(tab){
-    const f = state.tabFilters[tab]||'all';
-    const grid = document.getElementById(
-      tab==='new'?'new-grid':tab==='hot'?'hot-grid':tab==='franchise'?'fr-grid':tab==='youtube'?'yt-grid':tab==='place'?'place-grid':null
-    );
-    if(!grid) return;
-    grid.querySelectorAll('.card').forEach(c=>{
-      if (isExcludedFranchise(c.textContent)) { c.style.display='none'; c.dataset.excluded='1'; return; }
-      c.dataset.excluded='';
-      const isC=c.classList.contains('client');
-      const cat=c.dataset.category||'';
-      let show=true;
-      if(f==='client') show=isC;
-      else if(f==='prospect') show=!isC;
-      else if(f==='cat-A') show=cat==='A';
-      else if(f==='cat-B') show=cat==='B';
-      c.style.display=show?'':'none';
-    });
-  }
+const OPEN_KW = ['신규오픈','새로오픈','오픈했어요','오픈했습니다','오픈이에요','새로생긴','새로 생긴',
+  '드디어오픈','그랜드오픈','그랜드 오픈','프리오픈','오픈 기념','오픈 소식','오픈했다','첫날','첫 영업'];
 
-  // 카테고리 분류 (A 신규/B 가속/C 안정) — 매장당 /api/age 호출 + localStorage 캐시 24h
-  async function enrichNewCardsWithCategory(){
-    const grid=document.getElementById('new-grid');
-    if(!grid) return;
-    const cards=Array.from(grid.querySelectorAll('.card'));
-    const seen=new Set();
-    const targets=cards.filter(c=>{ const s=c.dataset.store; if(!s||seen.has(s)) return false; seen.add(s); return true; });
-    const concurrency=4; let idx=0;
-    const worker=async()=>{
-      while(idx<targets.length){
-        const card=targets[idx++]; const store=card.dataset.store;
-        try{
-          const ckey='store_age_v1:'+store; let info=null;
-          try{ const raw=localStorage.getItem(ckey); if(raw){ const o=JSON.parse(raw); if(o&&o.t&&(Date.now()-o.t)<86400000) info=o.d; } }catch(e){}
-          if(!info){
-            const r=await fetch('./api/age?store='+encodeURIComponent(store));
-            if(!r.ok) continue;
-            info=await r.json();
-            try{ localStorage.setItem(ckey,JSON.stringify({t:Date.now(),d:info})); }catch(e){}
-          }
-          if(!info||!info.category) continue;
-          grid.querySelectorAll('.card[data-store="'+store.replace(/"/g,'\\"')+'"]').forEach(c=>{
-            c.dataset.category=info.category;
-            if(c.querySelector('.badge.cat-marker')) return;
-            const meta=c.querySelector('.meta'); if(!meta) return;
-            const span=document.createElement('span');
-            if(info.category==='A'){ span.className='badge cat-a cat-marker'; span.textContent='🆕 신규'; span.title='등록 '+info.age_days+'일'; }
-            else if(info.category==='B'){ span.className='badge cat-b cat-marker'; span.textContent='📈 가속 '+info.acceleration+'x'; span.title=info.age_days+'일·4주 '+info.count_4w+'건'; }
-            else return;
-            meta.insertBefore(span, meta.firstChild);
-          });
-          applyFilter('new');
-        }catch(e){}
-      }
-    };
-    const ws=[]; for(let i=0;i<concurrency;i++) ws.push(worker());
-    await Promise.all(ws);
-  }
+const FR_BRANDS = ['교촌','비비큐','bhc','굽네','푸라닭','노랑통닭','페리카나','호식이','60계','네네치킨',
+  '맘스터치','롯데리아','맥도날드','버거킹','kfc','아웃백','더플레이스','빕스','애슐리','서가앤쿡',
+  '한솥도시락','김밥천국','본죽','설빙','배스킨','뚜레쥬르','파리바게뜨','스타벅스','컴포즈','메가커피',
+  '이디야','할리스','투썸','공차','샐러디','써브웨이','도미노','피자헛','미스터피자',
+  '한신포차','봉구스','육쌈냉면','청년다방','고기대장','이삭토스트','와라와라'];
 
-  // API 호출 (Vercel 서버리스 프록시 경유)
-  async function apiBlog(query, sort='date', display=10){
-    const r = await fetch(`./api/blog?query=${encodeURIComponent(query)}&sort=${sort}&display=${display}`);
-    if(!r.ok) throw new Error('네이버 블로그 API 오류 ('+r.status+')');
-    return r.json();
-  }
-  async function apiNews(query, sort='date', display=10){
-    const r = await fetch(`./api/news?query=${encodeURIComponent(query)}&sort=${sort}&display=${display}`);
-    if(!r.ok) throw new Error('뉴스 API 오류');
-    return r.json();
-  }
-  async function apiCafe(query, sort='date', display=10){
-    const r = await fetch(`./api/cafe?query=${encodeURIComponent(query)}&sort=${sort}&display=${display}`);
-    if(!r.ok) throw new Error('카페 API 오류');
-    return r.json();
-  }
-  async function apiPlace(query, sort='comment', display=5){
-    const r = await fetch(`./api/local?query=${encodeURIComponent(query)}&sort=${sort}&display=${display}`);
-    if(!r.ok) throw new Error('네이버 지역 API 오류');
-    return r.json();
-  }
-  async function apiYouTube(query, order='date', max_results=12){
-    const r = await fetch(`./api/youtube?query=${encodeURIComponent(query)}&order=${order}&max_results=${max_results}`);
-    if(!r.ok) throw new Error('유튜브 API 오류');
-    return r.json();
-  }
+const FR_SIGNAL = ['가맹점','직영점','신규출점','n호점','호점','분점','창업','가맹','체인'];
 
-  function renderCard(item, opts={}){
-    const title = stripTags(item.title||'');
-    const desc = stripTags(item.description||'');
-    const link = item.link || item.originallink || '#';
-    const date = fmtDate(item.postdate || item.pubDate || '');
-    const region = extractRegion(title+' '+desc);
-    const storeName = opts.storeName || extractStoreName(title);
-    const source = opts.source || (item.bloggername?'블로그':item.pubDate?'뉴스':'');
-    const blob = title+' '+desc;
-    const cm = isClient(blob);
-    const card = document.createElement('div'); card.className='card'+(cm?' client':''); card.dataset.store=storeName;
-    const titleHtml = (item.title||'').replace(/<\/?b>/g,'<b>') || title;
-    card.innerHTML = `
-      <div class="title">${titleHtml}</div>
-      <div class="meta">
-        ${cm?`<span class="badge client">거래중·${cm}</span>`:''}
-        ${region?`<span class="badge region">${region}</span>`:''}
-        ${opts.cat?`<span class="badge cat">${opts.cat}</span>`:''}
-        ${date?`<span>📅 ${date}</span>`:''}
-        ${source?`<span>${source}</span>`:''}
-      </div>
-      <div class="desc">${(item.description||'').replace(/<\/?b>/g,'<b>')}</div>
-      <div class="actions">
-        <a href="${link}" target="_blank" rel="noopener">원문 ↗</a>
-        <a href="https://map.naver.com/p/search/${encodeURIComponent(storeName)}" target="_blank" rel="noopener" style="color:#3d6033">📍 플레이스</a>
-        <button class="btn small ghost" data-store="${storeName}">⭐ 추적</button>
-      </div>`;
-    card.querySelector('button').addEventListener('click',e=>addWatch(e.currentTarget.dataset.store));
-    return card;
-  }
+const REGIONS = ['서울','경기','인천','부산','대구','광주','대전','울산','세종','강원',
+  '충북','충남','전북','전남','경북','경남','제주'];
 
-  function fmtViews(n){ n=Number(n)||0;
-    if(n>=10000) return (n/10000).toFixed(n>=100000?0:1)+'만';
-    if(n>=1000) return (n/1000).toFixed(1)+'천';
-    return n+''; }
-  function ytCard(v){
-    const id = v.videoId||'';
-    const title = stripTags(v.title||'');
-    const desc = stripTags(v.description||'');
-    const url = id?`https://www.youtube.com/watch?v=${id}`:'#';
-    const thumb = v.thumbnail || (id?`https://i.ytimg.com/vi/${id}/mqdefault.jpg`:'');
-    const region = extractRegion(title+' '+desc);
-    const cm = isClient(title+' '+desc);
-    const card = document.createElement('div'); card.className='card'+(cm?' client':'');
-    card.innerHTML = `
-      ${thumb?`<a href="${url}" target="_blank" rel="noopener"><div class="yt-thumb" style="background-image:url('${thumb}')"></div></a>`:''}
-      <div class="title">${title}</div>
-      <div class="meta">
-        ${cm?`<span class="badge client">거래중·${cm}</span>`:''}
-        ${region?`<span class="badge region">${region}</span>`:''}
-        <span class="badge cat">📺 YT</span>
-        ${v.publishedAt?`<span>📅 ${fmtDate(v.publishedAt)}</span>`:''}
-      </div>
-      <div class="yt-stats">
-        ${v.viewCount?`<span class="views">▶ ${fmtViews(v.viewCount)}</span>`:''}
-        ${v.likeCount?`<span>👍 ${fmtViews(v.likeCount)}</span>`:''}
-        ${v.channelTitle?`<span>· ${v.channelTitle}</span>`:''}
-      </div>
-      <div class="desc">${desc.slice(0,150)}</div>
-      <div class="actions">
-        <a href="${url}" target="_blank" rel="noopener">영상 ↗</a>
-        <a href="https://map.naver.com/p/search/${encodeURIComponent(extractStoreName(title))}" target="_blank" rel="noopener" style="color:#3d6033">📍 플레이스</a>
-        <button class="btn small ghost" data-store="${extractStoreName(title)}">⭐ 추적</button>
-      </div>`;
-    card.querySelector('button').addEventListener('click',e=>addWatch(e.currentTarget.dataset.store));
-    return card;
-  }
+const SEOUL_AREAS = ['강남','강북','강서','강동','마포','홍대','이태원','신촌','건대','합정',
+  '성수','왕십리','압구정','청담','신림','구로','종로','명동'];
 
-  // 추적 매장
-  function addWatch(name){
-    name=(name||'').trim(); if(!name) return;
-    if(state.watchList.find(w=>w.name===name)){ toast('이미 추적: '+name); return; }
-    state.watchList.push({name,addedAt:new Date().toISOString()}); save();
-    document.getElementById('cnt-watch').textContent = state.watchList.length;
-    toast('⭐ '+name);
+function classifyCat(txt){
+  const t = txt.toLowerCase();
+  for(const c of CATS.slice(0,-1)){
+    if(c.kw.some(k=>t.includes(k))) return c;
   }
-  function rmWatch(name){
-    state.watchList = state.watchList.filter(w=>w.name!==name); save();
-    document.getElementById('cnt-watch').textContent = state.watchList.length;
-    renderWatch();
-  }
-  function renderWatch(){
-    const grid = document.getElementById('watch-grid');
-    const empty = document.getElementById('watch-empty');
-    grid.innerHTML='';
-    if(state.watchList.length===0){ empty.style.display='block'; return; }
-    empty.style.display='none';
-    state.watchList.forEach(w=>{
-      const c = document.createElement('div'); c.className='card';
-      const isC = isClient(w.name);
-      if(isC) c.classList.add('client');
-      c.innerHTML = `
-        <div class="title">⭐ ${w.name}</div>
-        <div class="meta">
-          ${isC?`<span class="badge client">거래중</span>`:''}
-          <span class="badge">추적 ${fmtDate(w.addedAt.slice(0,10).replace(/-/g,''))}</span>
-          ${w.lastCheck?`<span>· 확인 ${fmtDate(w.lastCheck.slice(0,10).replace(/-/g,''))}</span>`:''}
-          ${w.recentCount!=null?`<span>· 언급 ${w.recentCount}건</span>`:''}
-        </div>
-        <div class="desc">${w.lastSnippet||'갱신 버튼을 눌러 최근 동향 수집'}</div>
-        <div class="actions">
-          <a href="https://search.naver.com/search.naver?query=${encodeURIComponent(w.name)}" target="_blank" rel="noopener">네이버 ↗</a>
-          <button class="btn small ghost" data-rm="${w.name}">🗑 해제</button>
-        </div>`;
-      c.querySelector('[data-rm]').addEventListener('click',()=>rmWatch(w.name));
-      grid.appendChild(c);
-    });
-  }
+  return CATS[CATS.length-1];
+}
+function extractRegion(txt){
+  for(const r of REGIONS) if(txt.includes(r)) return r;
+  return '기타';
+}
+function extractSubArea(txt){
+  for(const a of SEOUL_AREAS) if(txt.includes(a)) return a;
+  return '';
+}
+function isNewOpen(txt){
+  const t = txt.toLowerCase();
+  return OPEN_KW.some(k=>t.includes(k.toLowerCase()));
+}
+function isFranchise(txt){
+  const t = txt.toLowerCase();
+  if(FR_BRANDS.some(b=>t.includes(b))) return true;
+  if(FR_SIGNAL.some(s=>t.includes(s))) return true;
+  return false;
+}
+function daysAgo(dateStr){
+  if(!dateStr) return 999;
+  try{
+    let d = dateStr;
+    if(d.length===8) d=`${d.slice(0,4)}-${d.slice(4,6)}-${d.slice(6,8)}`;
+    return Math.floor((Date.now()-new Date(d))/(864e5));
+  }catch(e){return 999;}
+}
+function fmtDate(dateStr){
+  const n=daysAgo(dateStr);
+  if(n===0) return '오늘';
+  if(n===1) return '어제';
+  if(n<7) return `${n}일 전`;
+  if(n<14) return '1주 전';
+  if(n<30) return `${Math.floor(n/7)}주 전`;
+  return `${Math.floor(n/30)}개월 전`;
+}
 
-  async function loadNew(){
-    const region=document.getElementById('new-region').value;
-    const cats = document.getElementById('new-cat').value.split('|');
-    const grid=document.getElementById('new-grid'), empty=document.getElementById('new-empty'), loading=document.getElementById('new-loading');
-    grid.innerHTML=''; empty.style.display='none'; loading.style.display='inline';
-    const queries = cats.slice(0,3).map(c=>`${region?region+' ':''}신규오픈 ${c}`);
-    queries.push(`${region?region+' ':''}새로오픈 ${cats[0]}`);
-    const seen=new Set(); const all=[];
-    try{
-      const rs = await Promise.all(queries.map(q=>apiBlog(q,'date',8)));
-      rs.forEach((r,i)=>{
-        (r.items||[]).forEach(it=>{
-          const k=(it.link||'')+'|'+(it.title||'').slice(0,30);
-          if(seen.has(k)) return; seen.add(k);
-          const blob=(it.title+' '+it.description).toLowerCase();
-          if(!/신규.?오픈|새로.?오픈|new.?open|grand.?open|이번에.?오픈|오픈했/i.test(blob)) return;
-          if(!cats.some(c=>blob.indexOf(c.toLowerCase())!==-1)) return;
-          if(region && (it.title+' '+it.description).indexOf(region)===-1) return;
-          all.push({...it,_cat:cats[i]||cats[0]});
-        });
-      });
-      all.sort((a,b)=>(b.postdate||'').localeCompare(a.postdate||''));
-      const top = all.slice(0,30);
-      document.getElementById('cnt-new').textContent = top.length;
-      if(top.length===0) empty.style.display='block';
-      else top.forEach(it=>grid.appendChild(renderCard(it,{cat:it._cat})));
-      applyFilter('new');
-      enrichNewCardsWithCategory();
-    }catch(e){ empty.textContent='오류: '+e.message; empty.style.display='block'; }
-    finally{ loading.style.display='none'; }
-  }
+// ============================================================
+// API
+// ============================================================
+async function apiBlog(q,n=20,sort='date'){
+  try{
+    const r=await fetch(`/api/blog?query=${encodeURIComponent(q)}&display=${n}&sort=${sort}`);
+    const d=await r.json(); return d.items||[];
+  }catch(e){return [];}
+}
+async function apiNews(q,n=20){
+  try{
+    const r=await fetch(`/api/news?query=${encodeURIComponent(q)}&display=${n}`);
+    const d=await r.json(); return d.items||[];
+  }catch(e){return [];}
+}
+async function apiLocal(q,n=5){
+  try{
+    const r=await fetch(`/api/local?query=${encodeURIComponent(q)}&display=${n}`);
+    const d=await r.json();
+    return (d.items||[]).map(i=>({
+      ...i, isLocal:true,
+      title:i.title.replace(/<[^>]+>/g,''),
+      description:i.category||i.roadAddress||''
+    }));
+  }catch(e){return [];}
+}
 
-  async function loadHot(){
-    const region=document.getElementById('hot-region').value;
-    const kw = document.getElementById('hot-keyword').value.trim()||'핫플 술집';
-    const grid=document.getElementById('hot-grid'), empty=document.getElementById('hot-empty'), loading=document.getElementById('hot-loading');
-    grid.innerHTML=''; empty.style.display='none'; loading.style.display='inline';
-    try{
-      const [b1,b2,c1] = await Promise.all([
-        apiBlog(`${region?region+' ':''}${kw} 리뷰 많은`,'date',8),
-        apiBlog(`${region?region+' ':''}${kw} 평점 좋은 신규`,'date',8),
-        apiCafe(`${region?region+' ':''}${kw} 웨이팅`,'date',6),
-      ]);
-      const seen=new Set(); const all=[];
-      [b1,b2,c1].forEach(r=>{
-        (r.items||[]).forEach(it=>{
-          const k=(it.link||'')+'|'+(it.title||'').slice(0,30);
-          if(seen.has(k)) return; seen.add(k);
-          if(region && (it.title+' '+it.description).indexOf(region)===-1) return;
-          all.push(it);
-        });
-      });
-      all.sort((a,b)=>(b.postdate||'').localeCompare(a.postdate||''));
-      const top=all.slice(0,24);
-      document.getElementById('cnt-hot').textContent=top.length;
-      if(top.length===0) empty.style.display='block';
-      else top.forEach(it=>grid.appendChild(renderCard(it,{cat:'인기'})));
-      applyFilter('hot');
-    }catch(e){ empty.textContent='오류: '+e.message; empty.style.display='block'; }
-    finally{ loading.style.display='none'; }
-  }
-
-  async function loadFranchise(){
-    const kw=document.getElementById('fr-keyword').value;
-    const grid=document.getElementById('fr-grid'), empty=document.getElementById('fr-empty'), loading=document.getElementById('fr-loading');
-    grid.innerHTML=''; empty.style.display='none'; loading.style.display='inline';
-    try{
-      const [n1,n2] = await Promise.all([apiNews(kw,'date',12),apiNews(kw+' 확장','date',8)]);
-      const seen=new Set(); const all=[];
-      [n1,n2].forEach(r=>{
-        (r.items||[]).forEach(it=>{
-          const k=(it.originallink||it.link||'')+'|'+(it.title||'').slice(0,30);
-          if(seen.has(k)) return; seen.add(k);
-          const blob=(it.title+' '+it.description).toLowerCase();
-          if(!/오픈|출점|가맹|매장.?확대|점포.?확대|신규.?매장|확장|입점|런칭|개점/i.test(blob)) return;
-          all.push(it);
-        });
-      });
-      all.sort((a,b)=>new Date(b.pubDate||0)-new Date(a.pubDate||0));
-      const top=all.slice(0,20);
-      document.getElementById('cnt-franchise').textContent=top.length;
-      if(top.length===0) empty.style.display='block';
-      else top.forEach(it=>grid.appendChild(renderCard(it,{cat:'프랜차이즈',source:'뉴스'})));
-      applyFilter('franchise');
-    }catch(e){ empty.textContent='오류: '+e.message; empty.style.display='block'; }
-    finally{ loading.style.display='none'; }
-  }
-
-  async function loadYouTube(){
-    const kw=document.getElementById('yt-keyword').value;
-    const order=document.getElementById('yt-order').value;
-    const grid=document.getElementById('yt-grid'), empty=document.getElementById('yt-empty'), loading=document.getElementById('yt-loading');
-    grid.innerHTML=''; empty.style.display='none'; loading.style.display='inline';
-    try{
-      const r = await apiYouTube(kw,order,15);
-      const items = r.items||[];
-      document.getElementById('cnt-youtube').textContent=items.length;
-      if(items.length===0){ empty.style.display='block'; }
-      else items.forEach(v=>grid.appendChild(ytCard(v)));
-      applyFilter('youtube');
-    }catch(e){ empty.textContent='오류: '+e.message; empty.style.display='block'; }
-    finally{ loading.style.display='none'; }
-  }
-
-  
-    // 상권 매핑 (시도 → 상권 리스트)
-  const PLACE_COMMERCIALS = {
-    '서울': ['홍대','강남','연남','성수','이태원','잠실','익선동','압구정','한남','신사','망원','합정','명동','종로','신촌','건대','청담','서촌','북촌','여의도'],
-    '경기': ['판교','분당','일산','수원','광교','평촌','안산','하남'],
-    '부산': ['해운대','광안리','서면','전포','남포동'],
-    '대구': ['동성로','중구','수성'],
-    '인천': ['송도','구월동'],
-    '대전': ['둔산','유성'],
-    '광주': ['상무지구','충장로'],
-    '울산': ['삼산','성남동'],
-    '강원': ['강릉','속초','춘천'],
-    '충북': ['청주'],
-    '충남': ['천안','아산'],
-    '전북': ['전주'],
-    '전남': ['여수','순천'],
-    '경북': ['포항','경주'],
-    '경남': ['창원','진주','통영','거제'],
-    '제주': ['제주시','서귀포']
+// ============================================================
+// PARSE STORE
+// ============================================================
+function parseStore(item, src){
+  const raw=(item.title||'')+' '+(item.description||'');
+  const txt=raw.replace(/<[^>]+>/g,'');
+  const cat=classifyCat(txt);
+  const region=extractRegion(txt);
+  const sub=extractSubArea(txt);
+  const fr=isFranchise(txt);
+  const isNew=isNewOpen(txt);
+  let date=item.postdate||item.pubDate||'';
+  if(date&&date.includes('T')) date=date.split('T')[0];
+  if(date&&date.length===8) date=`${date.slice(0,4)}-${date.slice(4,6)}-${date.slice(6,8)}`;
+  const name=(item.title||'').replace(/<[^>]+>/g,'').trim().slice(0,25);
+  return {
+    id: item.link||name+date,
+    name, txt,
+    desc:(item.description||'').replace(/<[^>]+>/g,'').slice(0,120),
+    cat:cat.id, catLb:cat.lb,
+    region, sub,
+    fr, isNew, date,
+    link:item.link||'',
+    src,
   };
-  function populatePlaceCommercials(){
-    const region = document.getElementById('place-region').value;
-    const sel = document.getElementById('place-commercial');
-    if (!sel) return;
-    const cur = sel.value;
-    sel.innerHTML = '<option value="">상권 자동순회</option>' + (PLACE_COMMERCIALS[region]||[]).map(c => `<option>${c}</option>`).join('');
-    if ([...sel.options].some(o => o.value === cur)) sel.value = cur;
-  }
+}
 
-  async function loadPlace(){
-    const region = document.getElementById('place-region').value || '서울';
-    const commercial = document.getElementById('place-commercial')?.value || '';
-    const cat = document.getElementById('place-cat').value;
-    const maxAge = document.getElementById('place-age')?.value || '60';
-    const grid = document.getElementById('place-grid'), empty = document.getElementById('place-empty'), loading = document.getElementById('place-loading');
-    grid.innerHTML=''; empty.style.display='none'; loading.style.display='inline';
-    try {
-      const params = new URLSearchParams();
-      params.set('region', region);
-      if (commercial) params.set('commercial', commercial);
-      if (cat) params.set('cat', cat);
-      params.set('maxAge', maxAge);
-      params.set('display', '30');
-      const r = await fetch('./api/place_new?' + params.toString());
-      if (!r.ok) throw new Error('place_new ' + r.status);
-      const data = await r.json();
-      const items = data.items || [];
-      document.getElementById('cnt-place').textContent = items.length;
-      if (items.length === 0) {
-        empty.textContent = `신규 매장 없음 (후보 ${data.candidates||0}개 중 ${maxAge}일 이내 0개)`;
-        empty.style.display='block';
-      } else items.forEach(it => {
-        const card = document.createElement('div');
-        const name = it.name;
-        const blob = name + ' ' + (it.category||'') + ' ' + (it.address||'');
-        const cm = isClient(blob);
-        card.className = 'card' + (cm ? ' client' : '');
-        card.dataset.store = name;
-        const placeUrl = `https://map.naver.com/p/search/${encodeURIComponent(name)}`;
-        const region2 = extractRegion((it.address||''));
-        const ageDays = it.age_days;
-        const newBadge = ageDays !== null && ageDays !== undefined
-          ? `<span class="badge cat-a">🆕 ${it.badge} · ${ageDays}일</span>`
-          : `<span class="badge cat-a">🆕 ${it.badge}</span>`;
-        card.innerHTML = `
-          <div class="title">${name}</div>
-          <div class="meta">
-            ${newBadge}
-            ${cm?`<span class="badge client">거래중·${cm}</span>`:''}
-            ${region2?`<span class="badge region">${region2}</span>`:''}
-            <span class="badge cat">📍 플레이스</span>
-            <span>${stripTags(it.category||'')}</span>
-            ${it.first_blog_date?`<span>📅 ${it.first_blog_date}</span>`:''}
-          </div>
-          <div class="desc">${stripTags(it.address||'')}${it.telephone?' · '+it.telephone:''}${it.source_query?` <small style="color:#888">검색: ${it.source_query}</small>`:''}</div>
-          <div class="actions">
-            <a href="${placeUrl}" target="_blank" rel="noopener">📍 플레이스 ↗</a>
-            <button class="btn small ghost" data-store="${name}">⭐ 추적</button>
-          </div>`;
-        card.querySelector('button').addEventListener('click', e => addWatch(e.currentTarget.dataset.store));
-        grid.appendChild(card);
-      });
-      applyFilter('place');
-      enrichPlaceCardsWithAge(maxAge);
-    } catch(e) { empty.textContent='오류: '+e.message; empty.style.display='block'; }
-    finally{ loading.style.display='none'; }
-  }
+// ============================================================
+// LOAD NEW STORES
+// ============================================================
+let ALL=[]; // current result set
 
-  async function enrichPlaceCardsWithAge(maxAgeStr){
-    const grid = document.getElementById('place-grid');
-    if(!grid) return;
-    const maxAge = maxAgeStr ? parseInt(maxAgeStr, 10) : null;
-    const cards = Array.from(grid.querySelectorAll('.card'));
-    const seen = new Set();
-    const targets = cards.filter(c=>{ const s=c.dataset.store; if(!s||seen.has(s)) return false; seen.add(s); return true; });
-    const concurrency = 4; let idx = 0;
-    let hiddenByAge = 0;
-    const worker = async()=>{
-      while(idx < targets.length){
-        const card = targets[idx++]; const store = card.dataset.store;
-        try{
-          const ckey = 'place_age_v1:'+store;
-          let info = null;
-          try{ const raw = localStorage.getItem(ckey); if(raw){ const o = JSON.parse(raw); if(o&&o.t&&(Date.now()-o.t)<86400000) info = o.d; } }catch(e){}
-          if(!info){
-            const r = await fetch('./api/age?store='+encodeURIComponent(store));
-            if(!r.ok) continue;
-            info = await r.json();
-            try{ localStorage.setItem(ckey, JSON.stringify({t:Date.now(), d:info})); }catch(e){}
-          }
-          if(!info || info.age_days === null || info.age_days === undefined) continue;
-          const sel = '.card[data-store="'+store.replace(/"/g,'\\"')+'"]';
-          const sameCards = grid.querySelectorAll(sel);
-          if(maxAge && info.age_days > maxAge){
-            sameCards.forEach(c=>{ c.style.display='none'; c.dataset.agedOut='1'; });
-            hiddenByAge++;
-            continue;
-          }
-          sameCards.forEach(c=>{
-            const meta = c.querySelector('.meta'); if(!meta) return;
-            if(meta.querySelector('.badge.age-marker')) return;
-            const ageBadge = document.createElement('span');
-            ageBadge.className = 'badge age-marker';
-            ageBadge.style.cssText = 'background:#e8f4fd;color:#0366d6;';
-            ageBadge.textContent = '🗓 '+info.age_days+'일';
-            ageBadge.title = '첫 블로그 '+(info.first_blog_date||'?');
-            meta.appendChild(ageBadge);
-            if(info.acceleration && info.acceleration >= 1.5){
-              const accel = document.createElement('span');
-              accel.className = 'badge accel-marker';
-              accel.style.cssText = 'background:#fff3cd;color:#856404;';
-              accel.textContent = '📈 '+info.acceleration+'x';
-              accel.title = '4주 '+info.count_4w+'건 / 12주 평균';
-              meta.appendChild(accel);
-            }
-          });
-        }catch(e){}
-      }
-    };
-    const ws=[]; for(let i=0;i<concurrency;i++) ws.push(worker());
-    await Promise.all(ws);
-    if(hiddenByAge > 0){
-      const visible = grid.querySelectorAll('.card:not([data-aged-out="1"])').length;
-      const cntEl = document.getElementById('cnt-place');
-      if(cntEl) cntEl.textContent = visible;
+async function loadNew(btn){
+  const icoEl=btn ? btn.querySelector('#new-ico') : document.getElementById('new-ico');
+  if(icoEl) icoEl.innerHTML='<span class="spin"></span>';
+
+  const region=activeChip('chip-region');
+  const regKw=region||'';
+
+  // Build queries — target open keywords + various business types
+  const base = regKw ? [regKw] : ['서울','경기','부산','대구','인천','광주','대전'];
+  const suffixes = [
+    '신규오픈 음식점 주점',
+    '새로오픈 맛집 술집',
+    '오픈했어요 포차 이자카야',
+    '신규 고기집 오픈',
+    '신규 호프 치킨 오픈',
+    '신규 펍 와인바 오픈',
+    '오픈기념 음식점',
+    '그랜드오픈 음식점',
+  ];
+
+  // Pick 4-6 queries to stay fast
+  const queries=[];
+  if(region){
+    // Single region - more targeted queries
+    for(const s of suffixes.slice(0,6)) queries.push(`${regKw} ${s}`);
+  } else {
+    // Nationwide: cycle through cities + keywords
+    for(let i=0;i<Math.min(base.length,3);i++){
+      queries.push(`${base[i]} 신규오픈 음식점 주점`);
+      queries.push(`${base[i]} 오픈했어요 맛집 술집`);
     }
+    queries.push('신규오픈 이자카야 포차 2025');
+    queries.push('새로오픈 고기집 호프 맛집');
   }
 
-  async function refreshWatch(){
-    if(state.watchList.length===0){ toast('추적 매장 없음'); return; }
-    const loading=document.getElementById('watch-loading');
-    loading.style.display='inline';
-    try{
-      for(const w of state.watchList){
-        try{
-          const r = await apiBlog(w.name,'date',5);
-          const items = (r.items||[]).filter(it=>(it.title+it.description).indexOf(w.name)!==-1);
-          w.recentCount = items.length;
-          w.lastCheck = new Date().toISOString();
-          w.lastSnippet = items.length>0
-            ? stripTags(items[0].description||'').slice(0,160)+(items[0].postdate?` (${fmtDate(items[0].postdate)})`:'')
-            : '최근 1주일 내 신규 언급 없음';
-        }catch(e){ w.lastSnippet='갱신 실패: '+e.message; }
-      }
-      save(); renderWatch(); toast(state.watchList.length+'건 갱신');
-    }finally{ loading.style.display='none'; }
-  }
+  const results=await Promise.all(queries.slice(0,6).map(q=>apiBlog(q,20,'date')));
+  const raw=results.flat();
 
-  // 탭 전환
-  document.querySelectorAll('.tab').forEach(t=>{
-    t.addEventListener('click',()=>{
-      document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
-      document.querySelectorAll('.pane').forEach(x=>x.classList.remove('active'));
-      t.classList.add('active');
-      document.getElementById('pane-'+t.dataset.tab).classList.add('active');
-      const tab=t.dataset.tab;
-      if(tab==='watch') renderWatch();
-      if(!t.dataset.loaded){
-        t.dataset.loaded='1';
-        if(tab==='hot') loadHot();
-        else if(tab==='franchise') loadFranchise();
-        else if(tab==='youtube') loadYouTube();
-        else if(tab==='place') loadPlace();
-        else if(tab==='dashboard') loadDashboard();
-      } else if(tab==='dashboard') loadDashboard();
+  const seen=new Set();
+  ALL=raw.map(i=>parseStore(i,'blog'))
+    .filter(s=>{
+      const k=s.name.trim();
+      if(!k||seen.has(k)) return false;
+      seen.add(k); return true;
     });
+
+  ST.stores=ALL;
+  ST.lastFetch=new Date().toISOString();
+  save();
+
+  updateHeaderTime();
+  filterAndRender();
+  updateStats();
+  if(document.getElementById('pg-analysis').classList.contains('on')) renderAnalysis();
+
+  if(icoEl) icoEl.textContent='🔍';
+}
+
+function filterAndRender(){
+  const region=activeChip('chip-region');
+  const catKw=activeChip('chip-cat');
+  const days=parseInt(activeChip('chip-days')||'30');
+
+  let filtered=[...ALL];
+  if(region) filtered=filtered.filter(s=>s.region===region||s.txt.includes(region));
+  if(catKw) filtered=filtered.filter(s=>s.catLb.includes(catKw)||s.txt.includes(catKw)||s.cat.includes(catKw));
+
+  // Sort: confirmed new open first, then by date
+  filtered.sort((a,b)=>{
+    if(a.isNew&&!b.isNew) return -1;
+    if(!a.isNew&&b.isNew) return 1;
+    return daysAgo(a.date)-daysAgo(b.date);
   });
 
-  // 필터 버튼
-  document.querySelectorAll('.filter-row').forEach(row=>{
-    const tab = row.dataset.tab;
-    row.querySelectorAll('.filter-btn').forEach(b=>{
-      b.addEventListener('click',()=>{
-        row.querySelectorAll('.filter-btn').forEach(x=>x.classList.remove('active'));
-        b.classList.add('active');
-        state.tabFilters[tab]=b.dataset.f; save(); applyFilter(tab);
-      });
+  const cnt=document.getElementById('new-count');
+  if(cnt) cnt.textContent=filtered.length>0?`${filtered.length}몜 매장 발견`:'';
+
+  renderStoreList('new-list',filtered,false);
+}
+
+// ============================================================
+// RENDER STORE LIST
+// ============================================================
+function renderStoreList(id, list, compact=false){
+  const el=document.getElementById(id);
+  if(!list.length){
+    el.innerHTML=`<div class="empty"><div class="eico">🔍</div><div class="etxt">검색 버튼을 눌러<br>신규 업장을 찾아보세요</div></div>`;
+    return;
+  }
+
+  const show=compact?list.slice(0,5):list;
+  el.innerHTML=show.map(s=>{
+    const tr=ST.tracked.find(t=>t.id===s.id);
+    const da=daysAgo(s.date);
+    const da2=da<7?`${da}일 전`:fmtDate(s.date);
+    const ne=s.isNew||da<=3;
+    const safeS=encodeURIComponent(JSON.stringify({...s,txt:'',desc:s.desc}));
+    return `
+    <div class="sc" onclick="openLink('${encodeURIComponent(s.link)}')">
+      ${ne?'<div class="sc-new-glow"></div>':''}
+      <div class="sc-name">${s.name}</div>
+      <div class="sc-tags">
+        ${ne?'<span class="tag t-new">🆕 신규오픈</span>':''}
+        <span class="tag t-cat">${s.catLb}</span>
+        <span class="tag t-reg">${s.region}${s.sub?' '+s.sub:''}</span>
+        ${s.fr?'<span class="tag t-fr">프랜차이즈</span>':''}
+      </div>
+      <div class="sc-desc">${s.desc||'(상세 정보 없음)'}</div>
+      <div class="sc-foot">
+        <span class="sc-date">${da2}</span>
+        <button class="sc-track-btn ${tr?'tracked':''}"
+          onclick="event.stopPropagation();toggleTrack(${safeS})"
+        >${tr?'📌 추적중':'＋ 추적'}</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openLink(enc){
+  const url=decodeURIComponent(enc);
+  if(url) window.open(url,'_blank');
+}
+
+// ============================================================
+// TOGGLE TRACK
+// ============================================================
+function toggleTrack(s){
+  if(typeof s==='string') s=JSON.parse(s);
+  const i=ST.tracked.findIndex(t=>t.id===s.id);
+  if(i===-1){
+    ST.tracked.push({...s,status:'new',note:'',trackedAt:new Date().toISOString()});
+  } else {
+    ST.tracked.splice(i,1);
+  }
+  save();
+  filterAndRender();
+  updateStats();
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function updateStats(){
+  const todayStr=new Date().toISOString().slice(0,10);
+  const weekAgo=new Date(Date.now()-7*864e5).toISOString().slice(0,10);
+
+  const todayCnt=ALL.filter(s=>s.date===todayStr).length;
+  const weekCnt=ALL.filter(s=>s.date>=weekAgo).length;
+  const frCnt=ALL.filter(s=>s.fr).length;
+
+  document.getElementById('s-new').textContent=todayCnt||ALL.filter(s=>s.isNew).length||'-';
+  document.getElementById('s-week').textContent=weekCnt||ALL.length||'-';
+  document.getElementById('s-fr').textContent=frCnt||'-';
+  document.getElementById('s-tr').textContent=ST.tracked.length;
+
+  // Alert
+  const newOnes=ALL.filter(s=>s.isNew);
+  if(newOnes.length){
+    document.getElementById('home-alert').style.display='flex';
+    document.getElementById('home-alert-txt').textContent=
+      `확인된 신규오픈 매장 ${newOnes.length}몜 발견 — ${newOnes.slice(0,3).map(s=>s.name).join(', ')}${newOnes.length>3?` 외 ${newOnes.length-3}개`:''}`;
+  }
+
+  // Region grid
+  const regMap={};
+  ALL.forEach(s=>{ regMap[s.region]=(regMap[s.region]||0)+1; });
+  const sorted=Object.entries(regMap).sort((a,b)=>b[1]-a[1]).slice(0,9);
+  document.getElementById('home-regions').innerHTML=sorted.map(([r,n])=>`
+    <div class="reg-item" onclick="goNewWithRegion('${r}')">
+      <div class="reg-name">${r}</div>
+      <div class="reg-cnt">${n}</div>
+      <div class="reg-sub">개 매장</div>
+    </div>`).join('');
+
+  // Latest list
+  const latest=[...ALL].sort((a,b)=>{
+    if(a.isNew&&!b.isNew) return -1;
+    if(!a.isNew&&b.isNew) return 1;
+    return daysAgo(a.date)-daysAgo(b.date);
+  });
+  renderStoreList('home-latest',latest,true);
+
+  // Home chart
+  renderHomeChart();
+}
+
+function goNewWithRegion(region){
+  // Switch to new tab and set region filter
+  switchPage('new');
+  document.querySelectorAll('#chip-region .chip').forEach(c=>{
+    c.classList.toggle('on',c.dataset.v===region);
+  });
+  filterAndRender();
+}
+
+// ============================================================
+// CHARTS
+// ============================================================
+const CH={};
+
+function renderHomeChart(){
+  const catMap={};
+  CATS.forEach(c=>catMap[c.id]=0);
+  ALL.forEach(s=>{ catMap[s.cat]=(catMap[s.cat]||0)+1; });
+  const labels=CATS.map(c=>c.lb);
+  const data=CATS.map(c=>catMap[c.id]||0);
+  const colors=['#00d4ff','#7c3aed','#10b981','#f59e0b','#ef4444','#ec4899','#14b8a6','#6366f1'];
+  const ctx=document.getElementById('chart-home-cat');
+  if(!ctx) return;
+  if(CH.home) CH.home.destroy();
+  CH.home=new Chart(ctx,{
+    type:'doughnut',
+    data:{labels,datasets:[{data,backgroundColor:colors,borderWidth:0,hoverOffset:4}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'right',labels:{color:'#94a3b8',font:{size:10},boxWidth:10,padding:8}}}}
+  });
+}
+
+function renderAnalysis(){
+  const stores=ALL.length?ALL:ST.stores||[];
+  if(!stores.length) return;
+
+  // Cat doughnut
+  const catMap={};
+  CATS.forEach(c=>catMap[c.id]=0);
+  stores.forEach(s=>{ catMap[s.cat]=(catMap[s.cat]||0)+1; });
+  const colors=['#00d4ff','#7c3aed','#10b981','#f59e0b','#ef4444','#ec4899','#14b8a6','#6366f1'];
+  const ctx1=document.getElementById('chart-cat-doughnut');
+  if(ctx1){
+    if(CH.catD) CH.catD.destroy();
+    CH.catD=new Chart(ctx1,{
+      type:'doughnut',
+      data:{labels:CATS.map(c=>c.lb),datasets:[{data:CATS.map(c=>catMap[c.id]||0),backgroundColor:colors,borderWidth:0}]},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{position:'right',labels:{color:'#94a3b8',font:{size:10},boxWidth:10,padding:6}}}}
     });
-    const saved=state.tabFilters[tab];
-    if(saved){ row.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.f===saved)); }
-  });
-
-  // 거래처 입력
-  function renderClientCount(){ document.getElementById('client-count').textContent=(state.clients.length||0)+'개'; }
-  document.getElementById('client-list').value = (state.clients||[]).map(c => typeof c==='object' ? c.n : c).join('\n');
-  renderClientCount();
-  document.getElementById('client-save').addEventListener('click',()=>{
-    const lines = document.getElementById('client-list').value.split('\n').map(s=>s.trim()).filter(s=>s);
-    state.clients = Array.from(new Set(lines)); save();
-    renderClientCount();
-    document.getElementById('client-saved').textContent='✅ '+state.clients.length+'개 저장';
-    const tab = document.querySelector('.tab.active').dataset.tab;
-    if(tab==='new') loadNew();
-    else if(tab==='hot') loadHot();
-    else if(tab==='franchise') loadFranchise();
-    else if(tab==='youtube') loadYouTube();
-    else if(tab==='place') loadPlace();
-    document.querySelectorAll('.tab').forEach(t=>{ if(t.dataset.tab!==tab) delete t.dataset.loaded; });
-  });
-  document.getElementById('client-file-btn').addEventListener('click',()=>document.getElementById('client-file').click());
-  document.getElementById('client-file').addEventListener('change', async e => {
-    const f = e.target.files[0]; if(!f) return;
-    const text = await f.text();
-    let imported = [];
-    try { const j = JSON.parse(text); if(Array.isArray(j)) imported = j.filter(x => x && (typeof x==='string' || x.n)); } catch(_){}
-    if(imported.length === 0) imported = text.split('\n').map(s => s.trim()).filter(s => s);
-    state.clients = imported; save(); renderClientCount();
-    document.getElementById('client-list').value = imported.map(c => typeof c==='object' ? c.n : c).join('\n');
-    document.getElementById('client-saved').textContent = '✅ '+imported.length+'개 임포트 완료';
-    const tab = document.querySelector('.tab.active').dataset.tab;
-    if(tab==='new') loadNew(); else if(tab==='hot') loadHot(); else if(tab==='franchise') loadFranchise(); else if(tab==='youtube') loadYouTube(); else if(tab==='place') loadPlace();
-    document.querySelectorAll('.tab').forEach(t => { if(t.dataset.tab !== tab) delete t.dataset.loaded; });
-  });
-  document.getElementById('client-clear').addEventListener('click',()=>{
-    if(!confirm('거래처 명단 모두 삭제?')) return;
-    state.clients=[]; save();
-    document.getElementById('client-list').value=''; renderClientCount();
-  });
-
-  // 이벤트
-  document.getElementById('new-refresh').addEventListener('click',loadNew);
-  document.getElementById('hot-refresh').addEventListener('click',loadHot);
-  document.getElementById('fr-refresh').addEventListener('click',loadFranchise);
-  document.getElementById('yt-refresh').addEventListener('click',loadYouTube);
-  document.getElementById('place-refresh').addEventListener('click',loadPlace);
-  document.getElementById('place-region').addEventListener('change', populatePlaceCommercials);
-  populatePlaceCommercials();
-  document.getElementById('watch-refresh').addEventListener('click',refreshWatch);
-  document.getElementById('watch-add-btn').addEventListener('click',()=>{
-    const i = document.getElementById('watch-add'); addWatch(i.value); i.value=''; renderWatch();
-  });
-  document.getElementById('watch-add').addEventListener('keydown',e=>{
-    if(e.key==='Enter'){ addWatch(e.target.value); e.target.value=''; renderWatch(); }
-  });
-
-  // ===== 대시보드 =====
-  let __charts = {};
-  function makeChart(id, type, data, options){
-    if (!window.Chart) return null;
-    const ctx = document.getElementById(id);
-    if (!ctx) return null;
-    if (__charts[id]) { try{ __charts[id].destroy(); }catch(e){} }
-    const isDoughnut = type === 'doughnut' || type === 'pie';
-    const baseOptions = {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: isDoughnut ? { position: 'right', labels: { boxWidth: 10, font: { size: 10 }, padding: 8 } } : { display: false },
-        tooltip: { titleFont: { size: 10 }, bodyFont: { size: 11 } }
-      }
-    };
-    if (isDoughnut) baseOptions.cutout = '62%';
-    __charts[id] = new Chart(ctx, { type, data, options: Object.assign(baseOptions, options||{}) });
-    return __charts[id];
   }
-  function collectCards(){
-    const out = [];
-    const sources = [['new','new-grid'],['hot','hot-grid'],['franchise','fr-grid'],['youtube','yt-grid'],['place','place-grid']];
-    sources.forEach(([tab, gridId]) => {
-      const grid = document.getElementById(gridId);
-      if (!grid) return;
-      grid.querySelectorAll('.card').forEach(c => {
-        const text = c.textContent || '';
-        if (isExcludedFranchise(text)) return;
-        const title = (c.querySelector('.title')||{}).textContent || '';
-        const regionBadge = c.querySelector('.badge.region');
-        const region = regionBadge ? regionBadge.textContent.trim() : '';
-        out.push({ tab, title: title.trim(), region, isClient: c.classList.contains('client'), category: c.dataset.category||'', store: c.dataset.store||title.trim() });
-      });
+
+  // Region bar
+  const regMap={};
+  stores.forEach(s=>{ regMap[s.region]=(regMap[s.region]||0)+1; });
+  const regSorted=Object.entries(regMap).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const ctx2=document.getElementById('chart-region-bar');
+  if(ctx2){
+    if(CH.regB) CH.regB.destroy();
+    CH.regB=new Chart(ctx2,{
+      type:'bar',
+      data:{
+        labels:regSorted.map(r=>r[0]),
+        datasets:[{data:regSorted.map(r=>r[1]),backgroundColor:'rgba(0,212,255,0.7)',borderRadius:5,borderSkipped:false}]
+      },
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false}},
+        scales:{
+          x:{ticks:{color:'#94a3b8',font:{size:10}},grid:{color:'#1e2d45'}},
+          y:{ticks:{color:'#94a3b8'},grid:{color:'#1e2d45'}}
+        }}
     });
-    return out;
   }
-  const DASH_COMMERCIALS = ['홍대','강남','연남','성수','이태원','잠실','익선동','압구정','한남','신사','망원','합정','명동','종로','신촌','건대','청담','서촌','북촌','여의도','판교','분당','일산','수원','광교','평촌','안산','하남','해운대','광안리','서면','전포','남포동','동성로','송도','구월동','둔산','유성','상무지구','강릉','속초','춘천','청주','천안','전주','여수','순천','포항','경주','창원','진주','통영','제주시','서귀포'];
-  function extractCommercial(text){ for (const c of DASH_COMMERCIALS) if (text.indexOf(c) !== -1) return c; return null; }
-  async function loadDashboard(){
-    const status = document.getElementById('dash-status');
-    if (status) status.textContent = '⏳ 데이터 집계 중...';
-    const pending = [];
-    if (!document.querySelector('#new-grid .card') && typeof loadNew === 'function') pending.push(loadNew());
-    if (!document.querySelector('#hot-grid .card') && typeof loadHot === 'function') pending.push(loadHot());
-    if (!document.querySelector('#fr-grid .card') && typeof loadFranchise === 'function') pending.push(loadFranchise());
-    if (!document.querySelector('#yt-grid .card') && typeof loadYouTube === 'function') pending.push(loadYouTube());
-    if (!document.querySelector('#place-grid .card') && typeof loadPlace === 'function') pending.push(loadPlace());
-    await Promise.allSettled(pending);
-    await new Promise(r => setTimeout(r, 2000));
-    renderDashboard();
-    if (status) status.textContent = '✅ ' + new Date().toLocaleString('ko-KR');
+
+  // Individual vs Franchise progress bars
+  const frCnt=stores.filter(s=>s.fr).length;
+  const indCnt=stores.length-frCnt;
+  const progEl=document.getElementById('analysis-prog');
+  if(progEl){
+    const catBreakdown=CATS.slice(0,-1).map(c=>{
+      const n=stores.filter(s=>s.cat===c.id).length;
+      return {lb:c.lb,n};
+    }).sort((a,b)=>b.n-a.n);
+    const max=catBreakdown[0]?.n||1;
+    progEl.innerHTML=`
+      <div class="prog-row">
+        <div class="prog-label" style="color:#a78bfa">개인매장</div>
+        <div class="prog-bar-wrap"><div class="prog-bar" style="width:${Math.round(indCnt/stores.length*100)}%;background:#7c3aed"></div></div>
+        <div class="prog-val">${indCnt}</div>
+      </div>
+      <div class="prog-row">
+        <div class="prog-label" style="color:var(--c4)">프랜차이즈</div>
+        <div class="prog-bar-wrap"><div class="prog-bar" style="width:${Math.round(frCnt/stores.length*100)}%;background:var(--c4)"></div></div>
+        <div class="prog-val">${frCnt}</div>
+      </div>
+      <div style="height:10px"></div>
+      ${catBreakdown.map(c=>`
+      <div class="prog-row">
+        <div class="prog-label">${c.lb}</div>
+        <div class="prog-bar-wrap"><div class="prog-bar" style="width:${Math.round(c.n/max*100)}%;background:var(--c1)"></div></div>
+        <div class="prog-val">${c.n}</div>
+      </div>`).join('')}
+    `;
   }
-  function renderDashboard(){
-    const cards = collectCards();
-    const accel = cards.filter(c => c.category === 'B').length;
-    const newCount = cards.filter(c => c.tab === 'new' || c.tab === 'place').length;
-    const clientCount = cards.filter(c => c.isClient).length;
-    const watchCount = (state.watchList || []).length;
-    document.getElementById('kpi-new').textContent = newCount;
-    document.getElementById('kpi-accel').textContent = accel;
-    document.getElementById('kpi-client').textContent = clientCount;
-    document.getElementById('kpi-watch').textContent = watchCount;
-    const byRegion = {}; cards.forEach(c => { if (c.region) byRegion[c.region] = (byRegion[c.region]||0)+1; });
-    const regionLabels = Object.keys(byRegion).filter(r => byRegion[r] > 0).sort((a,b)=>byRegion[b]-byRegion[a]).slice(0,8);
-    const regionWrap = document.querySelector('.region-wrap');
-    if (regionWrap) regionWrap.style.height = Math.max(120, regionLabels.length * 24 + 24) + 'px';
-    makeChart('chart-region', 'bar', { labels: regionLabels, datasets: [{ data: regionLabels.map(r=>byRegion[r]), backgroundColor: '#3d6033', barThickness: 14 }] }, { indexAxis: 'y', scales: { x: { beginAtZero: true, ticks: { precision: 0, font: { size: 10 } } }, y: { ticks: { autoSkip: false, font: { size: 11 } } } } });
-    const byTab = {}; cards.forEach(c => { byTab[c.tab] = (byTab[c.tab]||0)+1; });
-    const tabLabel = { new: '🆕 신규', hot: '🔥 인기', franchise: '🏪 프차', youtube: '📺 유튜브', place: '📍 플레이스' };
-    const tabKeys = Object.keys(byTab);
-    makeChart('chart-tab', 'doughnut', { labels: tabKeys.map(k=>tabLabel[k]||k), datasets: [{ data: tabKeys.map(k=>byTab[k]), backgroundColor: ['#2e7d32','#d44a4a','#6a1b9a','#1976d2','#ef6c00'] }] });
-    makeChart('chart-client', 'doughnut', { labels: ['거래처','신규영업'], datasets: [{ data: [clientCount, cards.length - clientCount], backgroundColor: ['#d44a4a','#3d6033'] }] });
-    const byComm = {}; cards.forEach(c => { const co = extractCommercial(c.title); if (co) byComm[co] = (byComm[co]||0)+1; });
-    const commLabels = Object.keys(byComm).filter(r => byComm[r] > 0).sort((a,b)=>byComm[b]-byComm[a]).slice(0,8);
-    const commWrap = document.querySelector('.commercial-wrap');
-    if (commWrap) commWrap.style.height = Math.max(120, commLabels.length * 24 + 24) + 'px';
-    makeChart('chart-commercial', 'bar', { labels: commLabels, datasets: [{ data: commLabels.map(r=>byComm[r]), backgroundColor: '#6a1b9a', barThickness: 14 }] }, { indexAxis: 'y', scales: { x: { beginAtZero: true, ticks: { precision: 0, font: { size: 10 } } }, y: { ticks: { autoSkip: false, font: { size: 11 } } } } });
-    const recs = cards
-      .filter(c => !c.isClient)
-      .map(c => ({ ...c, score: (c.category==='B'?100:0) + (c.category==='A'?50:0) + (c.tab==='place'?20:0) + (c.tab==='hot'?15:0) }))
-      .filter((c,i,a)=>a.findIndex(x=>x.title===c.title)===i)
-      .sort((a,b)=>b.score-a.score).slice(0,5);
-    const recList = document.getElementById('rec-list');
-    if (recList) {
-      recList.innerHTML = recs.length === 0 ? '<div style="color:#888;font-size:12px">추천 없음 — 갱신 후 다시 확인</div>' :
-        recs.map(r => {
-          const tag = r.category==='B' ? '📈 가속' : r.category==='A' ? '🆕 신규' : (tabLabel[r.tab]||r.tab);
-          const name = (r.title||'').length > 28 ? (r.title||'').substring(0,28)+'…' : r.title;
-          return '<div class="rec-item"><span class="rec-tag">'+tag+'</span><span class="rec-name">'+name+'</span><span class="rec-reg">'+(r.region||'')+'</span></div>';
-        }).join('');
+
+  // TOP 10 table
+  const topStores=[...stores]
+    .sort((a,b)=>{
+      if(a.isNew&&!b.isNew) return -1;
+      if(!a.isNew&&b.isNew) return 1;
+      return daysAgo(a.date)-daysAgo(b.date);
+    }).slice(0,10);
+  document.getElementById('tbl-top').innerHTML=`
+    <tr><th>#</th><th>매장명</th><th>업종/지역</th></tr>
+    ${topStores.map((s,i)=>`
+    <tr>
+      <td class="rn">${i+1}</td>
+      <td>
+        <div style="font-size:12px;font-weight:600">${s.name}</div>
+        ${s.isNew?'<span class="tag t-new" style="font-size:9px">신규</span>':''}
+      </td>
+      <td>
+        <div style="font-size:10px;color:var(--txt2)">${s.catLb}</div>
+        <div style="font-size:10px;color:var(--c3)">${s.region}${s.sub?' '+s.sub:''}</div>
+      </td>
+    </tr>`).join('')}
+  `;
+}
+
+// ============================================================
+// FRANCHISE
+// ============================================================
+async function loadFranchise(btn){
+  const icoEl=btn?btn.querySelector('#fr-ico'):document.getElementById('fr-ico');
+  if(icoEl) icoEl.innerHTML='<span class="spin pulse"></span>';
+
+  const queries=[
+    '프랜차이즈 음식점 신규출점 가맹점',
+    '치킨 프랜차이즈 신규오픈',
+    '고기집 프랜차이즈 출점',
+    '이자카야 포차 프랜차이즈 오픈',
+    '호프 맥주 프랜차이즈 신규',
+    '음식점 프랜차이즈 확장 가맹',
+  ];
+
+  const [blogR, newsR]=await Promise.all([
+    Promise.all(queries.slice(0,3).map(q=>apiBlog(q,20,'date'))),
+    Promise.all(queries.slice(3).map(q=>apiNews(q,15))),
+  ]);
+
+  const items=[...blogR.flat(),...newsR.flat()];
+  const brandCount={};
+  const frStores=[];
+  const seen=new Set();
+
+  items.forEach(item=>{
+    const s=parseStore(item,'franchise');
+    if(s.fr){
+      if(!seen.has(s.name)){ frStores.push(s); seen.add(s.name); }
+      FR_BRANDS.forEach(b=>{ if(s.txt.includes(b)) brandCount[b]=(brandCount[b]||0)+1; });
     }
+  });
+
+  const topBrands=Object.entries(brandCount).sort((a,b)=>b[1]-a[1]).slice(0,15);
+  document.getElementById('tbl-brand').innerHTML=`
+    <tr><th>#</th><th>브랜드</th><th>언급</th></tr>
+    ${topBrands.map(([b,n],i)=>`
+    <tr>
+      <td class="rn">${i+1}</td>
+      <td style="font-size:12px;font-weight:600">${b}</td>
+      <td><span class="tag t-fr">${n}회</span></td>
+    </tr>`).join('')}
+  `;
+
+  renderStoreList('fr-list',frStores,false);
+  if(icoEl) icoEl.textContent='📡';
+}
+
+// ============================================================
+// TRACKED
+// ============================================================
+function renderTracked(){
+  const filter=activeChip('chip-track');
+  let list=ST.tracked;
+  if(filter) list=list.filter(s=>s.status===filter);
+
+  const el=document.getElementById('track-list');
+  if(!list.length){
+    el.innerHTML<`<div class="empty"><div class="eico">📌</div><div class="etxt">추적 중인 매장이 없습니다<br>신규오픈 탭에서 매장을 추가하세요</div></div>`;
+    return;
   }
-  setTimeout(() => {
-    const dashBtn = document.getElementById('dash-refresh');
-    if (dashBtn) dashBtn.addEventListener('click', () => {
-      document.querySelectorAll('.tab').forEach(t => delete t.dataset.loaded);
-      document.querySelector('.tab[data-tab="new"]').dataset.loaded = '1';
-      loadNew();
-      loadDashboard();
+
+  const stMap={new:'연락필요',active:'거래중',pass:'패스'};
+  const stCls={new:'st-new',active:'st-active',pass:'st-pass'};
+
+  el.innerHTML=list.map(s=>`
+    <div class="card" style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+        <div style="font-size:14px;font-weight:700;flex:1">${s.name}</div>
+        <select class="st-select" onchange="updateStatus('${encodeURIComponent(s.id)}',this.value)">
+          <option value="new" ${s.status==='new'?'selected':''}>연락필요</option>
+          <option value="active" ${s.status==='active'?'selected':''}>거래중</option>
+          <option value="pass" ${s.status==='pass'?'selected':''}>패스</option>
+        </select>
+      </div>
+      <div class="sc-tags">
+        <span class="tag t-cat">${s.catLb}</span>
+        <span class="tag t-reg">${s.region}</span>
+        <span class="st-badge ${stCls[s.status]||'st-new'}">${stMap[s.status]||'연락필요'}</span>
+      </div>
+      <input type="text" class="note-input"
+        value="${(s.note||'').replace(/"/g,'&quot;')}"
+        placeholder="📝 메모 (방문일, 담당자, 메뉴 등)"
+        onchange="updateNote('${encodeURIComponent(s.id)}',this.value)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+        <span style="font-size:10px;color:var(--txt3)">추적: ${(s.trackedAt||'').slice(0,10)}</span>
+        <button onclick="removeTrack('${encodeURIComponent(s.id)}')"
+          style="font-size:10px;padding:3px 10px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:6px;color:#f87171;cursor:pointer">삭제</button>
+      </div>
+    </div>`).join('');
+}
+
+function updateStatus(encId,status){
+  const id=decodeURIComponent(encId);
+  const s=ST.tracked.find(t=>t.id===id);
+  if(s){s.status=status;save();}
+}
+function updateNote(encId,note){
+  const id=decodeURIComponent(encId);
+  const s=ST.tracked.find(t=>t.id===id);
+  if(s){s.note=note;save();}
+}
+function removeTrack(encId){
+  const id=decodeURIComponent(encId);
+  ST.tracked=ST.tracked.filter(t=>t.id!==id);
+  save(); renderTracked(); updateStats();
+}
+function exportTracked(){
+  const lines=ST.tracked.map(s=>
+    `${s.name} | ${s.catLb} | ${s.region} | ${s.status==='new'?'연락필요':s.status==='active'?'거래중':'패스'} | ${s.note||''}`
+  );
+  const text=lines.join('\n');
+  const url=URL.createObjectURL(new Blob([text],{type:'text/plain;charset=utf-8'}));
+  const a=document.createElement('a');
+  a.href=url; a.download=`세왕추적매장_${new Date().toISOString().slice(0,10)}.txt`; a.click();
+}
+function clearTracked(){
+  if(confirm(`추적 매장 ${ST.tracked.length}개를 모두 삭제할까요?`)){
+    ST.tracked=[]; save(); renderTracked(); updateStats();
+  }
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function switchPage(pg){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.bnav-btn').forEach(b=>b.classList.remove('on'));
+  document.getElementById('pg-'+pg).classList.add('on');
+  document.querySelector(`.bnav-btn[data-pg="${pg}"]`).classList.add('on');
+  if(pg==='track') renderTracked();
+  if(pg==='analysis'){ ALL=ALL.length?ALL:(ST.stores||[]); renderAnalysis(); }
+}
+
+document.querySelectorAll('.bnav-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>switchPage(btn.dataset.pg));
+});
+
+// ============================================================
+// CHIP HELPERS
+// ============================================================
+function activeChip(id){
+  return document.querySelector(`#${id} .chip.on`)?.dataset.v||'';
+}
+
+['chip-days','chip-region','chip-cat'].forEach(id=>{
+  document.querySelectorAll(`#${id} .chip`).forEach(c=>{
+    c.addEventListener('click',()=>{
+      document.querySelectorAll(`#${id} .chip`).forEach(x=>x.classList.remove('on'));
+      c.classList.add('on');
+      if(id!=='chip-days') filterAndRender();
     });
-  }, 200);
+  });
+});
 
-  document.getElementById('cnt-watch').textContent = state.watchList.length;
-  document.querySelector('.tab[data-tab="new"]').dataset.loaded = '1';
-  loadNew();
-  loadDashboard();
+['chip-track'].forEach(id=>{
+  document.querySelectorAll(`#${id} .chip`).forEach(c=>{
+    c.addEventListener('click',()=>{
+      document.querySelectorAll(`#${id} .chip`).forEach(x=>x.classList.remove('on'));
+      c.classList.add('on');
+      renderTracked();
+    });
+  });
+});
 
-  // 서비스 워커 (기본 캐시 - 오프라인 대응)
+['chip-fr-days'].forEach(id=>{
+  document.querySelectorAll(`#${id} .chip`).forEach(c=>{
+    c.addEventListener('click',()=>{
+      document.querySelectorAll(`#${id} .chip`).forEach(x=>x.classList.remove('on'));
+      c.classList.add('on');
+    });
+  });
+});
+
+// ============================================================
+// REFRESH ALL
+// ============================================================
+async function refreshAll(btn){
+  const icoEl=btn?btn.querySelector('#home-ico'):document.getElementById('home-ico');
+  if(icoEl) icoEl.innerHTML='<span class="spin"></span>';
+  await loadNew(null);
+  if(icoEl) icoEl.textContent='🔄';
+}
+
+// ============================================================
+// HEADER CLOCK
+// ============================================================
+function updateHeaderTime(){
+  const now=new Date();
+  document.getElementById('hdr-time').textContent=
+    now.toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('hdr-date').textContent=
+    now.toLocaleDateString('ko-KR',{month:'short',day:'numeric',weekday:'short'});
+}
+setInterval(updateHeaderTime,30000);
+updateHeaderTime();
+
+// ============================================================
+// INIT
+// ============================================================
+function init(){
+  updateStats();
+  if(ST.stores?.length){
+    ALL=ST.stores;
+    filterAndRender();
+    renderHomeChart();
+  }
+  if(ST.lastFetch){
+    const d=new Date(ST.lastFetch);
+    document.getElementById('hdr-time').textContent=
+      d.toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
+    document.getElementById('hdr-date').textContent='마지막 업데이트';
+  }
+  // Service worker
   if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+    navigator.serviceWorker.register('/sw.js').catch(()=>{});
   }
-})();
+}
+init();
 </script>
 </body>
 </html>
-
-
-<script>
-/* === 인스타 탭 (Apify instagram-scraper 연동) - 독립 추가 블록, 기존 코드 수정 없음 === */
-(function(){
-  function esc(s){return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
-  var tabs=document.getElementById('tabs');
-  if(!tabs||document.getElementById('pane-instagram'))return;
-  var btn=document.createElement('div');
-  btn.className='tab'; btn.dataset.tab='instagram';
-  btn.innerHTML='📸 인스타 <span class="count" id="cnt-instagram">·</span>';
-  tabs.appendChild(btn);
-  var paneParent=document.getElementById('pane-dashboard').parentNode;
-  var pane=document.createElement('div');
-  pane.className='pane'; pane.id='pane-instagram';
-  pane.innerHTML=''
-    +'<div style="margin-bottom:12px">'
-    +'<input id="insta-tags" type="text" placeholder="해시태그 콤마 구분 (예: 강남이자카야,홍대와인바,와인바)" value="강남이자카야,홍대와인바,와인바" style="width:100%;padding:10px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;box-sizing:border-box">'
-    +'<div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">'
-    +'<button type="button" data-k="강남이자카야,홍대와인바,성수펍,연남위스키바" class="insta-chip">지역+업종</button>'
-    +'<button type="button" data-k="와인바,위스키바,이자카야,호프,펍" class="insta-chip">주류 카테고리</button>'
-    +'<button type="button" data-k="사케추천,하이볼맛집,와인추천,수제맥주" class="insta-chip">주류 브랜드</button>'
-    +'<button type="button" id="insta-refresh" style="margin-left:auto;padding:8px 16px;background:#0f172a;color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer">▶ 인스타 분석</button>'
-    +'</div></div>'
-    +'<div id="insta-status" style="font-size:13px;color:#6b7280;margin-bottom:10px"></div>'
-    +'<h3 style="font-size:15px;margin:14px 0 8px">📈 인스타 핫매장 랭킹</h3>'
-    +'<div id="insta-ranking" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px"></div>'
-    +'<h3 style="font-size:15px;margin:18px 0 8px">🆕 최신 게시물</h3>'
-    +'<div id="insta-feed" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px"></div>';
-  paneParent.appendChild(pane);
-  pane.querySelectorAll('.insta-chip').forEach(function(c){
-    c.style.cssText='background:#eef2ff;color:#4338ca;font-size:12px;padding:6px 10px;border-radius:14px;border:none;cursor:pointer;font-weight:500';
-    c.addEventListener('click',function(){document.getElementById('insta-tags').value=c.dataset.k;});
-  });
-  btn.addEventListener('click',function(){
-    document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active');});
-    document.querySelectorAll('.pane').forEach(function(x){x.classList.remove('active');});
-    btn.classList.add('active'); pane.classList.add('active');
-    if(!btn.dataset.loaded){btn.dataset.loaded='1';loadInstagram();}
-  });
-  document.getElementById('insta-refresh').addEventListener('click',loadInstagram);
-  var loading=false;
-  function loadInstagram(){
-    if(loading)return; loading=true;
-    var tags=document.getElementById('insta-tags').value.trim();
-    var status=document.getElementById('insta-status');
-    var rank=document.getElementById('insta-ranking');
-    var feed=document.getElementById('insta-feed');
-    var cnt=document.getElementById('cnt-instagram');
-    if(!tags){status.textContent='해시태그를 입력하세요.';loading=false;return;}
-    status.textContent='인스타그램 수집 중... (20~40초 소요)'; rank.innerHTML=''; feed.innerHTML='';
-    fetch('./api/instagram?tags='+encodeURIComponent(tags)+'&limit=20')
-      .then(function(r){return r.json();})
-      .then(function(d){
-        if(d.error){status.textContent='오류: '+d.error;return;}
-        status.textContent='✓ 게시물 '+d.count+'건 → 매장 '+d.ranking.length+'곳 집계';
-        if(cnt)cnt.textContent=d.ranking.length;
-        rank.innerHTML=d.ranking.map(function(g,i){
-          return '<div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:12px">'
-            +'<div style="font-size:12px;color:#9d174d;font-weight:700">#'+(i+1)+' · 📸 '+g.posts+'건</div>'
-            +'<div style="font-weight:700;margin:4px 0">'+esc(g.name)+'</div>'
-            +'<div style="font-size:12px;color:#374151">❤ '+(g.likes||0).toLocaleString()+' · 💬 '+(g.comments||0).toLocaleString()+'</div>'
-            +'<a href="https://map.naver.com/p/search/'+encodeURIComponent(g.name)+'" target="_blank" style="display:inline-block;margin-top:8px;font-size:12px;color:#2563eb">네이버에서 찾기 →</a>'
-            +'</div>';
-        }).join('')||'<div style="color:#6b7280">위치태그가 있는 매장이 없습니다.</div>';
-        var fd=d.feed.slice().sort(function(a,b){return new Date(b.timestamp)-new Date(a.timestamp);});
-        feed.innerHTML=fd.map(function(p){
-          return '<div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:12px">'
-            +'<div style="font-weight:700;font-size:13px">@'+esc(p.user)+'</div>'
-            +(p.location?'<div style="font-size:12px;color:#6b7280">📍 '+esc(p.location)+'</div>':'')
-            +'<div style="font-size:12px;color:#374151;margin:6px 0">❤ '+(p.likes||0).toLocaleString()+' · 💬 '+(p.comments||0)+'</div>'
-            +'<div style="font-size:12px;color:#4b5563;line-height:1.4">'+esc(p.caption)+'</div>'
-            +'<a href="'+esc(p.url)+'" target="_blank" style="display:inline-block;margin-top:6px;font-size:12px;color:#2563eb">인스타에서 보기 →</a>'
-            +'</div>';
-        }).join('');
-      })
-      .catch(function(e){status.textContent='오류: '+e.message;})
-      .then(function(){loading=false;});
-  }
-})();
-</script>
