@@ -1253,3 +1253,231 @@ init();
 </script>
 </body>
 </html>
+
+<!-- ===== 인허가 신규 탭 (행안부 지방행정 인허가 데이터, data.go.kr) ===== -->
+<script>
+(function(){
+  // ---- 페이지 추가 ----
+  var pg = document.createElement('div');
+  pg.className = 'page';
+  pg.id = 'pg-permit';
+  pg.innerHTML = ''
+    + '<div class="alert-banner" style="margin-bottom:12px">'
+    + '  <span class="aico">🏛️</span>'
+    + '  <div style="font-size:11px;line-height:1.5">관할구청 <strong style="color:var(--c1)">영업신고(인허가)</strong> 기준 신규 업장입니다.<br>네이버 플레이스 등록 <strong>이전</strong> 단계라 가장 빠른 선점 영업이 가능합니다. (데이터는 2일 전 기준)</div>'
+    + '</div>'
+    + '<div class="chips" id="chip-pm-days">'
+    + '  <div class="chip" data-v="3">최근 3일</div>'
+    + '  <div class="chip on" data-v="7">7일</div>'
+    + '  <div class="chip" data-v="14">14일</div>'
+    + '  <div class="chip" data-v="30">30일</div>'
+    + '</div>'
+    + '<div class="chips" id="chip-pm-region">'
+    + '  <div class="chip on" data-v="metro">서울+경기</div>'
+    + '  <div class="chip" data-v="seoul">서울</div>'
+    + '  <div class="chip" data-v="gyeonggi">경기</div>'
+    + '  <div class="chip" data-v="all">🇰🇷 전국</div>'
+    + '</div>'
+    + '<div class="chips" id="chip-pm-type">'
+    + '  <div class="chip on" data-v="all">전체 업종</div>'
+    + '  <div class="chip" data-v="ilban">일반음식점</div>'
+    + '  <div class="chip" data-v="hyuge">휴게음식점</div>'
+    + '  <div class="chip" data-v="danran">단란주점</div>'
+    + '  <div class="chip" data-v="yuheung">유흥주점</div>'
+    + '</div>'
+    + '<div class="chips" id="chip-pm-upte" style="display:none"></div>'
+    + '<button class="srch-btn" id="pm-load-btn">'
+    + '  <span id="pm-ico">🏛️</span> 신규 인허가 업장 조회'
+    + '</button>'
+    + '<div id="pm-count" style="font-size:11px;color:var(--txt3);margin-bottom:10px;text-align:center"></div>'
+    + '<div id="pm-list"><div class="empty"><div class="eico">🏛️</div><div class="etxt">조회 버튼을 눌러<br>방금 영업신고한 업장을 찾아보세요</div></div></div>';
+  document.querySelector('.main').appendChild(pg);
+
+  // ---- 하단 네비 버튼 추가 ----
+  var btn = document.createElement('button');
+  btn.className = 'bnav-btn';
+  btn.setAttribute('data-pg', 'permit');
+  btn.innerHTML = '<span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/><line x1="9" y1="11" x2="9.01" y2="11"/><line x1="15" y1="11" x2="15.01" y2="11"/></svg></span>인허가';
+  var nav = document.querySelector('.bnav');
+  nav.insertBefore(btn, nav.children[2]); // 신규오픈 다음 위치
+  btn.addEventListener('click', function(){ switchPage('permit'); });
+
+  // ---- 칩 핸들러 ----
+  ['chip-pm-days','chip-pm-region','chip-pm-type'].forEach(function(id){
+    document.querySelectorAll('#' + id + ' .chip').forEach(function(c){
+      c.addEventListener('click', function(){
+        document.querySelectorAll('#' + id + ' .chip').forEach(function(x){ x.classList.remove('on'); });
+        c.classList.add('on');
+        if (PM_ALL.length) renderPermits();
+      });
+    });
+  });
+
+  document.getElementById('pm-load-btn').addEventListener('click', loadPermits);
+
+  // ---- 상태 ----
+  var PM_ALL = [];
+  var PM_NAVER = {}; // id -> {found, link}
+
+  function pmEsc(s){
+    return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function pmFmtDate(ymd){
+    if (!ymd || ymd.length < 8) return '-';
+    return ymd.slice(0,4) + '.' + ymd.slice(4,6) + '.' + ymd.slice(6,8);
+  }
+  function pmDaysAgo(ymd){
+    if (!ymd || ymd.length < 8) return 999;
+    var dt = new Date(ymd.slice(0,4) + '-' + ymd.slice(4,6) + '-' + ymd.slice(6,8));
+    return Math.floor((Date.now() - dt.getTime()) / 864e5);
+  }
+  function pmRegion(addr){
+    if (!addr) return '-';
+    if (addr.indexOf('서울') === 0) return '서울';
+    if (addr.indexOf('경기') === 0) return '경기';
+    return addr.split(' ')[0];
+  }
+  function pmGu(addr){
+    var parts = String(addr || '').split(' ');
+    return parts.length > 1 ? parts[1] : '';
+  }
+
+  // ---- 조회 ----
+  async function loadPermits(){
+    var ico = document.getElementById('pm-ico');
+    ico.innerHTML = '<span class="spin"></span>';
+    var days = document.querySelector('#chip-pm-days .chip.on').dataset.v;
+    var region = document.querySelector('#chip-pm-region .chip.on').dataset.v;
+    try {
+      var r = await fetch('/api/permits?days=' + days + '&region=' + region + '&type=all');
+      var d = await r.json();
+      if (d.error) throw new Error(d.error);
+      PM_ALL = d.items || [];
+      PM_NAVER = {};
+      renderPermits();
+    } catch(e) {
+      document.getElementById('pm-list').innerHTML =
+        '<div class="empty"><div class="eico">⚠️</div><div class="etxt">조회 실패: ' + pmEsc(e.message) + '</div></div>';
+      document.getElementById('pm-count').textContent = '';
+    }
+    ico.innerHTML = '🏛️';
+  }
+
+  // ---- 렌더 ----
+  function renderPermits(){
+    var type = document.querySelector('#chip-pm-type .chip.on').dataset.v;
+    var list = type === 'all' ? PM_ALL : PM_ALL.filter(function(s){ return s.type === type; });
+
+    var cnt = document.getElementById('pm-count');
+    var byType = {};
+    list.forEach(function(s){ byType[s.typeLabel] = (byType[s.typeLabel] || 0) + 1; });
+    cnt.textContent = list.length
+      ? list.length + '건 — ' + Object.keys(byType).map(function(k){ return k + ' ' + byType[k]; }).join(' · ')
+      : '결과 없음';
+
+    var el = document.getElementById('pm-list');
+    if (!list.length) {
+      el.innerHTML = '<div class="empty"><div class="eico">🏛️</div><div class="etxt">해당 조건의 신규 인허가가 없습니다</div></div>';
+      return;
+    }
+
+    el.innerHTML = list.slice(0, 200).map(function(s){
+      var da = pmDaysAgo(s.permitDate);
+      var hot = da <= 3;
+      var tr = ST.tracked.find(function(t){ return t.id === s.id; });
+      var nv = PM_NAVER[s.id];
+      var nvBadge = '';
+      if (nv) {
+        nvBadge = nv.found
+          ? '<span class="tag" style="background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.3)">N등록됨</span>'
+          : '<span class="tag" style="background:rgba(239,68,68,.12);color:#f87171;border:1px solid rgba(239,68,68,.25)">N미등록 — 선점기회</span>';
+      }
+      return ''
+      + '<div class="sc" data-pmid="' + pmEsc(s.id) + '">'
+      + (hot ? '<div class="sc-new-glow"></div>' : '')
+      + '<div class="sc-name">' + pmEsc(s.name) + '</div>'
+      + '<div class="sc-tags">'
+      +   (hot ? '<span class="tag t-new">🔥 ' + (da <= 0 ? '오늘' : da + '일 전') + ' 인허가</span>' : '')
+      +   '<span class="tag t-cat">' + pmEsc(s.typeLabel) + (s.upte && s.upte !== s.typeLabel ? '·' + pmEsc(s.upte) : '') + '</span>'
+      +   '<span class="tag t-reg">' + pmEsc(pmRegion(s.addr)) + ' ' + pmEsc(pmGu(s.addr)) + '</span>'
+      +   '<span class="tag" style="background:rgba(75,94,122,.2);color:var(--txt2);border:1px solid var(--border2)">' + pmEsc(s.status || '영업') + '</span>'
+      +   nvBadge
+      + '</div>'
+      + '<div class="sc-desc">📍 ' + pmEsc(s.addr || '주소 정보 없음') + (s.tel ? '<br>📞 ' + pmEsc(s.tel) : '') + '</div>'
+      + '<div class="sc-foot">'
+      +   '<span class="sc-date">인허가 ' + pmFmtDate(s.permitDate) + '</span>'
+      +   '<span style="display:flex;gap:6px">'
+      +     '<button class="sc-track-btn" data-act="naver">N 확인</button>'
+      +     '<button class="sc-track-btn" data-act="place">플레이스</button>'
+      +     '<button class="sc-track-btn ' + (tr ? 'tracked' : '') + '" data-act="track">' + (tr ? '📌 추적중' : '＋ 추적') + '</button>'
+      +   '</span>'
+      + '</div>'
+      + '</div>';
+    }).join('');
+
+    // 카드 버튼 이벤트 위임
+    el.querySelectorAll('.sc').forEach(function(card){
+      var id = card.getAttribute('data-pmid');
+      var s = list.find(function(x){ return String(x.id) === id; });
+      if (!s) return;
+      card.querySelectorAll('button[data-act]').forEach(function(b){
+        b.addEventListener('click', function(ev){
+          ev.stopPropagation();
+          var act = b.getAttribute('data-act');
+          if (act === 'place') openNaverPlace(s);
+          else if (act === 'naver') checkNaver(s);
+          else if (act === 'track') trackPermit(s);
+        });
+      });
+    });
+  }
+
+  function naverQuery(s){
+    var gu = pmGu(s.addr);
+    return (s.name + ' ' + gu).trim();
+  }
+  function openNaverPlace(s){
+    window.open('https://m.search.naver.com/search.naver?query=' + encodeURIComponent(naverQuery(s)), '_blank');
+  }
+
+  // ---- 네이버 플레이스 등록 여부 확인 ----
+  async function checkNaver(s){
+    PM_NAVER[s.id] = null;
+    try {
+      var items = await apiLocal(naverQuery(s), 5);
+      var norm = function(t){ return String(t).replace(/<[^>]+>/g, '').replace(/\s/g, '').toLowerCase(); };
+      var target = norm(s.name);
+      var found = items.some(function(i){
+        var t = norm(i.title);
+        return t.indexOf(target) >= 0 || target.indexOf(t) >= 0;
+      });
+      PM_NAVER[s.id] = { found: found };
+    } catch(e) {
+      PM_NAVER[s.id] = { found: false };
+    }
+    renderPermits();
+  }
+
+  // ---- 추적매장 연동 ----
+  function trackPermit(s){
+    var da = s.permitDate && s.permitDate.length === 8
+      ? s.permitDate.slice(0,4) + '-' + s.permitDate.slice(4,6) + '-' + s.permitDate.slice(6,8) : '';
+    toggleTrack({
+      id: s.id,
+      name: s.name,
+      txt: '',
+      desc: (s.addr || '') + (s.tel ? ' / ' + s.tel : ''),
+      cat: 'other',
+      catLb: s.typeLabel + (s.upte && s.upte !== s.typeLabel ? '·' + s.upte : ''),
+      region: pmRegion(s.addr),
+      sub: pmGu(s.addr),
+      fr: false,
+      isNew: true,
+      date: da,
+      link: 'https://m.search.naver.com/search.naver?query=' + encodeURIComponent(naverQuery(s)),
+      src: 'permit'
+    });
+    renderPermits();
+  }
+})();
+</script>
