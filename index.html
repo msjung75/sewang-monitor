@@ -358,7 +358,7 @@ body{
       <div class="stat-n" id="s-tr">-</div>
       <div class="stat-l">추적 매장</div>
       <div class="stat-glow"></div>
-  2 </div>
+    </div>
   </div>
 
   <!-- Quick refresh -->
@@ -422,7 +422,6 @@ body{
     <div class="chip" data-v="고기">고기집</div>
     <div class="chip" data-v="치킨">치킨/호프</div>
     <div class="chip" data-v="펍">펍/바</div>
-    <div class="chip" data-v="광주">광주</div>
     <div class="chip" data-v="다이닝">레스토랑</div>
     <div class="chip" data-v="해산물">해산물</div>
     <div class="chip" data-v="한식">한식</div>
@@ -527,10 +526,12 @@ body{
     <span class="ico">🆕</span>신규오픈
   </button>
   <button class="bnav-btn" data-pg="analysis">
-    <span class="ico">🍊</span>업종분석
+    <span class="ico">📊</span>업종분석
   </button>
   <button class="bnav-btn" data-pg="fr">
-    <span class="ico">🏪</span>프�data-pg="track">
+    <span class="ico">🏪</span>프랜차이즈
+  </button>
+  <button class="bnav-btn" data-pg="track">
     <span class="ico">📌</span>추적매장
   </button>
 </nav>
@@ -561,11 +562,25 @@ const CATS = [
 const OPEN_KW = ['신규오픈','새로오픈','오픈했어요','오픈했습니다','오픈이에요','새로생긴','새로 생긴',
   '드디어오픈','그랜드오픈','그랜드 오픈','프리오픈','오픈 기념','오픈 소식','오픈했다','첫날','첫 영업'];
 
-const FR_BRANDS = ['교촌','비비큐','bhc','굽네','푸라닭','노랑통닭','페리카나','호식이','60계','네네치킨',
-  '맘스터치','롯데리아','맥도날드','버거킹','kfc','아웃백','더플레이스','빕스','애슐리','서가앤쿡',
-  '한솥도시락','김밥천국','본죽','설빙','배스킨','뚜레쥬르','파리바게뜨','스타벅스','컴포즈','메가커피',
-  '이디야','할리스','투썸','공차','샐러디','써브웨이','도미노','피자헛','미스터피자',
-  '한신포차','봉구스','육쌈냉면','청년다방','고기대장','이삭토스트','와라와라'];
+// 주류 취급 음식점 프랜차이즈만 포함 (커피/빵집/패스트푸드 제외)
+const FR_BRANDS = [
+  // 치킨 (주류 취급)
+  '교촌','비비큐','bhc','굽네','푸라닭','노랑통닭','페리카나','호식이','60계','네네치킨',
+  'kfc','불닭','버팔로','훌랄라','처갓집','지코바','bb큐','자담치킨','맥시칸','피자마루',
+  // 고기/구이 프랜차이즈
+  '하남돼지집','육쌈냉면','고기대장','황금에빠지다','한우물','연탄구이','숯불','고기리',
+  '본갈비','차돌박이','삼겹살','곱창','막창','돼지갈비','소갈비','양갈비','우삼겹',
+  // 호프/맥주 프랜차이즈
+  '생활맥주','투다리','와라와라','맥주바켓','쪼끼쪼끼','부어라마셔라','팔팔호프',
+  '치어스','비어캡','호프나무','수제맥주','크래프트','홉스','드래프트',
+  // 포차/주점 프랜차이즈
+  '한신포차','이모네포차','야장포차','열정포차','포차한잔','홍대포차','산수갑산',
+  '주막','막걸리나라','전통주막','복순도가','바른치킨',
+  // 이자카야/일식 체인
+  '이자카야','야키니쿠','야키토리','오야지','하나미','주당','사케바','니혼',
+  // 패밀리레스토랑 (주류 취급)
+  '아웃백','빕스','애슐리','서가앤쿡','더플레이스',
+];
 
 const FR_SIGNAL = ['가맹점','직영점','신규출점','n호점','호점','분점','창업','가맹','체인'];
 
@@ -684,39 +699,42 @@ async function loadNew(btn){
   const region=activeChip('chip-region');
   const regKw=region||'';
 
-  // Build queries — target open keywords + various business types
-  const base = regKw ? [regKw] : ['서울','경기','부산','대구','인천','광주','대전'];
-  const suffixes = [
-    '신규오픈 음식점 주점',
-    '새로오픈 맛집 술집',
-    '오픈했어요 포차 이자카야',
-    '신규 고기집 오픈',
-    '신규 호프 치킨 오픈',
-    '신규 펍 와인바 오픈',
-    '오픈기념 음식점',
-    '그랜드오픈 음식점',
-  ];
+  // === 1차: 네이버 플레이스(local) 직접 검색 ===
+  // 신규 창업 = 네이버 플레이스 등록이 먼저 → local API가 가장 신뢰할 수 있는 소스
+  const localCats = ['포차','이자카야','주점','고기집','치킨 호프','맥주집','횟집','와인바','막창','곱창'];
+  const searchRegions = regKw ? [regKw] : ['서울','경기','부산','인천','대구','광주','대전'];
 
-  // Pick 4-6 queries to stay fast
-  const queries=[];
-  if(region){
-    // Single region - more targeted queries
-    for(const s of suffixes.slice(0,6)) queries.push(`${regKw} ${s}`);
-  } else {
-    // Nationwide: cycle through cities + keywords
-    for(let i=0;i<Math.min(base.length,3);i++){
-      queries.push(`${base[i]} 신규오픈 음식점 주점`);
-      queries.push(`${base[i]} 오픈했어요 맛집 술집`);
+  const localQs = [];
+  for(const r of searchRegions.slice(0,3)){
+    for(const c of localCats.slice(0,5)){
+      localQs.push(`${r} ${c}`);
     }
-    queries.push('신규오픈 이자카야 포차 2025');
-    queries.push('새로오픈 고기집 호프 맛집');
   }
 
-  const results=await Promise.all(queries.slice(0,6).map(q=>apiBlog(q,20,'date')));
-  const raw=results.flat();
+  // === 2차: 블로그 — 네이버 플레이스 새로오픈 언급 글만 ===
+  const blogQs = regKw ? [
+    `${regKw} 네이버플레이스 새로오픈 주점 포차`,
+    `${regKw} 플레이스 신규오픈 이자카야 고기집`,
+    `${regKw} 새로오픈 술집 주류 음식점`,
+  ] : [
+    '네이버플레이스 새로오픈 주점 포차 이자카야',
+    '플레이스 신규오픈 고기집 호프 맥주',
+    '새로오픈 술집 포차 이자카야',
+    '신규오픈 주점 치킨 고기집',
+  ];
+
+  const [localRs, blogRs] = await Promise.all([
+    Promise.all(localQs.slice(0,9).map(q=>apiLocal(q,5))),
+    Promise.all(blogQs.map(q=>apiBlog(q,20,'date'))),
+  ]);
+
+  // local 결과는 실제 플레이스 등록 → _srcType 표시
+  const localItems = localRs.flat().map(i=>({...i, _srcType:'local'}));
+  const blogItems  = blogRs.flat();
+  const raw=[...localItems,...blogItems];
 
   const seen=new Set();
-  ALL=raw.map(i=>parseStore(i,'blog'))
+  ALL=raw.map(i=>parseStore(i, i._srcType==='local'?'local':'blog'))
     .filter(s=>{
       const k=s.name.trim();
       if(!k||seen.has(k)) return false;
@@ -752,7 +770,7 @@ function filterAndRender(){
   });
 
   const cnt=document.getElementById('new-count');
-  if(cnt) cnt.textContent=filtered.length>0?`${filtered.length}몜 매장 발견`:'';
+  if(cnt) cnt.textContent=filtered.length>0?`${filtered.length}개 매장 발견`:'';
 
   renderStoreList('new-list',filtered,false);
 }
@@ -779,7 +797,8 @@ function renderStoreList(id, list, compact=false){
       ${ne?'<div class="sc-new-glow"></div>':''}
       <div class="sc-name">${s.name}</div>
       <div class="sc-tags">
-        ${ne?'<span class="tag t-new">🆕 신규오픈</span>':''}
+        ${s.src==='local'?'<span class="tag" style="background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.3)">📍 플레이스</span>':''}
+        ${ne&&s.src!=='local'?'<span class="tag t-new">🆕 신규오픈</span>':''}
         <span class="tag t-cat">${s.catLb}</span>
         <span class="tag t-reg">${s.region}${s.sub?' '+s.sub:''}</span>
         ${s.fr?'<span class="tag t-fr">프랜차이즈</span>':''}
@@ -837,7 +856,7 @@ function updateStats(){
   if(newOnes.length){
     document.getElementById('home-alert').style.display='flex';
     document.getElementById('home-alert-txt').textContent=
-      `확인된 신규오픈 매장 ${newOnes.length}몜 발견 — ${newOnes.slice(0,3).map(s=>s.name).join(', ')}${newOnes.length>3?` 외 ${newOnes.length-3}개`:''}`;
+      `확인된 신규오픈 매장 ${newOnes.length}개 발견 — ${newOnes.slice(0,3).map(s=>s.name).join(', ')}${newOnes.length>3?` 외 ${newOnes.length-3}개`:''}`;
   }
 
   // Region grid
@@ -999,13 +1018,14 @@ async function loadFranchise(btn){
   const icoEl=btn?btn.querySelector('#fr-ico'):document.getElementById('fr-ico');
   if(icoEl) icoEl.innerHTML='<span class="spin pulse"></span>';
 
+  // 주류 취급 업종 프랜차이즈만 검색 (커피/빵집 제외)
   const queries=[
-    '프랜차이즈 음식점 신규출점 가맹점',
-    '치킨 프랜차이즈 신규오픈',
-    '고기집 프랜차이즈 출점',
-    '이자카야 포차 프랜차이즈 오픈',
-    '호프 맥주 프랜차이즈 신규',
-    '음식점 프랜차이즈 확장 가맹',
+    '치킨 프랜차이즈 가맹 신규출점 오픈',
+    '고기집 프랜차이즈 출점 가맹점 신규',
+    '이자카야 포차 프랜차이즈 가맹 출점',
+    '호프 맥주 프랜차이즈 신규오픈 가맹',
+    '주점 술집 프랜차이즈 확장 출점',
+    '삼겹살 갈비 구이 프랜차이즈 가맹',
   ];
 
   const [blogR, newsR]=await Promise.all([
@@ -1051,7 +1071,7 @@ function renderTracked(){
 
   const el=document.getElementById('track-list');
   if(!list.length){
-    el.innerHTML<`<div class="empty"><div class="eico">📌</div><div class="etxt">추적 중인 매장이 없습니다<br>신규오픈 탭에서 매장을 추가하세요</div></div>`;
+    el.innerHTML=`<div class="empty"><div class="eico">📌</div><div class="etxt">추적 중인 매장이 없습니다<br>신규오픈 탭에서 매장을 추가하세요</div></div>`;
     return;
   }
 
