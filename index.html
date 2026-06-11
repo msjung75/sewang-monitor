@@ -76,7 +76,7 @@ body{
   color:var(--txt3);font-size:9px;font-weight:500;
   transition:color .2s;
 }
-.bnav-btn .ico{font-size:20px;line-height:1}
+.bnav-btn .ico{display:flex;align-items:center;justify-content:center;width:24px;height:24px}
 .bnav-btn.on{color:var(--c1)}
 .bnav-btn.on .ico{filter:drop-shadow(0 0 6px rgba(0,212,255,0.6))}
 
@@ -312,6 +312,24 @@ body{
 /* ===== PULSE ANIMATION ===== */
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
 .pulse{animation:pulse 1.5s ease infinite}
+
+/* ===== 디자인 개선 ===== */
+.card-title{
+  font-size:13px;font-weight:700;color:var(--txt2);
+  letter-spacing:0.3px;text-transform:uppercase;
+  padding-bottom:10px;border-bottom:1px solid var(--border);
+  margin-bottom:12px;
+}
+.bnav-btn .ico svg{
+  transition:filter .2s;
+}
+.bnav-btn.on .ico svg{
+  filter:drop-shadow(0 0 5px rgba(0,212,255,0.7));
+  stroke:var(--c1);
+}
+.srch-btn svg{vertical-align:middle;margin-right:4px}
+.aico svg{vertical-align:middle}
+.hdr-badge svg{display:block}
 </style>
 </head>
 <body>
@@ -319,7 +337,7 @@ body{
 <!-- ===== HEADER ===== -->
 <div class="hdr">
   <div class="hdr-logo">
-    <div class="hdr-badge">🍶</div>
+    <div class="hdr-badge"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 22h8"/><path d="M12 11v11"/><path d="M7 7.5c0 2.5 2.5 3.5 5 3.5s5-1 5-3.5V5c0-1.1-.9-2-2-2H9a2 2 0 00-2 2v2.5z"/><circle cx="12" cy="2" r="1"/></svg></div>
     <div>
       <div class="hdr-title">세왕 신규업장 모니터</div>
       <div style="font-size:9px;color:var(--txt3);margin-top:1px">주류도매 영업지원 시스템</div>
@@ -363,27 +381,27 @@ body{
 
   <!-- Quick refresh -->
   <button class="srch-btn" onclick="refreshAll(this)">
-    <span id="home-ico">🔄</span> 전체 업데이트
+    <span id="home-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg></span> 전체 업데이트
   </button>
 
   <!-- Alert -->
   <div class="alert-banner" id="home-alert" style="display:none">
-    <span class="aico">🆕</span>
+    <span class="aico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></span>
     <div id="home-alert-txt"></div>
   </div>
 
   <!-- 업종 분포 차트 -->
   <div class="card">
-    <div class="card-title">📊 업종별 분포</div>
+    <div class="card-title">업종별 분포</div>
     <div class="chart-box"><canvas id="chart-home-cat"></canvas></div>
   </div>
 
   <!-- 지역별 카운트 -->
-  <div class="sdiv">📍 지역별 오픈 현황</div>
+  <div class="sdiv">지역별 오픈 현황</div>
   <div class="reg-grid" id="home-regions"></div>
 
   <!-- 최신 오픈 -->
-  <div class="sdiv">🆕 최신 신규오픈 매장</div>
+  <div class="sdiv">최신 신규오픈 매장</div>
   <div id="home-latest"></div>
 
 </div>
@@ -428,7 +446,7 @@ body{
   </div>
 
   <button class="srch-btn" onclick="loadNew(this)">
-    <span id="new-ico">🔍</span> 신규 업장 검색
+    <span id="new-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span> 신규 업장 검색
   </button>
 
   <div id="new-count" style="font-size:11px;color:var(--txt3);margin-bottom:10px;text-align:center"></div>
@@ -440,22 +458,22 @@ body{
 <div class="page" id="pg-analysis">
 
   <div class="card">
-    <div class="card-title">🍺 업종 분포</div>
+    <div class="card-title">업종 분포</div>
     <div class="chart-box"><canvas id="chart-cat-doughnut"></canvas></div>
   </div>
 
   <div class="card">
-    <div class="card-title">🗺️ 지역별 오픈 수</div>
+    <div class="card-title">지역별 오픈 수</div>
     <div class="chart-box"><canvas id="chart-region-bar"></canvas></div>
   </div>
 
   <div class="card">
-    <div class="card-title">📈 개인 vs 프랜차이즈</div>
+    <div class="card-title">개인 vs 프랜차이즈</div>
     <div id="analysis-prog"></div>
   </div>
 
   <div class="card">
-    <div class="card-title">🏆 주목 신규 매장 TOP 10</div>
+    <div class="card-title">주목 신규 매장 TOP 10</div>
     <table class="rtbl" id="tbl-top">
       <tr><td colspan="3" style="color:var(--txt3);text-align:center;padding:24px;font-size:12px">신규오픈 탭에서 검색 후 확인 가능</td></tr>
     </table>
@@ -474,17 +492,17 @@ body{
   </div>
 
   <button class="srch-btn" onclick="loadFranchise(this)">
-    <span id="fr-ico">📡</span> 프랜차이즈 확장 스캔
+    <span id="fr-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span> 프랜차이즈 확장 스캔
   </button>
 
   <div class="card">
-    <div class="card-title">📈 확장 중인 브랜드 TOP 15</div>
+    <div class="card-title">확장 중인 브랜드 TOP 15</div>
     <table class="rtbl" id="tbl-brand">
       <tr><td colspan="3" style="color:var(--txt3);text-align:center;padding:24px;font-size:12px">스캔 버튼을 눌러주세요</td></tr>
     </table>
   </div>
 
-  <div class="sdiv">🏪 신규 출점 매장</div>
+  <div class="sdiv">신규 출점 매장</div>
   <div id="fr-list"></div>
 
 </div>
@@ -498,8 +516,8 @@ body{
       상태를 업데이트하고 메모를 남길 수 있습니다.
     </div>
     <div style="display:flex;gap:8px">
-      <button onclick="exportTracked()" style="flex:1;padding:9px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.25);color:var(--c3);border-radius:9px;font-size:11px;font-weight:600;cursor:pointer">📤 내보내기</button>
-      <button onclick="clearTracked()" style="flex:1;padding:9px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);color:#f87171;border-radius:9px;font-size:11px;font-weight:600;cursor:pointer">🗑️ 전체삭제</button>
+      <button onclick="exportTracked()" style="flex:1;padding:9px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.25);color:var(--c3);border-radius:9px;font-size:11px;font-weight:600;cursor:pointer">내보내기</button>
+      <button onclick="clearTracked()" style="flex:1;padding:9px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);color:#f87171;border-radius:9px;font-size:11px;font-weight:600;cursor:pointer">전체삭제</button>
     </div>
   </div>
 
@@ -520,19 +538,19 @@ body{
 <!-- ===== BOTTOM NAV ===== -->
 <nav class="bnav">
   <button class="bnav-btn on" data-pg="home">
-    <span class="ico">🏠</span>대시보드
+    <span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>대시보드
   </button>
   <button class="bnav-btn" data-pg="new">
-    <span class="ico">🆕</span>신규오픈
+    <span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></span>신규오픈
   </button>
   <button class="bnav-btn" data-pg="analysis">
-    <span class="ico">📊</span>업종분석
+    <span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg></span>업종분석
   </button>
   <button class="bnav-btn" data-pg="fr">
-    <span class="ico">🏪</span>프랜차이즈
+    <span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h20l-2 9H4L2 3z"/><path d="M4 12v9h16v-9"/><path d="M9 21v-6h6v6"/></svg></span>프랜차이즈
   </button>
   <button class="bnav-btn" data-pg="track">
-    <span class="ico">📌</span>추적매장
+    <span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></span>추적매장
   </button>
 </nav>
 
@@ -750,7 +768,7 @@ async function loadNew(btn){
   updateStats();
   if(document.getElementById('pg-analysis').classList.contains('on')) renderAnalysis();
 
-  if(icoEl) icoEl.textContent='🔍';
+  if(icoEl) icoEl.innerHTML='<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"11\" cy=\"11\" r=\"8\"/><line x1=\"21\" y1=\"21\" x2=\"16.65\" y2=\"16.65\"/></svg>';
 }
 
 function filterAndRender(){
@@ -1058,7 +1076,7 @@ async function loadFranchise(btn){
   `;
 
   renderStoreList('fr-list',frStores,false);
-  if(icoEl) icoEl.textContent='📡';
+  if(icoEl) icoEl.innerHTML='<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polyline points=\"22 12 18 12 15 21 9 3 6 12 2 12\"/></svg>';
 }
 
 // ============================================================
@@ -1194,7 +1212,7 @@ async function refreshAll(btn){
   const icoEl=btn?btn.querySelector('#home-ico'):document.getElementById('home-ico');
   if(icoEl) icoEl.innerHTML='<span class="spin"></span>';
   await loadNew(null);
-  if(icoEl) icoEl.textContent='🔄';
+  if(icoEl) icoEl.innerHTML='<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M23 4v6h-6\"/><path d=\"M1 20v-6h6\"/><path d=\"M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15\"/></svg>';
 }
 
 // ============================================================
