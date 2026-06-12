@@ -594,8 +594,10 @@ function brandOf(name){
 // 주류 미취급 업종 제외 (커피/카페/빵집/디저트/햄버거/패스트푸드 등)
 var EXCLUDE_NAME = /커피|카페|까페|cafe|coffee|caffe|빵|베이커리|제과|베이글|도넛|도너츠|디저트|케이크|케익|와플|크로플|마카롱|버거|햄버거|샌드위치|토스트|아이스크림|빙수|젤라또|요거트|쥬스|주스|스무디|밀크티|버블티|공차|스타벅스|이디야|메가엠지씨|컴포즈|빽다방|투썸|폴바셋|할리스|파스쿠찌|더벤티|던킨|배스킨|베스킨|파리바게|뚜레쥬르|맘스터치|롯데리아|맥도날드|버거킹|서브웨이|편의점/i;
 var EXCLUDE_UPTE = /커피|까페|카페|다방|패스트푸드|제과|아이스크림|편의점|기타휴게/;
+// 법인·위탁운영체 (푸드코트/구내식당/급식 — 주류 영업 대상 아님)
+var EXCLUDE_CORP = /에프엔비|에프앤비|f&b|fnb|티에프|푸드시스템|푸드서비스|푸드코트|급식|구내식당|컨세션|케이터링|명륜당티에프|미르에프엔비|리은푸드|라온푸드/i;
 function isExcluded(s){
-  return EXCLUDE_NAME.test(normName(s.name)) || EXCLUDE_UPTE.test(s.upte || '');
+  return EXCLUDE_NAME.test(normName(s.name)) || EXCLUDE_UPTE.test(s.upte || '') || EXCLUDE_CORP.test(normName(s.name));
 }
 function computeBrands(list){
   var map = {}; // brand -> [stores]
@@ -609,6 +611,10 @@ function computeBrands(list){
   });
   return Object.values(map)
     .filter(function(g){ return g.stores.length >= 2; })
+    // "○○점" 패턴 없이 같은 이름만 반복된 경우, 2글자 이하 이름은 우연의 일치로 보고 제외 (예: 복당)
+    .filter(function(g){ return g.explicit || g.brand.replace(/\s/g, '').length >= 3; })
+    // 법인 접미사 (운영회사명) 제외
+    .filter(function(g){ return !/(푸드|티에프|컴퍼니|상사|유통|시스템|에프씨)$/.test(g.brand.replace(/\s/g, '')); })
     .sort(function(a, b){ return b.stores.length - a.stores.length; });
 }
 var BRANDS = [];
@@ -1380,6 +1386,9 @@ function init(){
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(function(){});
   }
+  // 앱을 열면 추이 데이터는 자동 수집 (지난달은 1회 수집 후 고정, 이번 달만 갱신)
+  fetchTrend30();
+  fetchMonthly();
 }
 init();
 </script>
