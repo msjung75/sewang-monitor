@@ -1,6 +1,6 @@
 // 정적 파일 캐시 (PWA 오프라인 기본 대응)
-// CACHE 버전 bump — v9: 시·도 17개 분할 호출 (전국 누락 fix)
-const CACHE = 'sewang-pwa-v9-sido-split';
+// CACHE 버전 bump — v9b: client-side 17 시·도 fanout (Vercel timeout 우회)
+const CACHE = 'sewang-pwa-v9b-client-fanout';
 const FILES = ['./','./index.html','./manifest.json','./icon.svg'];
 
 self.addEventListener('install', e => {

@@ -648,6 +648,24 @@ async function apiPermits(params){
   if (d.error) throw new Error(d.error);
   return d;
 }
+// 17 시·도 분할 호출 (Vercel function 단일 timeout 우회). 4개 묶음 순차 → 결과 dedup·합산.
+var SIDO17 = ['seoul','gyeonggi','busan','daegu','incheon','gwangju','daejeon','ulsan','sejong','gangwon','chungbuk','chungnam','jeonbuk','jeonnam','gyeongbuk','gyeongnam','jeju'];
+async function apiPermitsAll(params){
+  var all = [], seen = {};
+  for (var i = 0; i < SIDO17.length; i += 4) {
+    var batch = SIDO17.slice(i, i + 4);
+    var results = await Promise.all(batch.map(function(sd){
+      var pm = Object.assign({}, params, { region: sd });
+      return apiPermits(pm).catch(function(){ return { items: [] }; });
+    }));
+    results.forEach(function(r){
+      (r.items || []).forEach(function(it){
+        if (it.id && !seen[it.id]) { seen[it.id] = 1; all.push(it); }
+      });
+    });
+  }
+  return { items: all, count: all.length };
+}
 async function apiLocal(q, n){
   try {
     var r = await fetch('/api/local?query=' + encodeURIComponent(q) + '&display=' + (n || 5));
@@ -678,7 +696,9 @@ async function loadPermits(){
   try {
     var items = [];
     if (days <= 10) {
-      var d = await apiPermits({ days: days, region: region, type: 'all' });
+      var d = region === 'all'
+        ? await apiPermitsAll({ days: days, type: 'all' })
+        : await apiPermits({ days: days, region: region, type: 'all' });
       items = d.items;
     } else {
       // 긴 기간은 7일 단위로 분할 조회 (데이터 누락 방지)
@@ -694,9 +714,9 @@ async function loadPermits(){
       }
       for (var ci = 0; ci < chunks.length; ci++) {
         setProg(true, '인허가 조회 중 ' + (ci+1) + '/' + chunks.length, (ci+1) / chunks.length * 100);
-        var p = { region: region, type: 'all', from: chunks[ci].from };
+        var p = { type: 'all', from: chunks[ci].from };
         if (chunks[ci].to) p.to = chunks[ci].to;
-        var dd = await apiPermits(p);
+        var dd = region === 'all' ? await apiPermitsAll(p) : await apiPermits(Object.assign({region: region}, p));
         items = items.concat(dd.items);
       }
       var seen = {};
@@ -740,9 +760,9 @@ async function fetchTrend30(){
     for (var off = 0; off < 30; off += 7) {
       var to = new Date(end); to.setUTCDate(to.getUTCDate() - off);
       var from = new Date(end); from.setUTCDate(from.getUTCDate() - Math.min(off + 7, 30));
-      var p = { region: 'all', type: 'all', from: from.toISOString().slice(0,10).replace(/-/g,'') };
+      var p = { type: 'all', from: from.toISOString().slice(0,10).replace(/-/g,'') };
       if (off !== 0) p.to = to.toISOString().slice(0,10).replace(/-/g,'');
-      var d = await apiPermits(p);
+      var d = await apiPermitsAll(p);
       (d.items || []).forEach(function(s){
         if (!s.permitDate || isExcluded(s)) return;
         byDay[s.permitDate] = (byDay[s.permitDate] || 0) + 1;
@@ -798,7 +818,7 @@ async function fetchMonthly(){
       for (var c = new Date(mStart); c < stop; ) {
         var c2 = new Date(c); c2.setUTCDate(c2.getUTCDate() + 7);
         if (c2 > stop) c2 = new Date(stop);
-        var d = await apiPermits({ region: 'all', type: 'all', from: ymdOf(c), to: ymdOf(c2) });
+        var d = await apiPermitsAll({ type: 'all', from: ymdOf(c), to: ymdOf(c2) });
         (d.items || []).forEach(function(s){
           if (isExcluded(s)) return;
           byType[s.type] = (byType[s.type] || 0) + 1;
