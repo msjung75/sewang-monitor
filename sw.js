@@ -1,6 +1,6 @@
 // 정적 파일 캐시 (PWA 오프라인 기본 대응)
-// CACHE 버전 bump — v7 검색 기반(네이버 플레이스/블로그) + 업종분석 탭
-const CACHE = 'sewang-pwa-v7-search-analysis';
+// CACHE 버전 bump — v8: 전국 인허가 + 브랜드 alias 정규화(야화 혼술바)
+const CACHE = 'sewang-pwa-v8-permit-nation-alias';
 const FILES = ['./','./index.html','./manifest.json','./icon.svg'];
 
 self.addEventListener('install', e => {
