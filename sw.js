@@ -1,6 +1,6 @@
 // 정적 파일 캐시 (PWA 오프라인 기본 대응)
-// CACHE 버전 bump — v10.1: BBQ/BHC alias + 괄호 제거 + 소문자화
-const CACHE = 'sewang-pwa-v10_1-bbq-bhc-alias';
+// CACHE 버전 bump — v10.2: nightly cache가 ST.permits에도 머지 (오픈업장 지방 표시)
+const CACHE = 'sewang-pwa-v10_2-nightly-permits-merge';
 const FILES = ['./','./index.html','./manifest.json','./icon.svg'];
 
 self.addEventListener('install', e => {

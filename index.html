@@ -1596,6 +1596,7 @@ async function loadNightlyCache(){
     var existingAt = ST.trend30 && ST.trend30.at ? ST.trend30.at : 0;
     var nightlyAt = new Date(d.at || 0).getTime();
     if (nightlyAt > existingAt || !ST.trend30 || !ST.trend30.stores || !ST.trend30.stores.length) {
+      // 30일 trend (프랜차이즈 탭)
       ST.trend30 = {
         byDay: d.byDay || {},
         stores: d.stores,
@@ -1603,9 +1604,20 @@ async function loadNightlyCache(){
         scope: 'all',
         nightly: true
       };
+      // 「오픈업장」 탭 ST.permits 에도 머지 — 지방 자료 즉시 표시
+      // (사용자가 metro 조회를 별도로 했더라도, 전국 nightly가 더 크면 그것으로 덮어씀)
+      var filtered = d.stores.filter(function(s){ return !isExcluded(s); });
+      if (!ST.permits || filtered.length > ST.permits.length) {
+        ST.permits = filtered;
+        ST.lastFetch = new Date(nightlyAt).toISOString();
+      }
       save();
-      try { rebuildBrands(); renderCharts(); renderFr(); renderStats(); } catch(e){}
-      console.log('[nightly] 전국 캐시 로드 — ' + d.stores.length + '건, 수집시각 ' + new Date(nightlyAt).toLocaleString('ko-KR'));
+      // chip-region을 'all'로 자동 활성 (오픈업장 탭 라벨도 '전국'으로)
+      document.querySelectorAll('#chip-region .chip').forEach(function(c){
+        c.classList.toggle('on', c.dataset.v === 'all');
+      });
+      try { rebuildBrands(); renderCharts(); renderFr(); renderStats(); renderNew(); renderAll && renderAll(); } catch(e){ console.error('[nightly] render fail:', e); }
+      console.log('[nightly] 전국 캐시 로드 — trend30 ' + d.stores.length + '건, permits ' + filtered.length + '건, 수집시각 ' + new Date(nightlyAt).toLocaleString('ko-KR'));
       var st = document.getElementById('nightly-stamp');
       if (st) st.textContent = '🕐 마지막 새벽 수집: ' + new Date(nightlyAt).toLocaleString('ko-KR') + ' KST · 전국 ' + d.stores.length + '건';
     }
