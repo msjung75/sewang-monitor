@@ -640,28 +640,37 @@ function brandOf(name){
   return null;
 }
 // 주류 미취급 업종 제외 (커피/카페/빵집/디저트/햄버거/패스트푸드 등)
-var EXCLUDE_NAME = /커피|카페|까페|cafe|coffee|caffe|빵|베이커리|제과|베이글|도넛|도너츠|디저트|케이크|케익|와플|크로플|마카롱|버거|햄버거|샌드위치|토스트|브런치|치즈|아이스크림|빙수|젤라또|요거트|쥬스|주스|스무디|밀크티|버블티|공차|스타벅스|이디야|메가엠지씨|메가mgc|컴포즈|빽다방|투썸|폴바셋|할리스|파스쿠찌|더벤티|던킨|배스킨|베스킨|블루보틀|커피빈|요거트프레소|설빙|청수당|커피명가|드롭탑|핸드드립|파리바게|뚜레쥬르|맘스터치|롯데리아|kfc|맥도날드|버거킹|서브웨이|편의점|놀부|놀고먹다|씨유|cu편의점|^cu|cu(?=[^a-z])|cu한|세븐일레븐|7-eleven|7eleven|gs25|지에스25|이마트24|emart24|미니스톱|ministop|365플러스|바이더웨이|홈플러스익스프레스|이마트에브리데이|롯데마트|노브랜드/i;
+var EXCLUDE_NAME = /커피|카페|까페|cafe|coffee|caffe|빵|베이커리|제과|베이글|도넛|도너츠|디저트|케이크|케익|와플|크로플|마카롱|버거|햄버거|샌드위치|토스트|브런치|치즈|아이스크림|빙수|젤라또|요거트|쥬스|주스|스무디|밀크티|버블티|공차|스타벅스|이디야|메가엠지씨|메가mgc|컴포즈|빽다방|투썸|폴바셋|할리스|파스쿠찌|더벤티|던킨|배스킨|베스킨|블루보틀|커피빈|요거트프레소|설빙|청수당|커피명가|드롭탑|핸드드립|파리바게|뚜레쥬르|맘스터치|롯데리아|kfc|맥도날드|버거킹|서브웨이|편의점|놀부|놀고먹다|씨유|cu편의점|^cu|cu(?=[^a-z])|cu한|세븐일레븐|7-eleven|7eleven|gs25|지에스25|이마트24|emart24|미니스톱|ministop|365플러스|바이더웨이|홈플러스익스프레스|이마트에브리데이|롯데마트|노브랜드|농가의식탁|에이치에스마켓|대신에프앤|daeshinf&n|daeshin|지오에프앤|지오에브앤|보해명가|노배드바이브스|nobadvibes|서울키친|메가혼밥|올데이스테이|alldaystay|이안만두/i;
 var EXCLUDE_UPTE = /커피|까페|카페|다방|패스트푸드|제과|아이스크림|편의점|기타휴게|브런치|티전문|차전문/;
 // 법인·위탁운영체 (푸드코트/구내식당/급식 — 주류 영업 대상 아님)
 var EXCLUDE_CORP = /에프엔비|에프앤비|f&b|fnb|티에프|푸드시스템|푸드서비스|푸드코트|급식|구내식당|컨세션|케이터링|명륜당티에프|미르에프엔비|리은푸드|라온푸드/i;
 function isExcluded(s){
-  return EXCLUDE_NAME.test(normName(s.name)) || EXCLUDE_UPTE.test(s.upte || '') || EXCLUDE_CORP.test(normName(s.name));
+  var n = normName(s.name);
+  var compact = n.replace(/\s/g, '');
+  // EXCLUDE_NAME/CORP는 normalized name + compact 양쪽 매칭 → '농가의 식탁'·'농가의식탁' 모두 차단
+  return EXCLUDE_NAME.test(n) || EXCLUDE_NAME.test(compact)
+      || EXCLUDE_UPTE.test(s.upte || '')
+      || EXCLUDE_CORP.test(n) || EXCLUDE_CORP.test(compact);
 }
 function computeBrands(list){
-  var map = {}; // brand -> [stores]
+  var map = {}; // compactKey -> { brand, stores, explicit }
   list.forEach(function(s){
     var b = brandOf(s.name);
     var k = canonicalBrand(b || normName(s.name));
     if (k.length < 2) return;
-    if (!map[k]) map[k] = { brand: k, stores: [], explicit: !!b };
-    map[k].stores.push(s);
-    if (b) map[k].explicit = true;
+    // 공백 제거한 compact key로 그룹화 → '농가의 식탁'·'농가의식탁' 자동 통합
+    var compactKey = k.replace(/\s/g, '').toLowerCase();
+    if (!map[compactKey]) map[compactKey] = { brand: k, stores: [], explicit: !!b };
+    map[compactKey].stores.push(s);
+    if (b) map[compactKey].explicit = true;
+    // 표시명은 더 자연스러운(공백 포함) 표기 우선
+    if (k.indexOf(' ') !== -1 && map[compactKey].brand.indexOf(' ') === -1) {
+      map[compactKey].brand = k;
+    }
   });
   return Object.values(map)
     .filter(function(g){ return g.stores.length >= 2; })
-    // "○○점" 패턴 없이 같은 이름만 반복된 경우, 2글자 이하 이름은 우연의 일치로 보고 제외 (예: 복당)
     .filter(function(g){ return g.explicit || g.brand.replace(/\s/g, '').length >= 3; })
-    // 법인 접미사 (운영회사명) 제외
     .filter(function(g){ return !/(푸드|티에프|컴퍼니|상사|유통|시스템|에프씨)$/.test(g.brand.replace(/\s/g, '')); })
     .sort(function(a, b){ return b.stores.length - a.stores.length; });
 }

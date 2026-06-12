@@ -1,6 +1,6 @@
 // 정적 파일 캐시 (PWA 오프라인 기본 대응)
-// CACHE 버전 bump — v10.4: 편의점 브랜드(CU/세븐일레븐/GS25 등) 제외 추가
-const CACHE = 'sewang-pwa-v10_4b-cu-prefix';
+// CACHE 버전 bump — v10.5: 법인·B2B 10개 제외 + brandOf compactKey 자동 통합
+const CACHE = 'sewang-pwa-v10_5-exclude10-compact';
 const FILES = ['./','./index.html','./manifest.json','./icon.svg'];
 
 self.addEventListener('install', e => {
