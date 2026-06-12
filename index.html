@@ -339,12 +339,12 @@ body{
   </div>
 
   <div class="card">
-    <div class="card-title">📈 일별 신규 인허가 추이 <span style="font-weight:400;color:var(--txt3);font-size:10px">(최근 30일 · 전국)</span></div>
+    <div class="card-title">📈 일별 신규 인허가 추이 <span id="lbl-trend-scope" style="font-weight:400;color:var(--txt3);font-size:10px">(최근 30일 · 서울+경기)</span></div>
     <div class="chart-box"><canvas id="ch-daily"></canvas></div>
   </div>
 
   <div class="card">
-    <div class="card-title">🗓️ 월별 창업 추이 <span style="font-weight:400;color:var(--txt3);font-size:10px">(업종별 · 전국 · 지난달은 1회 수집 후 고정)</span></div>
+    <div class="card-title">🗓️ 월별 창업 추이 <span id="lbl-monthly-scope" style="font-weight:400;color:var(--txt3);font-size:10px">(업종별 · 서울+경기 · 지난달은 1회 수집 후 고정)</span></div>
     <div class="chart-box"><canvas id="ch-monthly"></canvas></div>
     <div id="monthly-status" style="font-size:10px;color:var(--txt3);text-align:center;margin-top:6px"></div>
   </div>
@@ -390,10 +390,10 @@ body{
     <div class="chip" data-v="30">30일</div>
   </div>
   <div class="chips" id="chip-region">
-    <div class="chip on" data-v="all">🇰🇷 전국</div>
-    <div class="chip" data-v="metro">서울+경기</div>
+    <div class="chip on" data-v="metro">서울+경기</div>
     <div class="chip" data-v="seoul">서울</div>
     <div class="chip" data-v="gyeonggi">경기</div>
+    <div class="chip" data-v="all">🇰🇷 전국 갱신 (~10분)</div>
   </div>
   <div class="chips" id="chip-type">
     <div class="chip on" data-v="all">전체 업종</div>
@@ -448,7 +448,7 @@ body{
 
   <div class="alert-banner">
     <span class="aico">🏪</span>
-    <div>인허가 <strong style="color:var(--c1)">상호명 패턴</strong>으로 같은 브랜드의 반복 출점을 감지합니다.<br>조회 기간과 무관하게 <strong>최근 30일</strong>(전국) 기준입니다.</div>
+    <div>인허가 <strong style="color:var(--c1)">상호명 패턴</strong>으로 같은 브랜드의 반복 출점을 감지합니다.<br>조회 기간과 무관하게 <strong>최근 30일</strong>(<span id="lbl-fr-scope">서울+경기</span>) 기준입니다.</div>
   </div>
 
   <div class="chips" id="chip-fr-kind">
@@ -650,18 +650,26 @@ async function apiPermits(params){
 }
 // 17 시·도 분할 호출 (Vercel function 단일 timeout 우회). 4개 묶음 순차 → 결과 dedup·합산.
 var SIDO17 = ['seoul','gyeonggi','busan','daegu','incheon','gwangju','daejeon','ulsan','sejong','gangwon','chungbuk','chungnam','jeonbuk','jeonnam','gyeongbuk','gyeongnam','jeju'];
-async function apiPermitsAll(params){
+async function apiPermitsAll(params, onProgress){
   var all = [], seen = {};
+  var done = 0, total = SIDO17.length;
+  // 17 시·도 → 4개씩 직렬, 묶음 내부 병렬 (행안부 API rate-limit 회피). 시·도별 1회 재시도.
   for (var i = 0; i < SIDO17.length; i += 4) {
     var batch = SIDO17.slice(i, i + 4);
-    var results = await Promise.all(batch.map(function(sd){
+    var results = await Promise.all(batch.map(async function(sd){
       var pm = Object.assign({}, params, { region: sd });
-      return apiPermits(pm).catch(function(){ return { items: [] }; });
+      try { return await apiPermits(pm); }
+      catch(e1) {
+        try { return await apiPermits(pm); }
+        catch(e2) { return { items: [], _failed: sd }; }
+      }
     }));
     results.forEach(function(r){
       (r.items || []).forEach(function(it){
         if (it.id && !seen[it.id]) { seen[it.id] = 1; all.push(it); }
       });
+      done++;
+      if (typeof onProgress === 'function') onProgress(done, total);
     });
   }
   return { items: all, count: all.length };
@@ -691,7 +699,19 @@ async function loadPermits(){
   icons.forEach(function(i){ if (i) i.innerHTML = '<span class="spin"></span>'; });
 
   var days = parseInt(activeChip('chip-days') || '7', 10);
-  var region = activeChip('chip-region') || 'all';
+  var region = activeChip('chip-region') || 'metro';
+
+  // '전국' 선택 시 — 시간이 오래 걸리니 확인 + scope 저장
+  if (region === 'all') {
+    var age = ST.trend30 && ST.trend30.scope === 'all' && ST.trend30.at ? (Date.now() - ST.trend30.at) : Infinity;
+    if (age >= 24*3600*1000) {
+      if (!confirm('전국 30일치 인허가 수집은 5~15분 걸릴 수 있습니다. 진행할까요?\n(취소시 서울+경기로 진행)')) {
+        region = 'metro';
+        document.querySelectorAll('#chip-region .chip').forEach(function(c){ c.classList.toggle('on', c.dataset.v === 'metro'); });
+      }
+    }
+  }
+  ST.trend30 = ST.trend30 || {}; ST.trend30.scope = region; save();
 
   try {
     var items = [];
@@ -762,7 +782,12 @@ async function fetchTrend30(){
       var from = new Date(end); from.setUTCDate(from.getUTCDate() - Math.min(off + 7, 30));
       var p = { type: 'all', from: from.toISOString().slice(0,10).replace(/-/g,'') };
       if (off !== 0) p.to = to.toISOString().slice(0,10).replace(/-/g,'');
-      var d = await apiPermitsAll(p);
+      var trendScope = (ST.trend30 && ST.trend30.scope) || 'metro';
+      var d = trendScope === 'all'
+        ? await apiPermitsAll(p, function(done, total){
+            setProg(true, '전국 30일 추이 수집 중 ' + done + '/' + total + ' 시·도', done/total*100);
+          })
+        : await apiPermits(Object.assign({region: trendScope}, p));
       (d.items || []).forEach(function(s){
         if (!s.permitDate || isExcluded(s)) return;
         byDay[s.permitDate] = (byDay[s.permitDate] || 0) + 1;
@@ -770,7 +795,7 @@ async function fetchTrend30(){
           upte: s.upte, addr: s.addr, permitDate: s.permitDate, tel: s.tel, status: s.status });
       });
     }
-    ST.trend30 = { byDay: byDay, stores: stores, at: Date.now() };
+    ST.trend30 = { byDay: byDay, stores: stores, at: Date.now(), scope: (ST.trend30 && ST.trend30.scope) || 'metro' };
     save();
     rebuildBrands();
     renderCharts();
@@ -787,6 +812,26 @@ function rebuildBrands(){
   BRANDS = computeBrands(brandBase());
   BRAND_SET = {};
   BRANDS.forEach(function(g){ g.stores.forEach(function(s){ BRAND_SET[s.id] = g.brand; }); });
+  updateScopeLabels();
+}
+var SCOPE_LABEL = { metro: '서울+경기', seoul: '서울', gyeonggi: '경기', all: '전국' };
+function updateScopeLabels(){
+  var sc = (ST.trend30 && ST.trend30.scope) || 'metro';
+  var lb = SCOPE_LABEL[sc] || sc;
+  var age = ST.trend30 && ST.trend30.at ? (Date.now() - ST.trend30.at) : Infinity;
+  var stale = sc === 'all' && age > 24*3600*1000;
+  var ageTxt = stale ? ' · 갱신 권장' : '';
+  var t = document.getElementById('lbl-trend-scope');
+  if (t) t.textContent = '(최근 30일 · ' + lb + ageTxt + ')';
+  var m = document.getElementById('lbl-monthly-scope');
+  if (m) m.textContent = '(업종별 · ' + lb + ' · 지난달은 1회 수집 후 고정)';
+  var f = document.getElementById('lbl-fr-scope');
+  if (f) f.textContent = lb + (stale ? ' · 갱신 권장' : '');
+}
+function syncScopeOnLoad(){
+  var sc = (ST.trend30 && ST.trend30.scope) || 'metro';
+  document.querySelectorAll('#chip-region .chip').forEach(function(c){ c.classList.toggle('on', c.dataset.v === sc); });
+  updateScopeLabels();
 }
 
 // ============================================================
@@ -818,7 +863,10 @@ async function fetchMonthly(){
       for (var c = new Date(mStart); c < stop; ) {
         var c2 = new Date(c); c2.setUTCDate(c2.getUTCDate() + 7);
         if (c2 > stop) c2 = new Date(stop);
-        var d = await apiPermitsAll({ type: 'all', from: ymdOf(c), to: ymdOf(c2) });
+        var monScope = (ST.trend30 && ST.trend30.scope) || 'metro';
+        var d = monScope === 'all'
+          ? await apiPermitsAll({ type: 'all', from: ymdOf(c), to: ymdOf(c2) })
+          : await apiPermits({ region: monScope, type: 'all', from: ymdOf(c), to: ymdOf(c2) });
         (d.items || []).forEach(function(s){
           if (isExcluded(s)) return;
           byType[s.type] = (byType[s.type] || 0) + 1;
@@ -1452,6 +1500,7 @@ setInterval(function(){ updateClock(); }, 30000);
 updateClock();
 
 function init(){
+  syncScopeOnLoad();
   if (ST.trend30 && ST.trend30.stores) {
     ST.trend30.stores = ST.trend30.stores.filter(function(s){ return !isExcluded(s); });
   }
