@@ -12,9 +12,24 @@ const SERVICES = {
 
 const REGION_PREFIX = {
   seoul:    ['서울특별시'],
+  busan:    ['부산광역시'],
+  daegu:    ['대구광역시'],
+  incheon:  ['인천광역시'],
+  gwangju:  ['광주광역시'],
+  daejeon:  ['대전광역시'],
+  ulsan:    ['울산광역시'],
+  sejong:   ['세종특별자치시'],
   gyeonggi: ['경기도'],
+  gangwon:  ['강원특별자치도'],
+  chungbuk: ['충청북도'],
+  chungnam: ['충청남도'],
+  jeonbuk:  ['전북특별자치도'],
+  jeonnam:  ['전라남도'],
+  gyeongbuk:['경상북도'],
+  gyeongnam:['경상남도'],
+  jeju:     ['제주특별자치도'],
   metro:    ['서울특별시', '경기도'],
-  // 전국 = 17개 시·도 prefix 분할 호출 (단일 prefix=''로는 정렬상 일부 시·도가 잘림)
+  // backwards-compat: region=all도 17개 분할 (단일 호출은 Vercel 10s timeout 위험 → client는 시·도별 호출 권장)
   all: [
     '서울특별시','경기도','부산광역시','대구광역시','인천광역시','광주광역시',
     '대전광역시','울산광역시','세종특별자치시','강원특별자치도','충청북도',
