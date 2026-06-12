@@ -1,6 +1,7 @@
 // 행안부 지방행정 인허가 데이터(data.go.kr) 신규 업장 조회 프록시
 // 일반음식점 / 휴게음식점 / 단란주점 / 유흥주점 신규 인허가 조회
 // 데이터는 매일 갱신, 2일 전 기준 현행화
+// 파라미터: days(기본7) 또는 from/to(YYYYMMDD, to는 미만조건), region, type, maxPages
 
 const SERVICES = {
   ilban:   { base: 'general_restaurants', label: '일반음식점' },
@@ -20,13 +21,19 @@ export default async function handler(req, res) {
   const key = process.env.DATA_GO_KR_KEY;
   if (!key) return res.status(500).json({ error: 'DATA_GO_KR_KEY 미설정' });
 
-  const { days = '7', region = 'metro', type = 'all' } = req.query;
-  const maxPages = Math.min(parseInt(req.query.maxPages || '3', 10), 5);
+  const { days = '7', region = 'metro', type = 'all', from = '', to = '' } = req.query;
+  const maxPages = Math.min(parseInt(req.query.maxPages || '5', 10), 8);
 
-  // KST 기준 N일 전 날짜 (YYYYMMDD)
-  const d = new Date(Date.now() + 9 * 3600 * 1000);
-  d.setUTCDate(d.getUTCDate() - Math.min(parseInt(days, 10) || 7, 90));
-  const since = d.toISOString().slice(0, 10).replace(/-/g, '');
+  // 조회 시작일: from(YYYYMMDD) 우선, 없으면 KST 기준 N일 전
+  let since, until = '';
+  if (/^\d{8}$/.test(from)) {
+    since = from;
+    if (/^\d{8}$/.test(to)) until = to;
+  } else {
+    const d = new Date(Date.now() + 9 * 3600 * 1000);
+    d.setUTCDate(d.getUTCDate() - Math.min(parseInt(days, 10) || 7, 90));
+    since = d.toISOString().slice(0, 10).replace(/-/g, '');
+  }
 
   const types = type === 'all'
     ? Object.keys(SERVICES)
@@ -35,12 +42,14 @@ export default async function handler(req, res) {
   const prefixes = REGION_PREFIX[region] || REGION_PREFIX.metro;
 
   const jobs = [];
-  for (const t of types) for (const p of prefixes) jobs.push(fetchService(t, p, since, key, maxPages));
+  for (const t of types) for (const p of prefixes) jobs.push(fetchService(t, p, since, until, key, maxPages));
 
   try {
     const results = await Promise.all(jobs);
     const seen = new Set();
-    const items = results.flat()
+    let capped = false;
+    results.forEach(r => { if (r.capped) capped = true; });
+    const items = results.map(r => r.items).flat()
       .filter(it => {
         if (!it.id || seen.has(it.id)) return false;
         seen.add(it.id);
@@ -49,15 +58,16 @@ export default async function handler(req, res) {
       .filter(it => !/폐업|취소|말소|중지|휴업/.test(it.status || ''))
       .sort((a, b) => (b.permitDate || '').localeCompare(a.permitDate || ''));
     res.setHeader('Cache-Control', 's-maxage=1800, stale-while-revalidate=300');
-    return res.status(200).json({ since, count: items.length, items });
+    return res.status(200).json({ since, until, count: items.length, capped, items });
   } catch (e) {
     return res.status(500).json({ error: e.message });
   }
 }
 
-async function fetchService(typeKey, addrPrefix, since, key, maxPages) {
+async function fetchService(typeKey, addrPrefix, since, until, key, maxPages) {
   const svc = SERVICES[typeKey];
   const all = [];
+  let capped = false;
   for (let page = 1; page <= maxPages; page++) {
     const qs = new URLSearchParams({
       serviceKey: key,
@@ -66,6 +76,7 @@ async function fetchService(typeKey, addrPrefix, since, key, maxPages) {
       returnType: 'json',
     });
     qs.append('cond[LCPMT_YMD::GTE]', since);
+    if (until) qs.append('cond[LCPMT_YMD::LT]', until);
     if (addrPrefix) qs.append('cond[ROAD_NM_ADDR::LIKE]', addrPrefix);
     const url = `https://apis.data.go.kr/1741000/${svc.base}/info?${qs.toString()}`;
 
@@ -99,6 +110,7 @@ async function fetchService(typeKey, addrPrefix, since, key, maxPages) {
 
     const total = Number(body.totalCount || 0);
     if (page * 100 >= total || arr.length < 100) break;
+    if (page === maxPages && total > maxPages * 100) capped = true;
   }
-  return all;
+  return { items: all, capped };
 }
