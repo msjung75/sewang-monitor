@@ -1,6 +1,6 @@
 // 정적 파일 캐시 (PWA 오프라인 기본 대응)
-// CACHE 버전 bump — v9g: apiPermits 30초 fetch timeout (무한 대기 차단)
-const CACHE = 'sewang-pwa-v9g-fetch-timeout';
+// CACHE 버전 bump — v10: brandOf 정규화 강화 + 서울·경기 즉시 + 새벽 cron
+const CACHE = 'sewang-pwa-v10-brand-normalize-cron';
 const FILES = ['./','./index.html','./manifest.json','./icon.svg'];
 
 self.addEventListener('install', e => {

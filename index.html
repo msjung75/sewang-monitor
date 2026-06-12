@@ -393,8 +393,9 @@ body{
     <div class="chip on" data-v="metro">서울+경기</div>
     <div class="chip" data-v="seoul">서울</div>
     <div class="chip" data-v="gyeonggi">경기</div>
-    <div class="chip" data-v="all">🇰🇷 전국 갱신 (~10분)</div>
+    <div class="chip" data-v="all">🇰🇷 전국 (새벽 자동)</div>
   </div>
+  <div id="nightly-stamp" style="font-size:10px;color:var(--txt3);margin-bottom:6px">🕐 지방은 매일 새벽 04:00 KST 자동 갱신</div>
   <div class="chips" id="chip-type">
     <div class="chip on" data-v="all">전체 업종</div>
     <div class="chip" data-v="ilban">일반음식점</div>
@@ -588,10 +589,17 @@ function normName(name){
 }
 // 흔한 split 케이스 → 표준 브랜드명으로 정규화 (한 브랜드가 두 행으로 갈리는 것 방지)
 // 예: '야화 혼술바 강남점'과 '야화 종로점'이 따로 잡혀 1위·29위로 갈리는 문제 해결
+// 흔한 split 케이스 → 표준 브랜드명으로 통합
+// 키는 공백 제거된(compact) 형태로 적음. 매장명 → compact → 시작 prefix 매칭으로 정규화.
 var BRAND_ALIASES = {
   '야화': '야화 혼술바',
   '야화혼술': '야화 혼술바',
   '야화혼술바': '야화 혼술바',
+  // 다른 흔한 혼술바 체인
+  '자유의지혼술바': '자유의지 혼술바',
+  '헤르츠혼술바': '헤르츠 혼술바',
+  '온도혼술바': '온도 혼술바',
+  '제주아홉혼술바': '제주아홉 혼술바',
 };
 function canonicalBrand(k){
   if (!k) return k;
@@ -600,12 +608,24 @@ function canonicalBrand(k){
 }
 function brandOf(name){
   var n = normName(name);
+  // 1차: 공백으로 분리되는 경우 — "브랜드 ○○점 / ○○지점 / n호점" 패턴
   var tokens = n.split(/\s+/);
-  var last = tokens[tokens.length - 1];
-  // "브랜드 ○○점 / ○○지점 / n호점" 패턴
-  if (tokens.length >= 2 && /(점|지점|호점|캠퍼스|역점)$/.test(last) && last.length <= 8) {
-    var b = tokens.slice(0, -1).join(' ').trim();
-    if (b.length >= 2) return b;
+  if (tokens.length >= 2) {
+    var last = tokens[tokens.length - 1];
+    if (/(점|지점|호점|캠퍼스|역점)$/.test(last) && last.length <= 8) {
+      var b = tokens.slice(0, -1).join(' ').trim();
+      if (b.length >= 2) return b;
+    }
+  }
+  // 2차: 공백 없이 한 단어로 등록된 매장 ('야화혼술바인천계양점' 같은 행안부 표기)
+  //   → compact 매장명의 시작이 BRAND_ALIASES의 키로 시작하면 그것이 브랜드
+  var compact = n.replace(/\s/g, '');
+  if (/점$/.test(compact)) {
+    // 길이 긴 alias부터 매칭(짧은 prefix 오매칭 방지)
+    var keys = Object.keys(BRAND_ALIASES).sort(function(a,b){ return b.length - a.length; });
+    for (var i = 0; i < keys.length; i++) {
+      if (compact.indexOf(keys[i]) === 0) return BRAND_ALIASES[keys[i]];
+    }
   }
   return null;
 }
@@ -716,15 +736,11 @@ async function loadPermits(){
   var days = parseInt(activeChip('chip-days') || '7', 10);
   var region = activeChip('chip-region') || 'metro';
 
-  // '전국' 선택 시 — 시간이 오래 걸리니 확인 + scope 저장
+  // '전국' 선택 시 — 즉시 수집 안 함. 새벽 cron 결과만 사용. 즉시 갱신은 metro로 강제.
   if (region === 'all') {
-    var age = ST.trend30 && ST.trend30.scope === 'all' && ST.trend30.at ? (Date.now() - ST.trend30.at) : Infinity;
-    if (age >= 24*3600*1000) {
-      if (!confirm('전국 30일치 인허가 수집은 5~15분 걸릴 수 있습니다. 진행할까요?\n(취소시 서울+경기로 진행)')) {
-        region = 'metro';
-        document.querySelectorAll('#chip-region .chip').forEach(function(c){ c.classList.toggle('on', c.dataset.v === 'metro'); });
-      }
-    }
+    alert('전국 데이터는 매일 새벽 04:00 KST 자동 수집됩니다.\n즉시 갱신은 서울·경기만 빠르게 진행합니다.');
+    region = 'metro';
+    document.querySelectorAll('#chip-region .chip').forEach(function(c){ c.classList.toggle('on', c.dataset.v === 'metro'); });
   }
   ST.trend30 = ST.trend30 || {}; ST.trend30.scope = region; save();
 
@@ -816,10 +832,11 @@ async function fetchTrend30(){
       var from = new Date(end); from.setUTCDate(from.getUTCDate() - Math.min(off + 7, 30));
       var p = { type: 'all', from: from.toISOString().slice(0,10).replace(/-/g,'') };
       if (off !== 0) p.to = to.toISOString().slice(0,10).replace(/-/g,'');
-      var trendScope = ST.trend30.scope || 'metro';
+      // 'all'은 새벽 cron 결과만 — 자동 fetchTrend30은 metro로 강제
+      var trendScope = (ST.trend30.scope === 'all') ? 'metro' : (ST.trend30.scope || 'metro');
       var d;
       try {
-        d = trendScope === 'all'
+        d = false  // 'all' 즉시 수집 차단
           ? await apiPermitsAll(p, function(done, total, job, ok, failures){
               var pct = Math.round(done/total*100);
               var mark = ok ? '✓' : '✗';
@@ -1559,8 +1576,34 @@ function updateClock(isFetch){
 setInterval(function(){ updateClock(); }, 30000);
 updateClock();
 
+async function loadNightlyCache(){
+  try {
+    var r = await fetch('/data/trend30_all.json', { cache: 'no-store' });
+    if (!r.ok) return; // 파일 없으면 무시
+    var d = await r.json();
+    if (!d || !Array.isArray(d.stores)) return;
+    // 새벽 cron 결과(전국)가 더 신선하거나 더 크면 ST.trend30에 머지
+    var existingAt = ST.trend30 && ST.trend30.at ? ST.trend30.at : 0;
+    var nightlyAt = new Date(d.at || 0).getTime();
+    if (nightlyAt > existingAt || !ST.trend30 || !ST.trend30.stores || !ST.trend30.stores.length) {
+      ST.trend30 = {
+        byDay: d.byDay || {},
+        stores: d.stores,
+        at: nightlyAt,
+        scope: 'all',
+        nightly: true
+      };
+      save();
+      try { rebuildBrands(); renderCharts(); renderFr(); renderStats(); } catch(e){}
+      console.log('[nightly] 전국 캐시 로드 — ' + d.stores.length + '건, 수집시각 ' + new Date(nightlyAt).toLocaleString('ko-KR'));
+      var st = document.getElementById('nightly-stamp');
+      if (st) st.textContent = '🕐 마지막 새벽 수집: ' + new Date(nightlyAt).toLocaleString('ko-KR') + ' KST · 전국 ' + d.stores.length + '건';
+    }
+  } catch(e) { console.warn('[nightly] 캐시 로드 실패 (정상 — 파일 없으면):', e.message); }
+}
 function init(){
   syncScopeOnLoad();
+  loadNightlyCache(); // 새벽 cron 결과 자동 로드 (서울·경기만 있으면 보강, 전국이면 덮어쓰기)
   if (ST.trend30 && ST.trend30.stores) {
     ST.trend30.stores = ST.trend30.stores.filter(function(s){ return !isExcluded(s); });
   }
