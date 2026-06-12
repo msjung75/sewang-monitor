@@ -8,8 +8,5 @@
                 { "key": "Access-Control-Allow-Methods", "value": "GET, OPTIONS" }
             ]
         }
-    ],
-    "functions": {
-        "api/permits.js": { "maxDuration": 60 }
-    }
+    ]
 }
