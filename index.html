@@ -448,7 +448,13 @@ body{
 
   <div class="alert-banner">
     <span class="aico">🏪</span>
-    <div>인허가 <strong style="color:var(--c1)">상호명 패턴</strong>으로 같은 브랜드의 반복 출점을 감지합니다.<br>기간을 14~30일로 잡으면 확장 추세가 잘 보입니다.</div>
+    <div>인허가 <strong style="color:var(--c1)">상호명 패턴</strong>으로 같은 브랜드의 반복 출점을 감지합니다.<br>조회 기간과 무관하게 <strong>최근 30일</strong>(서울+경기) 기준입니다.</div>
+  </div>
+
+  <div class="chips" id="chip-fr-kind">
+    <div class="chip on" data-v="">전체 브랜드</div>
+    <div class="chip" data-v="sool">🍺 주점·술집만</div>
+    <div class="chip" data-v="food">🍽️ 음식점만</div>
   </div>
 
   <div class="card">
@@ -693,9 +699,7 @@ async function loadPermits(){
     ST.lastFetch = new Date().toISOString();
     save();
 
-    BRANDS = computeBrands(items);
-    BRAND_SET = {};
-    BRANDS.forEach(function(g){ g.stores.forEach(function(s){ BRAND_SET[s.id] = g.brand; }); });
+    rebuildBrands();
 
     renderAll();
     setProg(false);
@@ -717,8 +721,9 @@ async function loadPermits(){
 async function fetchTrend30(){
   try {
     var t = ST.trend30;
-    if (t && (Date.now() - (t.at || 0)) < 12 * 3600 * 1000) return;
+    if (t && t.stores && (Date.now() - (t.at || 0)) < 12 * 3600 * 1000) return;
     var byDay = {};
+    var stores = []; // 프랜차이즈 감지용 30일 경량 데이터
     var end = new Date(Date.now() + 9 * 3600 * 1000);
     for (var off = 0; off < 30; off += 7) {
       var to = new Date(end); to.setUTCDate(to.getUTCDate() - off);
@@ -727,13 +732,29 @@ async function fetchTrend30(){
       if (off !== 0) p.to = to.toISOString().slice(0,10).replace(/-/g,'');
       var d = await apiPermits(p);
       (d.items || []).forEach(function(s){
-        if (s.permitDate && !isExcluded(s)) byDay[s.permitDate] = (byDay[s.permitDate] || 0) + 1;
+        if (!s.permitDate || isExcluded(s)) return;
+        byDay[s.permitDate] = (byDay[s.permitDate] || 0) + 1;
+        stores.push({ id: s.id, name: s.name, type: s.type, typeLabel: s.typeLabel,
+          upte: s.upte, addr: s.addr, permitDate: s.permitDate, tel: s.tel, status: s.status });
       });
     }
-    ST.trend30 = { byDay: byDay, at: Date.now() };
+    ST.trend30 = { byDay: byDay, stores: stores, at: Date.now() };
     save();
+    rebuildBrands();
     renderCharts();
+    renderFr();
+    renderStats();
   } catch (e) {}
+}
+
+// 프랜차이즈 감지 기준 데이터: 30일 수집분이 있으면 그것, 없으면 현재 조회분
+function brandBase(){
+  return (ST.trend30 && ST.trend30.stores && ST.trend30.stores.length) ? ST.trend30.stores : ST.permits;
+}
+function rebuildBrands(){
+  BRANDS = computeBrands(brandBase());
+  BRAND_SET = {};
+  BRANDS.forEach(function(g){ g.stores.forEach(function(s){ BRAND_SET[s.id] = g.brand; }); });
 }
 
 // ============================================================
@@ -1049,6 +1070,20 @@ function renderGold(){
 // 렌더: 프랜차이즈
 // ============================================================
 var FR_SELECTED = null;
+// 주점·술집 계열 판별 (업태명 + 상호 키워드 + 단란/유흥)
+var SOOL_RE = /호프|맥주|비어|주점|포차|술집|이자카야|와인|사케|하이볼|막걸리|전통주|소주|펍|꼬치|닭발|곱창|막창|족발|보쌈|횟집|회|선술|주막|바베큐|치킨|통닭/;
+function isSoolGroup(g){
+  return g.stores.some(function(s){
+    return s.type === 'danran' || s.type === 'yuheung' ||
+      SOOL_RE.test(s.upte || '') || SOOL_RE.test(normName(s.name));
+  });
+}
+function frFiltered(){
+  var kind = activeChip('chip-fr-kind');
+  if (kind === 'sool') return BRANDS.filter(isSoolGroup);
+  if (kind === 'food') return BRANDS.filter(function(g){ return !isSoolGroup(g); });
+  return BRANDS;
+}
 function renderFr(){
   var tbl = document.getElementById('tbl-brand');
   if (!BRANDS.length) {
@@ -1058,22 +1093,30 @@ function renderFr(){
     document.getElementById('fr-detail-title').style.display = 'none';
     return;
   }
+  var list = frFiltered();
+  if (!list.length) {
+    tbl.innerHTML = '<tr><td style="color:var(--txt3);text-align:center;padding:24px;font-size:12px">해당 계열의 반복 출점 브랜드가 없습니다</td></tr>';
+    document.getElementById('fr-detail').innerHTML = '';
+    document.getElementById('fr-detail-title').style.display = 'none';
+    return;
+  }
   tbl.innerHTML = '<tr><th>#</th><th>브랜드</th><th>신규 지점</th><th>지역</th></tr>' +
-    BRANDS.slice(0, 20).map(function(g, i){
+    list.slice(0, 30).map(function(g, i){
       var regs = {};
       g.stores.forEach(function(s){ regs[guOf(s.addr)] = 1; });
-      return '<tr style="cursor:pointer" onclick="selectBrand(' + i + ')">'
+      return '<tr style="cursor:pointer" onclick="selectBrand(\'' + encodeURIComponent(g.brand) + '\')">'
         + '<td class="rn">' + (i+1) + '</td>'
-        + '<td style="font-size:12px;font-weight:600">' + esc(g.brand) + '</td>'
+        + '<td style="font-size:12px;font-weight:600">' + esc(g.brand) + (isSoolGroup(g) ? ' <span style="font-size:10px">🍺</span>' : '') + '</td>'
         + '<td><span class="tag t-fr">' + g.stores.length + '개</span></td>'
         + '<td style="font-size:10px;color:var(--txt2)">' + esc(Object.keys(regs).slice(0,3).join(', ')) + '</td>'
         + '</tr>';
     }).join('');
-  if (FR_SELECTED != null && BRANDS[FR_SELECTED]) selectBrand(FR_SELECTED, true);
+  if (FR_SELECTED && BRANDS.some(function(g){ return g.brand === FR_SELECTED; })) selectBrand(encodeURIComponent(FR_SELECTED), true);
 }
-function selectBrand(i, silent){
-  FR_SELECTED = i;
-  var g = BRANDS[i];
+function selectBrand(encBrand, silent){
+  var brand = decodeURIComponent(encBrand);
+  FR_SELECTED = brand;
+  var g = BRANDS.find(function(x){ return x.brand === brand; });
   if (!g) return;
   document.getElementById('fr-detail-title').style.display = 'flex';
   document.getElementById('fr-detail-title').textContent = '🏪 ' + g.brand + ' — 신규 출점 ' + g.stores.length + '곳';
@@ -1136,7 +1179,7 @@ function renderCharts(){
   var mini = document.getElementById('tbl-fr-mini');
   if (BRANDS.length) {
     mini.innerHTML = BRANDS.slice(0, 5).map(function(g, i){
-      return '<tr style="cursor:pointer" onclick="switchPage(\'fr\');selectBrand(' + i + ')">'
+      return '<tr style="cursor:pointer" onclick="switchPage(\'fr\');selectBrand(\'' + encodeURIComponent(g.brand) + '\')">'
         + '<td class="rn">' + (i+1) + '</td>'
         + '<td style="font-size:12px;font-weight:600">' + esc(g.brand) + '</td>'
         + '<td><span class="tag t-fr">' + g.stores.length + '개 지점</span></td></tr>';
@@ -1349,7 +1392,7 @@ document.querySelectorAll('.bnav-btn').forEach(function(btn){
   btn.addEventListener('click', function(){ switchPage(btn.dataset.pg); });
 });
 
-['chip-days','chip-region','chip-type','chip-nstat','chip-gold-sort','chip-track'].forEach(function(id){
+['chip-days','chip-region','chip-type','chip-nstat','chip-gold-sort','chip-track','chip-fr-kind'].forEach(function(id){
   document.querySelectorAll('#' + id + ' .chip').forEach(function(c){
     c.addEventListener('click', function(){
       document.querySelectorAll('#' + id + ' .chip').forEach(function(x){ x.classList.remove('on'); });
@@ -1357,6 +1400,7 @@ document.querySelectorAll('.bnav-btn').forEach(function(btn){
       if (id === 'chip-type' || id === 'chip-nstat') renderNew();
       else if (id === 'chip-gold-sort') renderGold();
       else if (id === 'chip-track') renderTracked();
+      else if (id === 'chip-fr-kind') { FR_SELECTED = null; renderFr(); }
       // 기간/지역 변경은 조회 버튼으로 반영
     });
   });
@@ -1376,11 +1420,12 @@ setInterval(function(){ updateClock(); }, 30000);
 updateClock();
 
 function init(){
+  if (ST.trend30 && ST.trend30.stores) {
+    ST.trend30.stores = ST.trend30.stores.filter(function(s){ return !isExcluded(s); });
+  }
   if (ST.permits && ST.permits.length) {
     ST.permits = ST.permits.filter(function(s){ return !isExcluded(s); }); // 캐시에도 제외 적용
-    BRANDS = computeBrands(ST.permits);
-    BRAND_SET = {};
-    BRANDS.forEach(function(g){ g.stores.forEach(function(s){ BRAND_SET[s.id] = g.brand; }); });
+    rebuildBrands();
     renderAll();
   }
   if ('serviceWorker' in navigator) {
