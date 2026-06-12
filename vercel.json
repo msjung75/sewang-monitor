@@ -1,12 +1,15 @@
 {
     "version": 2,
     "headers": [
-          {
-                  "source": "/api/(.*)",
-                  "headers": [
-                            { "key": "Access-Control-Allow-Origin", "value": "*" },
-                            { "key": "Access-Control-Allow-Methods", "value": "GET, OPTIONS" }
-                  ]
-          }
-    ]
+        {
+            "source": "/api/(.*)",
+            "headers": [
+                { "key": "Access-Control-Allow-Origin", "value": "*" },
+                { "key": "Access-Control-Allow-Methods", "value": "GET, OPTIONS" }
+            ]
+        }
+    ],
+    "functions": {
+        "api/permits.js": { "maxDuration": 60 }
+    }
 }
