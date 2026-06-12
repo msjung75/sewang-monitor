@@ -159,8 +159,10 @@ body{
 .sc{
   background:var(--surface);border:1px solid var(--border);
   border-radius:13px;padding:13px;margin-bottom:10px;
-  position:relative;overflow:hidden;
+  position:relative;overflow:hidden;cursor:pointer;
+  transition:border-color .2s;
 }
+.sc:active{border-color:var(--c1)}
 .sc-new-glow{
   position:absolute;top:0;left:0;right:0;height:1px;
   background:linear-gradient(90deg,transparent,var(--c1),transparent);
@@ -428,6 +430,7 @@ body{
     <div class="chip on" data-v="date">최신 인허가순</div>
     <div class="chip" data-v="tel">전화번호 있는 곳 먼저</div>
   </div>
+  <div class="chips" id="chip-gold-gu"></div>
 
   <div id="gold-count" style="font-size:11px;color:var(--txt3);margin-bottom:10px;text-align:center"></div>
   <div id="gold-list"><div class="empty"><div class="eico">🏆</div><div class="etxt">신규업장 탭에서 조회하면<br>자동 분석 후 여기에 모입니다</div></div></div>
@@ -582,6 +585,12 @@ function brandOf(name){
   }
   return null;
 }
+// 주류 미취급 업종 제외 (커피/카페/빵집/디저트/햄버거/패스트푸드 등)
+var EXCLUDE_NAME = /커피|카페|까페|cafe|coffee|caffe|빵|베이커리|제과|베이글|도넛|도너츠|디저트|케이크|케익|와플|크로플|마카롱|버거|햄버거|샌드위치|토스트|아이스크림|빙수|젤라또|요거트|쥬스|주스|스무디|밀크티|버블티|공차|스타벅스|이디야|메가엠지씨|컴포즈|빽다방|투썸|폴바셋|할리스|파스쿠찌|더벤티|던킨|배스킨|베스킨|파리바게|뚜레쥬르|맘스터치|롯데리아|맥도날드|버거킹|서브웨이|편의점/i;
+var EXCLUDE_UPTE = /커피|까페|카페|다방|패스트푸드|제과|아이스크림|편의점|기타휴게/;
+function isExcluded(s){
+  return EXCLUDE_NAME.test(normName(s.name)) || EXCLUDE_UPTE.test(s.upte || '');
+}
 function computeBrands(list){
   var map = {}; // brand -> [stores]
   list.forEach(function(s){
@@ -664,6 +673,9 @@ async function loadPermits(){
       items = items.filter(function(s){ if (seen[s.id]) return false; seen[s.id] = 1; return true; });
       items.sort(function(a,b){ return (b.permitDate||'').localeCompare(a.permitDate||''); });
     }
+
+    // 커피·빵·카페·햄버거 등 주류 미취급 매장 제외
+    items = items.filter(function(s){ return !isExcluded(s); });
 
     ST.permits = items;
     ST.lastFetch = new Date().toISOString();
@@ -820,6 +832,12 @@ function bindCards(el, list){
     var id = card.getAttribute('data-id');
     var s = list.find(function(x){ return String(x.id) === id; });
     if (!s) return;
+    // 카드 클릭 → 네이버 플레이스(검색) 연결
+    card.addEventListener('click', function(){
+      window.open(naverSearchUrl(s), '_blank');
+    });
+    var ib = card.querySelector('.insta-box');
+    if (ib) ib.addEventListener('click', function(ev){ ev.stopPropagation(); });
     card.querySelectorAll('button[data-act]').forEach(function(b){
       b.addEventListener('click', function(ev){
         ev.stopPropagation();
@@ -871,9 +889,29 @@ function renderNew(){
 // ============================================================
 // 렌더: 선점기회 (N미등록)
 // ============================================================
+var GOLD_GU = '';
 function renderGold(){
   var sort = activeChip('chip-gold-sort') || 'date';
-  var list = ST.permits.filter(function(s){ return nv(s) && !nv(s).found; });
+  // 선점기회는 서울·경기만 (영업권역)
+  var base = ST.permits.filter(function(s){
+    return nv(s) && !nv(s).found && /^(서울|경기)/.test(s.addr || '');
+  });
+  // 구별 칩 구성
+  var guMap = {};
+  base.forEach(function(s){ var g = regionOf(s.addr) + ' ' + guOf(s.addr); guMap[g] = (guMap[g] || 0) + 1; });
+  var guKeys = Object.keys(guMap).sort(function(a, b){ return guMap[b] - guMap[a]; });
+  if (GOLD_GU && !guMap[GOLD_GU]) GOLD_GU = '';
+  var guEl = document.getElementById('chip-gold-gu');
+  if (guEl) {
+    guEl.innerHTML = '<div class="chip' + (GOLD_GU === '' ? ' on' : '') + '" data-v="">전체 구 (' + base.length + ')</div>' +
+      guKeys.map(function(g){
+        return '<div class="chip' + (GOLD_GU === g ? ' on' : '') + '" data-v="' + esc(g) + '">' + esc(g) + ' ' + guMap[g] + '</div>';
+      }).join('');
+    guEl.querySelectorAll('.chip').forEach(function(c){
+      c.addEventListener('click', function(){ GOLD_GU = c.dataset.v; renderGold(); });
+    });
+  }
+  var list = GOLD_GU ? base.filter(function(s){ return (regionOf(s.addr) + ' ' + guOf(s.addr)) === GOLD_GU; }) : base.slice();
   if (sort === 'tel') {
     list.sort(function(a, b){
       if (!!b.tel - !!a.tel !== 0) return (!!b.tel) - (!!a.tel);
@@ -882,7 +920,7 @@ function renderGold(){
   }
   var analyzed = ST.permits.filter(function(s){ return nv(s); }).length;
   document.getElementById('gold-count').textContent = list.length
-    ? '선점기회 ' + list.length + '곳 (분석 완료 ' + analyzed + '곳 중)'
+    ? '선점기회 ' + list.length + '곳' + (GOLD_GU ? ' — ' + GOLD_GU : '') + ' (분석 완료 ' + analyzed + '곳 중)'
     : (analyzed ? '분석된 매장은 모두 네이버에 등록되어 있습니다' : '');
   var el = document.getElementById('gold-list');
   if (!list.length) {
@@ -1004,7 +1042,7 @@ function renderBuzz(){
   tbl.innerHTML = '<tr><th>#</th><th>매장</th><th>블로그</th><th>인허가</th></tr>' +
     list.map(function(s, i){
       var n = nv(s);
-      return '<tr>'
+      return '<tr style="cursor:pointer" onclick="window.open(\'' + naverSearchUrl(s).replace(/'/g, '%27') + '\',\'_blank\')">'
         + '<td class="rn">' + (i+1) + '</td>'
         + '<td><div style="font-size:12px;font-weight:600">' + esc(s.name) + '</div>'
         + '<div style="font-size:10px;color:var(--txt2)">' + esc(regionOf(s.addr) + ' ' + guOf(s.addr)) + ' · ' + esc(s.typeLabel) + '</div></td>'
@@ -1223,6 +1261,7 @@ updateClock();
 
 function init(){
   if (ST.permits && ST.permits.length) {
+    ST.permits = ST.permits.filter(function(s){ return !isExcluded(s); }); // 캐시에도 제외 적용
     BRANDS = computeBrands(ST.permits);
     BRAND_SET = {};
     BRANDS.forEach(function(g){ g.stores.forEach(function(s){ BRAND_SET[s.id] = g.brand; }); });
