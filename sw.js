@@ -1,6 +1,6 @@
 // 정적 파일 캐시 (PWA 오프라인 기본 대응)
-// CACHE 버전 bump — v10: brandOf 정규화 강화 + 서울·경기 즉시 + 새벽 cron
-const CACHE = 'sewang-pwa-v10-brand-normalize-cron';
+// CACHE 버전 bump — v10.1: BBQ/BHC alias + 괄호 제거 + 소문자화
+const CACHE = 'sewang-pwa-v10_1-bbq-bhc-alias';
 const FILES = ['./','./index.html','./manifest.json','./icon.svg'];
 
 self.addEventListener('install', e => {

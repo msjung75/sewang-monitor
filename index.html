@@ -590,16 +590,27 @@ function normName(name){
 // 흔한 split 케이스 → 표준 브랜드명으로 정규화 (한 브랜드가 두 행으로 갈리는 것 방지)
 // 예: '야화 혼술바 강남점'과 '야화 종로점'이 따로 잡혀 1위·29위로 갈리는 문제 해결
 // 흔한 split 케이스 → 표준 브랜드명으로 통합
-// 키는 공백 제거된(compact) 형태로 적음. 매장명 → compact → 시작 prefix 매칭으로 정규화.
+// 키는 공백/괄호 제거 + 소문자로 변환된(compact) 형태. 매장명 → compact → 시작 prefix 매칭.
+// 길이 긴 키 먼저 매칭(짧은 prefix 오매칭 방지)
 var BRAND_ALIASES = {
+  // 혼술바 체인 — 행안부 한 단어 표기 통합
   '야화': '야화 혼술바',
   '야화혼술': '야화 혼술바',
   '야화혼술바': '야화 혼술바',
-  // 다른 흔한 혼술바 체인
   '자유의지혼술바': '자유의지 혼술바',
   '헤르츠혼술바': '헤르츠 혼술바',
   '온도혼술바': '온도 혼술바',
   '제주아홉혼술바': '제주아홉 혼술바',
+  // 치킨 — 한글·영문 표기 split 통합
+  '비비큐bbq': 'BBQ',
+  '비비큐': 'BBQ',
+  'bbq': 'BBQ',
+  'b.b.q': 'BBQ',
+  '비에이치씨bhc': 'BHC',
+  '비에이치씨': 'BHC',
+  'bhc': 'BHC',
+  // 페밀리·기타 (정규화 후 발견된 케이스)
+  '에키노마에': '에키노마에',
 };
 function canonicalBrand(k){
   if (!k) return k;
@@ -617,14 +628,13 @@ function brandOf(name){
       if (b.length >= 2) return b;
     }
   }
-  // 2차: 공백 없이 한 단어로 등록된 매장 ('야화혼술바인천계양점' 같은 행안부 표기)
-  //   → compact 매장명의 시작이 BRAND_ALIASES의 키로 시작하면 그것이 브랜드
-  var compact = n.replace(/\s/g, '');
+  // 2차: 공백 없이 한 단어로 등록된 매장 또는 괄호·영문 섞임 ('야화혼술바인천계양점', '비비큐(BBQ)동양점')
+  //   → 공백·괄호 제거 + 소문자화 후 BRAND_ALIASES key prefix 매칭
+  var compact = n.replace(/\s/g, '').replace(/[()]/g, '').toLowerCase();
   if (/점$/.test(compact)) {
-    // 길이 긴 alias부터 매칭(짧은 prefix 오매칭 방지)
     var keys = Object.keys(BRAND_ALIASES).sort(function(a,b){ return b.length - a.length; });
     for (var i = 0; i < keys.length; i++) {
-      if (compact.indexOf(keys[i]) === 0) return BRAND_ALIASES[keys[i]];
+      if (compact.indexOf(keys[i].toLowerCase()) === 0) return BRAND_ALIASES[keys[i]];
     }
   }
   return null;
