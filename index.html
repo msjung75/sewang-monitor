@@ -78,7 +78,7 @@ body{
 }
 .bnav-btn .ico{display:flex;align-items:center;justify-content:center;width:24px;height:24px}
 .bnav-btn.on{color:var(--c1)}
-.bnav-btn.on .ico{filter:drop-shadow(0 0 6px rgba(0,212,255,0.6))}
+.bnav-btn.on .ico svg{filter:drop-shadow(0 0 5px rgba(0,212,255,0.7))}
 
 /* ===== SCROLL AREA ===== */
 .main{
@@ -99,8 +99,9 @@ body{
   margin-bottom:12px;
 }
 .card-title{
-  font-size:11px;font-weight:600;
-  color:var(--txt2);text-transform:uppercase;letter-spacing:.6px;
+  font-size:12px;font-weight:700;color:var(--txt2);
+  letter-spacing:0.4px;text-transform:uppercase;
+  padding-bottom:10px;border-bottom:1px solid var(--border);
   margin-bottom:12px;display:flex;align-items:center;gap:6px;
 }
 
@@ -109,12 +110,9 @@ body{
 .stat{
   background:var(--surface);border:1px solid var(--border);
   border-radius:14px;padding:14px 14px 12px;
-  position:relative;overflow:hidden;cursor:default;
+  position:relative;overflow:hidden;cursor:pointer;
 }
-.stat::after{
-  content:'';position:absolute;
-  top:0;left:0;right:0;height:2px;
-}
+.stat::after{content:'';position:absolute;top:0;left:0;right:0;height:2px}
 .stat.c1::after{background:linear-gradient(90deg,var(--c1),#0088ff)}
 .stat.c2::after{background:linear-gradient(90deg,var(--c2),#a855f7)}
 .stat.c3::after{background:linear-gradient(90deg,var(--c3),#34d399)}
@@ -125,15 +123,6 @@ body{
 .stat.c3 .stat-n{color:var(--c3)}
 .stat.c4 .stat-n{color:var(--c4)}
 .stat-l{font-size:11px;color:var(--txt2)}
-.stat-glow{
-  position:absolute;bottom:-20px;right:-10px;
-  width:60px;height:60px;border-radius:50%;
-  opacity:.06;
-}
-.stat.c1 .stat-glow{background:var(--c1)}
-.stat.c2 .stat-glow{background:var(--c2)}
-.stat.c3 .stat-glow{background:var(--c3)}
-.stat.c4 .stat-glow{background:var(--c4)}
 
 /* ===== SEARCH BTN ===== */
 .srch-btn{
@@ -143,14 +132,14 @@ body{
   border-radius:12px;color:var(--c1);
   font-size:14px;font-weight:700;cursor:pointer;
   display:flex;align-items:center;justify-content:center;gap:8px;
-  margin-bottom:14px;transition:all .2s;
+  margin-bottom:12px;transition:all .2s;
 }
 .srch-btn:active{transform:scale(.98);opacity:.9}
 
 /* ===== CHIP ROWS ===== */
 .chips{
   display:flex;gap:7px;overflow-x:auto;
-  padding-bottom:6px;margin-bottom:10px;
+  padding-bottom:6px;margin-bottom:8px;
   scrollbar-width:none;
 }
 .chips::-webkit-scrollbar{display:none}
@@ -170,31 +159,28 @@ body{
 .sc{
   background:var(--surface);border:1px solid var(--border);
   border-radius:13px;padding:13px;margin-bottom:10px;
-  cursor:pointer;transition:border-color .2s,transform .1s;
   position:relative;overflow:hidden;
 }
-.sc:active{transform:scale(.99);border-color:var(--c1)}
 .sc-new-glow{
   position:absolute;top:0;left:0;right:0;height:1px;
   background:linear-gradient(90deg,transparent,var(--c1),transparent);
 }
+.sc-gold{border-color:rgba(245,158,11,.4)}
+.sc-gold .sc-new-glow{background:linear-gradient(90deg,transparent,var(--c4),transparent)}
 .sc-name{font-size:14px;font-weight:700;margin-bottom:5px;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sc-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:7px}
-.tag{
-  font-size:9px;padding:2px 7px;border-radius:20px;font-weight:600;
-  letter-spacing:.2px;
-}
+.tag{font-size:9px;padding:2px 7px;border-radius:20px;font-weight:600;letter-spacing:.2px}
 .t-new{background:rgba(0,212,255,.12);color:var(--c1);border:1px solid rgba(0,212,255,.25)}
 .t-cat{background:rgba(124,58,237,.15);color:#a78bfa;border:1px solid rgba(124,58,237,.25)}
 .t-reg{background:rgba(16,185,129,.12);color:var(--c3);border:1px solid rgba(16,185,129,.2)}
 .t-fr{background:rgba(245,158,11,.12);color:var(--c4);border:1px solid rgba(245,158,11,.2)}
-.sc-desc{
-  font-size:11px;color:var(--txt2);line-height:1.5;
-  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
-  margin-bottom:8px;
-}
-.sc-foot{display:flex;justify-content:space-between;align-items:center}
+.t-gold{background:rgba(245,158,11,.18);color:#fbbf24;border:1px solid rgba(245,158,11,.4)}
+.t-naver{background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.3)}
+.t-buzz{background:rgba(239,68,68,.12);color:#f87171;border:1px solid rgba(239,68,68,.25)}
+.t-gray{background:rgba(75,94,122,.2);color:var(--txt2);border:1px solid var(--border2)}
+.sc-desc{font-size:11px;color:var(--txt2);line-height:1.5;margin-bottom:8px}
+.sc-foot{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px}
 .sc-date{font-size:10px;color:var(--txt3)}
 .sc-track-btn{
   font-size:10px;padding:4px 10px;
@@ -207,9 +193,14 @@ body{
   background:rgba(124,58,237,.15);
   border-color:rgba(124,58,237,.3);color:#a78bfa;
 }
+.insta-box{
+  margin-top:8px;padding:8px 10px;border-radius:9px;
+  background:var(--surface2);border:1px solid var(--border2);
+  font-size:11px;color:var(--txt2);line-height:1.6;
+}
 
 /* ===== CHART ===== */
-.chart-box{position:relative;height:210px;margin-top:4px}
+.chart-box{position:relative;height:200px;margin-top:4px}
 
 /* ===== RANK TABLE ===== */
 .rtbl{width:100%;border-collapse:collapse;font-size:12px}
@@ -219,20 +210,22 @@ body{
 .rtbl tr:last-child td{border-bottom:none}
 .rn{font-size:10px;color:var(--txt3);width:18px}
 
-/* ===== PROGRESS BAR ===== */
-.prog-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-.prog-label{font-size:11px;color:var(--txt2);width:70px;flex-shrink:0}
-.prog-bar-wrap{flex:1;height:6px;background:var(--surface2);border-radius:3px;overflow:hidden}
-.prog-bar{height:100%;border-radius:3px;transition:width .5s}
-.prog-val{font-size:11px;color:var(--txt);width:28px;text-align:right;flex-shrink:0}
+/* ===== PROGRESS ===== */
+.an-prog{
+  display:none;align-items:center;gap:10px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:11px;padding:10px 14px;margin-bottom:10px;
+  font-size:11px;color:var(--txt2);
+}
+.an-prog.on{display:flex}
+.an-bar-wrap{flex:1;height:5px;background:var(--surface2);border-radius:3px;overflow:hidden}
+.an-bar{height:100%;background:linear-gradient(90deg,var(--c1),var(--c2));border-radius:3px;width:0%;transition:width .3s}
 
-/* ===== TRACKED STATUS ===== */
+/* ===== TRACKED ===== */
 .st-badge{font-size:9px;padding:2px 7px;border-radius:10px;font-weight:600}
 .st-new{background:rgba(239,68,68,.12);color:#f87171}
 .st-active{background:rgba(16,185,129,.12);color:var(--c3)}
 .st-pass{background:rgba(75,85,99,.2);color:var(--txt3)}
-
-/* ===== NOTE INPUT ===== */
 .note-input{
   width:100%;background:var(--surface2);
   border:1px solid var(--border2);color:var(--txt);
@@ -241,22 +234,16 @@ body{
 }
 .note-input:focus{border-color:var(--c1)}
 .note-input::placeholder{color:var(--txt3)}
-
-/* ===== STATUS SELECT ===== */
 .st-select{
   background:var(--surface2);border:1px solid var(--border2);
   color:var(--txt);border-radius:7px;padding:3px 8px;
   font-size:10px;outline:none;cursor:pointer;
 }
 
-/* ===== EMPTY STATE ===== */
-.empty{
-  text-align:center;padding:44px 20px;color:var(--txt3);
-}
+/* ===== EMPTY / SPINNER / DIVIDER ===== */
+.empty{text-align:center;padding:44px 20px;color:var(--txt3)}
 .empty .eico{font-size:44px;margin-bottom:12px}
 .empty .etxt{font-size:13px;line-height:1.6}
-
-/* ===== SPINNER ===== */
 @keyframes spin{to{transform:rotate(360deg)}}
 .spin{
   display:inline-block;width:15px;height:15px;
@@ -265,8 +252,6 @@ body{
   border-radius:50%;animation:spin .7s linear infinite;
   vertical-align:middle;
 }
-
-/* ===== SECTION DIVIDER ===== */
 .sdiv{
   font-size:11px;font-weight:600;color:var(--txt3);
   text-transform:uppercase;letter-spacing:.5px;
@@ -279,57 +264,19 @@ body{
 .alert-banner{
   background:linear-gradient(135deg,rgba(0,212,255,.08),rgba(124,58,237,.08));
   border:1px solid rgba(0,212,255,.2);
-  border-radius:12px;padding:12px 14px;
-  margin-bottom:12px;font-size:12px;
+  border-radius:12px;padding:11px 13px;
+  margin-bottom:12px;font-size:11px;line-height:1.55;
   display:flex;align-items:center;gap:10px;
 }
-.alert-banner .aico{font-size:20px;flex-shrink:0}
-
-/* ===== BADGE COUNT ===== */
-.bc{
-  min-width:16px;height:16px;padding:0 4px;
-  background:var(--c5);border-radius:8px;
-  font-size:9px;font-weight:700;color:#fff;
-  display:inline-flex;align-items:center;justify-content:center;
-  margin-left:4px;
+.alert-banner.gold{
+  background:linear-gradient(135deg,rgba(245,158,11,.1),rgba(239,68,68,.06));
+  border-color:rgba(245,158,11,.3);
 }
-
-/* ===== REGION MAP ===== */
-.reg-grid{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
-  margin-top:4px;
+.alert-banner .aico{font-size:19px;flex-shrink:0}
+.mini-btn{
+  font-size:10px;padding:5px 11px;border-radius:7px;cursor:pointer;font-weight:600;
+  background:var(--surface2);border:1px solid var(--border2);color:var(--txt2);
 }
-.reg-item{
-  background:var(--surface2);border:1px solid var(--border);
-  border-radius:10px;padding:10px 8px;text-align:center;
-  cursor:pointer;transition:all .2s;
-}
-.reg-item:active{border-color:var(--c1)}
-.reg-name{font-size:12px;font-weight:600;margin-bottom:3px}
-.reg-cnt{font-size:20px;font-weight:900;color:var(--c1)}
-.reg-sub{font-size:9px;color:var(--txt3);margin-top:1px}
-
-/* ===== PULSE ANIMATION ===== */
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
-.pulse{animation:pulse 1.5s ease infinite}
-
-/* ===== 디자인 개선 ===== */
-.card-title{
-  font-size:13px;font-weight:700;color:var(--txt2);
-  letter-spacing:0.3px;text-transform:uppercase;
-  padding-bottom:10px;border-bottom:1px solid var(--border);
-  margin-bottom:12px;
-}
-.bnav-btn .ico svg{
-  transition:filter .2s;
-}
-.bnav-btn.on .ico svg{
-  filter:drop-shadow(0 0 5px rgba(0,212,255,0.7));
-  stroke:var(--c1);
-}
-.srch-btn svg{vertical-align:middle;margin-right:4px}
-.aico svg{vertical-align:middle}
-.hdr-badge svg{display:block}
 </style>
 </head>
 <body>
@@ -340,7 +287,7 @@ body{
     <div class="hdr-badge"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 22h8"/><path d="M12 11v11"/><path d="M7 7.5c0 2.5 2.5 3.5 5 3.5s5-1 5-3.5V5c0-1.1-.9-2-2-2H9a2 2 0 00-2 2v2.5z"/><circle cx="12" cy="2" r="1"/></svg></div>
     <div>
       <div class="hdr-title">세왕 신규업장 모니터</div>
-      <div style="font-size:9px;color:var(--txt3);margin-top:1px">주류도매 영업지원 시스템</div>
+      <div style="font-size:9px;color:var(--txt3);margin-top:1px">인허가 기반 영업지원 시스템</div>
     </div>
   </div>
   <div class="hdr-meta">
@@ -355,155 +302,155 @@ body{
 <!-- ======= PAGE: 대시보드 ======= -->
 <div class="page on" id="pg-home">
 
-  <!-- Stats -->
   <div class="stat-grid">
-    <div class="stat c1">
-      <div class="stat-n" id="s-new">-</div>
-      <div class="stat-l">오늘 신규오픈</div>
-      <div class="stat-glow"></div>
+    <div class="stat c1" onclick="switchPage('new')">
+      <div class="stat-n" id="s-total">-</div>
+      <div class="stat-l">신규 인허가 (기간 내)</div>
     </div>
-    <div class="stat c2">
-      <div class="stat-n" id="s-week">-</div>
-      <div class="stat-l">이번주 수집</div>
-      <div class="stat-glow"></div>
+    <div class="stat c4" onclick="switchPage('gold')">
+      <div class="stat-n" id="s-gold">-</div>
+      <div class="stat-l">🏆 선점기회 (N미등록)</div>
     </div>
-    <div class="stat c3">
+    <div class="stat c2" onclick="switchPage('fr')">
       <div class="stat-n" id="s-fr">-</div>
-      <div class="stat-l">프랜차이즈 확장</div>
-      <div class="stat-glow"></div>
+      <div class="stat-l">확장 중 프랜차이즈</div>
     </div>
-    <div class="stat c4">
+    <div class="stat c3" onclick="switchPage('track')">
       <div class="stat-n" id="s-tr">-</div>
       <div class="stat-l">추적 매장</div>
-      <div class="stat-glow"></div>
     </div>
   </div>
 
-  <!-- Quick refresh -->
-  <button class="srch-btn" onclick="refreshAll(this)">
-    <span id="home-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg></span> 전체 업데이트
+  <button class="srch-btn" onclick="loadPermits()">
+    <span id="home-ico">🏛️</span> 신규 인허가 업데이트
   </button>
 
-  <!-- Alert -->
-  <div class="alert-banner" id="home-alert" style="display:none">
-    <span class="aico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></span>
-    <div id="home-alert-txt"></div>
+  <div class="an-prog" id="an-prog">
+    <span class="spin"></span>
+    <span id="an-txt">네이버 교차분석 중...</span>
+    <div class="an-bar-wrap"><div class="an-bar" id="an-bar"></div></div>
   </div>
 
-  <!-- 업종 분포 차트 -->
+  <div class="alert-banner gold" id="home-gold-alert" style="display:none">
+    <span class="aico">🏆</span>
+    <div id="home-gold-txt"></div>
+  </div>
+
   <div class="card">
-    <div class="card-title">업종별 분포</div>
-    <div class="chart-box"><canvas id="chart-home-cat"></canvas></div>
+    <div class="card-title">📈 일별 신규 인허가 추이</div>
+    <div class="chart-box"><canvas id="ch-daily"></canvas></div>
   </div>
-
-  <!-- 지역별 카운트 -->
-  <div class="sdiv">지역별 오픈 현황</div>
-  <div class="reg-grid" id="home-regions"></div>
-
-  <!-- 최신 오픈 -->
-  <div class="sdiv">최신 신규오픈 매장</div>
-  <div id="home-latest"></div>
-
-</div>
-
-<!-- ======= PAGE: 신규오픈 ======= -->
-<div class="page" id="pg-new">
-
-  <!-- 기간 필터 -->
-  <div class="chips" id="chip-days">
-    <div class="chip on" data-v="7">최근 7일</div>
-    <div class="chip" data-v="14">14일</div>
-    <div class="chip" data-v="30">30일</div>
-    <div class="chip" data-v="90">3개월</div>
-  </div>
-
-  <!-- 지역 필터 -->
-  <div class="chips" id="chip-region">
-    <div class="chip on" data-v="">🇰🇷 전국</div>
-    <div class="chip" data-v="서울">서울</div>
-    <div class="chip" data-v="경기">경기</div>
-    <div class="chip" data-v="부산">부산</div>
-    <div class="chip" data-v="인천">인천</div>
-    <div class="chip" data-v="대구">대구</div>
-    <div class="chip" data-v="광주">광주</div>
-    <div class="chip" data-v="대전">대전</div>
-    <div class="chip" data-v="울산">울산</div>
-    <div class="chip" data-v="강원">강원</div>
-    <div class="chip" data-v="제주">제주</div>
-  </div>
-
-  <!-- 업종 필터 -->
-  <div class="chips" id="chip-cat">
-    <div class="chip on" data-v="">전체 업종</div>
-    <div class="chip" data-v="포차">포차/주점</div>
-    <div class="chip" data-v="이자카야">이자카야</div>
-    <div class="chip" data-v="고기">고기집</div>
-    <div class="chip" data-v="치킨">치킨/호프</div>
-    <div class="chip" data-v="펍">펍/바</div>
-    <div class="chip" data-v="다이닝">레스토랑</div>
-    <div class="chip" data-v="해산물">해산물</div>
-    <div class="chip" data-v="한식">한식</div>
-  </div>
-
-  <button class="srch-btn" onclick="loadNew(this)">
-    <span id="new-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span> 신규 업장 검색
-  </button>
-
-  <div id="new-count" style="font-size:11px;color:var(--txt3);margin-bottom:10px;text-align:center"></div>
-  <div id="new-list"></div>
-
-</div>
-
-<!-- ======= PAGE: 업종분석 ======= -->
-<div class="page" id="pg-analysis">
 
   <div class="card">
     <div class="card-title">업종 분포</div>
-    <div class="chart-box"><canvas id="chart-cat-doughnut"></canvas></div>
+    <div class="chart-box"><canvas id="ch-type"></canvas></div>
   </div>
 
   <div class="card">
-    <div class="card-title">지역별 오픈 수</div>
-    <div class="chart-box"><canvas id="chart-region-bar"></canvas></div>
+    <div class="card-title">지역(구·시) TOP 10</div>
+    <div class="chart-box"><canvas id="ch-gu"></canvas></div>
   </div>
 
   <div class="card">
-    <div class="card-title">개인 vs 프랜차이즈</div>
-    <div id="analysis-prog"></div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">주목 신규 매장 TOP 10</div>
-    <table class="rtbl" id="tbl-top">
-      <tr><td colspan="3" style="color:var(--txt3);text-align:center;padding:24px;font-size:12px">신규오픈 탭에서 검색 후 확인 가능</td></tr>
+    <div class="card-title">🔥 화제성 TOP 5 <span style="font-weight:400;color:var(--txt3);font-size:10px">(네이버 블로그 언급 기준)</span></div>
+    <table class="rtbl" id="tbl-buzz">
+      <tr><td style="color:var(--txt3);text-align:center;padding:20px;font-size:11px">인허가 업데이트 후 자동 분석됩니다</td></tr>
     </table>
   </div>
+
+  <div class="card">
+    <div class="card-title">🏪 확장 중 프랜차이즈 TOP 5</div>
+    <table class="rtbl" id="tbl-fr-mini">
+      <tr><td style="color:var(--txt3);text-align:center;padding:20px;font-size:11px">데이터 없음</td></tr>
+    </table>
+  </div>
+
+</div>
+
+<!-- ======= PAGE: 신규업장 ======= -->
+<div class="page" id="pg-new">
+
+  <div class="alert-banner">
+    <span class="aico">🏛️</span>
+    <div>관할구청 <strong style="color:var(--c1)">영업신고(인허가)</strong> = 신규 매장의 기준.<br>조회하면 네이버 등록여부·화제성을 자동 분석합니다. (데이터 2일 전 기준)</div>
+  </div>
+
+  <div class="chips" id="chip-days">
+    <div class="chip" data-v="3">최근 3일</div>
+    <div class="chip on" data-v="7">7일</div>
+    <div class="chip" data-v="14">14일</div>
+    <div class="chip" data-v="30">30일</div>
+  </div>
+  <div class="chips" id="chip-region">
+    <div class="chip on" data-v="metro">서울+경기</div>
+    <div class="chip" data-v="seoul">서울</div>
+    <div class="chip" data-v="gyeonggi">경기</div>
+    <div class="chip" data-v="all">🇰🇷 전국</div>
+  </div>
+  <div class="chips" id="chip-type">
+    <div class="chip on" data-v="all">전체 업종</div>
+    <div class="chip" data-v="ilban">일반음식점</div>
+    <div class="chip" data-v="hyuge">휴게음식점</div>
+    <div class="chip" data-v="danran">단란주점</div>
+    <div class="chip" data-v="yuheung">유흥주점</div>
+  </div>
+  <div class="chips" id="chip-nstat">
+    <div class="chip on" data-v="">전체 상태</div>
+    <div class="chip" data-v="gold">N미등록</div>
+    <div class="chip" data-v="reg">N등록</div>
+    <div class="chip" data-v="buzz">화제순</div>
+  </div>
+
+  <button class="srch-btn" onclick="loadPermits()">
+    <span id="new-ico">🏛️</span> 신규 인허가 업장 조회
+  </button>
+
+  <div class="an-prog" id="an-prog2">
+    <span class="spin"></span>
+    <span id="an-txt2">분석 중...</span>
+    <div class="an-bar-wrap"><div class="an-bar" id="an-bar2"></div></div>
+  </div>
+
+  <div id="new-count" style="font-size:11px;color:var(--txt3);margin-bottom:10px;text-align:center"></div>
+  <div id="new-list"><div class="empty"><div class="eico">🏛️</div><div class="etxt">조회 버튼을 눌러<br>방금 영업신고한 업장을 찾아보세요</div></div></div>
+
+</div>
+
+<!-- ======= PAGE: 선점기회 ======= -->
+<div class="page" id="pg-gold">
+
+  <div class="alert-banner gold">
+    <span class="aico">🏆</span>
+    <div><strong style="color:#fbbf24">인허가는 났는데 네이버 플레이스에 아직 없는 매장</strong>입니다.<br>경쟁 주류사가 알기 전, 오픈 준비 중에 먼저 접촉하세요.</div>
+  </div>
+
+  <div class="chips" id="chip-gold-sort">
+    <div class="chip on" data-v="date">최신 인허가순</div>
+    <div class="chip" data-v="tel">전화번호 있는 곳 먼저</div>
+  </div>
+
+  <div id="gold-count" style="font-size:11px;color:var(--txt3);margin-bottom:10px;text-align:center"></div>
+  <div id="gold-list"><div class="empty"><div class="eico">🏆</div><div class="etxt">신규업장 탭에서 조회하면<br>자동 분석 후 여기에 모입니다</div></div></div>
 
 </div>
 
 <!-- ======= PAGE: 프랜차이즈 ======= -->
 <div class="page" id="pg-fr">
 
-  <!-- 기간 필터 -->
-  <div class="chips" id="chip-fr-days">
-    <div class="chip on" data-v="7">최근 7일</div>
-    <div class="chip" data-v="30">30일</div>
-    <div class="chip" data-v="90">3개월</div>
+  <div class="alert-banner">
+    <span class="aico">🏪</span>
+    <div>인허가 <strong style="color:var(--c1)">상호명 패턴</strong>으로 같은 브랜드의 반복 출점을 감지합니다.<br>기간을 14~30일로 잡으면 확장 추세가 잘 보입니다.</div>
   </div>
 
-  <button class="srch-btn" onclick="loadFranchise(this)">
-    <span id="fr-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span> 프랜차이즈 확장 스캔
-  </button>
-
   <div class="card">
-    <div class="card-title">확장 중인 브랜드 TOP 15</div>
+    <div class="card-title">확장 중인 브랜드 (기간 내 2개 지점 이상)</div>
     <table class="rtbl" id="tbl-brand">
-      <tr><td colspan="3" style="color:var(--txt3);text-align:center;padding:24px;font-size:12px">스캔 버튼을 눌러주세요</td></tr>
+      <tr><td style="color:var(--txt3);text-align:center;padding:24px;font-size:12px">신규업장 탭에서 조회하면 자동 분석됩니다</td></tr>
     </table>
   </div>
 
-  <div class="sdiv">신규 출점 매장</div>
-  <div id="fr-list"></div>
+  <div class="sdiv" id="fr-detail-title" style="display:none">신규 출점 지점</div>
+  <div id="fr-detail"></div>
 
 </div>
 
@@ -512,16 +459,16 @@ body{
 
   <div class="card" style="margin-bottom:12px">
     <div style="font-size:12px;color:var(--txt2);margin-bottom:10px">
-      신규오픈 탭에서 <strong style="color:var(--c1)">+ 추적</strong> 버튼으로 매장을 추가하세요.<br>
-      상태를 업데이트하고 메모를 남길 수 있습니다.
+      신규업장·선점기회에서 <strong style="color:var(--c1)">+ 추적</strong>으로 매장을 추가하세요.<br>
+      재분석하면 화제성 추이(블로그 언급 변화)가 기록됩니다.
     </div>
     <div style="display:flex;gap:8px">
+      <button onclick="reanalyzeTracked(this)" style="flex:1;padding:9px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.25);color:var(--c1);border-radius:9px;font-size:11px;font-weight:600;cursor:pointer">🔄 전체 재분석</button>
       <button onclick="exportTracked()" style="flex:1;padding:9px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.25);color:var(--c3);border-radius:9px;font-size:11px;font-weight:600;cursor:pointer">내보내기</button>
       <button onclick="clearTracked()" style="flex:1;padding:9px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);color:#f87171;border-radius:9px;font-size:11px;font-weight:600;cursor:pointer">전체삭제</button>
     </div>
   </div>
 
-  <!-- 상태별 필터 -->
   <div class="chips" id="chip-track">
     <div class="chip on" data-v="">전체</div>
     <div class="chip" data-v="new">연락필요</div>
@@ -541,10 +488,10 @@ body{
     <span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>대시보드
   </button>
   <button class="bnav-btn" data-pg="new">
-    <span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></span>신규오픈
+    <span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/><line x1="9" y1="11" x2="9.01" y2="11"/><line x1="15" y1="11" x2="15.01" y2="11"/></svg></span>신규업장
   </button>
-  <button class="bnav-btn" data-pg="analysis">
-    <span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg></span>업종분석
+  <button class="bnav-btn" data-pg="gold">
+    <span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 010-5H6"/><path d="M18 9h1.5a2.5 2.5 0 000-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0012 0V2z"/></svg></span>선점기회
   </button>
   <button class="bnav-btn" data-pg="fr">
     <span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h20l-2 9H4L2 3z"/><path d="M4 12v9h16v-9"/><path d="M9 21v-6h6v6"/></svg></span>프랜차이즈
@@ -556,928 +503,736 @@ body{
 
 <script>
 // ============================================================
-// STATE
+// STATE (인허가 = 신규 매장의 단일 기준)
 // ============================================================
-const KEY = 'sewang-v3';
-let ST = { tracked: [], stores: [], lastFetch: null };
-try { const s = localStorage.getItem(KEY); if(s) ST = {...ST, ...JSON.parse(s)}; } catch(e){}
-function save(){ try{ localStorage.setItem(KEY, JSON.stringify(ST)); }catch(e){} }
-
-// ============================================================
-// CATEGORY & REGION DEFS
-// ============================================================
-const CATS = [
-  {id:'pocha',    lb:'포차/주점',   kw:['포차','포장마차','이자카야','주점','술집','야키토리','꼬치','닭꼬치','오뎅','선술집','이자','이자카']},
-  {id:'meat',     lb:'고기집',      kw:['고기','삼겹살','갈비','소고기','돼지','오겹살','흑돼지','양꼬치','스테이크','정육','한우','뒷고기']},
-  {id:'chicken',  lb:'치킨/호프',   kw:['치킨','호프','맥주','통닭','프라이드','양념치킨','닭강정','비어','beer']},
-  {id:'pub',      lb:'펍/바/와인',  kw:['펍','바 ','와인바','위스키바','칵테일바','브루어리','루프탑바','craft']},
-  {id:'dining',   lb:'레스토랑',    kw:['레스토랑','다이닝','비스트로','이탈리안','파스타','피자','프렌치','양식','파인다이닝','오마카세']},
-  {id:'korean',   lb:'한식/백반',   kw:['한식','백반','가정식','찌개','국밥','해장','설렁탕','순대','족발','보쌈','된장','청국장']},
-  {id:'seafood',  lb:'해산물/횟집', kw:['회','횟집','수산','해산물','해물','낙지','오징어','꼬막','굴','조개','생선']},
-  {id:'other',    lb:'기타',        kw:[]},
-];
-
-const OPEN_KW = ['신규오픈','새로오픈','오픈했어요','오픈했습니다','오픈이에요','새로생긴','새로 생긴',
-  '드디어오픈','그랜드오픈','그랜드 오픈','프리오픈','오픈 기념','오픈 소식','오픈했다','첫날','첫 영업'];
-
-// 주류 취급 음식점 프랜차이즈만 포함 (커피/빵집/패스트푸드 제외)
-const FR_BRANDS = [
-  // 치킨 (주류 취급)
-  '교촌','비비큐','bhc','굽네','푸라닭','노랑통닭','페리카나','호식이','60계','네네치킨',
-  'kfc','불닭','버팔로','훌랄라','처갓집','지코바','bb큐','자담치킨','맥시칸','피자마루',
-  // 고기/구이 프랜차이즈
-  '하남돼지집','육쌈냉면','고기대장','황금에빠지다','한우물','연탄구이','숯불','고기리',
-  '본갈비','차돌박이','삼겹살','곱창','막창','돼지갈비','소갈비','양갈비','우삼겹',
-  // 호프/맥주 프랜차이즈
-  '생활맥주','투다리','와라와라','맥주바켓','쪼끼쪼끼','부어라마셔라','팔팔호프',
-  '치어스','비어캡','호프나무','수제맥주','크래프트','홉스','드래프트',
-  // 포차/주점 프랜차이즈
-  '한신포차','이모네포차','야장포차','열정포차','포차한잔','홍대포차','산수갑산',
-  '주막','막걸리나라','전통주막','복순도가','바른치킨',
-  // 이자카야/일식 체인
-  '이자카야','야키니쿠','야키토리','오야지','하나미','주당','사케바','니혼',
-  // 패밀리레스토랑 (주류 취급)
-  '아웃백','빕스','애슐리','서가앤쿡','더플레이스',
-];
-
-const FR_SIGNAL = ['가맹점','직영점','신규출점','n호점','호점','분점','창업','가맹','체인'];
-
-const REGIONS = ['서울','경기','인천','부산','대구','광주','대전','울산','세종','강원',
-  '충북','충남','전북','전남','경북','경남','제주'];
-
-const SEOUL_AREAS = ['강남','강북','강서','강동','마포','홍대','이태원','신촌','건대','합정',
-  '성수','왕십리','압구정','청담','신림','구로','종로','명동'];
-
-function classifyCat(txt){
-  const t = txt.toLowerCase();
-  for(const c of CATS.slice(0,-1)){
-    if(c.kw.some(k=>t.includes(k))) return c;
+var KEY = 'sewang-v4-permit';
+var ST = { tracked: [], naver: {}, permits: [], lastFetch: null };
+try { var _s = localStorage.getItem(KEY); if (_s) ST = Object.assign(ST, JSON.parse(_s)); } catch (e) {}
+// 구버전(v3) 추적매장 이관
+try {
+  var _old = localStorage.getItem('sewang-v3');
+  if (_old && !ST.tracked.length) {
+    var _o = JSON.parse(_old);
+    if (_o.tracked && _o.tracked.length) ST.tracked = _o.tracked;
   }
-  return CATS[CATS.length-1];
+} catch (e) {}
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(ST)); } catch (e) {} }
+
+var NAVER_TTL = 24 * 3600 * 1000; // 분석 캐시 24시간
+var ANALYZE_MAX = 100;            // 조회당 자동 분석 상한
+var analyzing = false;
+
+// ============================================================
+// HELPERS
+// ============================================================
+function esc(s){
+  return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
-function extractRegion(txt){
-  for(const r of REGIONS) if(txt.includes(r)) return r;
-  return '기타';
+function fmtYmd(ymd){
+  if (!ymd || ymd.length < 8) return '-';
+  return ymd.slice(0,4) + '.' + ymd.slice(4,6) + '.' + ymd.slice(6,8);
 }
-function extractSubArea(txt){
-  for(const a of SEOUL_AREAS) if(txt.includes(a)) return a;
-  return '';
+function daysAgo(ymd){
+  if (!ymd || ymd.length < 8) return 999;
+  var dt = new Date(ymd.slice(0,4) + '-' + ymd.slice(4,6) + '-' + ymd.slice(6,8));
+  return Math.floor((Date.now() - dt.getTime()) / 864e5);
 }
-function isNewOpen(txt){
-  const t = txt.toLowerCase();
-  return OPEN_KW.some(k=>t.includes(k.toLowerCase()));
+function regionOf(addr){
+  if (!addr) return '-';
+  if (addr.indexOf('서울') === 0) return '서울';
+  if (addr.indexOf('경기') === 0) return '경기';
+  return addr.split(' ')[0].replace(/(특별시|광역시|특별자치시|특별자치도)$/, '');
 }
-function isFranchise(txt){
-  const t = txt.toLowerCase();
-  if(FR_BRANDS.some(b=>t.includes(b))) return true;
-  if(FR_SIGNAL.some(s=>t.includes(s))) return true;
-  return false;
+function guOf(addr){
+  var p = String(addr || '').split(' ');
+  return p.length > 1 ? p[1] : '';
 }
-function daysAgo(dateStr){
-  if(!dateStr) return 999;
-  try{
-    let d = dateStr;
-    if(d.length===8) d=`${d.slice(0,4)}-${d.slice(4,6)}-${d.slice(6,8)}`;
-    return Math.floor((Date.now()-new Date(d))/(864e5));
-  }catch(e){return 999;}
+function naverQuery(s){ return (s.name + ' ' + guOf(s.addr)).trim(); }
+function naverSearchUrl(s){
+  return 'https://m.search.naver.com/search.naver?query=' + encodeURIComponent(naverQuery(s));
 }
-function fmtDate(dateStr){
-  const n=daysAgo(dateStr);
-  if(n===0) return '오늘';
-  if(n===1) return '어제';
-  if(n<7) return `${n}일 전`;
-  if(n<14) return '1주 전';
-  if(n<30) return `${Math.floor(n/7)}주 전`;
-  return `${Math.floor(n/30)}개월 전`;
+function mapUrl(s){
+  return 'https://map.naver.com/p/search/' + encodeURIComponent(naverQuery(s));
 }
+function activeChip(id){
+  var c = document.querySelector('#' + id + ' .chip.on');
+  return c ? c.dataset.v : '';
+}
+function nv(s){ return ST.naver[s.id]; } // 분석 결과
+function isFresh(n){ return n && (Date.now() - (n.at || 0)) < NAVER_TTL; }
+function buzzScore(n){
+  if (!n || !n.found) return 0;
+  return 1 + Math.min(n.blogTotal || 0, 999);
+}
+
+// ============================================================
+// 프랜차이즈 감지 (인허가 상호명 패턴)
+// ============================================================
+function normName(name){
+  return String(name || '').replace(/\((주|유|합)\)|주식회사|\s{2,}/g, ' ').trim();
+}
+function brandOf(name){
+  var n = normName(name);
+  var tokens = n.split(/\s+/);
+  var last = tokens[tokens.length - 1];
+  // "브랜드 ○○점 / ○○지점 / n호점" 패턴
+  if (tokens.length >= 2 && /(점|지점|호점|캠퍼스|역점)$/.test(last) && last.length <= 8) {
+    var b = tokens.slice(0, -1).join(' ').trim();
+    if (b.length >= 2) return b;
+  }
+  return null;
+}
+function computeBrands(list){
+  var map = {}; // brand -> [stores]
+  list.forEach(function(s){
+    var b = brandOf(s.name);
+    var k = b || normName(s.name);
+    if (k.length < 2) return;
+    if (!map[k]) map[k] = { brand: k, stores: [], explicit: !!b };
+    map[k].stores.push(s);
+    if (b) map[k].explicit = true;
+  });
+  return Object.values(map)
+    .filter(function(g){ return g.stores.length >= 2; })
+    .sort(function(a, b){ return b.stores.length - a.stores.length; });
+}
+var BRANDS = [];
+var BRAND_SET = {};
 
 // ============================================================
 // API
 // ============================================================
-async function apiBlog(q,n=20,sort='date'){
-  try{
-    const r=await fetch(`/api/blog?query=${encodeURIComponent(q)}&display=${n}&sort=${sort}`);
-    const d=await r.json(); return d.items||[];
-  }catch(e){return [];}
+async function apiPermits(params){
+  var qs = Object.keys(params).map(function(k){ return k + '=' + encodeURIComponent(params[k]); }).join('&');
+  var r = await fetch('/api/permits?' + qs);
+  var d = await r.json();
+  if (d.error) throw new Error(d.error);
+  return d;
 }
-async function apiNews(q,n=20){
-  try{
-    const r=await fetch(`/api/news?query=${encodeURIComponent(q)}&display=${n}`);
-    const d=await r.json(); return d.items||[];
-  }catch(e){return [];}
+async function apiLocal(q, n){
+  try {
+    var r = await fetch('/api/local?query=' + encodeURIComponent(q) + '&display=' + (n || 5));
+    var d = await r.json();
+    return d.items || [];
+  } catch (e) { return []; }
 }
-async function apiLocal(q,n=5){
-  try{
-    const r=await fetch(`/api/local?query=${encodeURIComponent(q)}&display=${n}`);
-    const d=await r.json();
-    return (d.items||[]).map(i=>({
-      ...i, isLocal:true,
-      title:i.title.replace(/<[^>]+>/g,''),
-      description:i.category||i.roadAddress||''
-    }));
-  }catch(e){return [];}
-}
-
-// ============================================================
-// PARSE STORE
-// ============================================================
-function parseStore(item, src){
-  const raw=(item.title||'')+' '+(item.description||'');
-  const txt=raw.replace(/<[^>]+>/g,'');
-  const cat=classifyCat(txt);
-  const region=extractRegion(txt);
-  const sub=extractSubArea(txt);
-  const fr=isFranchise(txt);
-  const isNew=isNewOpen(txt);
-  let date=item.postdate||item.pubDate||'';
-  if(date&&date.includes('T')) date=date.split('T')[0];
-  if(date&&date.length===8) date=`${date.slice(0,4)}-${date.slice(4,6)}-${date.slice(6,8)}`;
-  const name=(item.title||'').replace(/<[^>]+>/g,'').trim().slice(0,25);
-  return {
-    id: item.link||name+date,
-    name, txt,
-    desc:(item.description||'').replace(/<[^>]+>/g,'').slice(0,120),
-    cat:cat.id, catLb:cat.lb,
-    region, sub,
-    fr, isNew, date,
-    link:item.link||'',
-    src,
-  };
+async function apiBlogTotal(q){
+  try {
+    var r = await fetch('/api/blog?query=' + encodeURIComponent(q) + '&display=3&sort=date');
+    var d = await r.json();
+    var latest = '';
+    if (d.items && d.items[0] && d.items[0].postdate) latest = d.items[0].postdate;
+    return { total: d.total || 0, latest: latest };
+  } catch (e) { return { total: 0, latest: '' }; }
 }
 
 // ============================================================
-// LOAD NEW STORES
+// 인허가 조회 (메인 플로우)
 // ============================================================
-let ALL=[]; // current result set
+async function loadPermits(){
+  var icons = [document.getElementById('home-ico'), document.getElementById('new-ico')];
+  icons.forEach(function(i){ if (i) i.innerHTML = '<span class="spin"></span>'; });
 
-async function loadNew(btn){
-  const icoEl=btn ? btn.querySelector('#new-ico') : document.getElementById('new-ico');
-  if(icoEl) icoEl.innerHTML='<span class="spin"></span>';
+  var days = parseInt(activeChip('chip-days') || '7', 10);
+  var region = activeChip('chip-region') || 'metro';
 
-  const region=activeChip('chip-region');
-  const regKw=region||'';
-
-  // === 1차: 네이버 플레이스(local) 직접 검색 ===
-  // 신규 창업 = 네이버 플레이스 등록이 먼저 → local API가 가장 신뢰할 수 있는 소스
-  const localCats = ['포차','이자카야','주점','고기집','치킨 호프','맥주집','횟집','와인바','막창','곱창'];
-  const searchRegions = regKw ? [regKw] : ['서울','경기','부산','인천','대구','광주','대전'];
-
-  const localQs = [];
-  for(const r of searchRegions.slice(0,3)){
-    for(const c of localCats.slice(0,5)){
-      localQs.push(`${r} ${c}`);
+  try {
+    var items = [];
+    if (days <= 10) {
+      var d = await apiPermits({ days: days, region: region, type: 'all' });
+      items = d.items;
+    } else {
+      // 긴 기간은 7일 단위로 분할 조회 (데이터 누락 방지)
+      var chunks = [];
+      var end = new Date(Date.now() + 9 * 3600 * 1000); // KST now
+      for (var off = 0; off < days; off += 7) {
+        var to = new Date(end); to.setUTCDate(to.getUTCDate() - off);
+        var from = new Date(end); from.setUTCDate(from.getUTCDate() - Math.min(off + 7, days));
+        chunks.push({
+          from: from.toISOString().slice(0,10).replace(/-/g,''),
+          to: off === 0 ? '' : to.toISOString().slice(0,10).replace(/-/g,'')
+        });
+      }
+      for (var ci = 0; ci < chunks.length; ci++) {
+        setProg(true, '인허가 조회 중 ' + (ci+1) + '/' + chunks.length, (ci+1) / chunks.length * 100);
+        var p = { region: region, type: 'all', from: chunks[ci].from };
+        if (chunks[ci].to) p.to = chunks[ci].to;
+        var dd = await apiPermits(p);
+        items = items.concat(dd.items);
+      }
+      var seen = {};
+      items = items.filter(function(s){ if (seen[s.id]) return false; seen[s.id] = 1; return true; });
+      items.sort(function(a,b){ return (b.permitDate||'').localeCompare(a.permitDate||''); });
     }
+
+    ST.permits = items;
+    ST.lastFetch = new Date().toISOString();
+    save();
+
+    BRANDS = computeBrands(items);
+    BRAND_SET = {};
+    BRANDS.forEach(function(g){ g.stores.forEach(function(s){ BRAND_SET[s.id] = g.brand; }); });
+
+    renderAll();
+    setProg(false);
+    analyzeAll(); // 자동 네이버 교차분석
+  } catch (e) {
+    setProg(false);
+    document.getElementById('new-list').innerHTML =
+      '<div class="empty"><div class="eico">⚠️</div><div class="etxt">조회 실패: ' + esc(e.message) + '</div></div>';
+  }
+  icons.forEach(function(i){ if (i) i.innerHTML = '🏛️'; });
+  updateClock(true);
+}
+
+// ============================================================
+// 네이버 자동 교차분석 (등록여부 + 화제성)
+// ============================================================
+function setProg(on, txt, pct){
+  ['', '2'].forEach(function(sfx){
+    var box = document.getElementById('an-prog' + sfx);
+    if (!box) return;
+    box.classList.toggle('on', !!on);
+    if (on) {
+      document.getElementById('an-txt' + sfx).textContent = txt || '';
+      document.getElementById('an-bar' + sfx).style.width = (pct || 0) + '%';
+    }
+  });
+}
+
+async function analyzeStore(s){
+  var q = naverQuery(s);
+  var localItems = await apiLocal(q, 5);
+  var norm = function(t){ return String(t).replace(/<[^>]+>/g,'').replace(/\s/g,'').toLowerCase(); };
+  var target = norm(s.name);
+  var found = localItems.some(function(i){
+    var t = norm(i.title);
+    return t.indexOf(target) >= 0 || target.indexOf(t) >= 0;
+  });
+  var blog = { total: 0, latest: '' };
+  if (found) blog = await apiBlogTotal(q);
+  ST.naver[s.id] = { found: found, blogTotal: blog.total, blogLatest: blog.latest, at: Date.now() };
+}
+
+async function analyzeAll(){
+  if (analyzing) return;
+  var todo = ST.permits.filter(function(s){ return !isFresh(nv(s)); }).slice(0, ANALYZE_MAX);
+  if (!todo.length) { renderAll(); return; }
+  analyzing = true;
+  for (var i = 0; i < todo.length; i++) {
+    setProg(true, '네이버 교차분석 ' + (i+1) + '/' + todo.length, (i+1) / todo.length * 100);
+    try { await analyzeStore(todo[i]); } catch (e) {}
+    if (i % 10 === 9) { save(); renderStats(); }
+    await new Promise(function(r){ setTimeout(r, 120); });
+  }
+  save();
+  analyzing = false;
+  setProg(false);
+  renderAll();
+}
+
+// ============================================================
+// 렌더: 전체
+// ============================================================
+function renderAll(){
+  renderStats();
+  renderCharts();
+  renderNew();
+  renderGold();
+  renderFr();
+  renderBuzz();
+}
+
+function renderStats(){
+  var list = ST.permits;
+  var analyzed = list.filter(function(s){ return nv(s); });
+  var gold = analyzed.filter(function(s){ return nv(s) && !nv(s).found; });
+  document.getElementById('s-total').textContent = list.length || '-';
+  document.getElementById('s-gold').textContent = gold.length || (analyzed.length ? '0' : '-');
+  document.getElementById('s-fr').textContent = BRANDS.length || '-';
+  document.getElementById('s-tr').textContent = ST.tracked.length;
+
+  var banner = document.getElementById('home-gold-alert');
+  if (gold.length) {
+    banner.style.display = 'flex';
+    document.getElementById('home-gold-txt').innerHTML =
+      '<strong style="color:#fbbf24">선점기회 ' + gold.length + '곳</strong> — 인허가 완료, 네이버 미등록. ' +
+      esc(gold.slice(0,3).map(function(s){ return s.name; }).join(', ')) + (gold.length > 3 ? ' 외 ' + (gold.length-3) + '곳' : '');
+  } else {
+    banner.style.display = 'none';
+  }
+}
+
+// ============================================================
+// 렌더: 매장 카드 (공용)
+// ============================================================
+function storeCard(s, opts){
+  opts = opts || {};
+  var n = nv(s);
+  var da = daysAgo(s.permitDate);
+  var hot = da <= 3;
+  var tr = ST.tracked.find(function(t){ return t.id === s.id; });
+  var brand = BRAND_SET[s.id];
+  var isGold = n && !n.found;
+
+  var nvBadge = '';
+  if (n) {
+    if (n.found) {
+      var bz = n.blogTotal || 0;
+      nvBadge = '<span class="tag t-naver">N등록</span>' +
+        (bz > 0 ? '<span class="tag t-buzz">🔥 블로그 ' + (bz > 999 ? '999+' : bz) + '</span>' : '');
+    } else {
+      nvBadge = '<span class="tag t-gold">🏆 N미등록 — 선점기회</span>';
+    }
+  } else {
+    nvBadge = '<span class="tag t-gray">분석 대기</span>';
   }
 
-  // === 2차: 블로그 — 네이버 플레이스 새로오픈 언급 글만 ===
-  const blogQs = regKw ? [
-    `${regKw} 네이버플레이스 새로오픈 주점 포차`,
-    `${regKw} 플레이스 신규오픈 이자카야 고기집`,
-    `${regKw} 새로오픈 술집 주류 음식점`,
-  ] : [
-    '네이버플레이스 새로오픈 주점 포차 이자카야',
-    '플레이스 신규오픈 고기집 호프 맥주',
-    '새로오픈 술집 포차 이자카야',
-    '신규오픈 주점 치킨 고기집',
-  ];
+  return ''
+  + '<div class="sc' + (isGold ? ' sc-gold' : '') + '" data-id="' + esc(s.id) + '">'
+  + (hot || isGold ? '<div class="sc-new-glow"></div>' : '')
+  + '<div class="sc-name">' + esc(s.name) + '</div>'
+  + '<div class="sc-tags">'
+  +   (hot ? '<span class="tag t-new">🔥 ' + (da <= 0 ? '오늘' : da + '일 전') + ' 인허가</span>' : '')
+  +   '<span class="tag t-cat">' + esc(s.typeLabel) + (s.upte && s.upte !== s.typeLabel ? '·' + esc(s.upte) : '') + '</span>'
+  +   '<span class="tag t-reg">' + esc(regionOf(s.addr)) + ' ' + esc(guOf(s.addr)) + '</span>'
+  +   (brand ? '<span class="tag t-fr">🏪 ' + esc(brand) + '</span>' : '')
+  +   nvBadge
+  + '</div>'
+  + '<div class="sc-desc">📍 ' + esc(s.addr || '주소 정보 없음')
+  +   (s.tel ? '<br>📞 <a href="tel:' + esc(s.tel) + '" style="color:var(--c1);text-decoration:none" onclick="event.stopPropagation()">' + esc(s.tel) + '</a>' : '')
+  + '</div>'
+  + '<div class="sc-foot">'
+  +   '<span class="sc-date">인허가 ' + fmtYmd(s.permitDate) + '</span>'
+  +   '<span style="display:flex;gap:6px;flex-wrap:wrap">'
+  +     '<button class="sc-track-btn" data-act="naver">N 보기</button>'
+  +     '<button class="sc-track-btn" data-act="map">지도</button>'
+  +     '<button class="sc-track-btn" data-act="insta">📷 인스타</button>'
+  +     '<button class="sc-track-btn ' + (tr ? 'tracked' : '') + '" data-act="track">' + (tr ? '📌 추적중' : '＋ 추적') + '</button>'
+  +   '</span>'
+  + '</div>'
+  + '<div class="insta-box" id="insta-' + esc(s.id) + '" style="display:none"></div>'
+  + '</div>';
+}
 
-  const [localRs, blogRs] = await Promise.all([
-    Promise.all(localQs.slice(0,9).map(q=>apiLocal(q,5))),
-    Promise.all(blogQs.map(q=>apiBlog(q,20,'date'))),
-  ]);
-
-  // local 결과는 실제 플레이스 등록 → _srcType 표시
-  const localItems = localRs.flat().map(i=>({...i, _srcType:'local'}));
-  const blogItems  = blogRs.flat();
-  const raw=[...localItems,...blogItems];
-
-  const seen=new Set();
-  ALL=raw.map(i=>parseStore(i, i._srcType==='local'?'local':'blog'))
-    .filter(s=>{
-      const k=s.name.trim();
-      if(!k||seen.has(k)) return false;
-      seen.add(k); return true;
+function bindCards(el, list){
+  el.querySelectorAll('.sc').forEach(function(card){
+    var id = card.getAttribute('data-id');
+    var s = list.find(function(x){ return String(x.id) === id; });
+    if (!s) return;
+    card.querySelectorAll('button[data-act]').forEach(function(b){
+      b.addEventListener('click', function(ev){
+        ev.stopPropagation();
+        var act = b.getAttribute('data-act');
+        if (act === 'naver') window.open(naverSearchUrl(s), '_blank');
+        else if (act === 'map') window.open(mapUrl(s), '_blank');
+        else if (act === 'insta') loadInsta(s);
+        else if (act === 'track') { toggleTrack(s); }
+      });
     });
-
-  ST.stores=ALL;
-  ST.lastFetch=new Date().toISOString();
-  save();
-
-  updateHeaderTime();
-  filterAndRender();
-  updateStats();
-  if(document.getElementById('pg-analysis').classList.contains('on')) renderAnalysis();
-
-  if(icoEl) icoEl.innerHTML='<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"11\" cy=\"11\" r=\"8\"/><line x1=\"21\" y1=\"21\" x2=\"16.65\" y2=\"16.65\"/></svg>';
-}
-
-function filterAndRender(){
-  const region=activeChip('chip-region');
-  const catKw=activeChip('chip-cat');
-  const days=parseInt(activeChip('chip-days')||'30');
-
-  let filtered=[...ALL];
-  if(region) filtered=filtered.filter(s=>s.region===region||s.txt.includes(region));
-  if(catKw) filtered=filtered.filter(s=>s.catLb.includes(catKw)||s.txt.includes(catKw)||s.cat.includes(catKw));
-
-  // Sort: confirmed new open first, then by date
-  filtered.sort((a,b)=>{
-    if(a.isNew&&!b.isNew) return -1;
-    if(!a.isNew&&b.isNew) return 1;
-    return daysAgo(a.date)-daysAgo(b.date);
   });
-
-  const cnt=document.getElementById('new-count');
-  if(cnt) cnt.textContent=filtered.length>0?`${filtered.length}개 매장 발견`:'';
-
-  renderStoreList('new-list',filtered,false);
 }
 
 // ============================================================
-// RENDER STORE LIST
+// 렌더: 신규업장
 // ============================================================
-function renderStoreList(id, list, compact=false){
-  const el=document.getElementById(id);
-  if(!list.length){
-    el.innerHTML=`<div class="empty"><div class="eico">🔍</div><div class="etxt">검색 버튼을 눌러<br>신규 업장을 찾아보세요</div></div>`;
+function filteredPermits(){
+  var type = activeChip('chip-type');
+  var nstat = activeChip('chip-nstat');
+  var list = ST.permits.slice();
+  if (type && type !== 'all') list = list.filter(function(s){ return s.type === type; });
+  if (nstat === 'gold') list = list.filter(function(s){ return nv(s) && !nv(s).found; });
+  else if (nstat === 'reg') list = list.filter(function(s){ return nv(s) && nv(s).found; });
+  else if (nstat === 'buzz') list.sort(function(a,b){ return buzzScore(nv(b)) - buzzScore(nv(a)); });
+  return list;
+}
+
+function renderNew(){
+  var list = filteredPermits();
+  var cnt = document.getElementById('new-count');
+  if (list.length) {
+    var byType = {};
+    list.forEach(function(s){ byType[s.typeLabel] = (byType[s.typeLabel] || 0) + 1; });
+    cnt.textContent = list.length + '건 — ' + Object.keys(byType).map(function(k){ return k + ' ' + byType[k]; }).join(' · ');
+  } else {
+    cnt.textContent = ST.permits.length ? '필터 결과 없음' : '';
+  }
+  var el = document.getElementById('new-list');
+  if (!list.length) {
+    if (!ST.permits.length) return;
+    el.innerHTML = '<div class="empty"><div class="eico">🏛️</div><div class="etxt">해당 조건의 매장이 없습니다</div></div>';
     return;
   }
+  var show = list.slice(0, 150);
+  el.innerHTML = show.map(function(s){ return storeCard(s); }).join('');
+  bindCards(el, show);
+}
 
-  const show=compact?list.slice(0,5):list;
-  el.innerHTML=show.map(s=>{
-    const tr=ST.tracked.find(t=>t.id===s.id);
-    const da=daysAgo(s.date);
-    const da2=da<7?`${da}일 전`:fmtDate(s.date);
-    const ne=s.isNew||da<=3;
-    const safeS=encodeURIComponent(JSON.stringify({...s,txt:'',desc:s.desc}));
-    return `
-    <div class="sc" onclick="openLink('${encodeURIComponent(s.link)}')">
-      ${ne?'<div class="sc-new-glow"></div>':''}
-      <div class="sc-name">${s.name}</div>
-      <div class="sc-tags">
-        ${s.src==='local'?'<span class="tag" style="background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.3)">📍 플레이스</span>':''}
-        ${ne&&s.src!=='local'?'<span class="tag t-new">🆕 신규오픈</span>':''}
-        <span class="tag t-cat">${s.catLb}</span>
-        <span class="tag t-reg">${s.region}${s.sub?' '+s.sub:''}</span>
-        ${s.fr?'<span class="tag t-fr">프랜차이즈</span>':''}
-      </div>
-      <div class="sc-desc">${s.desc||'(상세 정보 없음)'}</div>
-      <div class="sc-foot">
-        <span class="sc-date">${da2}</span>
-        <button class="sc-track-btn ${tr?'tracked':''}"
-          onclick="event.stopPropagation();toggleTrack(${safeS})"
-        >${tr?'📌 추적중':'＋ 추적'}</button>
-      </div>
-    </div>`;
+// ============================================================
+// 렌더: 선점기회 (N미등록)
+// ============================================================
+function renderGold(){
+  var sort = activeChip('chip-gold-sort') || 'date';
+  var list = ST.permits.filter(function(s){ return nv(s) && !nv(s).found; });
+  if (sort === 'tel') {
+    list.sort(function(a, b){
+      if (!!b.tel - !!a.tel !== 0) return (!!b.tel) - (!!a.tel);
+      return (b.permitDate || '').localeCompare(a.permitDate || '');
+    });
+  }
+  var analyzed = ST.permits.filter(function(s){ return nv(s); }).length;
+  document.getElementById('gold-count').textContent = list.length
+    ? '선점기회 ' + list.length + '곳 (분석 완료 ' + analyzed + '곳 중)'
+    : (analyzed ? '분석된 매장은 모두 네이버에 등록되어 있습니다' : '');
+  var el = document.getElementById('gold-list');
+  if (!list.length) {
+    el.innerHTML = '<div class="empty"><div class="eico">🏆</div><div class="etxt">' +
+      (analyzed ? '현재 조건에서 미등록 매장이 없습니다' : '신규업장 탭에서 조회하면<br>자동 분석 후 여기에 모입니다') + '</div></div>';
+    return;
+  }
+  var show = list.slice(0, 150);
+  el.innerHTML = show.map(function(s){ return storeCard(s); }).join('');
+  bindCards(el, show);
+}
+
+// ============================================================
+// 렌더: 프랜차이즈
+// ============================================================
+var FR_SELECTED = null;
+function renderFr(){
+  var tbl = document.getElementById('tbl-brand');
+  if (!BRANDS.length) {
+    tbl.innerHTML = '<tr><td style="color:var(--txt3);text-align:center;padding:24px;font-size:12px">' +
+      (ST.permits.length ? '기간 내 반복 출점 브랜드가 없습니다.<br>기간을 14~30일로 늘려보세요.' : '신규업장 탭에서 조회하면 자동 분석됩니다') + '</td></tr>';
+    document.getElementById('fr-detail').innerHTML = '';
+    document.getElementById('fr-detail-title').style.display = 'none';
+    return;
+  }
+  tbl.innerHTML = '<tr><th>#</th><th>브랜드</th><th>신규 지점</th><th>지역</th></tr>' +
+    BRANDS.slice(0, 20).map(function(g, i){
+      var regs = {};
+      g.stores.forEach(function(s){ regs[guOf(s.addr)] = 1; });
+      return '<tr style="cursor:pointer" onclick="selectBrand(' + i + ')">'
+        + '<td class="rn">' + (i+1) + '</td>'
+        + '<td style="font-size:12px;font-weight:600">' + esc(g.brand) + '</td>'
+        + '<td><span class="tag t-fr">' + g.stores.length + '개</span></td>'
+        + '<td style="font-size:10px;color:var(--txt2)">' + esc(Object.keys(regs).slice(0,3).join(', ')) + '</td>'
+        + '</tr>';
+    }).join('');
+  if (FR_SELECTED != null && BRANDS[FR_SELECTED]) selectBrand(FR_SELECTED, true);
+}
+function selectBrand(i, silent){
+  FR_SELECTED = i;
+  var g = BRANDS[i];
+  if (!g) return;
+  document.getElementById('fr-detail-title').style.display = 'flex';
+  document.getElementById('fr-detail-title').textContent = '🏪 ' + g.brand + ' — 신규 출점 ' + g.stores.length + '곳';
+  var el = document.getElementById('fr-detail');
+  el.innerHTML = g.stores.map(function(s){ return storeCard(s); }).join('');
+  bindCards(el, g.stores);
+  if (!silent) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ============================================================
+// 렌더: 대시보드 차트 + 화제성
+// ============================================================
+var CH = {};
+function mkChart(id, type, data, opts){
+  var ctx = document.getElementById(id);
+  if (!ctx) return;
+  if (CH[id]) CH[id].destroy();
+  CH[id] = new Chart(ctx, { type: type, data: data, options: opts });
+}
+function renderCharts(){
+  var list = ST.permits;
+  if (!list.length) return;
+
+  // 일별 추이
+  var byDay = {};
+  list.forEach(function(s){ if (s.permitDate) byDay[s.permitDate] = (byDay[s.permitDate] || 0) + 1; });
+  var days = Object.keys(byDay).sort();
+  mkChart('ch-daily', 'bar', {
+    labels: days.map(function(d){ return d.slice(4,6) + '/' + d.slice(6,8); }),
+    datasets: [{ data: days.map(function(d){ return byDay[d]; }), backgroundColor: 'rgba(0,212,255,0.7)', borderRadius: 4 }]
+  }, { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+    scales: { x: { ticks: { color: '#94a3b8', font: { size: 9 } }, grid: { color: '#1e2d45' } },
+              y: { ticks: { color: '#94a3b8' }, grid: { color: '#1e2d45' } } } });
+
+  // 업종 분포
+  var byType = {};
+  list.forEach(function(s){ byType[s.typeLabel] = (byType[s.typeLabel] || 0) + 1; });
+  mkChart('ch-type', 'doughnut', {
+    labels: Object.keys(byType),
+    datasets: [{ data: Object.values(byType), backgroundColor: ['#00d4ff','#7c3aed','#10b981','#f59e0b'], borderWidth: 0 }]
+  }, { responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'right', labels: { color: '#94a3b8', font: { size: 10 }, boxWidth: 10 } } } });
+
+  // 구별 TOP10
+  var byGu = {};
+  list.forEach(function(s){ var g = regionOf(s.addr) + ' ' + guOf(s.addr); byGu[g] = (byGu[g] || 0) + 1; });
+  var gus = Object.entries(byGu).sort(function(a,b){ return b[1] - a[1]; }).slice(0, 10);
+  mkChart('ch-gu', 'bar', {
+    labels: gus.map(function(g){ return g[0]; }),
+    datasets: [{ data: gus.map(function(g){ return g[1]; }), backgroundColor: 'rgba(124,58,237,0.7)', borderRadius: 4 }]
+  }, { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+    scales: { x: { ticks: { color: '#94a3b8' }, grid: { color: '#1e2d45' } },
+              y: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { display: false } } } });
+
+  // 프랜차이즈 미니 테이블
+  var mini = document.getElementById('tbl-fr-mini');
+  if (BRANDS.length) {
+    mini.innerHTML = BRANDS.slice(0, 5).map(function(g, i){
+      return '<tr style="cursor:pointer" onclick="switchPage(\'fr\');selectBrand(' + i + ')">'
+        + '<td class="rn">' + (i+1) + '</td>'
+        + '<td style="font-size:12px;font-weight:600">' + esc(g.brand) + '</td>'
+        + '<td><span class="tag t-fr">' + g.stores.length + '개 지점</span></td></tr>';
+    }).join('');
+  } else {
+    mini.innerHTML = '<tr><td style="color:var(--txt3);text-align:center;padding:20px;font-size:11px">기간 내 반복 출점 브랜드 없음</td></tr>';
+  }
+}
+
+function renderBuzz(){
+  var tbl = document.getElementById('tbl-buzz');
+  var list = ST.permits.filter(function(s){ return nv(s) && nv(s).found && (nv(s).blogTotal || 0) > 0; })
+    .sort(function(a,b){ return buzzScore(nv(b)) - buzzScore(nv(a)); }).slice(0, 5);
+  if (!list.length) {
+    tbl.innerHTML = '<tr><td style="color:var(--txt3);text-align:center;padding:20px;font-size:11px">' +
+      (ST.permits.length ? '아직 블로그 언급이 있는 매장이 없습니다' : '인허가 업데이트 후 자동 분석됩니다') + '</td></tr>';
+    return;
+  }
+  tbl.innerHTML = '<tr><th>#</th><th>매장</th><th>블로그</th><th>인허가</th></tr>' +
+    list.map(function(s, i){
+      var n = nv(s);
+      return '<tr>'
+        + '<td class="rn">' + (i+1) + '</td>'
+        + '<td><div style="font-size:12px;font-weight:600">' + esc(s.name) + '</div>'
+        + '<div style="font-size:10px;color:var(--txt2)">' + esc(regionOf(s.addr) + ' ' + guOf(s.addr)) + ' · ' + esc(s.typeLabel) + '</div></td>'
+        + '<td><span class="tag t-buzz">🔥 ' + (n.blogTotal > 999 ? '999+' : n.blogTotal) + '</span></td>'
+        + '<td style="font-size:10px;color:var(--txt3)">' + fmtYmd(s.permitDate) + '</td>'
+        + '</tr>';
+    }).join('');
+}
+
+// ============================================================
+// 인스타 분석 (매장별 수동 — Apify 비용 발생)
+// ============================================================
+async function loadInsta(s){
+  var box = document.getElementById('insta-' + s.id);
+  if (!box) return;
+  if (box.style.display !== 'none' && box.dataset.loaded) {
+    box.style.display = 'none';
+    return;
+  }
+  box.style.display = 'block';
+  box.innerHTML = '<span class="spin"></span> 인스타그램 해시태그 수집 중... (20~40초 소요)';
+  var tag = s.name.replace(/[\s\(\)\[\]·\-&]/g, '');
+  try {
+    var r = await fetch('/api/instagram?tags=' + encodeURIComponent(tag) + '&limit=20');
+    var d = await r.json();
+    if (d.error) throw new Error(d.error);
+    var posts = d.count || 0;
+    var feed = (d.feed || []).slice(0, 3);
+    box.dataset.loaded = '1';
+    if (!posts) {
+      box.innerHTML = '📷 <strong>#' + esc(tag) + '</strong> — 게시물 없음 (오픈 초기이거나 해시태그 미사용)';
+    } else {
+      box.innerHTML = '📷 <strong>#' + esc(tag) + '</strong> — 게시물 ' + posts + '개 수집'
+        + feed.map(function(p){
+            return '<div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border)">'
+              + '<span style="color:var(--c1)">@' + esc(p.user) + '</span> ❤️' + p.likes + ' 💬' + p.comments
+              + '<br>' + esc((p.caption || '').slice(0, 80))
+              + (p.url ? ' <a href="' + esc(p.url) + '" target="_blank" style="color:var(--c4)">보기</a>' : '')
+              + '</div>';
+          }).join('');
+    }
+  } catch (e) {
+    box.innerHTML = '⚠️ 인스타 수집 실패: ' + esc(e.message);
+  }
+}
+
+// ============================================================
+// 추적매장
+// ============================================================
+function toggleTrack(s){
+  var i = ST.tracked.findIndex(function(t){ return t.id === s.id; });
+  if (i === -1) {
+    var n = nv(s);
+    ST.tracked.push({
+      id: s.id, name: s.name, typeLabel: s.typeLabel, upte: s.upte || '',
+      addr: s.addr || '', tel: s.tel || '', permitDate: s.permitDate || '',
+      status: 'new', note: '', trackedAt: new Date().toISOString(),
+      snapshots: n ? [{ d: new Date().toISOString().slice(0,10), found: n.found, blog: n.blogTotal || 0 }] : []
+    });
+  } else {
+    ST.tracked.splice(i, 1);
+  }
+  save();
+  renderAll();
+  renderTracked();
+}
+
+function renderTracked(){
+  var filter = activeChip('chip-track');
+  var list = ST.tracked;
+  if (filter) list = list.filter(function(s){ return s.status === filter; });
+  var el = document.getElementById('track-list');
+  if (!list.length) {
+    el.innerHTML = '<div class="empty"><div class="eico">📌</div><div class="etxt">추적 중인 매장이 없습니다<br>신규업장·선점기회에서 추가하세요</div></div>';
+    return;
+  }
+  var stMap = { new: '연락필요', active: '거래중', pass: '패스' };
+  var stCls = { new: 'st-new', active: 'st-active', pass: 'st-pass' };
+  el.innerHTML = list.map(function(s){
+    var snaps = s.snapshots || [];
+    var trend = '';
+    if (snaps.length >= 2) {
+      var first = snaps[0], last = snaps[snaps.length - 1];
+      var diff = (last.blog || 0) - (first.blog || 0);
+      trend = '블로그 ' + (first.blog || 0) + ' → ' + (last.blog || 0) + (diff > 0 ? ' (▲' + diff + ')' : diff < 0 ? ' (▼' + (-diff) + ')' : ' (—)');
+    } else if (snaps.length === 1) {
+      trend = (snaps[0].found ? '블로그 ' + (snaps[0].blog || 0) : 'N미등록') + ' (' + snaps[0].d.slice(5) + ' 기준)';
+    }
+    return '<div class="card" style="margin-bottom:10px">'
+      + '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">'
+      +   '<div style="font-size:14px;font-weight:700;flex:1">' + esc(s.name) + '</div>'
+      +   '<select class="st-select" onchange="updateStatus(\'' + encodeURIComponent(s.id) + '\',this.value)">'
+      +     '<option value="new"' + (s.status === 'new' ? ' selected' : '') + '>연락필요</option>'
+      +     '<option value="active"' + (s.status === 'active' ? ' selected' : '') + '>거래중</option>'
+      +     '<option value="pass"' + (s.status === 'pass' ? ' selected' : '') + '>패스</option>'
+      +   '</select>'
+      + '</div>'
+      + '<div class="sc-tags">'
+      +   '<span class="tag t-cat">' + esc(s.typeLabel) + '</span>'
+      +   '<span class="tag t-reg">' + esc(regionOf(s.addr) + ' ' + guOf(s.addr)) + '</span>'
+      +   '<span class="st-badge ' + (stCls[s.status] || 'st-new') + '">' + (stMap[s.status] || '연락필요') + '</span>'
+      +   (trend ? '<span class="tag t-gray">📊 ' + esc(trend) + '</span>' : '')
+      + '</div>'
+      + '<div class="sc-desc">📍 ' + esc(s.addr)
+      +   (s.tel ? '<br>📞 <a href="tel:' + esc(s.tel) + '" style="color:var(--c1);text-decoration:none">' + esc(s.tel) + '</a>' : '')
+      +   '<br>인허가 ' + fmtYmd(s.permitDate) + '</div>'
+      + '<input type="text" class="note-input" value="' + esc(s.note || '') + '"'
+      +   ' placeholder="📝 메모 (방문일, 담당자, 메뉴 등)"'
+      +   ' onchange="updateNote(\'' + encodeURIComponent(s.id) + '\',this.value)">'
+      + '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">'
+      +   '<span style="font-size:10px;color:var(--txt3)">추적 ' + (s.trackedAt || '').slice(0, 10) + '</span>'
+      +   '<span style="display:flex;gap:6px">'
+      +     '<button class="sc-track-btn" onclick="window.open(\'' + 'https://m.search.naver.com/search.naver?query=' + encodeURIComponent((s.name + ' ' + guOf(s.addr)).trim()) + '\',\'_blank\')">N 보기</button>'
+      +     '<button class="sc-track-btn" style="color:#f87171;border-color:rgba(239,68,68,.2);background:rgba(239,68,68,.06)" onclick="removeTrack(\'' + encodeURIComponent(s.id) + '\')">삭제</button>'
+      +   '</span>'
+      + '</div>'
+      + '</div>';
   }).join('');
 }
 
-function openLink(enc){
-  const url=decodeURIComponent(enc);
-  if(url) window.open(url,'_blank');
+function updateStatus(encId, status){
+  var s = ST.tracked.find(function(t){ return t.id === decodeURIComponent(encId); });
+  if (s) { s.status = status; save(); }
 }
-
-// ============================================================
-// TOGGLE TRACK
-// ============================================================
-function toggleTrack(s){
-  if(typeof s==='string') s=JSON.parse(s);
-  const i=ST.tracked.findIndex(t=>t.id===s.id);
-  if(i===-1){
-    ST.tracked.push({...s,status:'new',note:'',trackedAt:new Date().toISOString()});
-  } else {
-    ST.tracked.splice(i,1);
-  }
-  save();
-  filterAndRender();
-  updateStats();
-}
-
-// ============================================================
-// DASHBOARD
-// ============================================================
-function updateStats(){
-  const todayStr=new Date().toISOString().slice(0,10);
-  const weekAgo=new Date(Date.now()-7*864e5).toISOString().slice(0,10);
-
-  const todayCnt=ALL.filter(s=>s.date===todayStr).length;
-  const weekCnt=ALL.filter(s=>s.date>=weekAgo).length;
-  const frCnt=ALL.filter(s=>s.fr).length;
-
-  document.getElementById('s-new').textContent=todayCnt||ALL.filter(s=>s.isNew).length||'-';
-  document.getElementById('s-week').textContent=weekCnt||ALL.length||'-';
-  document.getElementById('s-fr').textContent=frCnt||'-';
-  document.getElementById('s-tr').textContent=ST.tracked.length;
-
-  // Alert
-  const newOnes=ALL.filter(s=>s.isNew);
-  if(newOnes.length){
-    document.getElementById('home-alert').style.display='flex';
-    document.getElementById('home-alert-txt').textContent=
-      `확인된 신규오픈 매장 ${newOnes.length}개 발견 — ${newOnes.slice(0,3).map(s=>s.name).join(', ')}${newOnes.length>3?` 외 ${newOnes.length-3}개`:''}`;
-  }
-
-  // Region grid
-  const regMap={};
-  ALL.forEach(s=>{ regMap[s.region]=(regMap[s.region]||0)+1; });
-  const sorted=Object.entries(regMap).sort((a,b)=>b[1]-a[1]).slice(0,9);
-  document.getElementById('home-regions').innerHTML=sorted.map(([r,n])=>`
-    <div class="reg-item" onclick="goNewWithRegion('${r}')">
-      <div class="reg-name">${r}</div>
-      <div class="reg-cnt">${n}</div>
-      <div class="reg-sub">개 매장</div>
-    </div>`).join('');
-
-  // Latest list
-  const latest=[...ALL].sort((a,b)=>{
-    if(a.isNew&&!b.isNew) return -1;
-    if(!a.isNew&&b.isNew) return 1;
-    return daysAgo(a.date)-daysAgo(b.date);
-  });
-  renderStoreList('home-latest',latest,true);
-
-  // Home chart
-  renderHomeChart();
-}
-
-function goNewWithRegion(region){
-  // Switch to new tab and set region filter
-  switchPage('new');
-  document.querySelectorAll('#chip-region .chip').forEach(c=>{
-    c.classList.toggle('on',c.dataset.v===region);
-  });
-  filterAndRender();
-}
-
-// ============================================================
-// CHARTS
-// ============================================================
-const CH={};
-
-function renderHomeChart(){
-  const catMap={};
-  CATS.forEach(c=>catMap[c.id]=0);
-  ALL.forEach(s=>{ catMap[s.cat]=(catMap[s.cat]||0)+1; });
-  const labels=CATS.map(c=>c.lb);
-  const data=CATS.map(c=>catMap[c.id]||0);
-  const colors=['#00d4ff','#7c3aed','#10b981','#f59e0b','#ef4444','#ec4899','#14b8a6','#6366f1'];
-  const ctx=document.getElementById('chart-home-cat');
-  if(!ctx) return;
-  if(CH.home) CH.home.destroy();
-  CH.home=new Chart(ctx,{
-    type:'doughnut',
-    data:{labels,datasets:[{data,backgroundColor:colors,borderWidth:0,hoverOffset:4}]},
-    options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{position:'right',labels:{color:'#94a3b8',font:{size:10},boxWidth:10,padding:8}}}}
-  });
-}
-
-function renderAnalysis(){
-  const stores=ALL.length?ALL:ST.stores||[];
-  if(!stores.length) return;
-
-  // Cat doughnut
-  const catMap={};
-  CATS.forEach(c=>catMap[c.id]=0);
-  stores.forEach(s=>{ catMap[s.cat]=(catMap[s.cat]||0)+1; });
-  const colors=['#00d4ff','#7c3aed','#10b981','#f59e0b','#ef4444','#ec4899','#14b8a6','#6366f1'];
-  const ctx1=document.getElementById('chart-cat-doughnut');
-  if(ctx1){
-    if(CH.catD) CH.catD.destroy();
-    CH.catD=new Chart(ctx1,{
-      type:'doughnut',
-      data:{labels:CATS.map(c=>c.lb),datasets:[{data:CATS.map(c=>catMap[c.id]||0),backgroundColor:colors,borderWidth:0}]},
-      options:{responsive:true,maintainAspectRatio:false,
-        plugins:{legend:{position:'right',labels:{color:'#94a3b8',font:{size:10},boxWidth:10,padding:6}}}}
-    });
-  }
-
-  // Region bar
-  const regMap={};
-  stores.forEach(s=>{ regMap[s.region]=(regMap[s.region]||0)+1; });
-  const regSorted=Object.entries(regMap).sort((a,b)=>b[1]-a[1]).slice(0,10);
-  const ctx2=document.getElementById('chart-region-bar');
-  if(ctx2){
-    if(CH.regB) CH.regB.destroy();
-    CH.regB=new Chart(ctx2,{
-      type:'bar',
-      data:{
-        labels:regSorted.map(r=>r[0]),
-        datasets:[{data:regSorted.map(r=>r[1]),backgroundColor:'rgba(0,212,255,0.7)',borderRadius:5,borderSkipped:false}]
-      },
-      options:{responsive:true,maintainAspectRatio:false,
-        plugins:{legend:{display:false}},
-        scales:{
-          x:{ticks:{color:'#94a3b8',font:{size:10}},grid:{color:'#1e2d45'}},
-          y:{ticks:{color:'#94a3b8'},grid:{color:'#1e2d45'}}
-        }}
-    });
-  }
-
-  // Individual vs Franchise progress bars
-  const frCnt=stores.filter(s=>s.fr).length;
-  const indCnt=stores.length-frCnt;
-  const progEl=document.getElementById('analysis-prog');
-  if(progEl){
-    const catBreakdown=CATS.slice(0,-1).map(c=>{
-      const n=stores.filter(s=>s.cat===c.id).length;
-      return {lb:c.lb,n};
-    }).sort((a,b)=>b.n-a.n);
-    const max=catBreakdown[0]?.n||1;
-    progEl.innerHTML=`
-      <div class="prog-row">
-        <div class="prog-label" style="color:#a78bfa">개인매장</div>
-        <div class="prog-bar-wrap"><div class="prog-bar" style="width:${Math.round(indCnt/stores.length*100)}%;background:#7c3aed"></div></div>
-        <div class="prog-val">${indCnt}</div>
-      </div>
-      <div class="prog-row">
-        <div class="prog-label" style="color:var(--c4)">프랜차이즈</div>
-        <div class="prog-bar-wrap"><div class="prog-bar" style="width:${Math.round(frCnt/stores.length*100)}%;background:var(--c4)"></div></div>
-        <div class="prog-val">${frCnt}</div>
-      </div>
-      <div style="height:10px"></div>
-      ${catBreakdown.map(c=>`
-      <div class="prog-row">
-        <div class="prog-label">${c.lb}</div>
-        <div class="prog-bar-wrap"><div class="prog-bar" style="width:${Math.round(c.n/max*100)}%;background:var(--c1)"></div></div>
-        <div class="prog-val">${c.n}</div>
-      </div>`).join('')}
-    `;
-  }
-
-  // TOP 10 table
-  const topStores=[...stores]
-    .sort((a,b)=>{
-      if(a.isNew&&!b.isNew) return -1;
-      if(!a.isNew&&b.isNew) return 1;
-      return daysAgo(a.date)-daysAgo(b.date);
-    }).slice(0,10);
-  document.getElementById('tbl-top').innerHTML=`
-    <tr><th>#</th><th>매장명</th><th>업종/지역</th></tr>
-    ${topStores.map((s,i)=>`
-    <tr>
-      <td class="rn">${i+1}</td>
-      <td>
-        <div style="font-size:12px;font-weight:600">${s.name}</div>
-        ${s.isNew?'<span class="tag t-new" style="font-size:9px">신규</span>':''}
-      </td>
-      <td>
-        <div style="font-size:10px;color:var(--txt2)">${s.catLb}</div>
-        <div style="font-size:10px;color:var(--c3)">${s.region}${s.sub?' '+s.sub:''}</div>
-      </td>
-    </tr>`).join('')}
-  `;
-}
-
-// ============================================================
-// FRANCHISE
-// ============================================================
-async function loadFranchise(btn){
-  const icoEl=btn?btn.querySelector('#fr-ico'):document.getElementById('fr-ico');
-  if(icoEl) icoEl.innerHTML='<span class="spin pulse"></span>';
-
-  // 주류 취급 업종 프랜차이즈만 검색 (커피/빵집 제외)
-  const queries=[
-    '치킨 프랜차이즈 가맹 신규출점 오픈',
-    '고기집 프랜차이즈 출점 가맹점 신규',
-    '이자카야 포차 프랜차이즈 가맹 출점',
-    '호프 맥주 프랜차이즈 신규오픈 가맹',
-    '주점 술집 프랜차이즈 확장 출점',
-    '삼겹살 갈비 구이 프랜차이즈 가맹',
-  ];
-
-  const [blogR, newsR]=await Promise.all([
-    Promise.all(queries.slice(0,3).map(q=>apiBlog(q,20,'date'))),
-    Promise.all(queries.slice(3).map(q=>apiNews(q,15))),
-  ]);
-
-  const items=[...blogR.flat(),...newsR.flat()];
-  const brandCount={};
-  const frStores=[];
-  const seen=new Set();
-
-  items.forEach(item=>{
-    const s=parseStore(item,'franchise');
-    if(s.fr){
-      if(!seen.has(s.name)){ frStores.push(s); seen.add(s.name); }
-      FR_BRANDS.forEach(b=>{ if(s.txt.includes(b)) brandCount[b]=(brandCount[b]||0)+1; });
-    }
-  });
-
-  const topBrands=Object.entries(brandCount).sort((a,b)=>b[1]-a[1]).slice(0,15);
-  document.getElementById('tbl-brand').innerHTML=`
-    <tr><th>#</th><th>브랜드</th><th>언급</th></tr>
-    ${topBrands.map(([b,n],i)=>`
-    <tr>
-      <td class="rn">${i+1}</td>
-      <td style="font-size:12px;font-weight:600">${b}</td>
-      <td><span class="tag t-fr">${n}회</span></td>
-    </tr>`).join('')}
-  `;
-
-  renderStoreList('fr-list',frStores,false);
-  if(icoEl) icoEl.innerHTML='<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polyline points=\"22 12 18 12 15 21 9 3 6 12 2 12\"/></svg>';
-}
-
-// ============================================================
-// TRACKED
-// ============================================================
-function renderTracked(){
-  const filter=activeChip('chip-track');
-  let list=ST.tracked;
-  if(filter) list=list.filter(s=>s.status===filter);
-
-  const el=document.getElementById('track-list');
-  if(!list.length){
-    el.innerHTML=`<div class="empty"><div class="eico">📌</div><div class="etxt">추적 중인 매장이 없습니다<br>신규오픈 탭에서 매장을 추가하세요</div></div>`;
-    return;
-  }
-
-  const stMap={new:'연락필요',active:'거래중',pass:'패스'};
-  const stCls={new:'st-new',active:'st-active',pass:'st-pass'};
-
-  el.innerHTML=list.map(s=>`
-    <div class="card" style="margin-bottom:10px">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
-        <div style="font-size:14px;font-weight:700;flex:1">${s.name}</div>
-        <select class="st-select" onchange="updateStatus('${encodeURIComponent(s.id)}',this.value)">
-          <option value="new" ${s.status==='new'?'selected':''}>연락필요</option>
-          <option value="active" ${s.status==='active'?'selected':''}>거래중</option>
-          <option value="pass" ${s.status==='pass'?'selected':''}>패스</option>
-        </select>
-      </div>
-      <div class="sc-tags">
-        <span class="tag t-cat">${s.catLb}</span>
-        <span class="tag t-reg">${s.region}</span>
-        <span class="st-badge ${stCls[s.status]||'st-new'}">${stMap[s.status]||'연락필요'}</span>
-      </div>
-      <input type="text" class="note-input"
-        value="${(s.note||'').replace(/"/g,'&quot;')}"
-        placeholder="📝 메모 (방문일, 담당자, 메뉴 등)"
-        onchange="updateNote('${encodeURIComponent(s.id)}',this.value)">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
-        <span style="font-size:10px;color:var(--txt3)">추적: ${(s.trackedAt||'').slice(0,10)}</span>
-        <button onclick="removeTrack('${encodeURIComponent(s.id)}')"
-          style="font-size:10px;padding:3px 10px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:6px;color:#f87171;cursor:pointer">삭제</button>
-      </div>
-    </div>`).join('');
-}
-
-function updateStatus(encId,status){
-  const id=decodeURIComponent(encId);
-  const s=ST.tracked.find(t=>t.id===id);
-  if(s){s.status=status;save();}
-}
-function updateNote(encId,note){
-  const id=decodeURIComponent(encId);
-  const s=ST.tracked.find(t=>t.id===id);
-  if(s){s.note=note;save();}
+function updateNote(encId, note){
+  var s = ST.tracked.find(function(t){ return t.id === decodeURIComponent(encId); });
+  if (s) { s.note = note; save(); }
 }
 function removeTrack(encId){
-  const id=decodeURIComponent(encId);
-  ST.tracked=ST.tracked.filter(t=>t.id!==id);
-  save(); renderTracked(); updateStats();
+  var id = decodeURIComponent(encId);
+  ST.tracked = ST.tracked.filter(function(t){ return t.id !== id; });
+  save(); renderTracked(); renderStats();
 }
 function exportTracked(){
-  const lines=ST.tracked.map(s=>
-    `${s.name} | ${s.catLb} | ${s.region} | ${s.status==='new'?'연락필요':s.status==='active'?'거래중':'패스'} | ${s.note||''}`
-  );
-  const text=lines.join('\n');
-  const url=URL.createObjectURL(new Blob([text],{type:'text/plain;charset=utf-8'}));
-  const a=document.createElement('a');
-  a.href=url; a.download=`세왕추적매장_${new Date().toISOString().slice(0,10)}.txt`; a.click();
+  var stMap = { new: '연락필요', active: '거래중', pass: '패스' };
+  var lines = ST.tracked.map(function(s){
+    var snaps = s.snapshots || [];
+    var last = snaps[snaps.length - 1];
+    return [s.name, s.typeLabel, regionOf(s.addr) + ' ' + guOf(s.addr), s.tel || '-',
+      '인허가 ' + fmtYmd(s.permitDate), stMap[s.status] || '연락필요',
+      last ? '블로그 ' + (last.blog || 0) : '', s.note || ''].join(' | ');
+  });
+  var url = URL.createObjectURL(new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' }));
+  var a = document.createElement('a');
+  a.href = url; a.download = '세왕추적매장_' + new Date().toISOString().slice(0,10) + '.txt'; a.click();
 }
 function clearTracked(){
-  if(confirm(`추적 매장 ${ST.tracked.length}개를 모두 삭제할까요?`)){
-    ST.tracked=[]; save(); renderTracked(); updateStats();
+  if (confirm('추적 매장 ' + ST.tracked.length + '개를 모두 삭제할까요?')) {
+    ST.tracked = []; save(); renderTracked(); renderStats();
   }
 }
 
+// 추적매장 전체 재분석 (화제성 추이 스냅샷 추가)
+async function reanalyzeTracked(btn){
+  if (!ST.tracked.length) return;
+  btn.disabled = true; btn.textContent = '재분석 중...';
+  for (var i = 0; i < ST.tracked.length; i++) {
+    var t = ST.tracked[i];
+    btn.textContent = '재분석 ' + (i+1) + '/' + ST.tracked.length;
+    try {
+      var fake = { id: t.id, name: t.name, addr: t.addr };
+      await analyzeStore(fake);
+      var n = ST.naver[t.id];
+      if (n) {
+        t.snapshots = t.snapshots || [];
+        t.snapshots.push({ d: new Date().toISOString().slice(0,10), found: n.found, blog: n.blogTotal || 0 });
+        if (t.snapshots.length > 30) t.snapshots = t.snapshots.slice(-30);
+      }
+    } catch (e) {}
+    await new Promise(function(r){ setTimeout(r, 150); });
+  }
+  save();
+  btn.disabled = false; btn.textContent = '🔄 전체 재분석';
+  renderTracked();
+}
+
 // ============================================================
-// NAVIGATION
+// NAVIGATION + CHIPS
 // ============================================================
 function switchPage(pg){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
-  document.querySelectorAll('.bnav-btn').forEach(b=>b.classList.remove('on'));
-  document.getElementById('pg-'+pg).classList.add('on');
-  document.querySelector(`.bnav-btn[data-pg="${pg}"]`).classList.add('on');
-  if(pg==='track') renderTracked();
-  if(pg==='analysis'){ ALL=ALL.length?ALL:(ST.stores||[]); renderAnalysis(); }
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('on'); });
+  document.querySelectorAll('.bnav-btn').forEach(function(b){ b.classList.remove('on'); });
+  document.getElementById('pg-' + pg).classList.add('on');
+  document.querySelector('.bnav-btn[data-pg="' + pg + '"]').classList.add('on');
+  if (pg === 'track') renderTracked();
 }
-
-document.querySelectorAll('.bnav-btn').forEach(btn=>{
-  btn.addEventListener('click',()=>switchPage(btn.dataset.pg));
+document.querySelectorAll('.bnav-btn').forEach(function(btn){
+  btn.addEventListener('click', function(){ switchPage(btn.dataset.pg); });
 });
 
-// ============================================================
-// CHIP HELPERS
-// ============================================================
-function activeChip(id){
-  return document.querySelector(`#${id} .chip.on`)?.dataset.v||'';
-}
-
-['chip-days','chip-region','chip-cat'].forEach(id=>{
-  document.querySelectorAll(`#${id} .chip`).forEach(c=>{
-    c.addEventListener('click',()=>{
-      document.querySelectorAll(`#${id} .chip`).forEach(x=>x.classList.remove('on'));
+['chip-days','chip-region','chip-type','chip-nstat','chip-gold-sort','chip-track'].forEach(function(id){
+  document.querySelectorAll('#' + id + ' .chip').forEach(function(c){
+    c.addEventListener('click', function(){
+      document.querySelectorAll('#' + id + ' .chip').forEach(function(x){ x.classList.remove('on'); });
       c.classList.add('on');
-      if(id!=='chip-days') filterAndRender();
-    });
-  });
-});
-
-['chip-track'].forEach(id=>{
-  document.querySelectorAll(`#${id} .chip`).forEach(c=>{
-    c.addEventListener('click',()=>{
-      document.querySelectorAll(`#${id} .chip`).forEach(x=>x.classList.remove('on'));
-      c.classList.add('on');
-      renderTracked();
-    });
-  });
-});
-
-['chip-fr-days'].forEach(id=>{
-  document.querySelectorAll(`#${id} .chip`).forEach(c=>{
-    c.addEventListener('click',()=>{
-      document.querySelectorAll(`#${id} .chip`).forEach(x=>x.classList.remove('on'));
-      c.classList.add('on');
+      if (id === 'chip-type' || id === 'chip-nstat') renderNew();
+      else if (id === 'chip-gold-sort') renderGold();
+      else if (id === 'chip-track') renderTracked();
+      // 기간/지역 변경은 조회 버튼으로 반영
     });
   });
 });
 
 // ============================================================
-// REFRESH ALL
+// CLOCK + INIT
 // ============================================================
-async function refreshAll(btn){
-  const icoEl=btn?btn.querySelector('#home-ico'):document.getElementById('home-ico');
-  if(icoEl) icoEl.innerHTML='<span class="spin"></span>';
-  await loadNew(null);
-  if(icoEl) icoEl.innerHTML='<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M23 4v6h-6\"/><path d=\"M1 20v-6h6\"/><path d=\"M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15\"/></svg>';
+function updateClock(isFetch){
+  var now = new Date();
+  document.getElementById('hdr-time').textContent =
+    now.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+  document.getElementById('hdr-date').textContent = isFetch ? '업데이트 완료' :
+    now.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric', weekday: 'short' });
 }
+setInterval(function(){ updateClock(); }, 30000);
+updateClock();
 
-// ============================================================
-// HEADER CLOCK
-// ============================================================
-function updateHeaderTime(){
-  const now=new Date();
-  document.getElementById('hdr-time').textContent=
-    now.toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
-  document.getElementById('hdr-date').textContent=
-    now.toLocaleDateString('ko-KR',{month:'short',day:'numeric',weekday:'short'});
-}
-setInterval(updateHeaderTime,30000);
-updateHeaderTime();
-
-// ============================================================
-// INIT
-// ============================================================
 function init(){
-  updateStats();
-  if(ST.stores?.length){
-    ALL=ST.stores;
-    filterAndRender();
-    renderHomeChart();
+  if (ST.permits && ST.permits.length) {
+    BRANDS = computeBrands(ST.permits);
+    BRAND_SET = {};
+    BRANDS.forEach(function(g){ g.stores.forEach(function(s){ BRAND_SET[s.id] = g.brand; }); });
+    renderAll();
   }
-  if(ST.lastFetch){
-    const d=new Date(ST.lastFetch);
-    document.getElementById('hdr-time').textContent=
-      d.toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
-    document.getElementById('hdr-date').textContent='마지막 업데이트';
-  }
-  // Service worker
-  if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('/sw.js').catch(()=>{});
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(function(){});
   }
 }
 init();
 </script>
 </body>
 </html>
-
-<!-- ===== 인허가 신규 탭 (행안부 지방행정 인허가 데이터, data.go.kr) ===== -->
-<script>
-(function(){
-  // ---- 페이지 추가 ----
-  var pg = document.createElement('div');
-  pg.className = 'page';
-  pg.id = 'pg-permit';
-  pg.innerHTML = ''
-    + '<div class="alert-banner" style="margin-bottom:12px">'
-    + '  <span class="aico">🏛️</span>'
-    + '  <div style="font-size:11px;line-height:1.5">관할구청 <strong style="color:var(--c1)">영업신고(인허가)</strong> 기준 신규 업장입니다.<br>네이버 플레이스 등록 <strong>이전</strong> 단계라 가장 빠른 선점 영업이 가능합니다. (데이터는 2일 전 기준)</div>'
-    + '</div>'
-    + '<div class="chips" id="chip-pm-days">'
-    + '  <div class="chip" data-v="3">최근 3일</div>'
-    + '  <div class="chip on" data-v="7">7일</div>'
-    + '  <div class="chip" data-v="14">14일</div>'
-    + '  <div class="chip" data-v="30">30일</div>'
-    + '</div>'
-    + '<div class="chips" id="chip-pm-region">'
-    + '  <div class="chip on" data-v="metro">서울+경기</div>'
-    + '  <div class="chip" data-v="seoul">서울</div>'
-    + '  <div class="chip" data-v="gyeonggi">경기</div>'
-    + '  <div class="chip" data-v="all">🇰🇷 전국</div>'
-    + '</div>'
-    + '<div class="chips" id="chip-pm-type">'
-    + '  <div class="chip on" data-v="all">전체 업종</div>'
-    + '  <div class="chip" data-v="ilban">일반음식점</div>'
-    + '  <div class="chip" data-v="hyuge">휴게음식점</div>'
-    + '  <div class="chip" data-v="danran">단란주점</div>'
-    + '  <div class="chip" data-v="yuheung">유흥주점</div>'
-    + '</div>'
-    + '<div class="chips" id="chip-pm-upte" style="display:none"></div>'
-    + '<button class="srch-btn" id="pm-load-btn">'
-    + '  <span id="pm-ico">🏛️</span> 신규 인허가 업장 조회'
-    + '</button>'
-    + '<div id="pm-count" style="font-size:11px;color:var(--txt3);margin-bottom:10px;text-align:center"></div>'
-    + '<div id="pm-list"><div class="empty"><div class="eico">🏛️</div><div class="etxt">조회 버튼을 눌러<br>방금 영업신고한 업장을 찾아보세요</div></div></div>';
-  document.querySelector('.main').appendChild(pg);
-
-  // ---- 하단 네비 버튼 추가 ----
-  var btn = document.createElement('button');
-  btn.className = 'bnav-btn';
-  btn.setAttribute('data-pg', 'permit');
-  btn.innerHTML = '<span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/><line x1="9" y1="11" x2="9.01" y2="11"/><line x1="15" y1="11" x2="15.01" y2="11"/></svg></span>인허가';
-  var nav = document.querySelector('.bnav');
-  nav.insertBefore(btn, nav.children[2]); // 신규오픈 다음 위치
-  btn.addEventListener('click', function(){ switchPage('permit'); });
-
-  // ---- 칩 핸들러 ----
-  ['chip-pm-days','chip-pm-region','chip-pm-type'].forEach(function(id){
-    document.querySelectorAll('#' + id + ' .chip').forEach(function(c){
-      c.addEventListener('click', function(){
-        document.querySelectorAll('#' + id + ' .chip').forEach(function(x){ x.classList.remove('on'); });
-        c.classList.add('on');
-        if (PM_ALL.length) renderPermits();
-      });
-    });
-  });
-
-  document.getElementById('pm-load-btn').addEventListener('click', loadPermits);
-
-  // ---- 상태 ----
-  var PM_ALL = [];
-  var PM_NAVER = {}; // id -> {found, link}
-
-  function pmEsc(s){
-    return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-  function pmFmtDate(ymd){
-    if (!ymd || ymd.length < 8) return '-';
-    return ymd.slice(0,4) + '.' + ymd.slice(4,6) + '.' + ymd.slice(6,8);
-  }
-  function pmDaysAgo(ymd){
-    if (!ymd || ymd.length < 8) return 999;
-    var dt = new Date(ymd.slice(0,4) + '-' + ymd.slice(4,6) + '-' + ymd.slice(6,8));
-    return Math.floor((Date.now() - dt.getTime()) / 864e5);
-  }
-  function pmRegion(addr){
-    if (!addr) return '-';
-    if (addr.indexOf('서울') === 0) return '서울';
-    if (addr.indexOf('경기') === 0) return '경기';
-    return addr.split(' ')[0];
-  }
-  function pmGu(addr){
-    var parts = String(addr || '').split(' ');
-    return parts.length > 1 ? parts[1] : '';
-  }
-
-  // ---- 조회 ----
-  async function loadPermits(){
-    var ico = document.getElementById('pm-ico');
-    ico.innerHTML = '<span class="spin"></span>';
-    var days = document.querySelector('#chip-pm-days .chip.on').dataset.v;
-    var region = document.querySelector('#chip-pm-region .chip.on').dataset.v;
-    try {
-      var r = await fetch('/api/permits?days=' + days + '&region=' + region + '&type=all');
-      var d = await r.json();
-      if (d.error) throw new Error(d.error);
-      PM_ALL = d.items || [];
-      PM_NAVER = {};
-      renderPermits();
-    } catch(e) {
-      document.getElementById('pm-list').innerHTML =
-        '<div class="empty"><div class="eico">⚠️</div><div class="etxt">조회 실패: ' + pmEsc(e.message) + '</div></div>';
-      document.getElementById('pm-count').textContent = '';
-    }
-    ico.innerHTML = '🏛️';
-  }
-
-  // ---- 렌더 ----
-  function renderPermits(){
-    var type = document.querySelector('#chip-pm-type .chip.on').dataset.v;
-    var list = type === 'all' ? PM_ALL : PM_ALL.filter(function(s){ return s.type === type; });
-
-    var cnt = document.getElementById('pm-count');
-    var byType = {};
-    list.forEach(function(s){ byType[s.typeLabel] = (byType[s.typeLabel] || 0) + 1; });
-    cnt.textContent = list.length
-      ? list.length + '건 — ' + Object.keys(byType).map(function(k){ return k + ' ' + byType[k]; }).join(' · ')
-      : '결과 없음';
-
-    var el = document.getElementById('pm-list');
-    if (!list.length) {
-      el.innerHTML = '<div class="empty"><div class="eico">🏛️</div><div class="etxt">해당 조건의 신규 인허가가 없습니다</div></div>';
-      return;
-    }
-
-    el.innerHTML = list.slice(0, 200).map(function(s){
-      var da = pmDaysAgo(s.permitDate);
-      var hot = da <= 3;
-      var tr = ST.tracked.find(function(t){ return t.id === s.id; });
-      var nv = PM_NAVER[s.id];
-      var nvBadge = '';
-      if (nv) {
-        nvBadge = nv.found
-          ? '<span class="tag" style="background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.3)">N등록됨</span>'
-          : '<span class="tag" style="background:rgba(239,68,68,.12);color:#f87171;border:1px solid rgba(239,68,68,.25)">N미등록 — 선점기회</span>';
-      }
-      return ''
-      + '<div class="sc" data-pmid="' + pmEsc(s.id) + '">'
-      + (hot ? '<div class="sc-new-glow"></div>' : '')
-      + '<div class="sc-name">' + pmEsc(s.name) + '</div>'
-      + '<div class="sc-tags">'
-      +   (hot ? '<span class="tag t-new">🔥 ' + (da <= 0 ? '오늘' : da + '일 전') + ' 인허가</span>' : '')
-      +   '<span class="tag t-cat">' + pmEsc(s.typeLabel) + (s.upte && s.upte !== s.typeLabel ? '·' + pmEsc(s.upte) : '') + '</span>'
-      +   '<span class="tag t-reg">' + pmEsc(pmRegion(s.addr)) + ' ' + pmEsc(pmGu(s.addr)) + '</span>'
-      +   '<span class="tag" style="background:rgba(75,94,122,.2);color:var(--txt2);border:1px solid var(--border2)">' + pmEsc(s.status || '영업') + '</span>'
-      +   nvBadge
-      + '</div>'
-      + '<div class="sc-desc">📍 ' + pmEsc(s.addr || '주소 정보 없음') + (s.tel ? '<br>📞 ' + pmEsc(s.tel) : '') + '</div>'
-      + '<div class="sc-foot">'
-      +   '<span class="sc-date">인허가 ' + pmFmtDate(s.permitDate) + '</span>'
-      +   '<span style="display:flex;gap:6px">'
-      +     '<button class="sc-track-btn" data-act="naver">N 확인</button>'
-      +     '<button class="sc-track-btn" data-act="place">플레이스</button>'
-      +     '<button class="sc-track-btn ' + (tr ? 'tracked' : '') + '" data-act="track">' + (tr ? '📌 추적중' : '＋ 추적') + '</button>'
-      +   '</span>'
-      + '</div>'
-      + '</div>';
-    }).join('');
-
-    // 카드 버튼 이벤트 위임
-    el.querySelectorAll('.sc').forEach(function(card){
-      var id = card.getAttribute('data-pmid');
-      var s = list.find(function(x){ return String(x.id) === id; });
-      if (!s) return;
-      card.querySelectorAll('button[data-act]').forEach(function(b){
-        b.addEventListener('click', function(ev){
-          ev.stopPropagation();
-          var act = b.getAttribute('data-act');
-          if (act === 'place') openNaverPlace(s);
-          else if (act === 'naver') checkNaver(s);
-          else if (act === 'track') trackPermit(s);
-        });
-      });
-    });
-  }
-
-  function naverQuery(s){
-    var gu = pmGu(s.addr);
-    return (s.name + ' ' + gu).trim();
-  }
-  function openNaverPlace(s){
-    window.open('https://m.search.naver.com/search.naver?query=' + encodeURIComponent(naverQuery(s)), '_blank');
-  }
-
-  // ---- 네이버 플레이스 등록 여부 확인 ----
-  async function checkNaver(s){
-    PM_NAVER[s.id] = null;
-    try {
-      var items = await apiLocal(naverQuery(s), 5);
-      var norm = function(t){ return String(t).replace(/<[^>]+>/g, '').replace(/\s/g, '').toLowerCase(); };
-      var target = norm(s.name);
-      var found = items.some(function(i){
-        var t = norm(i.title);
-        return t.indexOf(target) >= 0 || target.indexOf(t) >= 0;
-      });
-      PM_NAVER[s.id] = { found: found };
-    } catch(e) {
-      PM_NAVER[s.id] = { found: false };
-    }
-    renderPermits();
-  }
-
-  // ---- 추적매장 연동 ----
-  function trackPermit(s){
-    var da = s.permitDate && s.permitDate.length === 8
-      ? s.permitDate.slice(0,4) + '-' + s.permitDate.slice(4,6) + '-' + s.permitDate.slice(6,8) : '';
-    toggleTrack({
-      id: s.id,
-      name: s.name,
-      txt: '',
-      desc: (s.addr || '') + (s.tel ? ' / ' + s.tel : ''),
-      cat: 'other',
-      catLb: s.typeLabel + (s.upte && s.upte !== s.typeLabel ? '·' + s.upte : ''),
-      region: pmRegion(s.addr),
-      sub: pmGu(s.addr),
-      fr: false,
-      isNew: true,
-      date: da,
-      link: 'https://m.search.naver.com/search.naver?query=' + encodeURIComponent(naverQuery(s)),
-      src: 'permit'
-    });
-    renderPermits();
-  }
-})();
-</script>
