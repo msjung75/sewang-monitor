@@ -22,7 +22,7 @@ export default async function handler(req, res) {
   if (!key) return res.status(500).json({ error: 'DATA_GO_KR_KEY 미설정' });
 
   const { days = '7', region = 'metro', type = 'all', from = '', to = '' } = req.query;
-  const maxPages = Math.min(parseInt(req.query.maxPages || '5', 10), 8);
+  const maxPages = Math.min(parseInt(req.query.maxPages || '8', 10), 15);
 
   // 조회 시작일: from(YYYYMMDD) 우선, 없으면 KST 기준 N일 전
   let since, until = '';
