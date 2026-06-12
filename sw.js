@@ -1,6 +1,6 @@
 // 정적 파일 캐시 (PWA 오프라인 기본 대응)
-// CACHE 버전 bump — v9f: chunk 부분 저장 + silent catch 제거 + 쿨다운
-const CACHE = 'sewang-pwa-v9f-chunk-incremental';
+// CACHE 버전 bump — v9g: apiPermits 30초 fetch timeout (무한 대기 차단)
+const CACHE = 'sewang-pwa-v9g-fetch-timeout';
 const FILES = ['./','./index.html','./manifest.json','./icon.svg'];
 
 self.addEventListener('install', e => {
