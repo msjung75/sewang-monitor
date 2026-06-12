@@ -339,8 +339,14 @@ body{
   </div>
 
   <div class="card">
-    <div class="card-title">📈 일별 신규 인허가 추이</div>
+    <div class="card-title">📈 일별 신규 인허가 추이 <span style="font-weight:400;color:var(--txt3);font-size:10px">(최근 30일 · 서울+경기)</span></div>
     <div class="chart-box"><canvas id="ch-daily"></canvas></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🗓️ 월별 창업 추이 <span style="font-weight:400;color:var(--txt3);font-size:10px">(업종별 · 서울+경기 · 지난달은 1회 수집 후 고정)</span></div>
+    <div class="chart-box"><canvas id="ch-monthly"></canvas></div>
+    <div id="monthly-status" style="font-size:10px;color:var(--txt3);text-align:center;margin-top:6px"></div>
   </div>
 
   <div class="card">
@@ -687,7 +693,9 @@ async function loadPermits(){
 
     renderAll();
     setProg(false);
-    analyzeAll(); // 자동 네이버 교차분석
+    fetchTrend30();   // 30일 추이 백그라운드 집계
+    fetchMonthly();   // 월별 창업 추이 (지난달은 1회 수집 후 고정)
+    analyzeAll();     // 자동 네이버 교차분석
   } catch (e) {
     setProg(false);
     document.getElementById('new-list').innerHTML =
@@ -695,6 +703,103 @@ async function loadPermits(){
   }
   icons.forEach(function(i){ if (i) i.innerHTML = '🏛️'; });
   updateClock(true);
+}
+
+// ============================================================
+// 30일 인허가 추이 (대시보드 차트 전용, 12시간 캐시)
+// ============================================================
+async function fetchTrend30(){
+  try {
+    var t = ST.trend30;
+    if (t && (Date.now() - (t.at || 0)) < 12 * 3600 * 1000) return;
+    var byDay = {};
+    var end = new Date(Date.now() + 9 * 3600 * 1000);
+    for (var off = 0; off < 30; off += 7) {
+      var to = new Date(end); to.setUTCDate(to.getUTCDate() - off);
+      var from = new Date(end); from.setUTCDate(from.getUTCDate() - Math.min(off + 7, 30));
+      var p = { region: 'metro', type: 'all', from: from.toISOString().slice(0,10).replace(/-/g,'') };
+      if (off !== 0) p.to = to.toISOString().slice(0,10).replace(/-/g,'');
+      var d = await apiPermits(p);
+      (d.items || []).forEach(function(s){
+        if (s.permitDate && !isExcluded(s)) byDay[s.permitDate] = (byDay[s.permitDate] || 0) + 1;
+      });
+    }
+    ST.trend30 = { byDay: byDay, at: Date.now() };
+    save();
+    renderCharts();
+  } catch (e) {}
+}
+
+// ============================================================
+// 월별 창업 추이 (업종별 아카이브)
+// 지난달까지는 1회 수집 후 영구 고정(final), 이번 달만 12시간마다 갱신
+// ============================================================
+function ymdOf(d){ return d.toISOString().slice(0,10).replace(/-/g,''); }
+var monthlyFetching = false;
+async function fetchMonthly(){
+  if (monthlyFetching) return;
+  monthlyFetching = true;
+  try {
+    ST.monthly = ST.monthly || {};
+    var nowK = new Date(Date.now() + 9 * 3600 * 1000);
+    var curKey = nowK.toISOString().slice(0,7).replace('-','');
+    for (var i = 5; i >= 0; i--) {
+      var mStart = new Date(Date.UTC(nowK.getUTCFullYear(), nowK.getUTCMonth() - i, 1));
+      var mEnd = new Date(Date.UTC(mStart.getUTCFullYear(), mStart.getUTCMonth() + 1, 1));
+      var key = mStart.toISOString().slice(0,7).replace('-','');
+      var isCur = key === curKey;
+      var rec = ST.monthly[key];
+      if (rec && rec.final) continue;
+      if (rec && isCur && (Date.now() - (rec.at || 0)) < 12 * 3600 * 1000) continue;
+      var stEl = document.getElementById('monthly-status');
+      if (stEl) stEl.textContent = key.slice(0,4) + '.' + key.slice(4) + ' 수집 중...';
+      var byType = { ilban: 0, hyuge: 0, danran: 0, yuheung: 0 };
+      var total = 0;
+      var stop = isCur ? new Date(nowK.getTime() + 864e5) : mEnd;
+      for (var c = new Date(mStart); c < stop; ) {
+        var c2 = new Date(c); c2.setUTCDate(c2.getUTCDate() + 7);
+        if (c2 > stop) c2 = new Date(stop);
+        var d = await apiPermits({ region: 'metro', type: 'all', from: ymdOf(c), to: ymdOf(c2) });
+        (d.items || []).forEach(function(s){
+          if (isExcluded(s)) return;
+          byType[s.type] = (byType[s.type] || 0) + 1;
+          total++;
+        });
+        c = c2;
+      }
+      ST.monthly[key] = { byType: byType, total: total, final: !isCur, at: Date.now() };
+      save();
+      renderMonthly();
+    }
+    var stEl2 = document.getElementById('monthly-status');
+    if (stEl2) stEl2.textContent = '';
+  } catch (e) {
+    var stEl3 = document.getElementById('monthly-status');
+    if (stEl3) stEl3.textContent = '';
+  }
+  monthlyFetching = false;
+}
+
+function renderMonthly(){
+  var m = ST.monthly || {};
+  var keys = Object.keys(m).sort().slice(-6);
+  if (!keys.length) return;
+  var TYPES = { ilban: '일반음식점', hyuge: '휴게음식점', danran: '단란주점', yuheung: '유흥주점' };
+  var colors = { ilban: '#00d4ff', hyuge: '#7c3aed', danran: '#10b981', yuheung: '#f59e0b' };
+  var datasets = Object.keys(TYPES).map(function(t){
+    return {
+      label: TYPES[t],
+      data: keys.map(function(k){ return (m[k].byType && m[k].byType[t]) || 0; }),
+      backgroundColor: colors[t], borderRadius: 3, stack: 's'
+    };
+  });
+  mkChart('ch-monthly', 'bar', {
+    labels: keys.map(function(k){ return k.slice(2,4) + '.' + k.slice(4); }),
+    datasets: datasets
+  }, { responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 10 }, boxWidth: 10, padding: 8 } } },
+    scales: { x: { stacked: true, ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { color: '#1e2d45' } },
+              y: { stacked: true, ticks: { color: '#94a3b8' }, grid: { color: '#1e2d45' } } } });
 }
 
 // ============================================================
@@ -749,6 +854,7 @@ async function analyzeAll(){
 function renderAll(){
   renderStats();
   renderCharts();
+  renderMonthly();
   renderNew();
   renderGold();
   renderFr();
@@ -985,10 +1091,14 @@ function renderCharts(){
   var list = ST.permits;
   if (!list.length) return;
 
-  // 일별 추이
+  // 일별 추이 — 30일 캐시가 있으면 그것으로, 없으면 조회분으로
   var byDay = {};
-  list.forEach(function(s){ if (s.permitDate) byDay[s.permitDate] = (byDay[s.permitDate] || 0) + 1; });
-  var days = Object.keys(byDay).sort();
+  if (ST.trend30 && ST.trend30.byDay && Object.keys(ST.trend30.byDay).length) {
+    byDay = ST.trend30.byDay;
+  } else {
+    list.forEach(function(s){ if (s.permitDate) byDay[s.permitDate] = (byDay[s.permitDate] || 0) + 1; });
+  }
+  var days = Object.keys(byDay).sort().slice(-31);
   mkChart('ch-daily', 'bar', {
     labels: days.map(function(d){ return d.slice(4,6) + '/' + d.slice(6,8); }),
     datasets: [{ data: days.map(function(d){ return byDay[d]; }), backgroundColor: 'rgba(0,212,255,0.7)', borderRadius: 4 }]
