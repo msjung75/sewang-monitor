@@ -14,7 +14,12 @@ const REGION_PREFIX = {
   seoul:    ['서울특별시'],
   gyeonggi: ['경기도'],
   metro:    ['서울특별시', '경기도'],
-  all:      [''],
+  // 전국 = 17개 시·도 prefix 분할 호출 (단일 prefix=''로는 정렬상 일부 시·도가 잘림)
+  all: [
+    '서울특별시','경기도','부산광역시','대구광역시','인천광역시','광주광역시',
+    '대전광역시','울산광역시','세종특별자치시','강원특별자치도','충청북도',
+    '충청남도','전북특별자치도','전라남도','경상북도','경상남도','제주특별자치도',
+  ],
 };
 
 export default async function handler(req, res) {
@@ -22,7 +27,7 @@ export default async function handler(req, res) {
   if (!key) return res.status(500).json({ error: 'DATA_GO_KR_KEY 미설정' });
 
   const { days = '7', region = 'metro', type = 'all', from = '', to = '' } = req.query;
-  const maxPages = Math.min(parseInt(req.query.maxPages || '8', 10), 15);
+  const maxPages = Math.min(parseInt(req.query.maxPages || '5', 10), 10);
 
   // 조회 시작일: from(YYYYMMDD) 우선, 없으면 KST 기준 N일 전
   let since, until = '';
