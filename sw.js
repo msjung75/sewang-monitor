@@ -1,6 +1,6 @@
 // 정적 파일 캐시 (PWA 오프라인 기본 대응)
-// CACHE 버전 bump — v10.3: 커피/빵/햄버거 EXCLUDE 키워드 확장 + nightly 양쪽 필터
-const CACHE = 'sewang-pwa-v10_3-coffee-exclude';
+// CACHE 버전 bump — v10.4: 편의점 브랜드(CU/세븐일레븐/GS25 등) 제외 추가
+const CACHE = 'sewang-pwa-v10_4-conv-store-exclude';
 const FILES = ['./','./index.html','./manifest.json','./icon.svg'];
 
 self.addEventListener('install', e => {
