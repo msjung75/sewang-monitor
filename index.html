@@ -620,7 +620,7 @@ function computeBrands(list){
     // "○○점" 패턴 없이 같은 이름만 반복된 경우, 2글자 이하 이름은 우연의 일치로 보고 제외 (예: 복당)
     .filter(function(g){ return g.explicit || g.brand.replace(/\s/g, '').length >= 3; })
     // 법인 접미사 (운영회사명) 제외
-    .filter(function(g){ return !/(푸드|티에프|컴퍼니|상사|유통|시스템|에프씨)$/.test(g.brand.replace(/\s/g, '')); })
+    .filter(function(g){ return !/(푸드|티에프|컴퍼니|상사|유통|시스템|마켓|홀딩스|파트너스|프로젝트|앤씨|엔씨|에프씨|에프앤|에프엔|앤비|엔비)$/.test(g.brand.replace(/\s/g, '')); })
     .sort(function(a, b){ return b.stores.length - a.stores.length; });
 }
 var BRANDS = [];
