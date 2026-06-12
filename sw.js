@@ -1,6 +1,6 @@
 // 정적 파일 캐시 (PWA 오프라인 기본 대응)
-// CACHE 버전 bump — v9d: 하이브리드(metro 기본 + 전국 옵션 + 24h 캐시 + 진행률)
-const CACHE = 'sewang-pwa-v9d-hybrid';
+// CACHE 버전 bump — v9e: 시·도×타입 68 분할 (Vercel 10초 안전선)
+const CACHE = 'sewang-pwa-v9e-sido-type-split';
 const FILES = ['./','./index.html','./manifest.json','./icon.svg'];
 
 self.addEventListener('install', e => {

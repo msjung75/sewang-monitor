@@ -650,29 +650,39 @@ async function apiPermits(params){
 }
 // 17 시·도 분할 호출 (Vercel function 단일 timeout 우회). 4개 묶음 순차 → 결과 dedup·합산.
 var SIDO17 = ['seoul','gyeonggi','busan','daegu','incheon','gwangju','daejeon','ulsan','sejong','gangwon','chungbuk','chungnam','jeonbuk','jeonnam','gyeongbuk','gyeongnam','jeju'];
+// 시·도 × 타입 68 분할 fanout (Vercel function 10초 한도 안에 들어오게 호출당 1 type × maxPages 5)
+var TYPES4 = ['ilban','hyuge','danran','yuheung'];
 async function apiPermitsAll(params, onProgress){
-  var all = [], seen = {};
-  var done = 0, total = SIDO17.length;
-  // 17 시·도 → 4개씩 직렬, 묶음 내부 병렬 (행안부 API rate-limit 회피). 시·도별 1회 재시도.
-  for (var i = 0; i < SIDO17.length; i += 4) {
-    var batch = SIDO17.slice(i, i + 4);
-    var results = await Promise.all(batch.map(async function(sd){
-      var pm = Object.assign({}, params, { region: sd });
-      try { return await apiPermits(pm); }
+  // params에 type이 있으면 무시(타입은 fanout이 각각 지정). 다른 키만 base로.
+  var base = {};
+  Object.keys(params || {}).forEach(function(k){ if (k !== 'region' && k !== 'type') base[k] = params[k]; });
+  var jobs = [];
+  SIDO17.forEach(function(sd){ TYPES4.forEach(function(tp){ jobs.push({ sido: sd, type: tp }); }); });
+  var total = jobs.length; // 68
+  var all = [], seen = {}, done = 0, failures = [];
+  var CONCURRENCY = 6;
+  for (var i = 0; i < jobs.length; i += CONCURRENCY) {
+    var batch = jobs.slice(i, i + CONCURRENCY);
+    var results = await Promise.all(batch.map(async function(j){
+      var pm = Object.assign({}, base, { region: j.sido, type: j.type, maxPages: 5 });
+      try { return { job: j, data: await apiPermits(pm), ok: true }; }
       catch(e1) {
-        try { return await apiPermits(pm); }
-        catch(e2) { return { items: [], _failed: sd }; }
+        try { return { job: j, data: await apiPermits(pm), ok: true }; }
+        catch(e2) {
+          failures.push(j.sido + '·' + j.type);
+          return { job: j, data: { items: [] }, ok: false };
+        }
       }
     }));
     results.forEach(function(r){
-      (r.items || []).forEach(function(it){
+      (r.data.items || []).forEach(function(it){
         if (it.id && !seen[it.id]) { seen[it.id] = 1; all.push(it); }
       });
       done++;
-      if (typeof onProgress === 'function') onProgress(done, total);
+      if (typeof onProgress === 'function') onProgress(done, total, r.job, r.ok, failures);
     });
   }
-  return { items: all, count: all.length };
+  return { items: all, count: all.length, failures: failures };
 }
 async function apiLocal(q, n){
   try {
@@ -784,8 +794,11 @@ async function fetchTrend30(){
       if (off !== 0) p.to = to.toISOString().slice(0,10).replace(/-/g,'');
       var trendScope = (ST.trend30 && ST.trend30.scope) || 'metro';
       var d = trendScope === 'all'
-        ? await apiPermitsAll(p, function(done, total){
-            setProg(true, '전국 30일 추이 수집 중 ' + done + '/' + total + ' 시·도', done/total*100);
+        ? await apiPermitsAll(p, function(done, total, job, ok, failures){
+            var pct = Math.round(done/total*100);
+            var mark = ok ? '✓' : '✗';
+            var failTxt = failures.length ? ' · 실패 ' + failures.length : '';
+            setProg(true, '전국 갱신 ' + done + '/' + total + ' (' + job.sido + '·' + job.type + ' ' + mark + ')' + failTxt, pct);
           })
         : await apiPermits(Object.assign({region: trendScope}, p));
       (d.items || []).forEach(function(s){
