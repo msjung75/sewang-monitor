@@ -410,6 +410,31 @@ body{
     <div class="chip" data-v="buzz">화제순</div>
   </div>
 
+  <!-- 검색창 + 시·도 + 시·군·구 (v10.6) -->
+  <input id="new-search" type="search" placeholder="🔍 매장명·업태·주소로 검색" autocomplete="off"
+    style="width:100%;padding:10px 14px;border:1px solid var(--border2);background:var(--surface2);border-radius:10px;color:var(--txt);font-size:13px;margin:8px 0 6px;box-sizing:border-box">
+  <div class="chips" id="chip-sido">
+    <div class="chip on" data-v="">전국</div>
+    <div class="chip" data-v="서울">서울</div>
+    <div class="chip" data-v="경기">경기</div>
+    <div class="chip" data-v="인천">인천</div>
+    <div class="chip" data-v="부산">부산</div>
+    <div class="chip" data-v="대구">대구</div>
+    <div class="chip" data-v="광주">광주</div>
+    <div class="chip" data-v="대전">대전</div>
+    <div class="chip" data-v="울산">울산</div>
+    <div class="chip" data-v="세종">세종</div>
+    <div class="chip" data-v="강원">강원</div>
+    <div class="chip" data-v="충북">충북</div>
+    <div class="chip" data-v="충남">충남</div>
+    <div class="chip" data-v="전북">전북</div>
+    <div class="chip" data-v="전남">전남</div>
+    <div class="chip" data-v="경북">경북</div>
+    <div class="chip" data-v="경남">경남</div>
+    <div class="chip" data-v="제주">제주</div>
+  </div>
+  <div class="chips" id="chip-gugun" style="display:none"></div>
+
   <button class="srch-btn" onclick="loadPermits()">
     <span id="new-ico">🏛️</span> 신규 인허가 업장 조회
   </button>
@@ -1163,26 +1188,120 @@ function bindCards(el, list){
 // ============================================================
 // 렌더: 신규업장
 // ============================================================
+// === 「신규업장」 탭 필터 상태 (sessionStorage 보존) ===
+var NEW_SIDO = '';
+var NEW_GUGUN = '';
+var NEW_SEARCH = '';
+try {
+  NEW_SIDO   = sessionStorage.getItem('new-sido')   || '';
+  NEW_GUGUN  = sessionStorage.getItem('new-gugun')  || '';
+  NEW_SEARCH = sessionStorage.getItem('new-search') || '';
+} catch(e){}
+
+function sidoMatch(addr, sido){
+  if (!sido) return true;
+  var r = regionOf(addr || '');
+  return r === sido || r.indexOf(sido) === 0;
+}
+
 function filteredPermits(){
   var type = activeChip('chip-type');
   var nstat = activeChip('chip-nstat');
   var list = ST.permits.slice();
   if (type && type !== 'all') list = list.filter(function(s){ return s.type === type; });
+  if (NEW_SIDO) list = list.filter(function(s){ return sidoMatch(s.addr, NEW_SIDO); });
+  if (NEW_GUGUN) list = list.filter(function(s){ return guOf(s.addr) === NEW_GUGUN; });
+  if (NEW_SEARCH) {
+    var q = NEW_SEARCH.toLowerCase();
+    list = list.filter(function(s){
+      return ((s.name || '').toLowerCase().indexOf(q) !== -1)
+          || ((s.upte || '').toLowerCase().indexOf(q) !== -1)
+          || ((s.addr || '').toLowerCase().indexOf(q) !== -1);
+    });
+  }
   if (nstat === 'gold') list = list.filter(function(s){ return nv(s) && !nv(s).found; });
   else if (nstat === 'reg') list = list.filter(function(s){ return nv(s) && nv(s).found; });
   else if (nstat === 'buzz') list.sort(function(a,b){ return buzzScore(nv(b)) - buzzScore(nv(a)); });
   return list;
 }
 
+// 시·도 선택 시 그 안 시·군·구 chip 동적 구성
+function rebuildChipGugun(){
+  var el = document.getElementById('chip-gugun');
+  if (!el) return;
+  if (!NEW_SIDO) { el.style.display = 'none'; el.innerHTML = ''; return; }
+  var guMap = {};
+  ST.permits.forEach(function(s){
+    if (!sidoMatch(s.addr, NEW_SIDO)) return;
+    var g = guOf(s.addr);
+    if (g) guMap[g] = (guMap[g] || 0) + 1;
+  });
+  var keys = Object.keys(guMap).sort(function(a,b){ return guMap[b] - guMap[a]; });
+  if (!keys.length) { el.style.display = 'none'; el.innerHTML = ''; return; }
+  el.style.display = 'flex';
+  el.innerHTML = '<div class="chip' + (NEW_GUGUN === '' ? ' on' : '') + '" data-v="">전체 시·군·구</div>' +
+    keys.map(function(g){
+      return '<div class="chip' + (NEW_GUGUN === g ? ' on' : '') + '" data-v="' + esc(g) + '">' + esc(g) + ' ' + guMap[g] + '</div>';
+    }).join('');
+  el.querySelectorAll('.chip').forEach(function(c){
+    c.addEventListener('click', function(){
+      NEW_GUGUN = c.dataset.v;
+      try { sessionStorage.setItem('new-gugun', NEW_GUGUN); } catch(e){}
+      el.querySelectorAll('.chip').forEach(function(x){ x.classList.remove('on'); });
+      c.classList.add('on');
+      renderNew();
+    });
+  });
+}
+
+// 검색 input debounce 200ms
+var _newSearchTimer = null;
+function bindNewSearch(){
+  var inp = document.getElementById('new-search');
+  if (!inp) return;
+  inp.value = NEW_SEARCH;
+  inp.addEventListener('input', function(){
+    var v = inp.value;
+    clearTimeout(_newSearchTimer);
+    _newSearchTimer = setTimeout(function(){
+      NEW_SEARCH = v.trim();
+      try { sessionStorage.setItem('new-search', NEW_SEARCH); } catch(e){}
+      renderNew();
+    }, 200);
+  });
+}
+
+// 시·도 chip 핸들러
+function bindChipSido(){
+  document.querySelectorAll('#chip-sido .chip').forEach(function(c){
+    c.classList.toggle('on', c.dataset.v === NEW_SIDO);
+    c.addEventListener('click', function(){
+      NEW_SIDO = c.dataset.v;
+      NEW_GUGUN = '';
+      try { sessionStorage.setItem('new-sido', NEW_SIDO); sessionStorage.setItem('new-gugun', ''); } catch(e){}
+      document.querySelectorAll('#chip-sido .chip').forEach(function(x){ x.classList.remove('on'); });
+      c.classList.add('on');
+      rebuildChipGugun();
+      renderNew();
+    });
+  });
+  rebuildChipGugun();
+}
+
 function renderNew(){
   var list = filteredPermits();
   var cnt = document.getElementById('new-count');
+  var total = ST.permits.length;
   if (list.length) {
     var byType = {};
     list.forEach(function(s){ byType[s.typeLabel] = (byType[s.typeLabel] || 0) + 1; });
-    cnt.textContent = list.length + '건 — ' + Object.keys(byType).map(function(k){ return k + ' ' + byType[k]; }).join(' · ');
+    var typeStr = Object.keys(byType).map(function(k){ return k + ' ' + byType[k]; }).join(' · ');
+    var prefix = (list.length === total)
+      ? list.length + '건'
+      : '결과 ' + list.length + '건 / 전체 ' + total + '건';
+    cnt.textContent = prefix + ' — ' + typeStr;
   } else {
-    cnt.textContent = ST.permits.length ? '필터 결과 없음' : '';
+    cnt.textContent = total ? '결과 0건 / 전체 ' + total + '건 (필터를 조정해보세요)' : '';
   }
   var el = document.getElementById('new-list');
   if (!list.length) {
@@ -1638,6 +1757,8 @@ async function loadNightlyCache(){
 }
 function init(){
   syncScopeOnLoad();
+  bindChipSido();
+  bindNewSearch();
   loadNightlyCache(); // 새벽 cron 결과 자동 로드 (서울·경기만 있으면 보강, 전국이면 덮어쓰기)
   if (ST.trend30 && ST.trend30.stores) {
     ST.trend30.stores = ST.trend30.stores.filter(function(s){ return !isExcluded(s); });

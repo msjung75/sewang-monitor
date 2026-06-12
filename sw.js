@@ -1,6 +1,6 @@
 // 정적 파일 캐시 (PWA 오프라인 기본 대응)
-// CACHE 버전 bump — v10.5: 법인·B2B 10개 제외 + brandOf compactKey 자동 통합
-const CACHE = 'sewang-pwa-v10_5-exclude10-compact';
+// CACHE 버전 bump — v10.6: 신규업장 검색 + 17 시·도 필터 + 시·군·구 동적
+const CACHE = 'sewang-pwa-v10_6-new-search-sido';
 const FILES = ['./','./index.html','./manifest.json','./icon.svg'];
 
 self.addEventListener('install', e => {
