@@ -780,41 +780,83 @@ async function loadPermits(){
 // ============================================================
 // 30일 인허가 추이 (대시보드 차트 전용, 12시간 캐시)
 // ============================================================
+// 진행 중 가드 + 실패 후 5분 쿨다운 (자동 재호출 무한루프 방지)
+var _trend30InProgress = false;
+var _trend30LastFail = 0;
 async function fetchTrend30(){
+  if (_trend30InProgress) { console.warn('[fetchTrend30] 이미 진행 중 — 스킵'); return; }
+  if (Date.now() - _trend30LastFail < 5*60*1000) { console.warn('[fetchTrend30] 실패 후 5분 쿨다운'); return; }
+  var t = ST.trend30;
+  // 24h 이내 완료 캐시면 스킵 (chunksDone 5 = 완료 표시)
+  if (t && t.stores && t.stores.length && t.at && (Date.now() - t.at) < 24*3600*1000 && t.chunksDone === 5) return;
+  _trend30InProgress = true;
+  console.log('[fetchTrend30] 시작', { scope: (t && t.scope) || 'metro' });
+  // 진행 메타 초기화 — scope·기존 부분 데이터는 보존
+  ST.trend30 = ST.trend30 || {};
+  ST.trend30.scope = ST.trend30.scope || 'metro';
+  ST.trend30.byDay = ST.trend30.byDay || {};
+  ST.trend30.stores = Array.isArray(ST.trend30.stores) ? ST.trend30.stores : [];
+  ST.trend30.chunksDone = 0;
+  ST.trend30.chunksTotal = 5;
+  // 새로 시작할 땐 기존 stores 비움 (전체 새로 수집)
+  ST.trend30.stores = [];
+  ST.trend30.byDay = {};
+  save();
+  var seenIds = {};
   try {
-    var t = ST.trend30;
-    if (t && t.stores && (Date.now() - (t.at || 0)) < 12 * 3600 * 1000) return;
-    var byDay = {};
-    var stores = []; // 프랜차이즈 감지용 30일 경량 데이터
     var end = new Date(Date.now() + 9 * 3600 * 1000);
     for (var off = 0; off < 30; off += 7) {
+      var chunkIdx = (off/7) + 1;
       var to = new Date(end); to.setUTCDate(to.getUTCDate() - off);
       var from = new Date(end); from.setUTCDate(from.getUTCDate() - Math.min(off + 7, 30));
       var p = { type: 'all', from: from.toISOString().slice(0,10).replace(/-/g,'') };
       if (off !== 0) p.to = to.toISOString().slice(0,10).replace(/-/g,'');
-      var trendScope = (ST.trend30 && ST.trend30.scope) || 'metro';
-      var d = trendScope === 'all'
-        ? await apiPermitsAll(p, function(done, total, job, ok, failures){
-            var pct = Math.round(done/total*100);
-            var mark = ok ? '✓' : '✗';
-            var failTxt = failures.length ? ' · 실패 ' + failures.length : '';
-            setProg(true, '전국 갱신 ' + done + '/' + total + ' (' + job.sido + '·' + job.type + ' ' + mark + ')' + failTxt, pct);
-          })
-        : await apiPermits(Object.assign({region: trendScope}, p));
+      var trendScope = ST.trend30.scope || 'metro';
+      var d;
+      try {
+        d = trendScope === 'all'
+          ? await apiPermitsAll(p, function(done, total, job, ok, failures){
+              var pct = Math.round(done/total*100);
+              var mark = ok ? '✓' : '✗';
+              var failTxt = failures.length ? ' · 실패 ' + failures.length : '';
+              setProg(true, '전국 갱신 chunk ' + chunkIdx + '/5 · ' + done + '/' + total + ' (' + job.sido + '·' + job.type + ' ' + mark + ')' + failTxt, pct);
+            })
+          : await apiPermits(Object.assign({region: trendScope}, p));
+      } catch (chunkErr) {
+        console.error('[fetchTrend30] chunk ' + chunkIdx + ' fetch 실패:', chunkErr);
+        continue; // 한 chunk 실패해도 다음 chunk 진행
+      }
+      var added = 0;
       (d.items || []).forEach(function(s){
         if (!s.permitDate || isExcluded(s)) return;
-        byDay[s.permitDate] = (byDay[s.permitDate] || 0) + 1;
-        stores.push({ id: s.id, name: s.name, type: s.type, typeLabel: s.typeLabel,
+        if (s.id && seenIds[s.id]) return;
+        if (s.id) seenIds[s.id] = 1;
+        ST.trend30.byDay[s.permitDate] = (ST.trend30.byDay[s.permitDate] || 0) + 1;
+        ST.trend30.stores.push({ id: s.id, name: s.name, type: s.type, typeLabel: s.typeLabel,
           upte: s.upte, addr: s.addr, permitDate: s.permitDate, tel: s.tel, status: s.status });
+        added++;
       });
+      ST.trend30.chunksDone = chunkIdx;
+      ST.trend30.lastChunkAt = Date.now();
+      console.log('[fetchTrend30] chunk ' + chunkIdx + '/5 완료, 추가 ' + added + '건, 누적 ' + ST.trend30.stores.length);
+      // 매 chunk 끝마다 즉시 저장 + 부분 렌더 (실패해도 부분 데이터 살림)
+      try { save(); } catch (e) { console.error('[fetchTrend30] save 실패:', e); }
+      try { rebuildBrands(); } catch (e) { console.error('[fetchTrend30] rebuildBrands 실패:', e); }
+      try { renderCharts(); } catch (e) { console.error('[fetchTrend30] renderCharts 실패:', e); }
+      try { renderFr(); } catch (e) { console.error('[fetchTrend30] renderFr 실패:', e); }
+      try { renderStats(); } catch (e) { console.error('[fetchTrend30] renderStats 실패:', e); }
     }
-    ST.trend30 = { byDay: byDay, stores: stores, at: Date.now(), scope: (ST.trend30 && ST.trend30.scope) || 'metro' };
+    ST.trend30.at = Date.now();
     save();
-    rebuildBrands();
-    renderCharts();
-    renderFr();
-    renderStats();
-  } catch (e) {}
+    setProg(false);
+    console.log('[fetchTrend30] ✅ 완료 — 총 ' + ST.trend30.stores.length + '건');
+  } catch (e) {
+    console.error('[fetchTrend30] 전체 실패:', e);
+    _trend30LastFail = Date.now();
+    setProg(false);
+  } finally {
+    _trend30InProgress = false;
+  }
 }
 
 // 프랜차이즈 감지 기준 데이터: 30일 수집분이 있으면 그것, 없으면 현재 조회분

@@ -1,6 +1,6 @@
 // 정적 파일 캐시 (PWA 오프라인 기본 대응)
-// CACHE 버전 bump — v9e: 시·도×타입 68 분할 (Vercel 10초 안전선)
-const CACHE = 'sewang-pwa-v9e-sido-type-split';
+// CACHE 버전 bump — v9f: chunk 부분 저장 + silent catch 제거 + 쿨다운
+const CACHE = 'sewang-pwa-v9f-chunk-incremental';
 const FILES = ['./','./index.html','./manifest.json','./icon.svg'];
 
 self.addEventListener('install', e => {
