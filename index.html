@@ -323,9 +323,13 @@ body{
     </div>
   </div>
 
-  <button class="srch-btn" onclick="loadPermits()">
-    <span id="home-ico">🏛️</span> 신규 인허가 업데이트
-  </button>
+  <div style="background:linear-gradient(135deg,rgba(56,189,248,.08),rgba(124,58,237,.08));border:1px solid rgba(56,189,248,.2);border-radius:12px;padding:12px 14px;margin-bottom:12px;font-size:12px;display:flex;align-items:center;gap:10px">
+    <span style="font-size:20px">🕐</span>
+    <div style="flex:1">
+      <div style="font-weight:700;color:var(--c1)">새벽 자동 수집 완료</div>
+      <div id="home-stamp" style="font-size:10px;color:var(--txt3);margin-top:2px">매일 04:00 KST 자동 갱신 · 모든 데이터는 캐시에서 표시</div>
+    </div>
+  </div>
 
   <div class="an-prog" id="an-prog">
     <span class="spin"></span>
@@ -435,9 +439,8 @@ body{
   </div>
   <div class="chips" id="chip-gugun" style="display:none"></div>
 
-  <button class="srch-btn" onclick="loadPermits()">
-    <span id="new-ico">🏛️</span> 신규 인허가 업장 조회
-  </button>
+  <!-- v12: 라이브 fetch 제거 — 새벽 cron 캐시만 -->
+  <div id="new-stamp" style="font-size:10px;color:var(--txt3);text-align:center;padding:6px 0 12px">🕐 새벽 04:00 KST 자동 갱신 · 캐시에서 표시</div>
 
   <div class="an-prog" id="an-prog2">
     <span class="spin"></span>
@@ -501,6 +504,43 @@ body{
 </div>
 
 <!-- ======= PAGE: 추적매장 ======= -->
+<!-- ======= PAGE: 사용자 관리 (admin only) ======= -->
+<div class="page" id="pg-admin">
+  <div class="alert-banner">
+    <span class="aico">👥</span>
+    <div><strong style="color:var(--c1)">사용자 관리</strong> — 화이트리스트·역할·메모. (admin 전용)</div>
+  </div>
+  <div class="card" style="margin-bottom:12px">
+    <div class="card-title">📊 현재 사용자 현황</div>
+    <div id="admin-stats" style="font-size:12px;color:var(--txt2);line-height:1.8">로딩 중...</div>
+  </div>
+  <div class="card" style="margin-bottom:12px">
+    <div class="card-title">✅ 승인된 사용자</div>
+    <div id="admin-users-list"><div class="empty" style="padding:24px"><div class="etxt" style="font-size:11px">로딩 중...</div></div></div>
+  </div>
+  <div class="card" style="margin-bottom:12px">
+    <div class="card-title">➕ 사용자 추가</div>
+    <div style="font-size:11px;color:var(--txt3);line-height:1.6;margin-bottom:10px">신청자가 카카오 로그인 시 본인 ID가 화면에 표시됩니다. 그 ID를 받아 아래에 입력하세요.</div>
+    <input id="adm-input-id" type="text" placeholder="카카오 ID (숫자)" style="width:100%;padding:9px 12px;border:1px solid var(--border2);background:var(--surface2);border-radius:9px;color:var(--txt);font-size:12px;margin-bottom:6px;box-sizing:border-box">
+    <input id="adm-input-name" type="text" placeholder="이름·소속 (예: 김영업·강남영업소)" style="width:100%;padding:9px 12px;border:1px solid var(--border2);background:var(--surface2);border-radius:9px;color:var(--txt);font-size:12px;margin-bottom:6px;box-sizing:border-box">
+    <select id="adm-input-role" style="width:100%;padding:9px 12px;border:1px solid var(--border2);background:var(--surface2);border-radius:9px;color:var(--txt);font-size:12px;margin-bottom:6px;box-sizing:border-box">
+      <option value="viewer">viewer · 공개 데이터만</option>
+      <option value="sales" selected>sales · 거래처·영업 데이터</option>
+      <option value="admin">admin · 사용자 관리 권한</option>
+    </select>
+    <input id="adm-input-memo" type="text" placeholder="메모 (선택)" style="width:100%;padding:9px 12px;border:1px solid var(--border2);background:var(--surface2);border-radius:9px;color:var(--txt);font-size:12px;margin-bottom:10px;box-sizing:border-box">
+    <button onclick="adminAddUser()" class="srch-btn">➕ 추가 (GitHub 편집 페이지로 이동)</button>
+  </div>
+  <div class="card" style="margin-bottom:12px">
+    <div class="card-title">🚫 차단된 사용자</div>
+    <div id="admin-blocked-list"><div class="empty" style="padding:18px"><div class="etxt" style="font-size:11px">차단된 사용자 없음</div></div></div>
+  </div>
+  <div class="alert-banner" style="margin-top:12px;background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.3)">
+    <span class="aico">💡</span>
+    <div style="font-size:11px;line-height:1.6"><strong style="color:#fbbf24">자동 commit 업그레이드</strong><br>현재는 수동 편집. GitHub PAT를 env에 등록하면 「추가/거부」 즉시 자동 commit.</div>
+  </div>
+</div>
+
 <div class="page" id="pg-track">
 
   <div class="card" style="margin-bottom:12px">
@@ -541,6 +581,9 @@ body{
   </button>
   <button class="bnav-btn" data-pg="fr">
     <span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h20l-2 9H4L2 3z"/><path d="M4 12v9h16v-9"/><path d="M9 21v-6h6v6"/></svg></span>프랜차이즈
+  </button>
+  <button class="bnav-btn" id="bnav-admin" data-pg="admin" style="display:none">
+    <span class="ico">👥</span>관리
   </button>
   <button class="bnav-btn" data-pg="track">
     <span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></span>추적매장
@@ -851,8 +894,8 @@ async function loadPermits(){
 
     renderAll();
     setProg(false);
-    fetchTrend30();   // 30일 추이 백그라운드 집계
-    fetchMonthly();   // 월별 창업 추이 (지난달은 1회 수집 후 고정)
+    // v12: fetchTrend30/fetchMonthly 비활성화 — 새벽 cron 캐시만 사용
+    // fetchTrend30(); fetchMonthly();
     analyzeAll();     // 자동 네이버 교차분석
   } catch (e) {
     setProg(false);
@@ -1716,7 +1759,9 @@ async function reanalyzeTracked(btn){
 // NAVIGATION + CHIPS
 // ============================================================
 function switchPage(pg){
-  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('on'); });
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('on'); 
+  if (pg === 'admin') loadAdminPanel();
+});
   document.querySelectorAll('.bnav-btn').forEach(function(b){ b.classList.remove('on'); });
   document.getElementById('pg-' + pg).classList.add('on');
   document.querySelector('.bnav-btn[data-pg="' + pg + '"]').classList.add('on');
@@ -1907,15 +1952,75 @@ function init(){
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(function(){});
   }
-  // 앱을 열면 추이 데이터는 자동 수집 (지난달은 1회 수집 후 고정, 이번 달만 갱신)
-  fetchTrend30();
-  fetchMonthly();
+  // v12: 라이브 fetch 비활성화 — loadNightlyCache가 정적 캐시(data/*.json)에서만 로드
 }
 (async function bootstrap(){
   var ok = await checkAuth();
   if (!ok) { showLoginScreen(); return; }
+  if (window.ME && window.ME.role === 'admin') {
+    var btn = document.getElementById('bnav-admin');
+    if (btn) btn.style.display = '';
+  }
   init();
 })();
+
+// ============================================================
+// admin 패널 (v12)
+// ============================================================
+async function loadAdminPanel(){
+  if (!window.ME || window.ME.role !== 'admin') return;
+  try {
+    var r = await fetch('/api/auth/kakao?action=list_users', { credentials:'same-origin' });
+    var d = await r.json();
+    if (!d.ok) { document.getElementById('admin-stats').textContent = '권한 오류 또는 API 응답 실패'; return; }
+    var users = d.users || []; var blocked = d.blocked || []; var byRole = {};
+    users.forEach(function(u){ byRole[u.role||'unknown'] = (byRole[u.role||'unknown']||0)+1; });
+    document.getElementById('admin-stats').innerHTML =
+      '<div>총 승인 ' + users.length + '명 · 차단 ' + blocked.length + '명</div>'
+      + '<div style="margin-top:4px;font-size:11px">' + (byRole['admin']||0) + ' admin · ' + (byRole['sales']||0) + ' sales · ' + (byRole['viewer']||0) + ' viewer</div>'
+      + '<div style="margin-top:4px;font-size:10px;color:var(--txt3)">env ADMIN_KAKAO_ID: ' + (d.admin_env ? '<span style="color:#10b981">설정됨</span>' : '<span style="color:#fbbf24">미설정</span>') + '</div>';
+    var el = document.getElementById('admin-users-list');
+    if (!users.length) {
+      el.innerHTML = '<div class="empty" style="padding:24px"><div class="etxt" style="font-size:11px">아직 등록된 사용자 없음<br>(사장님은 env ADMIN_KAKAO_ID로 admin 권한 부여)</div></div>';
+    } else {
+      el.innerHTML = users.map(function(u){
+        return '<div style="background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:10px 12px;margin-bottom:6px;font-size:12px">'
+          + '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px">'
+          + '<div style="font-weight:700;color:var(--txt)">' + esc(u.nickname || '(닉네임 없음)') + '</div>'
+          + '<span style="font-size:9px;padding:2px 8px;border-radius:10px;font-weight:700;'
+          + (u.role==='admin'?'background:rgba(124,58,237,.2);color:#a78bfa':u.role==='sales'?'background:rgba(56,189,248,.2);color:#38bdf8':'background:rgba(148,163,184,.2);color:var(--txt2)') + '">'
+          + esc(u.role||'?') + '</span></div>'
+          + '<div style="font-size:10px;color:var(--txt3);margin-top:3px">ID: ' + esc(u.id) + '</div>'
+          + (u.memo ? '<div style="font-size:10px;color:var(--txt2);margin-top:3px">📝 ' + esc(u.memo) + '</div>' : '')
+          + (u.last_seen ? '<div style="font-size:9px;color:var(--txt3);margin-top:3px">최근 ' + esc(u.last_seen) + '</div>' : '')
+          + '</div>';
+      }).join('');
+    }
+    var bel = document.getElementById('admin-blocked-list');
+    if (blocked.length) {
+      bel.innerHTML = blocked.map(function(b){
+        return '<div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:8px 12px;margin-bottom:5px;font-size:11px">'
+          + '<div style="color:#ef4444;font-weight:700">ID: ' + esc(b.id) + '</div>'
+          + (b.reason ? '<div style="color:var(--txt3);margin-top:2px">' + esc(b.reason) + '</div>' : '') + '</div>';
+      }).join('');
+    }
+  } catch (e) {
+    document.getElementById('admin-stats').textContent = '오류: ' + e.message;
+  }
+}
+
+function adminAddUser(){
+  var id = document.getElementById('adm-input-id').value.trim();
+  var name = document.getElementById('adm-input-name').value.trim();
+  var role = document.getElementById('adm-input-role').value;
+  var memo = document.getElementById('adm-input-memo').value.trim();
+  if (!/^\d+$/.test(id)) { alert('카카오 ID는 숫자만 입력하세요.'); return; }
+  if (!name) { alert('이름·소속을 입력하세요.'); return; }
+  var nowIso = new Date().toISOString().slice(0,10);
+  var entry = { id: id, nickname: name, role: role, memo: memo, approved_at: nowIso, last_seen: '' };
+  alert('아래 JSON을 data/allowlist.json의 users 배열에 추가:\n\n' + JSON.stringify(entry, null, 2) + '\n\n편집 페이지가 새 창으로 열립니다.');
+  window.open('https://github.com/msjung75/sewang-monitor/edit/main/data/allowlist.json', '_blank');
+}
 </script>
 </body>
 </html>
