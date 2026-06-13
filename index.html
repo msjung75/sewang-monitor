@@ -339,12 +339,12 @@ body{
   </div>
 
   <div class="card">
-    <div class="card-title">📈 일별 신규 인허가 추이 <span id="lbl-trend-scope" style="font-weight:400;color:var(--txt3);font-size:10px">(최근 30일 · 서울+경기)</span></div>
+    <div class="card-title">📈 일별 신규 인허가 추이 <span id="lbl-trend-scope" style="font-weight:400;color:var(--txt3);font-size:10px">(최근 30일 · 수도권)</span></div>
     <div class="chart-box"><canvas id="ch-daily"></canvas></div>
   </div>
 
   <div class="card">
-    <div class="card-title">🗓️ 월별 창업 추이 <span id="lbl-monthly-scope" style="font-weight:400;color:var(--txt3);font-size:10px">(업종별 · 서울+경기 · 지난달은 1회 수집 후 고정)</span></div>
+    <div class="card-title">🗓️ 월별 창업 추이 <span id="lbl-monthly-scope" style="font-weight:400;color:var(--txt3);font-size:10px">(업종별 · 수도권 · 지난달은 1회 수집 후 고정)</span></div>
     <div class="chart-box"><canvas id="ch-monthly"></canvas></div>
     <div id="monthly-status" style="font-size:10px;color:var(--txt3);text-align:center;margin-top:6px"></div>
   </div>
@@ -390,7 +390,7 @@ body{
     <div class="chip" data-v="30">30일</div>
   </div>
   <div class="chips" id="chip-region">
-    <div class="chip on" data-v="metro">서울+경기</div>
+    <div class="chip on" data-v="metro">수도권</div>
     <div class="chip" data-v="seoul">서울</div>
     <div class="chip" data-v="gyeonggi">경기</div>
     <div class="chip" data-v="all">🇰🇷 전국 (새벽 자동)</div>
@@ -474,7 +474,7 @@ body{
 
   <div class="alert-banner">
     <span class="aico">🏪</span>
-    <div>인허가 <strong style="color:var(--c1)">상호명 패턴</strong>으로 같은 브랜드의 반복 출점을 감지합니다.<br>조회 기간과 무관하게 <strong>최근 30일</strong>(<span id="lbl-fr-scope">서울+경기</span>) 기준입니다.</div>
+    <div>인허가 <strong style="color:var(--c1)">상호명 패턴</strong>으로 같은 브랜드의 반복 출점을 감지합니다.<br>조회 기간과 무관하게 <strong>최근 30일</strong>(<span id="lbl-fr-scope">수도권</span>) 기준입니다.</div>
   </div>
 
   <div class="chips" id="chip-fr-kind">
@@ -782,7 +782,7 @@ async function loadPermits(){
 
   // '전국' 선택 시 — 즉시 수집 안 함. 새벽 cron 결과만 사용. 즉시 갱신은 metro로 강제.
   if (region === 'all') {
-    alert('전국 데이터는 매일 새벽 04:00 KST 자동 수집됩니다.\n즉시 갱신은 서울·경기만 빠르게 진행합니다.');
+    alert('전국 데이터는 매일 새벽 04:00 KST 자동 수집된 캐시를 즉시 표시합니다.\n실시간 호출(수도권)은 서울·경기·인천만 빠르게 진행합니다.');
     region = 'metro';
     document.querySelectorAll('#chip-region .chip').forEach(function(c){ c.classList.toggle('on', c.dataset.v === 'metro'); });
   }
@@ -935,7 +935,7 @@ function rebuildBrands(){
   BRANDS.forEach(function(g){ g.stores.forEach(function(s){ BRAND_SET[s.id] = g.brand; }); });
   updateScopeLabels();
 }
-var SCOPE_LABEL = { metro: '서울+경기', seoul: '서울', gyeonggi: '경기', all: '전국' };
+var SCOPE_LABEL = { metro: '수도권(서울·경기·인천)', seoul: '서울', gyeonggi: '경기', all: '전국' };
 function updateScopeLabels(){
   var sc = (ST.trend30 && ST.trend30.scope) || 'metro';
   var lb = SCOPE_LABEL[sc] || sc;
@@ -1322,7 +1322,7 @@ function renderGold(){
   var sort = activeChip('chip-gold-sort') || 'date';
   // 선점기회는 서울·경기만 (영업권역)
   var base = ST.permits.filter(function(s){
-    return nv(s) && !nv(s).found && /^(서울|경기)/.test(s.addr || '');
+    return nv(s) && !nv(s).found && /^(서울|경기|인천)/.test(s.addr || '');
   });
   // 구별 칩 구성
   var guMap = {};
@@ -1696,10 +1696,46 @@ document.querySelectorAll('.bnav-btn').forEach(function(btn){
       else if (id === 'chip-gold-sort') renderGold();
       else if (id === 'chip-track') renderTracked();
       else if (id === 'chip-fr-kind') { FR_SELECTED = null; renderFr(); }
-      // 기간/지역 변경은 조회 버튼으로 반영
+      else if (id === 'chip-region') {
+        // 「전국」 chip → 즉시 nightly cache 표시 (실시간 fetch 차단)
+        if (c.dataset.v === 'all') {
+          showNightlyOnly();
+        }
+      }
+      // 기간/수도권/시·도 변경은 조회 버튼으로 반영
     });
   });
 });
+
+// 「전국」 chip 클릭 시 — 행안부 실시간 호출 안 함. nightly cache만 즉시 머지/표시.
+function showNightlyOnly(){
+  if (ST.trend30 && ST.trend30.nightly && ST.trend30.stores && ST.trend30.stores.length) {
+    // 이미 캐시 메모리에 있음 — ST.permits에 머지(이미 머지됐을 수도)
+    var filtered = ST.trend30.stores.filter(function(s){ return !isExcluded(s); });
+    ST.permits = filtered;
+    ST.lastFetch = new Date(ST.trend30.at || Date.now()).toISOString();
+    save();
+    try { renderNew(); renderStats(); rebuildBrands(); renderFr(); renderCharts(); } catch(e){}
+    var age = ST.trend30.at ? (Date.now() - ST.trend30.at) : 0;
+    var hours = Math.round(age/3600000);
+    if (age > 24*3600*1000) {
+      alert('🕐 어제 새벽 수집된 데이터입니다 — 오늘 새벽 04:00 자동 갱신 예정\n(수집 시각: ' + new Date(ST.trend30.at).toLocaleString('ko-KR') + ')');
+    }
+    return;
+  }
+  // 캐시 없음 — fetch 시도
+  loadNightlyCache().then(function(){
+    if (ST.trend30 && ST.trend30.nightly && ST.trend30.stores && ST.trend30.stores.length) {
+      var filtered = ST.trend30.stores.filter(function(s){ return !isExcluded(s); });
+      ST.permits = filtered;
+      ST.lastFetch = new Date(ST.trend30.at || Date.now()).toISOString();
+      save();
+      try { renderNew(); renderStats(); rebuildBrands(); renderFr(); renderCharts(); } catch(e){}
+    } else {
+      alert('지방 데이터는 매일 새벽 04:00 KST 자동 수집됩니다.\n마지막 수집 결과 없음 — 내일 새벽 이후 다시 확인해 주세요.');
+    }
+  });
+}
 
 // ============================================================
 // CLOCK + INIT
