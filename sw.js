@@ -1,6 +1,6 @@
 // 정적 파일 캐시 (PWA 오프라인 기본 대응)
-// CACHE 버전 bump — v10.7: 수도권에 인천 추가 + 전국 chip은 nightly cache만
-const CACHE = 'sewang-pwa-v10_7-metro-incheon-nightly-only';
+// CACHE 버전 bump — v10.8: ST.permits dedupe (동일 매장 중복 제거)
+const CACHE = 'sewang-pwa-v10_8-dedupe';
 const FILES = ['./','./index.html','./manifest.json','./icon.svg'];
 
 self.addEventListener('install', e => {

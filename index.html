@@ -677,6 +677,22 @@ function isExcluded(s){
       || EXCLUDE_UPTE.test(s.upte || '')
       || EXCLUDE_CORP.test(n) || EXCLUDE_CORP.test(compact);
 }
+// 중복 매장 제거 — id 우선, 없으면 name+addr+permitDate 조합
+function permitKey(s){
+  if (s && s.id) return 'id:' + s.id;
+  return 'np:' + (s && s.name || '') + '|' + (s && s.addr || '') + '|' + (s && s.permitDate || '');
+}
+function dedupePermits(list){
+  var seen = {};
+  var out = [];
+  (list || []).forEach(function(s){
+    var k = permitKey(s);
+    if (seen[k]) return;
+    seen[k] = 1;
+    out.push(s);
+  });
+  return out;
+}
 function computeBrands(list){
   var map = {}; // compactKey -> { brand, stores, explicit }
   list.forEach(function(s){
@@ -1207,7 +1223,7 @@ function sidoMatch(addr, sido){
 function filteredPermits(){
   var type = activeChip('chip-type');
   var nstat = activeChip('chip-nstat');
-  var list = ST.permits.slice();
+  var list = dedupePermits(ST.permits || []);
   if (type && type !== 'all') list = list.filter(function(s){ return s.type === type; });
   if (NEW_SIDO) list = list.filter(function(s){ return sidoMatch(s.addr, NEW_SIDO); });
   if (NEW_GUGUN) list = list.filter(function(s){ return guOf(s.addr) === NEW_GUGUN; });
@@ -1711,7 +1727,7 @@ document.querySelectorAll('.bnav-btn').forEach(function(btn){
 function showNightlyOnly(){
   if (ST.trend30 && ST.trend30.nightly && ST.trend30.stores && ST.trend30.stores.length) {
     // 이미 캐시 메모리에 있음 — ST.permits에 머지(이미 머지됐을 수도)
-    var filtered = ST.trend30.stores.filter(function(s){ return !isExcluded(s); });
+    var filtered = dedupePermits(ST.trend30.stores.filter(function(s){ return !isExcluded(s); }));
     ST.permits = filtered;
     ST.lastFetch = new Date(ST.trend30.at || Date.now()).toISOString();
     save();
@@ -1726,7 +1742,7 @@ function showNightlyOnly(){
   // 캐시 없음 — fetch 시도
   loadNightlyCache().then(function(){
     if (ST.trend30 && ST.trend30.nightly && ST.trend30.stores && ST.trend30.stores.length) {
-      var filtered = ST.trend30.stores.filter(function(s){ return !isExcluded(s); });
+      var filtered = dedupePermits(ST.trend30.stores.filter(function(s){ return !isExcluded(s); }));
       ST.permits = filtered;
       ST.lastFetch = new Date(ST.trend30.at || Date.now()).toISOString();
       save();
@@ -1774,9 +1790,10 @@ async function loadNightlyCache(){
         rawTotal: rawTotal,
         excluded: excludedCount
       };
-      // 「오픈업장」 탭 ST.permits 에도 같은 필터 적용 후 머지
-      if (!ST.permits || filtered.length > ST.permits.length) {
-        ST.permits = filtered;
+      // 「오픈업장」 탭 ST.permits 에도 같은 필터 + dedupe 적용 후 머지
+      var dedFiltered = dedupePermits(filtered);
+      if (!ST.permits || dedFiltered.length > ST.permits.length) {
+        ST.permits = dedFiltered;
         ST.lastFetch = new Date(nightlyAt).toISOString();
       }
       save();
@@ -1800,7 +1817,8 @@ function init(){
     ST.trend30.stores = ST.trend30.stores.filter(function(s){ return !isExcluded(s); });
   }
   if (ST.permits && ST.permits.length) {
-    ST.permits = ST.permits.filter(function(s){ return !isExcluded(s); }); // 캐시에도 제외 적용
+    // 기존 캐시에 중복이 있으면 dedupe + isExcluded 적용
+    ST.permits = dedupePermits(ST.permits.filter(function(s){ return !isExcluded(s); }));
     rebuildBrands();
     renderAll();
   }
