@@ -589,7 +589,7 @@ body{
 // ============================================================
 // STATE (인허가 = 신규 매장의 단일 기준)
 // ============================================================
-var KEY = 'sewang-v4-permit';
+var KEY = 'sewang-v12';
 var ST = { tracked: [], naver: {}, permits: [], lastFetch: null };
 try { var _s = localStorage.getItem(KEY); if (_s) ST = Object.assign(ST, JSON.parse(_s)); } catch (e) {}
 // 구버전(v3) 추적매장 이관
@@ -1838,7 +1838,12 @@ async function loadNightlyCache(){
     // 새벽 cron 결과(전국)가 더 신선하거나 더 크면 ST.trend30에 머지
     var existingAt = ST.trend30 && ST.trend30.at ? ST.trend30.at : 0;
     var nightlyAt = new Date(d.at || 0).getTime();
-    if (nightlyAt > existingAt || !ST.trend30 || !ST.trend30.stores || !ST.trend30.stores.length) {
+    // v12.2: nightly cache가 현재 메모리 데이터보다 크게 다르면 무조건 머지 (옛 metro-only 캐시 무효화)
+    var bigDiff = d.stores && (
+      !ST.permits || ST.permits.length < d.stores.length * 0.5 ||
+      !ST.trend30 || !ST.trend30.stores || ST.trend30.stores.length < d.stores.length * 0.5
+    );
+    if (nightlyAt > existingAt || !ST.trend30 || !ST.trend30.stores || !ST.trend30.stores.length || bigDiff) {
       // 커피/빵/햄버거 등 주류 미취급 매장 nightly 단계에서 일괄 제외 — ST.trend30·ST.permits 양쪽
       var filtered = d.stores.filter(function(s){ return !isExcluded(s); });
       var rawTotal = d.stores.length;
