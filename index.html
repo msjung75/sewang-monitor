@@ -597,13 +597,14 @@ body{
 
   <div class="chips" id="chip-fr-source">
     <div class="chip on" data-v="biz">🎯 영업대상</div>
-    <div class="chip" data-v="cafe">☕ 상권 카페·빵</div>
+    <div class="chip" data-v="all">📋 전체 브랜드</div>
   </div>
 
   <div class="chips" id="chip-fr-kind">
-    <div class="chip on" data-v="">전체 브랜드</div>
-    <div class="chip" data-v="sool">🍺 주점·술집만</div>
-    <div class="chip" data-v="food">🍽️ 음식점만</div>
+    <div class="chip on" data-v="">전체</div>
+    <div class="chip" data-v="sool">🍺 주점·술집</div>
+    <div class="chip" data-v="food">🍽️ 음식점</div>
+    <div class="chip" data-v="cafe">☕ 카페·빵</div>
   </div>
 
   <div class="card">
@@ -1570,25 +1571,30 @@ function isSoolGroup(g){
 }
 function frFiltered(){
   var kind = activeChip('chip-fr-kind');
+  // 카페·빵은 별도 pool (CAFE_BRANDS), 나머지는 source(biz/all)로 결정
+  if (kind === 'cafe') return CAFE_BRANDS;
   var src = activeChip('chip-fr-source') || 'biz';
-  var pool = (src === 'cafe') ? CAFE_BRANDS : BRANDS;
+  // src: biz(영업대상) 또는 all(전체 브랜드) — 둘 다 BRANDS 사용 (영업대상 필터는 향후 v14)
+  var pool = BRANDS;
   if (kind === 'sool') return pool.filter(isSoolGroup);
   if (kind === 'food') return pool.filter(function(g){ return !isSoolGroup(g); });
   return pool;
 }
 function renderFr(){
   var tbl = document.getElementById('tbl-brand');
+  var kind = activeChip('chip-fr-kind');
   var src = activeChip('chip-fr-source') || 'biz';
-  var pool = (src === 'cafe') ? CAFE_BRANDS : BRANDS;
-  // 카드 제목/안내문 source 따라 변경
+  var isCafe = (kind === 'cafe');
+  var pool = isCafe ? CAFE_BRANDS : BRANDS;
+  // 카드 제목 변경
   var cardTitleEl = document.querySelector('#pg-fr .card-title');
-  if (cardTitleEl) cardTitleEl.textContent = (src === 'cafe')
-    ? '☕ 상권 카페·빵 출점 (참고 지표)'
+  if (cardTitleEl) cardTitleEl.textContent = isCafe
+    ? '☕ 카페·빵 출점 (상권 참고)'
     : '확장 중인 브랜드 (기간 내 2개 지점 이상)';
   if (!pool.length) {
     tbl.innerHTML = '<tr><td style="color:var(--txt3);text-align:center;padding:24px;font-size:12px">' +
       (ST.permits.length
-        ? (src === 'cafe' ? '기간 내 반복 출점 카페 브랜드가 없습니다.' : '기간 내 반복 출점 브랜드가 없습니다.<br>기간을 14~30일로 늘려보세요.')
+        ? (isCafe ? '기간 내 반복 출점 카페·빵 브랜드가 없습니다.' : '기간 내 반복 출점 브랜드가 없습니다.<br>기간을 14~30일로 늘려보세요.')
         : '신규업장 탭에서 조회하면 자동 분석됩니다') + '</td></tr>';
     document.getElementById('fr-detail').innerHTML = '';
     document.getElementById('fr-detail-title').style.display = 'none';
