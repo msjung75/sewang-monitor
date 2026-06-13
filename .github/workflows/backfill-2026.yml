@@ -63,38 +63,44 @@ jobs:
       - name: Aggregate YTD
         if: steps.gate.outputs.run == 'true'
         run: python3 scripts/aggregate-ytd.py
-      - name: Commit (강력 retry)
+      - name: Commit (안전 retry - 다른 매트릭스 파일 보존)
         if: steps.gate.outputs.run == 'true'
         run: |
           set -e
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          # 데이터 변경 확인
-          if [ ! -s "data/ytd_2026/${{ matrix.month }}.json" ]; then
-            echo "::error::no data file for ${{ matrix.month }}"
+          M="${{ matrix.month }}"
+          DATA_FILE="data/ytd_2026/${M}.json"
+          SUMMARY_FILE="data/ytd_2026_summary.json"
+          if [ ! -s "$DATA_FILE" ]; then
+            echo "::error::no data file for $M"
             exit 1
           fi
-          BYTES=$(stat -c %s "data/ytd_2026/${{ matrix.month }}.json")
-          echo "Month ${{ matrix.month }} file: $BYTES bytes"
-          # 강력 retry (5회) + sleep 점진 증가
+          BYTES=$(stat -c %s "$DATA_FILE")
+          echo "Month $M file: $BYTES bytes"
+          # 우리 데이터를 임시 보관 후, origin/main에서 다른 매트릭스 결과를 가져옴
+          cp "$DATA_FILE" /tmp/our_data.json
+          [ -f "$SUMMARY_FILE" ] && cp "$SUMMARY_FILE" /tmp/our_summary.json
           for i in 1 2 3 4 5; do
             git fetch origin main
-            git reset --soft origin/main
+            git reset --hard origin/main
+            # 우리 파일 복원
+            cp /tmp/our_data.json "$DATA_FILE"
+            [ -f /tmp/our_summary.json ] && cp /tmp/our_summary.json "$SUMMARY_FILE"
+            # aggregate 재실행 (다른 매트릭스 데이터 포함)
+            python3 scripts/aggregate-ytd.py
             git add data/ytd_2026/ data/ytd_2026_summary.json
             if git diff --cached --quiet; then
-              echo "No staged changes after rebase — possibly identical to main"
-              # 그래도 한 번 commit allow-empty로 추적
-              git commit --allow-empty -m "YTD backfill ${{ matrix.month }}: ${{ steps.dates.outputs.from }} -> ${{ steps.dates.outputs.to }} (no diff, ${BYTES}B file)"
-            else
-              git commit -m "YTD backfill ${{ matrix.month }}: ${{ steps.dates.outputs.from }} -> ${{ steps.dates.outputs.to }} (${BYTES}B)"
+              echo "No changes after rebase"
+              exit 0
             fi
+            git commit -m "YTD backfill ${M}: ${{ steps.dates.outputs.from }} -> ${{ steps.dates.outputs.to }} (${BYTES}B)"
             if git push origin main; then
               echo "Push success on try $i"
               exit 0
             fi
-            echo "Push fail on try $i, retry after sleep $((i*10))"
-            sleep $((i*10))
-            git reset --hard origin/main
+            echo "Push fail on try $i, sleep $((i*5))"
+            sleep $((i*5))
           done
           echo "::error::Push failed after 5 retries"
           exit 1
