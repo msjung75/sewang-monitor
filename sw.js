@@ -1,6 +1,6 @@
 // 정적 파일 캐시 (PWA 오프라인 기본 대응)
-// CACHE 버전 bump — v10.8: ST.permits dedupe (동일 매장 중복 제거)
-const CACHE = 'sewang-pwa-v10_8-dedupe';
+// CACHE 버전 bump — v10.9: 프랜차이즈 탭에 상권 카페 별도 섹션
+const CACHE = 'sewang-pwa-v10_9-cafe-section';
 const FILES = ['./','./index.html','./manifest.json','./icon.svg'];
 
 self.addEventListener('install', e => {

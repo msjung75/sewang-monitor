@@ -477,6 +477,11 @@ body{
     <div>인허가 <strong style="color:var(--c1)">상호명 패턴</strong>으로 같은 브랜드의 반복 출점을 감지합니다.<br>조회 기간과 무관하게 <strong>최근 30일</strong>(<span id="lbl-fr-scope">수도권</span>) 기준입니다.</div>
   </div>
 
+  <div class="chips" id="chip-fr-source">
+    <div class="chip on" data-v="biz">🎯 영업대상</div>
+    <div class="chip" data-v="cafe">☕ 상권 카페·빵</div>
+  </div>
+
   <div class="chips" id="chip-fr-kind">
     <div class="chip on" data-v="">전체 브랜드</div>
     <div class="chip" data-v="sool">🍺 주점·술집만</div>
@@ -949,7 +954,14 @@ function rebuildBrands(){
   BRANDS = computeBrands(brandBase());
   BRAND_SET = {};
   BRANDS.forEach(function(g){ g.stores.forEach(function(s){ BRAND_SET[s.id] = g.brand; }); });
+  rebuildCafeBrands();
   updateScopeLabels();
+}
+// 상권 카페 — 커피·빵 체인의 30일 신규 출점 그룹화
+var CAFE_BRANDS = [];
+function rebuildCafeBrands(){
+  var cafeBase = (ST.trend30 && ST.trend30.cafeStores) || [];
+  CAFE_BRANDS = computeBrands(cafeBase);
 }
 var SCOPE_LABEL = { metro: '수도권(서울·경기·인천)', seoul: '서울', gyeonggi: '경기', all: '전국' };
 function updateScopeLabels(){
@@ -1391,15 +1403,26 @@ function isSoolGroup(g){
 }
 function frFiltered(){
   var kind = activeChip('chip-fr-kind');
-  if (kind === 'sool') return BRANDS.filter(isSoolGroup);
-  if (kind === 'food') return BRANDS.filter(function(g){ return !isSoolGroup(g); });
-  return BRANDS;
+  var src = activeChip('chip-fr-source') || 'biz';
+  var pool = (src === 'cafe') ? CAFE_BRANDS : BRANDS;
+  if (kind === 'sool') return pool.filter(isSoolGroup);
+  if (kind === 'food') return pool.filter(function(g){ return !isSoolGroup(g); });
+  return pool;
 }
 function renderFr(){
   var tbl = document.getElementById('tbl-brand');
-  if (!BRANDS.length) {
+  var src = activeChip('chip-fr-source') || 'biz';
+  var pool = (src === 'cafe') ? CAFE_BRANDS : BRANDS;
+  // 카드 제목/안내문 source 따라 변경
+  var cardTitleEl = document.querySelector('#pg-fr .card-title');
+  if (cardTitleEl) cardTitleEl.textContent = (src === 'cafe')
+    ? '☕ 상권 카페·빵 출점 (참고 지표)'
+    : '확장 중인 브랜드 (기간 내 2개 지점 이상)';
+  if (!pool.length) {
     tbl.innerHTML = '<tr><td style="color:var(--txt3);text-align:center;padding:24px;font-size:12px">' +
-      (ST.permits.length ? '기간 내 반복 출점 브랜드가 없습니다.<br>기간을 14~30일로 늘려보세요.' : '신규업장 탭에서 조회하면 자동 분석됩니다') + '</td></tr>';
+      (ST.permits.length
+        ? (src === 'cafe' ? '기간 내 반복 출점 카페 브랜드가 없습니다.' : '기간 내 반복 출점 브랜드가 없습니다.<br>기간을 14~30일로 늘려보세요.')
+        : '신규업장 탭에서 조회하면 자동 분석됩니다') + '</td></tr>';
     document.getElementById('fr-detail').innerHTML = '';
     document.getElementById('fr-detail-title').style.display = 'none';
     return;
@@ -1703,7 +1726,7 @@ document.querySelectorAll('.bnav-btn').forEach(function(btn){
   btn.addEventListener('click', function(){ switchPage(btn.dataset.pg); });
 });
 
-['chip-days','chip-region','chip-type','chip-nstat','chip-gold-sort','chip-track','chip-fr-kind'].forEach(function(id){
+['chip-days','chip-region','chip-type','chip-nstat','chip-gold-sort','chip-track','chip-fr-kind','chip-fr-source'].forEach(function(id){
   document.querySelectorAll('#' + id + ' .chip').forEach(function(c){
     c.addEventListener('click', function(){
       document.querySelectorAll('#' + id + ' .chip').forEach(function(x){ x.classList.remove('on'); });
@@ -1711,7 +1734,7 @@ document.querySelectorAll('.bnav-btn').forEach(function(btn){
       if (id === 'chip-type' || id === 'chip-nstat') renderNew();
       else if (id === 'chip-gold-sort') renderGold();
       else if (id === 'chip-track') renderTracked();
-      else if (id === 'chip-fr-kind') { FR_SELECTED = null; renderFr(); }
+      else if (id === 'chip-fr-kind' || id === 'chip-fr-source') { FR_SELECTED = null; renderFr(); }
       else if (id === 'chip-region') {
         // 「전국」 chip → 즉시 nightly cache 표시 (실시간 fetch 차단)
         if (c.dataset.v === 'all') {
@@ -1780,10 +1803,18 @@ async function loadNightlyCache(){
       var filtered = d.stores.filter(function(s){ return !isExcluded(s); });
       var rawTotal = d.stores.length;
       var excludedCount = rawTotal - filtered.length;
+      // 상권 분석용 — 커피·카페·빵·디저트 매장만 별도 보관
+      var CAFE_KW = /커피|카페|까페|cafe|coffee|caffe|빵|베이커리|제과|베이글|도넛|도너츠|디저트|케이크|케익|와플|크로플|마카롱|아이스크림|빙수|젤라또|요거트/i;
+      var cafeStores = d.stores.filter(function(s){
+        var n = normName(s.name);
+        return CAFE_KW.test(n) || CAFE_KW.test(s.upte || '');
+      });
+      var cafeDed = dedupePermits(cafeStores);
       // 30일 trend (프랜차이즈 탭) — 필터 적용된 stores만
       ST.trend30 = {
         byDay: d.byDay || {},
         stores: filtered,
+        cafeStores: cafeDed,
         at: nightlyAt,
         scope: 'all',
         nightly: true,
