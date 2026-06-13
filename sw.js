@@ -1,6 +1,6 @@
 // 정적 파일 캐시 (PWA 오프라인 기본 대응)
 // CACHE 버전 bump — v10.9: 프랜차이즈 탭에 상권 카페 별도 섹션
-const CACHE = 'sewang-pwa-v10_9-cafe-section';
+const CACHE = 'sewang-pwa-v11-auth-kakao';
 const FILES = ['./','./index.html','./manifest.json','./icon.svg'];
 
 self.addEventListener('install', e => {

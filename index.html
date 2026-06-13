@@ -1839,6 +1839,57 @@ async function loadNightlyCache(){
     }
   } catch(e) { console.warn('[nightly] 캐시 로드 실패 (정상 — 파일 없으면):', e.message); }
 }
+// ============================================================
+// 인증 게이트 (카카오 OAuth — v11)
+// ============================================================
+window.ME = null;
+async function checkAuth(){
+  try {
+    var r = await fetch('/api/auth/kakao?action=me', { cache: 'no-store', credentials: 'same-origin' });
+    var d = await r.json();
+    if (d && d.authenticated && d.user) {
+      window.ME = d.user;
+      return true;
+    }
+    return false;
+  } catch(e) {
+    console.error('[auth] check fail:', e);
+    return false;
+  }
+}
+
+function showLoginScreen(){
+  // URL 쿼리에서 안내 정보 추출
+  var q = new URLSearchParams(location.search);
+  var loginState = q.get('login');
+  var myId = q.get('my_id');
+  var firstAdmin = q.get('first_admin') === '1';
+  var pendingHtml = '';
+  if (loginState === 'pending' && myId) {
+    pendingHtml = '<div style="background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.4);border-radius:12px;padding:14px;margin-top:24px;text-align:center;color:#fbbf24;font-size:12px;line-height:1.6">'
+      + '<div style="font-weight:800;margin-bottom:6px">⏳ 승인 대기</div>'
+      + '본인 카카오 ID: <strong>' + myId + '</strong><br>사장님께 ID 알려드리고 승인 받으세요.</div>';
+  }
+  var firstAdminHtml = '';
+  if (firstAdmin && myId) {
+    firstAdminHtml = '<div style="background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.4);border-radius:12px;padding:14px;margin-top:24px;text-align:center;color:#10b981;font-size:11px;line-height:1.6">'
+      + '<div style="font-weight:800;margin-bottom:6px">🎉 첫 관리자 등록 완료</div>'
+      + '본인 카카오 ID: <strong>' + myId + '</strong><br>Vercel env에 <strong>ADMIN_KAKAO_ID</strong>=<code>' + myId + '</code> 등록 후 Redeploy 권장.</div>';
+  }
+  document.documentElement.style.background = 'linear-gradient(135deg,#0b1220,#0b3a8a)';
+  document.body.innerHTML =
+    '<div style="position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#0b1220,#0b3a8a);color:white;font-family:-apple-system,\'Noto Sans KR\',sans-serif;padding:24px;box-sizing:border-box">'
+    + '<div style="background:linear-gradient(135deg,#38bdf8,#7c3aed);width:80px;height:80px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:900;color:white;margin-bottom:24px;box-shadow:0 0 40px rgba(56,189,248,0.4)">세</div>'
+    + '<div style="font-size:22px;font-weight:800;letter-spacing:-0.5px;margin-bottom:8px;text-align:center">세왕 상권·영업 인텔리전스</div>'
+    + '<div style="font-size:11px;color:#94a3b8;margin-bottom:40px;letter-spacing:1px">SEWANG INTELLIGENCE · v11</div>'
+    + '<a href="/api/auth/kakao?action=login" style="display:flex;align-items:center;gap:10px;background:#fee500;color:#000;padding:14px 28px;border-radius:12px;font-weight:700;font-size:15px;text-decoration:none;box-shadow:0 4px 24px rgba(254,229,0,0.35);transition:transform .15s">'
+    + '<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 3C6.48 3 2 6.48 2 10.8c0 2.74 1.79 5.15 4.5 6.5l-1 3.4c-.1.35.3.6.6.4l4-2.7c.6.1 1.2.1 1.9.1 5.52 0 10-3.48 10-7.7S17.52 3 12 3z" fill="#000"/></svg>'
+    + '카카오로 로그인</a>'
+    + '<div style="font-size:11px;color:#475569;margin-top:32px;text-align:center;line-height:1.6;max-width:300px">이 앱은 세왕상사 영업·관리 도구입니다.<br>사전 승인된 분만 접근 가능합니다.</div>'
+    + pendingHtml + firstAdminHtml
+    + '</div>';
+}
+
 function init(){
   syncScopeOnLoad();
   bindChipSido();
@@ -1860,7 +1911,11 @@ function init(){
   fetchTrend30();
   fetchMonthly();
 }
-init();
+(async function bootstrap(){
+  var ok = await checkAuth();
+  if (!ok) { showLoginScreen(); return; }
+  init();
+})();
 </script>
 </body>
 </html>
