@@ -595,7 +595,11 @@ body{
 
   <div class="alert-banner">
     <span class="aico">🏪</span>
-    <div>인허가 <strong style="color:var(--c1)">상호명 패턴</strong>으로 반복 출점을 감지합니다.<br>리스트는 <strong>최근 30일</strong> 기준 · 브랜드 클릭/검색 시 <strong style="color:#34d399">올해 1~6월 누적</strong> 표시 (<span id="lbl-fr-scope">전국</span>)</div>
+    <div>
+      <strong style="color:var(--c1)">올해 누적 (2026년 1월~)</strong><br>
+      <span id="fr-ytd-summary" style="font-size:13px">개점 <strong style="color:#34d399">집계 중...</strong> · 폐업 <strong style="color:#f87171">집계 중...</strong></span><br>
+      <span style="font-size:11px;color:var(--txt3)">인허가 상호명 패턴으로 반복 출점 브랜드 자동 감지 (<span id="lbl-fr-scope">전국</span>)</span>
+    </div>
   </div>
 
   <div class="chips" id="chip-fr-kind">
@@ -1665,8 +1669,26 @@ async function loadYTDSummary(){
     var r = await fetch('/data/ytd_2026_summary.json?_=' + Date.now(), { cache: 'no-store' });
     if (!r.ok) return;
     window.YTD = await r.json();
+    // 「프랜차이즈」 상단 안내문 집계 표시
+    var sumEl = document.getElementById('fr-ytd-summary');
+    if (sumEl && window.YTD.by_month) {
+      var totalOpen = 0, totalClosed = 0;
+      for (var m in window.YTD.by_month) {
+        totalOpen += (window.YTD.by_month[m].open || 0);
+        totalClosed += (window.YTD.by_month[m].closed || 0);
+      }
+      var months = (window.YTD.months_loaded || []).length;
+      sumEl.innerHTML = '개점 <strong style="color:#34d399">' + totalOpen.toLocaleString() + '</strong>곳 · 폐업 <strong style="color:#f87171">' + totalClosed.toLocaleString() + '</strong>곳 <span style="color:var(--txt3);font-size:11px">(' + months + '개월)</span>';
+    }
+    // 「프랜차이즈」 카드 제목도 갱신
+    var cardTitleEl = document.querySelector('#pg-fr .card-title');
+    if (cardTitleEl && cardTitleEl.textContent.indexOf('확장') >= 0) {
+      cardTitleEl.textContent = '확장 중인 브랜드 (올해 누적 · 2건 이상 출점)';
+    }
     // 선택된 브랜드 있으면 다시 표시 (YTD 데이터로 갱신)
     if (FR_SELECTED) try { selectBrand(encodeURIComponent(FR_SELECTED), true); } catch(e){}
+    // 「프랜차이즈」 테이블 재렌더 (YTD 로드 후 BRANDS → YTD 데이터로 전환)
+    try { renderFr(); } catch(e){}
   } catch(e) { console.warn('[YTD] load fail:', e.message); }
 }
 
