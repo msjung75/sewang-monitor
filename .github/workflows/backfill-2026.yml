@@ -14,7 +14,7 @@ jobs:
   backfill:
     runs-on: ubuntu-latest
     strategy:
-      max-parallel: 2   # 동시 2개만 (API 안전)
+      max-parallel: 1   # 동시 2개만 (API 안전)
       fail-fast: false
       matrix:
         month: ['202601', '202602', '202603', '202604', '202605', '202606']
