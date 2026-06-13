@@ -25,11 +25,22 @@ jobs:
       - name: Check gate
         id: gate
         run: |
-          if [ "${{ inputs.month }}" = "all" ] || [ "${{ inputs.month }}" = "${{ matrix.month }}" ]; then
-            echo "run=true" >> $GITHUB_OUTPUT
+          INPUT="${{ inputs.month }}"
+          M="${{ matrix.month }}"
+          # 지원 입력: all | 202603 | 202603,202604 | 202603~202606 | 202603-202606
+          if [ "$INPUT" = "all" ]; then
+            RESULT=true
+          elif echo "$INPUT" | grep -q "$M"; then
+            RESULT=true
+          elif echo "$INPUT" | grep -qE '^[0-9]{6}[~-][0-9]{6}$'; then
+            FROM=$(echo "$INPUT" | sed -E 's/[~-].*$//')
+            TO=$(echo "$INPUT" | sed -E 's/^[0-9]{6}[~-]//')
+            if [ "$M" \>= "$FROM" ] && [ "$M" \<= "$TO" ]; then RESULT=true; else RESULT=false; fi
           else
-            echo "run=false" >> $GITHUB_OUTPUT
+            RESULT=false
           fi
+          echo "run=$RESULT" >> $GITHUB_OUTPUT
+          echo "gate INPUT=$INPUT M=$M result=$RESULT"
       - name: Compute month range
         if: steps.gate.outputs.run == 'true'
         id: dates
