@@ -599,7 +599,7 @@ body{
   </div>
 
   <div style="margin-bottom:12px;position:relative">
-    <input id="fr-search" type="text" placeholder="🔍 브랜드 검색 (예: 생마차, 신전떡볶이...)" style="width:100%;padding:13px 16px;border:1px solid var(--border2);background:var(--surface);border-radius:12px;color:var(--txt);font-size:14px;box-sizing:border-box;backdrop-filter:blur(10px)" oninput="frSearch(this.value)">
+    <input id="fr-search" type="text" placeholder="🔍 브랜드·매장 검색" style="width:100%;padding:13px 16px;border:1px solid var(--border2);background:var(--surface);border-radius:12px;color:var(--txt);font-size:14px;box-sizing:border-box;backdrop-filter:blur(10px)" oninput="frSearch(this.value)">
     <div id="fr-search-results" style="display:none;position:absolute;top:100%;left:0;right:0;margin-top:6px;background:var(--surface);border:1px solid var(--border-hi);border-radius:12px;max-height:300px;overflow-y:auto;z-index:50;box-shadow:0 12px 32px rgba(0,0,0,0.5);backdrop-filter:blur(20px)"></div>
   </div>
 
@@ -1672,7 +1672,7 @@ function ytdBrandData(brand){
   return merged;
 }
 
-// 「프랜차이즈」 검색 (모든 YTD 브랜드 — 2,000개+)
+// 「프랜차이즈」 검색 (브랜드 + 매장명 둘 다, 모든 YTD)
 function frSearch(q){
   var box = document.getElementById('fr-search-results');
   q = (q||'').trim();
@@ -1680,26 +1680,46 @@ function frSearch(q){
   var qLow = q.toLowerCase();
   var qCompact = qLow.replace(/\s/g,'');
   var brands = window.YTD.by_brand;
-  // 매칭 — name이나 compact에 q 포함
+  // 1차: 브랜드명 매칭
   var hits = [];
+  var hitNames = {};
   for (var b in brands) {
     var bLow = b.toLowerCase();
     var bCompact = bLow.replace(/\s/g,'');
     if (bLow.indexOf(qLow) >= 0 || bCompact.indexOf(qCompact) >= 0) {
       var v = brands[b];
-      hits.push({ name: b, open: v.total_open, closed: v.total_closed, total: v.total_open + v.total_closed });
+      hits.push({ name: b, open: v.total_open, closed: v.total_closed, total: v.total_open + v.total_closed, isStore: false });
+      hitNames[b] = 1;
     }
   }
-  // 합 큰 순 정렬, 최대 12개
+  // 2차: 매장명 매칭 (브랜드별 stores 순회) — 브랜드명에 없어도 매장명에 있으면 그 브랜드 추가
+  for (var b in brands) {
+    if (hitNames[b]) continue;
+    var v = brands[b];
+    for (var m in v.monthly) {
+      var stores = v.monthly[m].stores || [];
+      for (var i = 0; i < stores.length; i++) {
+        var sName = (stores[i].name || '').toLowerCase();
+        if (sName.indexOf(qLow) >= 0 || sName.replace(/\s/g,'').indexOf(qCompact) >= 0) {
+          hits.push({ name: b, open: v.total_open, closed: v.total_closed, total: v.total_open + v.total_closed, isStore: true, matchStore: stores[i].name });
+          hitNames[b] = 1;
+          break;
+        }
+      }
+      if (hitNames[b]) break;
+    }
+  }
+  // 합 큰 순 정렬, 최대 15개
   hits.sort(function(a,b){ return b.total - a.total; });
-  hits = hits.slice(0, 12);
+  hits = hits.slice(0, 15);
   if (!hits.length) {
     box.innerHTML = '<div style="padding:14px;color:var(--txt3);font-size:13px;text-align:center">매칭 브랜드 없음</div>';
   } else {
-    box.innerHTML = '<div style="padding:8px 14px;font-size:10px;color:var(--txt3);font-weight:700;letter-spacing:0.4px;text-transform:uppercase;border-bottom:1px solid var(--border);background:rgba(56,189,248,0.05)">올해 누적 (1~6월) 기준</div>' + hits.map(function(h){
+    box.innerHTML = '<div style="padding:8px 14px;font-size:10px;color:var(--txt3);font-weight:700;letter-spacing:0.4px;text-transform:uppercase;border-bottom:1px solid var(--border);background:rgba(56,189,248,0.05)">올해 누적 (1~6월) 기준 · 브랜드 + 매장명 검색</div>' + hits.map(function(h){
+      var storeHint = h.isStore && h.matchStore ? '<div style="font-size:10px;color:var(--txt3);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">↳ ' + esc(h.matchStore) + '</div>' : '';
       return '<div onclick="frSearchClick(\'' + encodeURIComponent(h.name) + '\')" style="padding:11px 14px;border-bottom:1px solid var(--border);cursor:pointer;font-size:13px;display:flex;justify-content:space-between;align-items:center;gap:10px" onmouseover="this.style.background=\'rgba(56,189,248,0.08)\'" onmouseout="this.style.background=\'\'">'
-        + '<div style="font-weight:700;color:var(--txt);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(h.name) + '</div>'
-        + '<div style="font-size:11px;font-weight:700;white-space:nowrap"><span style="color:#34d399">출점 ' + h.open + '</span> · <span style="color:#f87171">폐점 ' + h.closed + '</span></div>'
+        + '<div style="flex:1;overflow:hidden"><div style="font-weight:700;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(h.name) + '</div>' + storeHint + '</div>'
+        + '<div style="font-size:11px;font-weight:700;white-space:nowrap;flex-shrink:0"><span style="color:#34d399">출점 ' + h.open + '</span> · <span style="color:#f87171">폐점 ' + h.closed + '</span></div>'
         + '</div>';
     }).join('');
   }
@@ -1708,7 +1728,17 @@ function frSearch(q){
 function frSearchClick(encBrand){
   document.getElementById('fr-search-results').style.display = 'none';
   document.getElementById('fr-search').value = decodeURIComponent(encBrand);
-  selectBrand(encBrand);
+  selectBrand(encBrand, true);  // silent — selectBrand 내부 스크롤 우회
+  // 검색 결과 영역으로 부드럽게 스크롤
+  setTimeout(function(){
+    var t = document.getElementById('fr-detail-title');
+    if (t && t.style.display !== 'none') {
+      t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      var d = document.getElementById('fr-detail');
+      if (d) d.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, 150);
 }
 // 외부 클릭 시 검색 결과 닫기
 document.addEventListener('click', function(e){
