@@ -8,6 +8,9 @@
 <meta name="theme-color" content="#090d1a">
 <title>세왕 신규업장 모니터</title>
 <link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icon.svg">
+<meta name="apple-mobile-web-app-title" content="세왕 모니터">
+<meta name="format-detection" content="telephone=no">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
 :root {
@@ -26,6 +29,10 @@
   --txt3: #4b5e7a;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+/* iOS Safari 자동 줌 방지 — input·select·textarea 최소 16px */
+input,select,textarea{font-size:16px !important;-webkit-appearance:none;appearance:none}
+/* 단 chip 안 텍스트는 그대로 */
+.chip,.chip *{font-size:inherit !important}
 html,body{height:100%;overscroll-behavior:none}
 body{
   background:var(--bg);
@@ -572,8 +579,9 @@ body{
   <button class="bnav-btn" data-pg="fr">
     <span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h20l-2 9H4L2 3z"/><path d="M4 12v9h16v-9"/><path d="M9 21v-6h6v6"/></svg></span>프랜차이즈
   </button>
-  <button class="bnav-btn" id="bnav-admin" data-pg="admin" style="display:none">
+  <button class="bnav-btn" id="bnav-admin" data-pg="admin" style="display:none;position:relative">
     <span class="ico">👥</span>관리
+    <span id="admin-pending-badge" style="display:none;position:absolute;top:4px;right:14px;min-width:18px;height:18px;padding:0 5px;background:#ef4444;color:white;border-radius:9px;font-size:9px;font-weight:800;line-height:18px;text-align:center;box-shadow:0 0 8px rgba(239,68,68,0.4)">0</span>
   </button>
   <button class="bnav-btn" data-pg="track">
     <span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></span>추적매장
@@ -1283,6 +1291,8 @@ function filteredPermits(){
   if (nstat === 'gold') list = list.filter(function(s){ return nv(s) && !nv(s).found; });
   else if (nstat === 'reg') list = list.filter(function(s){ return nv(s) && nv(s).found; });
   else if (nstat === 'buzz') list.sort(function(a,b){ return buzzScore(nv(b)) - buzzScore(nv(a)); });
+  // v12.4: 기본 정렬 — 인허가일 내림차순 (최신 매장 먼저). buzz/gold/reg 외 기본 케이스
+  else list.sort(function(a,b){ return (b.permitDate||'').localeCompare(a.permitDate||''); });
   return list;
 }
 
@@ -1949,12 +1959,49 @@ function init(){
   }
   // v12: 라이브 fetch 비활성화 — loadNightlyCache가 정적 캐시(data/*.json)에서만 로드
 }
+// 🚨 보안 (v12.4): 승인 안 된 사용자(pending/blocked)는 메인 앱 차단
+function showPendingScreen(){
+  var me = window.ME || {};
+  var nick = me.nickname || '신청자';
+  var myId = me.id || '';
+  document.documentElement.style.background = 'linear-gradient(135deg,#0b1220,#3b2a0b)';
+  document.body.innerHTML =
+    '<div style="position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#0b1220,#3b2a0b);color:white;font-family:-apple-system,\'Noto Sans KR\',sans-serif;padding:24px;box-sizing:border-box;text-align:center">'
+    + '<div style="background:linear-gradient(135deg,#f59e0b,#ef4444);width:80px;height:80px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:40px;margin-bottom:24px;box-shadow:0 0 40px rgba(245,158,11,0.4)">⏳</div>'
+    + '<div style="font-size:22px;font-weight:800;letter-spacing:-0.5px;margin-bottom:8px">승인 대기 중</div>'
+    + '<div style="font-size:14px;color:#fbbf24;margin-bottom:24px">안녕하세요 <strong>' + nick + '</strong>님</div>'
+    + '<div style="background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.4);border-radius:14px;padding:18px 22px;max-width:340px;color:#fcd34d;font-size:13px;line-height:1.7">'
+    + '세왕상사 대표 승인이 필요합니다.<br>아래 카카오 ID를 사장님께 전달해 주세요.</div>'
+    + '<div style="background:rgba(15,23,42,0.7);border:1px solid rgba(148,163,184,0.3);border-radius:12px;padding:18px 22px;margin-top:18px;font-family:ui-monospace,monospace;font-size:16px;color:#e2e8f0;letter-spacing:0.5px">'
+    + '카카오 ID<br><strong style="color:#fde68a;font-size:22px">' + myId + '</strong></div>'
+    + '<div style="font-size:11px;color:#94a3b8;margin-top:24px;max-width:300px;line-height:1.6">승인 완료되면 자동으로 정상 접근 가능합니다.<br>승인 전까지는 데이터 열람이 차단됩니다.</div>'
+    + '<a href="/api/auth/kakao?action=logout" style="display:inline-block;margin-top:32px;padding:10px 22px;background:rgba(148,163,184,0.18);color:#cbd5e1;border-radius:10px;text-decoration:none;font-size:12px;font-weight:600">로그아웃</a>'
+    + '</div>';
+}
+function showBlockedScreen(){
+  var nick = (window.ME && window.ME.nickname) || '사용자';
+  document.documentElement.style.background = 'linear-gradient(135deg,#0b1220,#3b0b1a)';
+  document.body.innerHTML =
+    '<div style="position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#0b1220,#3b0b1a);color:white;font-family:-apple-system,sans-serif;padding:24px;text-align:center">'
+    + '<div style="font-size:64px;margin-bottom:16px">🚫</div>'
+    + '<div style="font-size:20px;font-weight:800">접근 차단됨</div>'
+    + '<div style="font-size:13px;color:#fca5a5;margin-top:12px">' + nick + '님의 계정은 접근이 차단되어 있습니다.</div>'
+    + '<a href="/api/auth/kakao?action=logout" style="margin-top:24px;padding:10px 22px;background:rgba(148,163,184,0.18);color:#cbd5e1;border-radius:10px;text-decoration:none;font-size:12px">로그아웃</a>'
+    + '</div>';
+}
+
 (async function bootstrap(){
   var ok = await checkAuth();
   if (!ok) { showLoginScreen(); return; }
-  if (window.ME && window.ME.role === 'admin') {
+  // 🚨 보안 게이트 (v12.4) — pending/blocked는 메인 앱 차단
+  var role = (window.ME && window.ME.role) || 'pending';
+  var ALLOWED = ['admin','sales','viewer'];
+  if (role === 'blocked') { showBlockedScreen(); return; }
+  if (ALLOWED.indexOf(role) < 0) { showPendingScreen(); return; }
+  if (role === 'admin') {
     var btn = document.getElementById('bnav-admin');
     if (btn) btn.style.display = '';
+    setTimeout(function(){ try { loadAdminPanel(); } catch(e){} }, 500);
   }
   init();
 })();
@@ -1970,10 +2017,14 @@ async function loadAdminPanel(){
     if (!d.ok) { document.getElementById('admin-stats').textContent = '권한 오류 또는 API 응답 실패'; return; }
     var users = d.users || []; var blocked = d.blocked || []; var byRole = {};
     users.forEach(function(u){ byRole[u.role||'unknown'] = (byRole[u.role||'unknown']||0)+1; });
+    var pendingN = (d.pending || []).length;
     document.getElementById('admin-stats').innerHTML =
-      '<div>총 승인 ' + users.length + '명 · 차단 ' + blocked.length + '명</div>'
+      '<div>총 승인 ' + users.length + '명 · 차단 ' + blocked.length + '명' + (pendingN ? ' · <strong style="color:#fbbf24">대기 ' + pendingN + '명</strong>' : '') + '</div>'
       + '<div style="margin-top:4px;font-size:11px">' + (byRole['admin']||0) + ' admin · ' + (byRole['sales']||0) + ' sales · ' + (byRole['viewer']||0) + ' viewer</div>'
-      + '<div style="margin-top:4px;font-size:10px;color:var(--txt3)">env ADMIN_KAKAO_ID: ' + (d.admin_env ? '<span style="color:#10b981">설정됨</span>' : '<span style="color:#fbbf24">미설정</span>') + '</div>';
+      + '<div style="margin-top:4px;font-size:10px;color:var(--txt3)">env ADMIN_KAKAO_ID: ' + (d.admin_env ? '<span style="color:#10b981">설정됨</span>' : '<span style="color:#fbbf24">미설정</span>') + ' · RESEND_API_KEY: ' + (d.resend_env ? '<span style="color:#10b981">설정됨</span>' : '<span style="color:#fbbf24">미설정</span>') + '</div>';
+    // bnav 배지 업데이트
+    var badge = document.getElementById('admin-pending-badge');
+    if (badge) { badge.textContent = pendingN; badge.style.display = pendingN ? '' : 'none'; }
     var el = document.getElementById('admin-users-list');
     if (!users.length) {
       el.innerHTML = '<div class="empty" style="padding:24px"><div class="etxt" style="font-size:11px">아직 등록된 사용자 없음<br>(사장님은 env ADMIN_KAKAO_ID로 admin 권한 부여)</div></div>';
