@@ -1,5 +1,14 @@
 {
-  "users": [],
+  "users": [
+    {
+      "id": "4942879828",
+      "nickname": "정택성",
+      "profile": "",
+      "role": "viewer",
+      "memo": "정택성 시더 대표",
+      "approved_at": "2026-06-13T10:37:49.613Z"
+    }
+  ],
   "blocked": [],
-  "updated_at": ""
+  "updated_at": "2026-06-13T10:37:49.613Z"
 }
