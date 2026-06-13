@@ -7,8 +7,16 @@
       "role": "viewer",
       "memo": "정택성 시더 대표",
       "approved_at": "2026-06-13T10:37:49.613Z"
+    },
+    {
+      "id": "4942767056",
+      "nickname": "청주종합주류",
+      "profile": "http://k.kakaocdn.net/dn/cGZU2S/dJMcaiV6VZc/DdhcjYWnTrAUoB78HAkWoK/img_640x640.jpg",
+      "role": "viewer",
+      "memo": "청주종합주류 대표 한승훈",
+      "approved_at": "2026-06-13T10:56:22.556Z"
     }
   ],
   "blocked": [],
-  "updated_at": "2026-06-13T10:37:49.613Z"
+  "updated_at": "2026-06-13T10:56:22.556Z"
 }
