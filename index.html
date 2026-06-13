@@ -12,6 +12,8 @@
 <meta name="apple-mobile-web-app-title" content="세왕 모니터">
 <meta name="format-detection" content="telephone=no">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<!-- Kakao Map SDK (libraries: clusterer for marker grouping) -->
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=051405d05504fe15b8137583758e5eca&libraries=clusterer&autoload=false"></script>
 <style>
 :root {
   /* v14 - 다크 그라스모피즘 (Toss·Apple 무드) */
@@ -627,6 +629,42 @@ body{
 
 </div>
 
+<!-- ======= PAGE: 🗺️ 지도 ======= -->
+<div class="page" id="pg-map">
+  <div class="alert-banner">
+    <span class="aico">🗺️</span>
+    <div>
+      <strong style="color:var(--c1)">매장 위치 지도 (Kakao)</strong><br>
+      <span style="font-size:12px">올해 신규 매장 핀 + 영업대상 브랜드 highlight + 시·도 heatmap</span><br>
+      <span style="font-size:10.5px;color:var(--txt3)">매장 클릭 → 상세 + 추적 추가 가능</span>
+    </div>
+  </div>
+
+  <div class="chips" id="chip-map-mode" style="margin-bottom:8px">
+    <div class="chip on" data-v="ytd">📅 올해 누적</div>
+    <div class="chip" data-v="30d">🆕 최근 30일</div>
+  </div>
+  <div class="chips" id="chip-map-cat" style="margin-bottom:10px">
+    <div class="chip on" data-v="">전체</div>
+    <div class="chip" data-v="sool">🍺 주점</div>
+    <div class="chip" data-v="food">🍽️ 음식점</div>
+  </div>
+
+  <div style="position:relative;width:100%;height:60vh;min-height:400px;border-radius:14px;overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow-card);margin-bottom:12px">
+    <div id="kakao-map" style="width:100%;height:100%"></div>
+    <div id="map-loading" style="position:absolute;inset:0;background:rgba(6,9,18,0.85);display:flex;align-items:center;justify-content:center;color:var(--txt2);font-size:13px;backdrop-filter:blur(10px)">
+      <div style="text-align:center"><div style="font-size:32px;margin-bottom:10px">🗺️</div>지도 로딩 중...</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:12px">
+    <div class="card-title">📍 시·도별 분포 (TOP 10)</div>
+    <div id="map-sido-stats" style="font-size:13px;line-height:1.8"></div>
+  </div>
+
+  <div id="map-selected-store" style="display:none"></div>
+</div>
+
 <!-- ======= PAGE: 추적매장 ======= -->
 <!-- ======= PAGE: 사용자 관리 (admin only) v13 ======= -->
 <div class="page" id="pg-admin">
@@ -716,6 +754,9 @@ body{
   <button class="bnav-btn" id="bnav-admin" data-pg="admin" style="display:none;position:relative">
     <span class="ico">👥</span>관리
     <span id="admin-pending-badge" style="display:none;position:absolute;top:4px;right:14px;min-width:18px;height:18px;padding:0 5px;background:#ef4444;color:white;border-radius:9px;font-size:9px;font-weight:800;line-height:18px;text-align:center;box-shadow:0 0 8px rgba(239,68,68,0.4)">0</span>
+  </button>
+  <button class="bnav-btn" data-pg="map">
+    <span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></span>지도
   </button>
   <button class="bnav-btn" data-pg="track">
     <span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></span>추적매장
@@ -1921,11 +1962,20 @@ function selectBrand(encBrand, silent){
       var mark = s.closed ? '🚫' : '🆕';
       var color = s.closed ? '#f87171' : '#7dd3fc';
       var bgT = s.closed ? 'rgba(248,113,113,0.05)' : 'var(--surface)';
-      return '<div style="background:' + bgT + ';border:1px solid var(--border);border-radius:10px;padding:11px 14px;margin-bottom:7px;font-size:13px">'
+      // 네이버 검색·플레이스 링크 (사장님 영업 핵심 기능 복원)
+      var addrShort = (s.addr || '').replace(/^[가-힣]+(특별시|광역시|특별자치도|특별자치시|도)\s*/, '').slice(0, 25);
+      var nQuery = encodeURIComponent((s.name + ' ' + addrShort).trim());
+      var npUrl = 'https://map.naver.com/p/search/' + nQuery;
+      var nsUrl = 'https://m.search.naver.com/search.naver?query=' + nQuery;
+      return '<div style="background:' + bgT + ';border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;font-size:13px;cursor:pointer;transition:border-color .2s" onclick="window.open(\'' + npUrl + '\',\'_blank\')">'
         + '<div style="display:flex;justify-content:space-between;gap:8px;align-items:start">'
-        + '<div style="font-weight:700;color:var(--txt);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:-0.2px">' + esc(s.name) + '</div>'
-        + '<span style="font-size:13px;color:' + color + ';font-weight:700;flex-shrink:0">' + mark + '</span></div>'
-        + '<div style="font-size:11.5px;color:var(--txt2);margin-top:4px;font-weight:500">' + pdFmt + (s.addr ? ' · ' + esc(s.addr.slice(0,42)) : '') + '</div>'
+        + '<div style="font-weight:700;color:var(--txt);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:-0.2px;word-break:keep-all">' + esc(s.name) + '</div>'
+        + '<span style="font-size:14px;color:' + color + ';font-weight:700;flex-shrink:0">' + mark + '</span></div>'
+        + '<div style="font-size:11.5px;color:var(--txt2);margin-top:5px;font-weight:500">' + pdFmt + (s.addr ? ' · ' + esc(s.addr.slice(0,42)) : '') + '</div>'
+        + '<div style="display:flex;gap:6px;margin-top:9px">'
+        + '<button onclick="event.stopPropagation();window.open(\'' + npUrl + '\',\'_blank\')" style="flex:1;padding:6px 8px;background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.3);color:#6ee7b7;border-radius:7px;font-size:11.5px;font-weight:700;cursor:pointer">📍 N 플레이스</button>'
+        + '<button onclick="event.stopPropagation();window.open(\'' + nsUrl + '\',\'_blank\')" style="flex:1;padding:6px 8px;background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.3);color:#7dd3fc;border-radius:7px;font-size:11.5px;font-weight:700;cursor:pointer">🔍 N 검색</button>'
+        + '</div>'
         + '</div>';
     }).join('');
     if (allStores.length > 60) {
@@ -2198,19 +2248,19 @@ async function reanalyzeTracked(btn){
 // NAVIGATION + CHIPS
 // ============================================================
 function switchPage(pg){
-  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('on'); 
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('on'); });
   if (pg === 'admin') loadAdminPanel();
-});
   document.querySelectorAll('.bnav-btn').forEach(function(b){ b.classList.remove('on'); });
   document.getElementById('pg-' + pg).classList.add('on');
   document.querySelector('.bnav-btn[data-pg="' + pg + '"]').classList.add('on');
   if (pg === 'track') renderTracked();
+  if (pg === 'map') initKakaoMap();
 }
 document.querySelectorAll('.bnav-btn').forEach(function(btn){
   btn.addEventListener('click', function(){ switchPage(btn.dataset.pg); });
 });
 
-['chip-days','chip-region','chip-type','chip-nstat','chip-gold-sort','chip-track','chip-fr-kind','chip-fr-source'].forEach(function(id){
+['chip-days','chip-region','chip-type','chip-nstat','chip-gold-sort','chip-track','chip-fr-kind','chip-fr-source','chip-map-mode','chip-map-cat'].forEach(function(id){
   document.querySelectorAll('#' + id + ' .chip').forEach(function(c){
     c.addEventListener('click', function(){
       document.querySelectorAll('#' + id + ' .chip').forEach(function(x){ x.classList.remove('on'); });
