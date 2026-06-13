@@ -118,7 +118,7 @@ for s in filtered:
 
 # 2건 이상 출점 브랜드만 (노이즈 제거)
 for brand, data in brand_data.items():
-    if data['total_open'] + data['total_closed'] < 2: continue
+    if data['total_open'] + data['total_closed'] < 1: continue
     monthly = {}
     for m, v in data['monthly'].items():
         v['stores'].sort(key=lambda x: x.get('permitDate',''), reverse=True)
