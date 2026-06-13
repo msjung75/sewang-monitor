@@ -1607,7 +1607,11 @@ function frFiltered(){
   }
   if (kind === 'sool') arr = arr.filter(isSoolYtdBrand);
   else if (kind === 'food') arr = arr.filter(function(g){ return !isSoolYtdBrand(g); });
-  arr.sort(function(a,b){ return b.total - a.total; });
+  // 사장님 안: 신규 출점 1순위 정렬 (동률이면 폐점 적은 순 — 깨끗한 성장 위로)
+  arr.sort(function(a,b){
+    if (b.total_open !== a.total_open) return b.total_open - a.total_open;
+    return a.total_closed - b.total_closed;
+  });
   return arr;
 }
 function renderFr(){
