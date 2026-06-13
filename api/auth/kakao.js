@@ -232,6 +232,38 @@ async function actUpdateRole(kakaoId, role, memo) {
   await ghPutFile('data/allowlist.json', acontent, af.sha, `update_role: ${kakaoId} -> ${role}`);
   return { ok: true };
 }
+async function actAddUser(kakaoId, role, nickname, memo) {
+  if (!GITHUB_TOKEN) throw new Error('GITHUB_TOKEN 미설정');
+  const af = await ghGetFile('data/allowlist.json');
+  let acontent = af.content;
+  if (!acontent) acontent = { users: [], blocked: [], updated_at: '' };
+  if (Array.isArray(acontent)) acontent = { users: acontent, blocked: [], updated_at: '' };
+  if (!acontent.blocked) acontent.blocked = [];
+  const exists = acontent.users.some(u => String(u.id) === String(kakaoId));
+  if (exists) throw new Error('이미 등록된 사용자');
+  acontent.users.push({
+    id: kakaoId,
+    nickname: nickname || '',
+    role: role || 'viewer',
+    memo: memo || '',
+    approved_at: new Date().toISOString(),
+  });
+  acontent.updated_at = new Date().toISOString();
+  // pending에서 같은 ID 있으면 같이 정리
+  try {
+    const pf = await ghGetFile('data/pending_users.json');
+    if (pf.content) {
+      const before = pf.content.pending.length;
+      pf.content.pending = pf.content.pending.filter(p => String(p.id) !== String(kakaoId));
+      if (pf.content.pending.length !== before) {
+        pf.content.updated_at = new Date().toISOString();
+        await ghPutFile('data/pending_users.json', pf.content, pf.sha, `add_user(pending cleanup): ${kakaoId}`);
+      }
+    }
+  } catch (e) { /* ignore */ }
+  await ghPutFile('data/allowlist.json', acontent, af.sha, `add_user: ${nickname || kakaoId} as ${role}`);
+  return { ok: true, kakaoId, role };
+}
 async function actRemove(kakaoId) {
   if (!GITHUB_TOKEN) throw new Error('GITHUB_TOKEN 미설정');
   const af = await ghGetFile('data/allowlist.json');
@@ -350,6 +382,20 @@ export default async function handler(req, res) {
       });
     }
 
+    if (action === 'pending_count') {
+      const pl = await getPending();
+      return res.status(200).json({ ok: true, count: (pl.pending || []).length, updated_at: pl.updated_at || '' });
+    }
+    if (action === 'add_user') {
+      const body = await readBody(req);
+      const { kakao_id, role, nickname, memo } = body;
+      if (!kakao_id) return res.status(400).json({ ok: false, error: 'kakao_id 필요' });
+      if (!/^\d+$/.test(String(kakao_id))) return res.status(400).json({ ok: false, error: '카카오 ID는 숫자만' });
+      try {
+        const r = await actAddUser(String(kakao_id), role || 'viewer', nickname || '', memo || '');
+        return res.status(200).json(r);
+      } catch (e) { return res.status(400).json({ ok: false, error: e.message }); }
+    }
     if (action === 'approve') {
       const body = await readBody(req);
       const { kakao_id, role, memo, nickname, profile } = body;
@@ -379,7 +425,7 @@ export default async function handler(req, res) {
       return res.status(200).json(r);
     }
 
-    return res.status(400).json({ error: 'unknown_action', hint: 'action=login|me|logout|list_users|approve|reject|update_role|remove' });
+    return res.status(400).json({ error: 'unknown_action', hint: 'action=login|me|logout|list_users|pending_count|add_user|approve|reject|update_role|remove' });
   } catch (err) {
     console.error('[auth_handler_failed]', err);
     return res.status(500).json({ error: 'auth_handler_failed', message: err.message });

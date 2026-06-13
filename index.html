@@ -211,7 +211,9 @@ body{
   border:1px solid var(--border);color:var(--txt2);
   background:rgba(30,41,64,0.4);backdrop-filter:blur(10px);
   transition:all var(--t-base);letter-spacing:-0.1px;
+  white-space:nowrap; /* v13.1 fix — 2자리수+"개" 줄바꿈 방지 */
 }
+.tag{white-space:nowrap}
 .chip:hover{color:var(--txt);border-color:var(--border2);background:rgba(30,41,64,0.6)}
 .chip.on{
   background:linear-gradient(135deg,rgba(56,189,248,0.2),rgba(167,139,250,0.2));
@@ -359,9 +361,41 @@ body{
   transition:all var(--t-base);
 }
 .mini-btn:hover{background:rgba(30,41,64,0.7);border-color:var(--border-hi);color:#7dd3fc}
+
+/* ===== TOAST 알림 (in-app) ===== */
+.toast-stack{position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:300;display:flex;flex-direction:column;gap:8px;pointer-events:none;max-width:92vw;width:380px}
+.toast{
+  background:linear-gradient(135deg,rgba(15,23,42,0.95),rgba(30,41,64,0.95));
+  backdrop-filter:blur(20px) saturate(160%);
+  -webkit-backdrop-filter:blur(20px) saturate(160%);
+  border:1px solid rgba(56,189,248,0.4);
+  border-radius:var(--r-md);padding:13px 15px;
+  display:flex;align-items:center;gap:11px;
+  box-shadow:0 12px 40px rgba(0,0,0,0.5),0 0 24px rgba(56,189,248,0.2);
+  pointer-events:auto;cursor:pointer;
+  animation:toastIn .3s cubic-bezier(.4,0,.2,1);
+}
+.toast.urgent{border-color:rgba(251,191,36,0.5);box-shadow:0 12px 40px rgba(0,0,0,0.5),0 0 24px rgba(251,191,36,0.25)}
+.toast.urgent .toast-ico{color:#fbbf24}
+.toast-ico{font-size:24px;color:#38bdf8;flex-shrink:0}
+.toast-body{flex:1;min-width:0}
+.toast-t{font-size:13px;font-weight:700;color:var(--txt);margin-bottom:2px;letter-spacing:-0.2px}
+.toast-d{font-size:11px;color:var(--txt2);line-height:1.4}
+.toast.fade-out{animation:toastOut .25s cubic-bezier(.4,0,.2,1) forwards}
+@keyframes toastIn{from{transform:translateY(-20px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes toastOut{to{transform:translateY(-20px);opacity:0}}
+
+/* ===== 「관리」 탭 빨간 배지 (펄스) ===== */
+#admin-pending-badge{
+  animation:badgePulse 1.6s ease-in-out infinite;
+  background:linear-gradient(135deg,#ef4444,#f87171) !important;
+  box-shadow:0 0 12px rgba(239,68,68,0.6) !important;
+}
+@keyframes badgePulse{0%,100%{transform:scale(1);box-shadow:0 0 12px rgba(239,68,68,0.6)}50%{transform:scale(1.15);box-shadow:0 0 18px rgba(239,68,68,0.8)}}
 </style>
 </head>
 <body>
+<div class="toast-stack" id="toast-stack"></div>
 
 <!-- ===== HEADER ===== -->
 <div class="hdr">
@@ -592,6 +626,19 @@ body{
   <div class="card" style="margin-bottom:12px">
     <div class="card-title">✅ 활성 사용자 (<span id="adm-active-count">0</span>명)</div>
     <div id="admin-users-list"><div class="empty" style="padding:18px"><div class="etxt" style="font-size:11px">로딩 중...</div></div></div>
+  </div>
+  <div class="card" style="margin-bottom:12px">
+    <div class="card-title">➕ 직접 추가</div>
+    <div style="font-size:11px;color:var(--txt3);line-height:1.6;margin-bottom:10px">신청자 카카오 ID를 직접 받았을 때. 입력 후 「추가」 클릭 → 즉시 GitHub 자동 commit.</div>
+    <input id="adm-input-id" type="text" placeholder="카카오 ID (숫자만)" style="width:100%;padding:10px 12px;border:1px solid var(--border2);background:var(--surface2);border-radius:10px;color:var(--txt);font-size:12px;margin-bottom:6px;box-sizing:border-box;backdrop-filter:blur(10px)">
+    <input id="adm-input-name" type="text" placeholder="이름 (예: 한승훈)" style="width:100%;padding:10px 12px;border:1px solid var(--border2);background:var(--surface2);border-radius:10px;color:var(--txt);font-size:12px;margin-bottom:6px;box-sizing:border-box;backdrop-filter:blur(10px)">
+    <select id="adm-input-role" style="width:100%;padding:10px 12px;border:1px solid var(--border2);background:var(--surface2);border-radius:10px;color:var(--txt);font-size:12px;margin-bottom:6px;box-sizing:border-box">
+      <option value="viewer" selected>viewer · 공개 데이터만</option>
+      <option value="sales">sales · 영업 데이터</option>
+      <option value="admin">admin · 사용자 관리</option>
+    </select>
+    <input id="adm-input-memo" type="text" placeholder="메모 (예: 청주주류 한승훈 이사)" style="width:100%;padding:10px 12px;border:1px solid var(--border2);background:var(--surface2);border-radius:10px;color:var(--txt);font-size:12px;margin-bottom:10px;box-sizing:border-box;backdrop-filter:blur(10px)">
+    <button onclick="adminAddUserDirect()" class="srch-btn">➕ 추가 (자동 commit)</button>
   </div>
   <div class="card" style="margin-bottom:12px">
     <div class="card-title">🚫 차단된 사용자 (<span id="adm-blocked-count">0</span>명)</div>
@@ -2063,6 +2110,7 @@ function showBlockedScreen(){
     var btn = document.getElementById('bnav-admin');
     if (btn) btn.style.display = '';
     setTimeout(function(){ try { loadAdminPanel(); } catch(e){} }, 500);
+    setTimeout(function(){ try { startPendingPolling(); } catch(e){} }, 2000);
   }
   init();
 })();
@@ -2204,6 +2252,98 @@ async function blockUser(kakaoId, nickname){
   var res = await adminPost('reject', { kakao_id: kakaoId, reason: reason || '관리자 차단' });
   if (res.ok) { alert('차단 완료'); setTimeout(loadAdminPanel, 1500); }
   else { alert('실패: ' + (res.data && res.data.error || res.status)); }
+}
+
+// 「직접 추가」 — admin이 카카오 ID 받아 직접 등록 (한 이사처럼 외부에서 ID 받은 경우)
+async function adminAddUserDirect(){
+  var id = (document.getElementById('adm-input-id').value || '').trim();
+  var name = (document.getElementById('adm-input-name').value || '').trim();
+  var role = document.getElementById('adm-input-role').value;
+  var memo = (document.getElementById('adm-input-memo').value || '').trim();
+  if (!/^\d+$/.test(id)) { alert('카카오 ID는 숫자만 입력하세요.'); return; }
+  if (!name) { alert('이름을 입력하세요.'); return; }
+  if (!confirm(name + ' (' + id + ')를 ' + role + '로 추가? 자동 GitHub commit됩니다.')) return;
+  var res = await adminPost('add_user', { kakao_id: id, nickname: name, role: role, memo: memo });
+  if (res.ok) {
+    showToast('✅', '사용자 추가 완료', name + ' · ' + role + ' (자동 commit)');
+    document.getElementById('adm-input-id').value = '';
+    document.getElementById('adm-input-name').value = '';
+    document.getElementById('adm-input-memo').value = '';
+    setTimeout(loadAdminPanel, 1500);
+  } else {
+    alert('실패: ' + (res.data && res.data.error || res.status));
+  }
+}
+
+// ============================================================
+// In-app Toast 알림 (v13.1)
+// ============================================================
+function showToast(icon, title, desc, options){
+  options = options || {};
+  var stack = document.getElementById('toast-stack');
+  if (!stack) return;
+  var div = document.createElement('div');
+  div.className = 'toast' + (options.urgent ? ' urgent' : '');
+  div.innerHTML = '<div class="toast-ico">' + icon + '</div><div class="toast-body"><div class="toast-t">' + (title||'') + '</div><div class="toast-d">' + (desc||'') + '</div></div>';
+  if (options.onClick) div.onclick = function(){ try{ options.onClick(); }catch(e){} closeToast(div); };
+  else div.onclick = function(){ closeToast(div); };
+  stack.appendChild(div);
+  setTimeout(function(){ closeToast(div); }, options.duration || 6000);
+}
+function closeToast(div){
+  if (!div || div._closing) return;
+  div._closing = true;
+  div.classList.add('fade-out');
+  setTimeout(function(){ try{ div.remove(); }catch(e){} }, 300);
+}
+
+// ============================================================
+// Pending Polling (v13.1) — 30초마다 새 신청 체크, 새 신청 발견 시 toast + 빨간 배지
+// ============================================================
+window._lastPendingCount = -1;
+async function pollPending(){
+  if (!window.ME || window.ME.role !== 'admin') return;
+  try {
+    var r = await fetch('/api/auth/kakao?action=pending_count', { credentials: 'same-origin', cache: 'no-store' });
+    var d = await r.json();
+    if (!d.ok) return;
+    var n = d.count || 0;
+    var prev = window._lastPendingCount;
+    // 배지 업데이트
+    var badge = document.getElementById('admin-pending-badge');
+    if (badge) {
+      badge.textContent = n;
+      badge.style.display = n > 0 ? '' : 'none';
+    }
+    // 새 신청 감지 (이전보다 늘어났을 때)
+    if (prev >= 0 && n > prev) {
+      var diff = n - prev;
+      showToast('🔔', '새 가입 신청 ' + diff + '건', '「관리」 탭으로 이동해서 확인', {
+        urgent: true,
+        duration: 12000,
+        onClick: function(){
+          var btn = document.getElementById('bnav-admin');
+          if (btn) btn.click();
+        }
+      });
+      // 「관리」 탭이 열려있으면 자동 새로고침
+      if (document.getElementById('pg-admin') && document.getElementById('pg-admin').classList.contains('on')) {
+        loadAdminPanel();
+      }
+    }
+    window._lastPendingCount = n;
+  } catch (e) { /* silent */ }
+}
+function startPendingPolling(){
+  if (!window.ME || window.ME.role !== 'admin') return;
+  if (window._pollTimer) clearInterval(window._pollTimer);
+  // 즉시 한 번 + 30초마다
+  pollPending();
+  window._pollTimer = setInterval(pollPending, 30000);
+  // 페이지 visibility 변화 시 즉시 한 번
+  document.addEventListener('visibilitychange', function(){
+    if (!document.hidden) pollPending();
+  });
 }
 </script>
 </body>
