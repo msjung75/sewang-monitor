@@ -595,11 +595,6 @@ body{
     <div>인허가 <strong style="color:var(--c1)">상호명 패턴</strong>으로 같은 브랜드의 반복 출점을 감지합니다.<br>조회 기간과 무관하게 <strong>최근 30일</strong>(<span id="lbl-fr-scope">전국</span>) 기준입니다.</div>
   </div>
 
-  <div class="chips" id="chip-fr-source">
-    <div class="chip on" data-v="biz">🎯 영업대상</div>
-    <div class="chip" data-v="all">📋 전체 브랜드</div>
-  </div>
-
   <div class="chips" id="chip-fr-kind">
     <div class="chip on" data-v="">전체</div>
     <div class="chip" data-v="sool">🍺 주점·술집</div>
@@ -1571,19 +1566,14 @@ function isSoolGroup(g){
 }
 function frFiltered(){
   var kind = activeChip('chip-fr-kind');
-  // 카페·빵은 별도 pool (CAFE_BRANDS), 나머지는 source(biz/all)로 결정
   if (kind === 'cafe') return CAFE_BRANDS;
-  var src = activeChip('chip-fr-source') || 'biz';
-  // src: biz(영업대상) 또는 all(전체 브랜드) — 둘 다 BRANDS 사용 (영업대상 필터는 향후 v14)
-  var pool = BRANDS;
-  if (kind === 'sool') return pool.filter(isSoolGroup);
-  if (kind === 'food') return pool.filter(function(g){ return !isSoolGroup(g); });
-  return pool;
+  if (kind === 'sool') return BRANDS.filter(isSoolGroup);
+  if (kind === 'food') return BRANDS.filter(function(g){ return !isSoolGroup(g); });
+  return BRANDS;
 }
 function renderFr(){
   var tbl = document.getElementById('tbl-brand');
   var kind = activeChip('chip-fr-kind');
-  var src = activeChip('chip-fr-source') || 'biz';
   var isCafe = (kind === 'cafe');
   var pool = isCafe ? CAFE_BRANDS : BRANDS;
   // 카드 제목 변경
@@ -1623,13 +1613,17 @@ function renderFr(){
 function selectBrand(encBrand, silent){
   var brand = decodeURIComponent(encBrand);
   FR_SELECTED = brand;
-  var g = BRANDS.find(function(x){ return x.brand === brand; });
+  // BRANDS + CAFE_BRANDS 모두 검색
+  var g = BRANDS.find(function(x){ return x.brand === brand; })
+       || CAFE_BRANDS.find(function(x){ return x.brand === brand; });
   if (!g) return;
   document.getElementById('fr-detail-title').style.display = 'flex';
   document.getElementById('fr-detail-title').textContent = '🏪 ' + g.brand + ' — 신규 출점 ' + g.stores.length + '곳';
   var el = document.getElementById('fr-detail');
-  el.innerHTML = g.stores.map(function(s){ return storeCard(s); }).join('');
-  bindCards(el, g.stores);
+  // 등록일 desc 정렬
+  var sorted = g.stores.slice().sort(function(a,b){ return (b.permitDate||'').localeCompare(a.permitDate||''); });
+  el.innerHTML = sorted.map(function(s){ return storeCard(s); }).join('');
+  bindCards(el, sorted);
   if (!silent) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
