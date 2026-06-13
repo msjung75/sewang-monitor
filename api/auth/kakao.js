@@ -278,6 +278,47 @@ async function actAddUser(kakaoId, role, nickname, memo) {
   await ghPutFile('data/allowlist.json', acontent, af.sha, `add_user: ${nickname || kakaoId} as ${role}`);
   return { ok: true, kakaoId, role };
 }
+// ============================================================
+// 브랜드 분류 관리 (admin only) — v13.6
+// ============================================================
+async function actListBrandOverrides() {
+  const af = await ghGetFile('data/brand_overrides.json');
+  return af.content || { excluded: [], category_overrides: {}, updated_at: '' };
+}
+async function actExcludeBrand(brandName, by) {
+  if (!GITHUB_TOKEN) throw new Error('GITHUB_TOKEN 미설정');
+  const f = await ghGetFile('data/brand_overrides.json');
+  let c = f.content || { excluded: [], category_overrides: {}, updated_at: '' };
+  if (!c.excluded.some(x => x.name === brandName)) {
+    c.excluded.push({ name: brandName, by: by || '', at: new Date().toISOString() });
+  }
+  c.updated_at = new Date().toISOString();
+  await ghPutFile('data/brand_overrides.json', c, f.sha, `exclude_brand: ${brandName}`);
+  return { ok: true, brandName };
+}
+async function actRestoreBrand(brandName) {
+  if (!GITHUB_TOKEN) throw new Error('GITHUB_TOKEN 미설정');
+  const f = await ghGetFile('data/brand_overrides.json');
+  let c = f.content || { excluded: [], category_overrides: {}, updated_at: '' };
+  const before = c.excluded.length;
+  c.excluded = c.excluded.filter(x => x.name !== brandName);
+  if (c.excluded.length === before) throw new Error('not excluded');
+  c.updated_at = new Date().toISOString();
+  await ghPutFile('data/brand_overrides.json', c, f.sha, `restore_brand: ${brandName}`);
+  return { ok: true, brandName };
+}
+async function actSetBrandCategory(brandName, category) {
+  if (!GITHUB_TOKEN) throw new Error('GITHUB_TOKEN 미설정');
+  if (!['sool','food','cafe',''].includes(category)) throw new Error('invalid category');
+  const f = await ghGetFile('data/brand_overrides.json');
+  let c = f.content || { excluded: [], category_overrides: {}, updated_at: '' };
+  if (category === '') delete c.category_overrides[brandName];
+  else c.category_overrides[brandName] = category;
+  c.updated_at = new Date().toISOString();
+  await ghPutFile('data/brand_overrides.json', c, f.sha, `set_category: ${brandName} -> ${category}`);
+  return { ok: true, brandName, category };
+}
+
 async function actRemove(kakaoId) {
   if (!GITHUB_TOKEN) throw new Error('GITHUB_TOKEN 미설정');
   const af = await ghGetFile('data/allowlist.json');
@@ -446,6 +487,38 @@ export default async function handler(req, res) {
       if (!kakao_id) return res.status(400).json({ ok: false, error: 'kakao_id 필요' });
       const r = await actRemove(String(kakao_id));
       return res.status(200).json(r);
+    }
+    // ===== 브랜드 분류 관리 (admin) =====
+    if (action === 'list_brand_overrides') {
+      const r = await actListBrandOverrides();
+      return res.status(200).json({ ok: true, ...r });
+    }
+    if (action === 'exclude_brand') {
+      const body = await readBody(req);
+      const { brand } = body;
+      if (!brand) return res.status(400).json({ ok: false, error: 'brand 필요' });
+      try {
+        const r = await actExcludeBrand(brand, payload.n || '');
+        return res.status(200).json(r);
+      } catch (e) { return res.status(400).json({ ok: false, error: e.message }); }
+    }
+    if (action === 'restore_brand') {
+      const body = await readBody(req);
+      const { brand } = body;
+      if (!brand) return res.status(400).json({ ok: false, error: 'brand 필요' });
+      try {
+        const r = await actRestoreBrand(brand);
+        return res.status(200).json(r);
+      } catch (e) { return res.status(400).json({ ok: false, error: e.message }); }
+    }
+    if (action === 'set_brand_category') {
+      const body = await readBody(req);
+      const { brand, category } = body;
+      if (!brand) return res.status(400).json({ ok: false, error: 'brand 필요' });
+      try {
+        const r = await actSetBrandCategory(brand, category || '');
+        return res.status(200).json(r);
+      } catch (e) { return res.status(400).json({ ok: false, error: e.message }); }
     }
 
     return res.status(400).json({ error: 'unknown_action', hint: 'action=login|me|logout|list_users|pending_count|add_user|approve|reject|update_role|update_user|remove' });

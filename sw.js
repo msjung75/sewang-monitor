@@ -1,5 +1,5 @@
 // PWA Service Worker v13 (사용자 관리 풀 UI)
-const CACHE = 'sewang-pwa-v13_4-ytd';
+const CACHE = 'sewang-pwa-v13_6-brand-ov';
 const SHELL = ['/', '/index.html', '/manifest.json', '/icon.svg'];
 
 self.addEventListener('install', e => {

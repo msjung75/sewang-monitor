@@ -664,6 +664,12 @@ body{
     <div class="card-title">🚫 차단된 사용자 (<span id="adm-blocked-count">0</span>명)</div>
     <div id="admin-blocked-list"><div class="empty" style="padding:18px"><div class="etxt" style="font-size:11px">차단된 사용자 없음</div></div></div>
   </div>
+  <div class="card" style="margin-bottom:12px">
+    <div class="card-title">🏪 브랜드 분류 관리</div>
+    <div style="font-size:11px;color:var(--txt3);line-height:1.5;margin-bottom:10px">「프랜차이즈」 카드의 ⋮ 버튼으로 브랜드 제외·카테고리 변경. 여기서 복원.</div>
+    <div id="admin-excluded-brands"></div>
+    <div id="admin-category-overrides" style="margin-top:10px"></div>
+  </div>
 </div>
 
 <div class="page" id="pg-track">
@@ -1580,6 +1586,9 @@ function isSoolGroup(g){
 // YTD brand의 주점 그룹 판단 (sample 매장 upte/name으로)
 window._ytdSoolCache = {};
 function isSoolYtdBrand(g){
+  // category override 우선
+  var ov = window.BRAND_OVERRIDES && window.BRAND_OVERRIDES.category_overrides;
+  if (ov && ov[g.brand]) return ov[g.brand] === 'sool';
   if (window._ytdSoolCache[g.brand] !== undefined) return window._ytdSoolCache[g.brand];
   var isSool = false;
   for (var m in g.monthly) {
@@ -1593,17 +1602,36 @@ function isSoolYtdBrand(g){
   window._ytdSoolCache[g.brand] = isSool;
   return isSool;
 }
+// 카페·빵 override
+function isCafeYtdBrand(g){
+  var ov = window.BRAND_OVERRIDES && window.BRAND_OVERRIDES.category_overrides;
+  return ov && ov[g.brand] === 'cafe';
+}
 function frFiltered(){
   var kind = activeChip('chip-fr-kind');
   if (kind === 'cafe') return CAFE_BRANDS;  // 카페·빵은 30일 (별도 데이터 흐름)
   // 다른 chip은 YTD 사용 (사장님 안)
   if (!window.YTD || !window.YTD.by_brand) return BRANDS;  // fallback: YTD 미로드 시 30일
+  var excluded = window._excludedBrandSet || {};
+  var catOv = window.BRAND_OVERRIDES && window.BRAND_OVERRIDES.category_overrides || {};
   var arr = [];
   for (var b in window.YTD.by_brand) {
+    if (excluded[b]) continue;  // admin이 제외한 브랜드
     var v = window.YTD.by_brand[b];
     var total = v.total_open + v.total_closed;
-    if (total < 2) continue;  // 확장 중인 브랜드 = 2건 이상
+    if (total < 2) continue;
     arr.push({ brand: b, total_open: v.total_open, total_closed: v.total_closed, total: total, monthly: v.monthly, _ytd: true });
+  }
+  // kind=cafe는 category_overrides에서 cafe만 추출
+  if (kind === 'cafe' && Object.keys(catOv).length) {
+    var cafeOnly = arr.filter(function(g){ return isCafeYtdBrand(g); });
+    if (cafeOnly.length) {
+      cafeOnly.sort(function(a,b){
+        if (b.total_open !== a.total_open) return b.total_open - a.total_open;
+        return a.total_closed - b.total_closed;
+      });
+      return cafeOnly;
+    }
   }
   if (kind === 'sool') arr = arr.filter(isSoolYtdBrand);
   else if (kind === 'food') arr = arr.filter(function(g){ return !isSoolYtdBrand(g); });
@@ -1651,16 +1679,21 @@ function renderFr(){
           + '</tr>';
       }).join('');
   } else {
-    // 올해 누적 (1~6월) — 신규 / 폐점 컬럼
-    tbl.innerHTML = '<tr><th>#</th><th>브랜드</th><th style="color:#34d399">신규</th><th style="color:#f87171">폐점</th></tr>' +
+    // 올해 누적 (1~6월) — 신규 / 폐점 / 회전율 / [⋮ admin]
+    var isAdmin = window.ME && window.ME.role === 'admin';
+    tbl.innerHTML = '<tr><th>#</th><th>브랜드</th><th style="color:#34d399">신규</th><th style="color:#f87171">폐점</th><th title="회전율 = 폐점/(신규+폐점)">🔄</th>' + (isAdmin ? '<th></th>' : '') + '</tr>' +
       list.slice(0,30).map(function(g,i){
         var open = g._ytd ? g.total_open : (g.stores ? g.stores.length : 0);
         var closed = g._ytd ? g.total_closed : 0;
+        var churn = (open + closed) > 0 ? Math.round(closed / (open + closed) * 100) : 0;
+        var churnColor = churn < 20 ? '#34d399' : churn < 50 ? '#fbbf24' : '#f87171';
         return '<tr style="cursor:pointer" onclick="selectBrand(\'' + encodeURIComponent(g.brand) + '\')">'
           + '<td class="rn">' + (i+1) + '</td>'
           + '<td style="font-size:13px;font-weight:600">' + esc(g.brand) + '</td>'
           + '<td><span style="font-weight:800;color:#34d399;font-size:13px">' + open + '</span></td>'
           + '<td><span style="font-weight:800;color:' + (closed > 0 ? '#f87171' : 'var(--txt3)') + ';font-size:13px">' + closed + '</span></td>'
+          + '<td><span style="font-weight:700;color:' + churnColor + ';font-size:11px">' + churn + '%</span></td>'
+          + (isAdmin ? '<td onclick="event.stopPropagation();brandMenu(\'' + encodeURIComponent(g.brand) + '\')" style="cursor:pointer;color:var(--txt3);font-size:16px;padding:0 6px">⋮</td>' : '')
           + '</tr>';
     }).join('');
   }
@@ -1668,6 +1701,20 @@ function renderFr(){
 }
 // YTD summary 로드 (올해 출점/폐점 통계)
 window.YTD = null;
+// brand_overrides 로드 (admin이 제외/카테고리 변경한 브랜드)
+window.BRAND_OVERRIDES = { excluded: [], category_overrides: {} };
+async function loadBrandOverrides(){
+  try {
+    var r = await fetch('/data/brand_overrides.json?_=' + Date.now(), { cache: 'no-store' });
+    if (!r.ok) return;
+    var d = await r.json();
+    window.BRAND_OVERRIDES = { excluded: d.excluded || [], category_overrides: d.category_overrides || {} };
+    // 메모리 set 생성 (빠른 조회용)
+    window._excludedBrandSet = {};
+    window.BRAND_OVERRIDES.excluded.forEach(function(x){ window._excludedBrandSet[x.name] = 1; });
+    try { renderFr(); } catch(e){}
+  } catch(e) {}
+}
 async function loadYTDSummary(){
   try {
     var r = await fetch('/data/ytd_2026_summary.json?_=' + Date.now(), { cache: 'no-store' });
@@ -2338,6 +2385,7 @@ function init(){
   bindNewSearch();
   loadNightlyCache(); // 새벽 cron 결과 자동 로드 (서울·경기만 있으면 보강, 전국이면 덮어쓰기)
   loadYTDSummary();   // YTD 6개월 summary (프랜차이즈 클릭 시 올해 출점/폐점 표시용)
+  loadBrandOverrides(); // admin 브랜드 분류 관리 (제외/카테고리)
   if (ST.trend30 && ST.trend30.stores) {
     ST.trend30.stores = ST.trend30.stores.filter(function(s){ return !isExcluded(s); });
   }
@@ -2481,6 +2529,41 @@ async function loadAdminPanel(){
           + (b.blocked_at ? '<div style="color:var(--txt3);margin-top:2px;font-size:9px">차단 ' + esc((b.blocked_at||'').slice(0,10)) + '</div>' : '') + '</div>';
       }).join('');
     }
+    // 브랜드 분류 관리 표시
+    try {
+      var bo = window.BRAND_OVERRIDES || { excluded: [], category_overrides: {} };
+      var exEl = document.getElementById('admin-excluded-brands');
+      if (exEl) {
+        if (!bo.excluded.length) {
+          exEl.innerHTML = '<div style="font-size:11px;color:var(--txt3);padding:10px 0">제외된 브랜드 없음</div>';
+        } else {
+          exEl.innerHTML = '<div style="font-size:11px;color:var(--txt3);font-weight:700;margin-bottom:6px">제외된 브랜드 (' + bo.excluded.length + ')</div>' +
+            bo.excluded.map(function(x){
+              return '<div style="display:flex;justify-content:space-between;align-items:center;background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:8px 11px;margin-bottom:5px;font-size:12px">'
+                + '<span style="color:var(--txt);font-weight:600">🚫 ' + esc(x.name) + '</span>'
+                + '<button onclick="restoreBrand(\'' + encodeURIComponent(x.name) + '\')" style="padding:4px 10px;background:rgba(52,211,153,.15);border:1px solid rgba(52,211,153,.3);color:#6ee7b7;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer">↺ 복원</button>'
+                + '</div>';
+            }).join('');
+        }
+      }
+      var ovEl = document.getElementById('admin-category-overrides');
+      var ovKeys = Object.keys(bo.category_overrides || {});
+      if (ovEl) {
+        if (!ovKeys.length) {
+          ovEl.innerHTML = '<div style="font-size:11px;color:var(--txt3);padding:10px 0">카테고리 override 없음</div>';
+        } else {
+          ovEl.innerHTML = '<div style="font-size:11px;color:var(--txt3);font-weight:700;margin-bottom:6px">카테고리 override (' + ovKeys.length + ')</div>' +
+            ovKeys.map(function(k){
+              var cat = bo.category_overrides[k];
+              var catLabel = cat === 'sool' ? '🍺 주점' : cat === 'food' ? '🍽️ 음식점' : cat === 'cafe' ? '☕ 카페' : cat;
+              return '<div style="display:flex;justify-content:space-between;align-items:center;background:rgba(56,189,248,.05);border:1px solid rgba(56,189,248,.2);border-radius:8px;padding:8px 11px;margin-bottom:5px;font-size:12px">'
+                + '<div><div style="color:var(--txt);font-weight:600">' + esc(k) + '</div><div style="font-size:10px;color:var(--txt3);margin-top:2px">→ ' + catLabel + '</div></div>'
+                + '<button onclick="brandMenu(\'' + encodeURIComponent(k) + '\')" style="padding:4px 10px;background:rgba(56,189,248,.15);border:1px solid rgba(56,189,248,.3);color:#7dd3fc;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer">변경/제거</button>'
+                + '</div>';
+            }).join('');
+        }
+      }
+    } catch(e) {}
   } catch (e) {
     document.getElementById('admin-stats').textContent = '오류: ' + e.message;
   }
@@ -2544,6 +2627,44 @@ async function editUserInfo(kakaoId, currentName, currentMemo){
   var res = await adminPost('update_user', body);
   if (res.ok) { showToast('✏️','사용자 정보 수정 완료','자동 commit'); setTimeout(loadAdminPanel, 1500); }
   else { alert('실패: ' + (res.data && res.data.error || res.status)); }
+}
+
+// 「프랜차이즈」 카드 ⋮ 메뉴 — admin이 브랜드 분류 관리
+async function brandMenu(encBrand){
+  var brand = decodeURIComponent(encBrand);
+  var action = prompt(
+    '「' + brand + '」 관리\n\n' +
+    '1: 집계표에서 제외 (노이즈/법인명)\n' +
+    '2: 카테고리 변경 → 주점·술집 (sool)\n' +
+    '3: 카테고리 변경 → 음식점 (food)\n' +
+    '4: 카테고리 변경 → 카페·빵 (cafe)\n' +
+    '5: 카테고리 override 제거 (자동 분류)\n' +
+    '취소',
+    '1'
+  );
+  if (!action) return;
+  if (action === '1') {
+    if (!confirm('「' + brand + '」을 집계표에서 제외? 자동 commit됩니다.')) return;
+    var r = await adminPost('exclude_brand', { brand: brand });
+    if (r.ok) { showToast('🚫','제외 완료', brand); setTimeout(loadBrandOverrides, 1500); }
+    else alert('실패: ' + (r.data && r.data.error));
+  } else if (['2','3','4'].indexOf(action) >= 0) {
+    var cat = action === '2' ? 'sool' : action === '3' ? 'food' : 'cafe';
+    var r = await adminPost('set_brand_category', { brand: brand, category: cat });
+    if (r.ok) { showToast('🔄','카테고리 변경', brand + ' → ' + cat); setTimeout(loadBrandOverrides, 1500); }
+    else alert('실패: ' + (r.data && r.data.error));
+  } else if (action === '5') {
+    var r = await adminPost('set_brand_category', { brand: brand, category: '' });
+    if (r.ok) { showToast('↺','override 제거', brand); setTimeout(loadBrandOverrides, 1500); }
+    else alert('실패: ' + (r.data && r.data.error));
+  }
+}
+async function restoreBrand(encBrand){
+  var brand = decodeURIComponent(encBrand);
+  if (!confirm('「' + brand + '」을 집계표에 복원?')) return;
+  var r = await adminPost('restore_brand', { brand: brand });
+  if (r.ok) { showToast('✅','복원 완료', brand); setTimeout(loadBrandOverrides, 1500); setTimeout(loadAdminPanel, 1500); }
+  else alert('실패: ' + (r.data && r.data.error));
 }
 
 async function blockUser(kakaoId, nickname){
