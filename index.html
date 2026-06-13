@@ -255,7 +255,10 @@ body{
 .sc-gold{border-color:rgba(251,191,36,.35)}
 .sc-gold .sc-new-glow{background:linear-gradient(90deg,transparent,#fbbf24,transparent);box-shadow:0 0 12px rgba(251,191,36,0.6)}
 .sc-name{font-size:17px;font-weight:700;margin-bottom:8px;letter-spacing:-0.3px;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  word-break:keep-all;min-width:0;max-width:100%}
+/* 한글 단어 단위 wrap — 폐점/점 한 글자 떨어지는 버그 fix */
+.sc-name,.sc-desc{word-break:keep-all}
 .sc-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
 .tag{font-size:11px;padding:4px 10px;border-radius:999px;font-weight:700;letter-spacing:-0.1px}
 .t-new{background:rgba(56,189,248,.15);color:#7dd3fc;border:1px solid rgba(56,189,248,.3)}
