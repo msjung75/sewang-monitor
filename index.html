@@ -343,12 +343,12 @@ body{
   </div>
 
   <div class="card">
-    <div class="card-title">📈 일별 신규 인허가 추이 <span id="lbl-trend-scope" style="font-weight:400;color:var(--txt3);font-size:10px">(최근 30일 · 수도권)</span></div>
+    <div class="card-title">📈 일별 신규 인허가 추이 <span id="lbl-trend-scope" style="font-weight:400;color:var(--txt3);font-size:10px">(최근 30일 · 전국)</span></div>
     <div class="chart-box"><canvas id="ch-daily"></canvas></div>
   </div>
 
   <div class="card">
-    <div class="card-title">🗓️ 월별 창업 추이 <span id="lbl-monthly-scope" style="font-weight:400;color:var(--txt3);font-size:10px">(업종별 · 수도권 · 지난달은 1회 수집 후 고정)</span></div>
+    <div class="card-title">🗓️ 월별 창업 추이 <span id="lbl-monthly-scope" style="font-weight:400;color:var(--txt3);font-size:10px">(업종별 · 전국 · 지난달은 1회 수집 후 고정)</span></div>
     <div class="chart-box"><canvas id="ch-monthly"></canvas></div>
     <div id="monthly-status" style="font-size:10px;color:var(--txt3);text-align:center;margin-top:6px"></div>
   </div>
@@ -387,12 +387,7 @@ body{
     <div>관할구청 <strong style="color:var(--c1)">영업신고(인허가)</strong> = 신규 매장의 기준.<br>조회하면 네이버 등록여부·화제성을 자동 분석합니다. (데이터 2일 전 기준)</div>
   </div>
 
-  <div class="chips" id="chip-days">
-    <div class="chip" data-v="3">최근 3일</div>
-    <div class="chip on" data-v="7">7일</div>
-    <div class="chip" data-v="14">14일</div>
-    <div class="chip" data-v="30">30일</div>
-  </div>
+  <!-- v12.3: chip-days 제거 — 항상 30일 cache 기준 -->
   <!-- v12.1: chip-region 제거 — chip-sido가 메인 region 필터 -->
   <div id="nightly-stamp" style="font-size:10px;color:var(--txt3);margin-bottom:6px">🕐 지방은 매일 새벽 04:00 KST 자동 갱신</div>
   <div class="chips" id="chip-type">
@@ -472,7 +467,7 @@ body{
 
   <div class="alert-banner">
     <span class="aico">🏪</span>
-    <div>인허가 <strong style="color:var(--c1)">상호명 패턴</strong>으로 같은 브랜드의 반복 출점을 감지합니다.<br>조회 기간과 무관하게 <strong>최근 30일</strong>(<span id="lbl-fr-scope">수도권</span>) 기준입니다.</div>
+    <div>인허가 <strong style="color:var(--c1)">상호명 패턴</strong>으로 같은 브랜드의 반복 출점을 감지합니다.<br>조회 기간과 무관하게 <strong>최근 30일</strong>(<span id="lbl-fr-scope">전국</span>) 기준입니다.</div>
   </div>
 
   <div class="chips" id="chip-fr-source">
@@ -1001,7 +996,7 @@ function rebuildCafeBrands(){
   var cafeBase = (ST.trend30 && ST.trend30.cafeStores) || [];
   CAFE_BRANDS = computeBrands(cafeBase);
 }
-var SCOPE_LABEL = { metro: '수도권(서울·경기·인천)', seoul: '서울', gyeonggi: '경기', all: '전국' };
+var SCOPE_LABEL = { metro: '수도권', seoul: '서울', gyeonggi: '경기', all: '전국' };
 function updateScopeLabels(){
   var sc = (ST.trend30 && ST.trend30.scope) || 'metro';
   var lb = SCOPE_LABEL[sc] || sc;
