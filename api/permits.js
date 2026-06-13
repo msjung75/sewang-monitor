@@ -28,7 +28,7 @@ const REGION_PREFIX = {
   gyeongbuk:['경상북도'],
   gyeongnam:['경상남도'],
   jeju:     ['제주특별자치도'],
-  metro:    ['서울특별시', '경기도'],
+  metro:    ['서울특별시', '경기도', '인천광역시'],
   // backwards-compat: region=all도 17개 분할 (단일 호출은 Vercel 10s timeout 위험 → client는 시·도별 호출 권장)
   all: [
     '서울특별시','경기도','부산광역시','대구광역시','인천광역시','광주광역시',
