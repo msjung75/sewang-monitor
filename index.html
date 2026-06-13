@@ -598,11 +598,6 @@ body{
     <div>인허가 <strong style="color:var(--c1)">상호명 패턴</strong>으로 반복 출점을 감지합니다.<br>리스트는 <strong>최근 30일</strong> 기준 · 브랜드 클릭/검색 시 <strong style="color:#34d399">올해 1~6월 누적</strong> 표시 (<span id="lbl-fr-scope">전국</span>)</div>
   </div>
 
-  <div style="margin-bottom:12px;position:relative">
-    <input id="fr-search" type="text" placeholder="🔍 브랜드·매장 검색" style="width:100%;padding:13px 16px;border:1px solid var(--border2);background:var(--surface);border-radius:12px;color:var(--txt);font-size:14px;box-sizing:border-box;backdrop-filter:blur(10px)" oninput="frSearch(this.value)">
-    <div id="fr-search-results" style="display:none;position:absolute;top:100%;left:0;right:0;margin-top:6px;background:var(--surface);border:1px solid var(--border-hi);border-radius:12px;max-height:300px;overflow-y:auto;z-index:50;box-shadow:0 12px 32px rgba(0,0,0,0.5);backdrop-filter:blur(20px)"></div>
-  </div>
-
   <div class="chips" id="chip-fr-kind">
     <div class="chip on" data-v="">전체</div>
     <div class="chip" data-v="sool">🍺 주점·술집</div>
@@ -615,6 +610,12 @@ body{
     <table class="rtbl" id="tbl-brand">
       <tr><td style="color:var(--txt3);text-align:center;padding:24px;font-size:12px">신규업장 탭에서 조회하면 자동 분석됩니다</td></tr>
     </table>
+  </div>
+
+  <!-- 검색창 — 순위 테이블 아래 (사장님 안) -->
+  <div style="margin-bottom:12px;position:relative">
+    <input id="fr-search" type="text" placeholder="🔍 브랜드·매장 검색 (순위에 없는 것도 검색)" style="width:100%;padding:13px 16px;border:1px solid var(--border2);background:var(--surface);border-radius:12px;color:var(--txt);font-size:14px;box-sizing:border-box;backdrop-filter:blur(10px)" oninput="frSearch(this.value)">
+    <div id="fr-search-results" style="display:none;position:absolute;top:100%;left:0;right:0;margin-top:6px;background:var(--surface);border:1px solid var(--border-hi);border-radius:12px;max-height:300px;overflow-y:auto;z-index:50;box-shadow:0 12px 32px rgba(0,0,0,0.5);backdrop-filter:blur(20px)"></div>
   </div>
 
   <div class="sdiv" id="fr-detail-title" style="display:none">신규 출점 지점</div>
