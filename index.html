@@ -595,6 +595,11 @@ body{
     <div>인허가 <strong style="color:var(--c1)">상호명 패턴</strong>으로 같은 브랜드의 반복 출점을 감지합니다.<br>조회 기간과 무관하게 <strong>최근 30일</strong>(<span id="lbl-fr-scope">전국</span>) 기준입니다.</div>
   </div>
 
+  <div style="margin-bottom:12px;position:relative">
+    <input id="fr-search" type="text" placeholder="🔍 브랜드 검색 (예: 생마차, 신전떡볶이...)" style="width:100%;padding:13px 16px;border:1px solid var(--border2);background:var(--surface);border-radius:12px;color:var(--txt);font-size:14px;box-sizing:border-box;backdrop-filter:blur(10px)" oninput="frSearch(this.value)">
+    <div id="fr-search-results" style="display:none;position:absolute;top:100%;left:0;right:0;margin-top:6px;background:var(--surface);border:1px solid var(--border-hi);border-radius:12px;max-height:300px;overflow-y:auto;z-index:50;box-shadow:0 12px 32px rgba(0,0,0,0.5);backdrop-filter:blur(20px)"></div>
+  </div>
+
   <div class="chips" id="chip-fr-kind">
     <div class="chip on" data-v="">전체</div>
     <div class="chip" data-v="sool">🍺 주점·술집</div>
@@ -1664,12 +1669,70 @@ function ytdBrandData(brand){
   return merged;
 }
 
+// 「프랜차이즈」 검색 (모든 YTD 브랜드 — 2,000개+)
+function frSearch(q){
+  var box = document.getElementById('fr-search-results');
+  q = (q||'').trim();
+  if (!q || !window.YTD || !window.YTD.by_brand) { box.style.display = 'none'; return; }
+  var qLow = q.toLowerCase();
+  var qCompact = qLow.replace(/\s/g,'');
+  var brands = window.YTD.by_brand;
+  // 매칭 — name이나 compact에 q 포함
+  var hits = [];
+  for (var b in brands) {
+    var bLow = b.toLowerCase();
+    var bCompact = bLow.replace(/\s/g,'');
+    if (bLow.indexOf(qLow) >= 0 || bCompact.indexOf(qCompact) >= 0) {
+      var v = brands[b];
+      hits.push({ name: b, open: v.total_open, closed: v.total_closed, total: v.total_open + v.total_closed });
+    }
+  }
+  // 합 큰 순 정렬, 최대 12개
+  hits.sort(function(a,b){ return b.total - a.total; });
+  hits = hits.slice(0, 12);
+  if (!hits.length) {
+    box.innerHTML = '<div style="padding:14px;color:var(--txt3);font-size:13px;text-align:center">매칭 브랜드 없음</div>';
+  } else {
+    box.innerHTML = hits.map(function(h){
+      return '<div onclick="frSearchClick(\'' + encodeURIComponent(h.name) + '\')" style="padding:11px 14px;border-bottom:1px solid var(--border);cursor:pointer;font-size:13px;display:flex;justify-content:space-between;align-items:center;gap:10px" onmouseover="this.style.background=\'rgba(56,189,248,0.08)\'" onmouseout="this.style.background=\'\'">'
+        + '<div style="font-weight:700;color:var(--txt);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(h.name) + '</div>'
+        + '<div style="font-size:11px;font-weight:700"><span style="color:#34d399">+' + h.open + '</span> <span style="color:#f87171">-' + h.closed + '</span></div>'
+        + '</div>';
+    }).join('');
+  }
+  box.style.display = 'block';
+}
+function frSearchClick(encBrand){
+  document.getElementById('fr-search-results').style.display = 'none';
+  document.getElementById('fr-search').value = decodeURIComponent(encBrand);
+  selectBrand(encBrand);
+}
+// 외부 클릭 시 검색 결과 닫기
+document.addEventListener('click', function(e){
+  var s = document.getElementById('fr-search');
+  var r = document.getElementById('fr-search-results');
+  if (!s || !r) return;
+  if (e.target !== s && !r.contains(e.target)) r.style.display = 'none';
+});
+
 function selectBrand(encBrand, silent){
   var brand = decodeURIComponent(encBrand);
   FR_SELECTED = brand;
+  // 1) BRANDS / CAFE_BRANDS에서 찾기 — 30일 매장 있으면 사용
   var g = BRANDS.find(function(x){ return x.brand === brand; })
        || CAFE_BRANDS.find(function(x){ return x.brand === brand; });
-  if (!g) return;
+  // 2) 없으면 YTD만으로도 표시 가능 — 가짜 g 생성
+  if (!g && window.YTD && window.YTD.by_brand) {
+    if (window.YTD.by_brand[brand]) g = { brand: brand, stores: [] };
+    // alias 정규화
+    if (!g) {
+      var compact = brand.replace(/\s/g,'').toLowerCase();
+      for (var k in window.YTD.by_brand) {
+        if (k.replace(/\s/g,'').toLowerCase() === compact) { g = { brand: brand, stores: [] }; break; }
+      }
+    }
+  }
+  if (!g) { alert('해당 브랜드 데이터 없음'); return; }
   document.getElementById('fr-detail-title').style.display = 'flex';
   document.getElementById('fr-detail-title').textContent = '🏪 ' + g.brand;
   var el = document.getElementById('fr-detail');
