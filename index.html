@@ -610,7 +610,7 @@ body{
   </div>
 
   <div class="card">
-    <div class="card-title">확장 중인 브랜드 (기간 내 2개 지점 이상)</div>
+    <div class="card-title">확장 중인 브랜드 (올해 누적 · 2건 이상 출점)</div>
     <table class="rtbl" id="tbl-brand">
       <tr><td style="color:var(--txt3);text-align:center;padding:24px;font-size:12px">신규업장 탭에서 조회하면 자동 분석됩니다</td></tr>
     </table>
@@ -1618,8 +1618,8 @@ function renderFr(){
   // 카드 제목 변경
   var cardTitleEl = document.querySelector('#pg-fr .card-title');
   if (cardTitleEl) cardTitleEl.textContent = isCafe
-    ? '☕ 카페·빵 출점 (상권 참고)'
-    : '확장 중인 브랜드 (기간 내 2개 지점 이상)';
+    ? '☕ 카페·빵 출점 (최근 30일 · 참고)'
+    : '확장 중인 브랜드 (올해 누적 · 2건 이상 출점)';
   if (!pool.length) {
     tbl.innerHTML = '<tr><td style="color:var(--txt3);text-align:center;padding:24px;font-size:12px">' +
       (ST.permits.length
