@@ -1625,16 +1625,31 @@ async function loadYTDSummary(){
 // 브랜드 표기 변형 합치기 (예: '야화 혼술바' + '야화혼술바')
 function ytdBrandData(brand){
   if (!window.YTD || !window.YTD.by_brand) return null;
-  if (window.YTD.by_brand[brand]) return window.YTD.by_brand[brand];
   var compact = brand.replace(/\s/g,'').toLowerCase();
+  // BRAND_ALIASES 정규화 거친 키와 일치하는 모든 YTD brand 찾아서 합산
+  var brandAlias = (typeof BRAND_ALIASES !== 'undefined' && BRAND_ALIASES[compact]) || brand;
+  var aliasCompact = brandAlias.replace(/\s/g,'').toLowerCase();
   var found = [];
   for (var k in window.YTD.by_brand) {
     var kCompact = k.replace(/\s/g,'').toLowerCase();
-    if (kCompact === compact || kCompact.indexOf(compact) === 0 || compact.indexOf(kCompact) === 0) {
+    var kAlias = (typeof BRAND_ALIASES !== 'undefined' && BRAND_ALIASES[kCompact]) || k;
+    var kAliasCompact = kAlias.replace(/\s/g,'').toLowerCase();
+    if (kCompact === compact || kAliasCompact === aliasCompact || kCompact === aliasCompact || kAliasCompact === compact) {
       found.push(window.YTD.by_brand[k]);
     }
   }
+  if (!found.length) {
+    // 정확 매치 실패 시 substring 매칭 fallback
+    for (var k in window.YTD.by_brand) {
+      var kCompact = k.replace(/\s/g,'').toLowerCase();
+      if ((compact.length >= 3 && kCompact.indexOf(compact) === 0) || (kCompact.length >= 3 && compact.indexOf(kCompact) === 0)) {
+        found.push(window.YTD.by_brand[k]);
+      }
+    }
+  }
   if (!found.length) return null;
+  if (found.length === 1) return found[0];
+  // 합산
   var merged = { total_open: 0, total_closed: 0, monthly: {} };
   found.forEach(function(d){
     merged.total_open += d.total_open;
