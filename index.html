@@ -1572,12 +1572,38 @@ function isSoolGroup(g){
       SOOL_RE.test(s.upte || '') || SOOL_RE.test(normName(s.name));
   });
 }
+// YTD brand의 주점 그룹 판단 (sample 매장 upte/name으로)
+window._ytdSoolCache = {};
+function isSoolYtdBrand(g){
+  if (window._ytdSoolCache[g.brand] !== undefined) return window._ytdSoolCache[g.brand];
+  var isSool = false;
+  for (var m in g.monthly) {
+    var stores = g.monthly[m].stores || [];
+    for (var i = 0; i < stores.length; i++) {
+      var s = stores[i];
+      if (SOOL_RE.test(s.upte || '') || SOOL_RE.test((s.name||'').replace(/\s/g,''))) { isSool = true; break; }
+    }
+    if (isSool) break;
+  }
+  window._ytdSoolCache[g.brand] = isSool;
+  return isSool;
+}
 function frFiltered(){
   var kind = activeChip('chip-fr-kind');
-  if (kind === 'cafe') return CAFE_BRANDS;
-  if (kind === 'sool') return BRANDS.filter(isSoolGroup);
-  if (kind === 'food') return BRANDS.filter(function(g){ return !isSoolGroup(g); });
-  return BRANDS;
+  if (kind === 'cafe') return CAFE_BRANDS;  // 카페·빵은 30일 (별도 데이터 흐름)
+  // 다른 chip은 YTD 사용 (사장님 안)
+  if (!window.YTD || !window.YTD.by_brand) return BRANDS;  // fallback: YTD 미로드 시 30일
+  var arr = [];
+  for (var b in window.YTD.by_brand) {
+    var v = window.YTD.by_brand[b];
+    var total = v.total_open + v.total_closed;
+    if (total < 2) continue;  // 확장 중인 브랜드 = 2건 이상
+    arr.push({ brand: b, total_open: v.total_open, total_closed: v.total_closed, total: total, monthly: v.monthly, _ytd: true });
+  }
+  if (kind === 'sool') arr = arr.filter(isSoolYtdBrand);
+  else if (kind === 'food') arr = arr.filter(function(g){ return !isSoolYtdBrand(g); });
+  arr.sort(function(a,b){ return b.total - a.total; });
+  return arr;
 }
 function renderFr(){
   var tbl = document.getElementById('tbl-brand');
@@ -1605,18 +1631,31 @@ function renderFr(){
     document.getElementById('fr-detail-title').style.display = 'none';
     return;
   }
-  tbl.innerHTML = '<tr><th>#</th><th>브랜드</th><th>신규 지점</th><th>지역</th></tr>' +
-    list.slice(0, 30).map(function(g, i){
-      var regs = {};
-      g.stores.forEach(function(s){ regs[guOf(s.addr)] = 1; });
-      return '<tr style="cursor:pointer" onclick="selectBrand(\'' + encodeURIComponent(g.brand) + '\')">'
-        + '<td class="rn">' + (i+1) + '</td>'
-        + '<td style="font-size:12px;font-weight:600">' + esc(g.brand) + (isSoolGroup(g) ? ' <span style="font-size:10px">🍺</span>' : '') + '</td>'
-        + '<td><span class="tag t-fr">' + g.stores.length + '개</span></td>'
-        + '<td style="font-size:10px;color:var(--txt2)">' + esc(Object.keys(regs).slice(0,3).join(', ')) + '</td>'
-        + '</tr>';
+  if (isCafe) {
+    // 카페·빵은 30일 (CAFE_BRANDS 구조)
+    tbl.innerHTML = '<tr><th>#</th><th>브랜드</th><th>30일 출점</th></tr>' +
+      list.slice(0,30).map(function(g,i){
+        return '<tr style="cursor:pointer" onclick="selectBrand(\'' + encodeURIComponent(g.brand) + '\')">'
+          + '<td class="rn">' + (i+1) + '</td>'
+          + '<td style="font-size:13px;font-weight:600">' + esc(g.brand) + '</td>'
+          + '<td><span class="tag t-fr">' + (g.stores ? g.stores.length : 0) + '개</span></td>'
+          + '</tr>';
+      }).join('');
+  } else {
+    // 올해 누적 (1~6월) — 신규 / 폐점 컬럼
+    tbl.innerHTML = '<tr><th>#</th><th>브랜드</th><th style="color:#34d399">신규</th><th style="color:#f87171">폐점</th></tr>' +
+      list.slice(0,30).map(function(g,i){
+        var open = g._ytd ? g.total_open : (g.stores ? g.stores.length : 0);
+        var closed = g._ytd ? g.total_closed : 0;
+        return '<tr style="cursor:pointer" onclick="selectBrand(\'' + encodeURIComponent(g.brand) + '\')">'
+          + '<td class="rn">' + (i+1) + '</td>'
+          + '<td style="font-size:13px;font-weight:600">' + esc(g.brand) + '</td>'
+          + '<td><span style="font-weight:800;color:#34d399;font-size:13px">' + open + '</span></td>'
+          + '<td><span style="font-weight:800;color:' + (closed > 0 ? '#f87171' : 'var(--txt3)') + ';font-size:13px">' + closed + '</span></td>'
+          + '</tr>';
     }).join('');
-  if (FR_SELECTED && BRANDS.some(function(g){ return g.brand === FR_SELECTED; })) selectBrand(encodeURIComponent(FR_SELECTED), true);
+  }
+  if (FR_SELECTED) try { selectBrand(encodeURIComponent(FR_SELECTED), true); } catch(e){}
 }
 // YTD summary 로드 (올해 출점/폐점 통계)
 window.YTD = null;
@@ -1772,14 +1811,8 @@ function selectBrand(encBrand, silent){
   var ytd = ytdBrandData(g.brand);
   var html = '';
   if (ytd) {
-    // 올해 출점/폐점 헤더
+    // 월별 차트 카드 (큰 숫자 헤더 제거 — 사장님 안)
     html += '<div class="card" style="margin-bottom:12px;padding:18px">';
-    html += '<div style="display:flex;gap:14px;justify-content:space-around;text-align:center">';
-    html += '<div><div style="font-size:11px;color:var(--txt3);font-weight:600;margin-bottom:4px">올해 출점</div><div style="font-size:30px;font-weight:900;color:#34d399;letter-spacing:-1px;line-height:1">' + ytd.total_open + '</div></div>';
-    html += '<div style="border-left:1px solid var(--border)"></div>';
-    html += '<div><div style="font-size:11px;color:var(--txt3);font-weight:600;margin-bottom:4px">올해 폐점</div><div style="font-size:30px;font-weight:900;color:#f87171;letter-spacing:-1px;line-height:1">' + ytd.total_closed + '</div></div>';
-    html += '</div>';
-    // 월별 미니 차트
     var monthLabels = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
     var monthData = {};
     Object.keys(ytd.monthly).forEach(function(m){
@@ -1788,7 +1821,7 @@ function selectBrand(encBrand, silent){
     });
     var maxN = 1;
     for (var i in monthData) { maxN = Math.max(maxN, monthData[i].open, monthData[i].closed); }
-    html += '<div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border)"><div style="font-size:11px;color:var(--txt3);font-weight:600;margin-bottom:10px">월별 추이</div>';
+    html += '<div><div style="font-size:12px;color:var(--txt2);font-weight:700;margin-bottom:12px;letter-spacing:-0.2px">월별 추이 (올해 누적: <span style="color:#34d399">출점 ' + ytd.total_open + '</span> · <span style="color:#f87171">폐점 ' + ytd.total_closed + '</span>)</div>';
     for (var i = 0; i < 6; i++) {
       var v = monthData[i] || { open: 0, closed: 0 };
       var openW = (v.open / maxN * 100).toFixed(0);
