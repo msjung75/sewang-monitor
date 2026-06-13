@@ -1610,20 +1610,117 @@ function renderFr(){
     }).join('');
   if (FR_SELECTED && BRANDS.some(function(g){ return g.brand === FR_SELECTED; })) selectBrand(encodeURIComponent(FR_SELECTED), true);
 }
+// YTD summary 로드 (올해 출점/폐점 통계)
+window.YTD = null;
+async function loadYTDSummary(){
+  try {
+    var r = await fetch('/data/ytd_2026_summary.json?_=' + Date.now(), { cache: 'no-store' });
+    if (!r.ok) return;
+    window.YTD = await r.json();
+    // 선택된 브랜드 있으면 다시 표시 (YTD 데이터로 갱신)
+    if (FR_SELECTED) try { selectBrand(encodeURIComponent(FR_SELECTED), true); } catch(e){}
+  } catch(e) { console.warn('[YTD] load fail:', e.message); }
+}
+
+// 브랜드 표기 변형 합치기 (예: '야화 혼술바' + '야화혼술바')
+function ytdBrandData(brand){
+  if (!window.YTD || !window.YTD.by_brand) return null;
+  if (window.YTD.by_brand[brand]) return window.YTD.by_brand[brand];
+  var compact = brand.replace(/\s/g,'').toLowerCase();
+  var found = [];
+  for (var k in window.YTD.by_brand) {
+    var kCompact = k.replace(/\s/g,'').toLowerCase();
+    if (kCompact === compact || kCompact.indexOf(compact) === 0 || compact.indexOf(kCompact) === 0) {
+      found.push(window.YTD.by_brand[k]);
+    }
+  }
+  if (!found.length) return null;
+  var merged = { total_open: 0, total_closed: 0, monthly: {} };
+  found.forEach(function(d){
+    merged.total_open += d.total_open;
+    merged.total_closed += d.total_closed;
+    for (var m in d.monthly) {
+      if (!merged.monthly[m]) merged.monthly[m] = { open: 0, closed: 0, stores: [] };
+      merged.monthly[m].open += d.monthly[m].open;
+      merged.monthly[m].closed += d.monthly[m].closed;
+      merged.monthly[m].stores = merged.monthly[m].stores.concat(d.monthly[m].stores || []);
+    }
+  });
+  return merged;
+}
+
 function selectBrand(encBrand, silent){
   var brand = decodeURIComponent(encBrand);
   FR_SELECTED = brand;
-  // BRANDS + CAFE_BRANDS 모두 검색
   var g = BRANDS.find(function(x){ return x.brand === brand; })
        || CAFE_BRANDS.find(function(x){ return x.brand === brand; });
   if (!g) return;
   document.getElementById('fr-detail-title').style.display = 'flex';
-  document.getElementById('fr-detail-title').textContent = '🏪 ' + g.brand + ' — 신규 출점 ' + g.stores.length + '곳';
+  document.getElementById('fr-detail-title').textContent = '🏪 ' + g.brand;
   var el = document.getElementById('fr-detail');
-  // 등록일 desc 정렬
-  var sorted = g.stores.slice().sort(function(a,b){ return (b.permitDate||'').localeCompare(a.permitDate||''); });
-  el.innerHTML = sorted.map(function(s){ return storeCard(s); }).join('');
-  bindCards(el, sorted);
+  var ytd = ytdBrandData(g.brand);
+  var html = '';
+  if (ytd) {
+    // 올해 출점/폐점 헤더
+    html += '<div class="card" style="margin-bottom:12px;padding:18px">';
+    html += '<div style="display:flex;gap:14px;justify-content:space-around;text-align:center">';
+    html += '<div><div style="font-size:11px;color:var(--txt3);font-weight:600;margin-bottom:4px">올해 출점</div><div style="font-size:30px;font-weight:900;color:#34d399;letter-spacing:-1px;line-height:1">' + ytd.total_open + '</div></div>';
+    html += '<div style="border-left:1px solid var(--border)"></div>';
+    html += '<div><div style="font-size:11px;color:var(--txt3);font-weight:600;margin-bottom:4px">올해 폐점</div><div style="font-size:30px;font-weight:900;color:#f87171;letter-spacing:-1px;line-height:1">' + ytd.total_closed + '</div></div>';
+    html += '</div>';
+    // 월별 미니 차트
+    var monthLabels = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+    var monthData = {};
+    Object.keys(ytd.monthly).forEach(function(m){
+      var idx = parseInt(m.slice(4,6))-1;
+      monthData[idx] = ytd.monthly[m];
+    });
+    var maxN = 1;
+    for (var i in monthData) { maxN = Math.max(maxN, monthData[i].open, monthData[i].closed); }
+    html += '<div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border)"><div style="font-size:11px;color:var(--txt3);font-weight:600;margin-bottom:10px">월별 추이</div>';
+    for (var i = 0; i < 6; i++) {
+      var v = monthData[i] || { open: 0, closed: 0 };
+      var openW = (v.open / maxN * 100).toFixed(0);
+      var closedW = (v.closed / maxN * 100).toFixed(0);
+      html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;font-size:12px">';
+      html += '<div style="width:32px;color:var(--txt2);font-weight:600">' + monthLabels[i] + '</div>';
+      html += '<div style="flex:1">';
+      html += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:2px"><div style="height:7px;background:#34d399;border-radius:3px;width:' + openW + '%;min-width:' + (v.open?3:0) + 'px"></div><span style="color:#34d399;font-weight:700;font-size:11px">+' + v.open + '</span></div>';
+      html += '<div style="display:flex;align-items:center;gap:6px"><div style="height:7px;background:#f87171;border-radius:3px;width:' + closedW + '%;min-width:' + (v.closed?3:0) + 'px"></div><span style="color:#f87171;font-weight:700;font-size:11px">-' + v.closed + '</span></div>';
+      html += '</div></div>';
+    }
+    html += '</div></div>';
+    // 매장 리스트 (등록일 desc)
+    var allStores = [];
+    Object.keys(ytd.monthly).forEach(function(m){
+      allStores = allStores.concat(ytd.monthly[m].stores || []);
+    });
+    allStores.sort(function(a,b){ return (b.permitDate||'').localeCompare(a.permitDate||''); });
+    html += '<div style="font-size:11px;color:var(--txt3);font-weight:600;margin-bottom:8px">올해 매장 ' + allStores.length + '곳 · 최신순</div>';
+    html += allStores.slice(0,60).map(function(s){
+      var pd = s.permitDate||'';
+      var pdFmt = pd.length === 8 ? pd.slice(0,4)+'.'+pd.slice(4,6)+'.'+pd.slice(6,8) : pd;
+      var mark = s.closed ? '🚫' : '🆕';
+      var color = s.closed ? '#f87171' : '#7dd3fc';
+      var bgT = s.closed ? 'rgba(248,113,113,0.05)' : 'var(--surface)';
+      return '<div style="background:' + bgT + ';border:1px solid var(--border);border-radius:10px;padding:11px 14px;margin-bottom:7px;font-size:13px">'
+        + '<div style="display:flex;justify-content:space-between;gap:8px;align-items:start">'
+        + '<div style="font-weight:700;color:var(--txt);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:-0.2px">' + esc(s.name) + '</div>'
+        + '<span style="font-size:13px;color:' + color + ';font-weight:700;flex-shrink:0">' + mark + '</span></div>'
+        + '<div style="font-size:11.5px;color:var(--txt2);margin-top:4px;font-weight:500">' + pdFmt + (s.addr ? ' · ' + esc(s.addr.slice(0,42)) : '') + '</div>'
+        + '</div>';
+    }).join('');
+    if (allStores.length > 60) {
+      html += '<div style="text-align:center;color:var(--txt3);font-size:11px;padding:10px">... 그 외 ' + (allStores.length - 60) + '곳</div>';
+    }
+  } else {
+    // YTD 데이터 미로드 — 30일 기준만 표시
+    var sorted = g.stores.slice().sort(function(a,b){ return (b.permitDate||'').localeCompare(a.permitDate||''); });
+    html += '<div style="font-size:11px;color:var(--txt3);margin-bottom:8px;padding:9px 12px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:8px;font-weight:600">⏳ 올해 누적 데이터 로딩 중... 곧 자동 표시</div>';
+    html += sorted.map(function(s){ return storeCard(s); }).join('');
+    bindCards(el, sorted);
+  }
+  el.innerHTML = html;
   if (!silent) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
@@ -2069,6 +2166,7 @@ function init(){
   bindChipSido();
   bindNewSearch();
   loadNightlyCache(); // 새벽 cron 결과 자동 로드 (서울·경기만 있으면 보강, 전국이면 덮어쓰기)
+  loadYTDSummary();   // YTD 6개월 summary (프랜차이즈 클릭 시 올해 출점/폐점 표시용)
   if (ST.trend30 && ST.trend30.stores) {
     ST.trend30.stores = ST.trend30.stores.filter(function(s){ return !isExcluded(s); });
   }
