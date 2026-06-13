@@ -1,0 +1,68 @@
+name: Backfill 2026 YTD (manual)
+on:
+  workflow_dispatch:
+    inputs:
+      month:
+        description: 'Month (yyyymm) — e.g. 202601 ~ 202606. all=전체 1~현재 월'
+        required: true
+        default: 'all'
+
+permissions:
+  contents: write
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 2   # 동시 2개만 (API 안전)
+      fail-fast: false
+      matrix:
+        month: ['202601', '202602', '202603', '202604', '202605', '202606']
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check if this month should run
+        id: gate
+        run: |
+          if [ "${{ inputs.month }}" = "all" ] || [ "${{ inputs.month }}" = "${{ matrix.month }}" ]; then
+            echo "run=true" >> $GITHUB_OUTPUT
+          else
+            echo "run=false" >> $GITHUB_OUTPUT
+          fi
+      - name: Compute month range
+        if: steps.gate.outputs.run == 'true'
+        id: dates
+        run: |
+          M="${{ matrix.month }}"
+          YEAR=${M:0:4}; MM=${M:4:2}
+          FROM_DATE="${YEAR}${MM}01"
+          NEXT=$(date -d "${YEAR}-${MM}-01 + 1 month - 1 day" +%Y%m%d)
+          TODAY=$(TZ=Asia/Seoul date +%Y%m%d)
+          if [ "$NEXT" \> "$TODAY" ]; then NEXT="$TODAY"; fi
+          echo "from=$FROM_DATE" >> $GITHUB_OUTPUT
+          echo "to=$NEXT" >> $GITHUB_OUTPUT
+          echo "$M: $FROM_DATE → $NEXT"
+      - name: Fetch month
+        if: steps.gate.outputs.run == 'true'
+        env:
+          FROM_DATE: ${{ steps.dates.outputs.from }}
+          TO_DATE: ${{ steps.dates.outputs.to }}
+        run: bash scripts/fetch-ytd-range.sh
+      - name: Aggregate YTD
+        if: steps.gate.outputs.run == 'true'
+        run: python3 scripts/aggregate-ytd.py
+      - name: Commit if changed
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # 동시 push 충돌 방지 — pull --rebase 후 push
+          for i in 1 2 3; do
+            git pull --rebase || true
+            git add data/ytd_2026/ data/ytd_2026_summary.json
+            if git diff --cached --quiet; then
+              echo "No changes"; break
+            fi
+            git commit -m "YTD backfill ${{ matrix.month }}: ${{ steps.dates.outputs.from }} → ${{ steps.dates.outputs.to }}"
+            if git push; then break; fi
+            sleep 5
+          done

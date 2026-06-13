@@ -1,0 +1,36 @@
+name: Nightly Naver N-Check (priority queue)
+on:
+  schedule:
+    - cron: '45 19 * * *'   # 매일 19:45 UTC = 04:45 KST (incremental 30분 뒤)
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: 'Daily limit (default 5000)'
+        required: false
+        default: '5000'
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run N-check
+        env:
+          NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
+          NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
+          NAVER_DAILY_LIMIT: ${{ inputs.limit || '5000' }}
+        run: python3 scripts/naver-nstat-check.py
+      - name: Commit cache
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/naver_nstat_cache.json
+          if git diff --cached --quiet; then
+            echo "No changes"
+          else
+            git commit -m "N-check $(TZ=Asia/Seoul date +%Y-%m-%d): cache updated"
+            git push
+          fi

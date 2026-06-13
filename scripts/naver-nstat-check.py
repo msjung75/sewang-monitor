@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
-"""네이버 N등록 확인 — 우선순위 큐 + registered 영구 SKIP
+"""네이버 N등록 확인 — 사장님 단순 정책 (v13.3)
+
 정책:
-1. registered → 영원히 SKIP (재확인 X)
-2. nstat 없음 (unknown) → 모두 1순위
-3. 신규 30일 안 unregistered → 매일 모두
-4. 30일+ unregistered, 마지막 확인 7일+ 전 → 일 5k 한도
-5. 90일+ unregistered, 마지막 확인 30일+ 전 → 일 500 한도
+- registered → 영원히 SKIP
+- unknown 0~30일 → 첫 확인
+- unregistered 0~30일 → 매일 1회
+- unregistered 30~60일 → 주 1회 (분산)
+- unregistered 60일+ → STOP (nstat_locked=true, 영원히 SKIP)
+- unknown 30일+ → 확인 안 함 (이미 늦었으면 의미 적음)
+
+일 호출 추정 ~6.4k (네이버 25k/일의 26%)
 
 캐시: data/naver_nstat_cache.json
-- {매장id: {nstat, checked_at}}
-- registered는 절대 다시 안 채움 (영구)
+{매장id: {nstat, checked_at, locked?}}
 """
 import json, os, glob, sys, datetime, time
 from urllib.parse import quote
@@ -19,9 +22,8 @@ CACHE_PATH = 'data/naver_nstat_cache.json'
 NAVER_CLIENT_ID = os.environ.get('NAVER_CLIENT_ID', '')
 NAVER_CLIENT_SECRET = os.environ.get('NAVER_CLIENT_SECRET', '')
 
-# 일별 한도 (네이버 25k/일 → 안전하게 5k 한도)
-DAILY_LIMIT = int(os.environ.get('NAVER_DAILY_LIMIT', '5000'))
-REQUEST_INTERVAL_SEC = 0.12  # 초당 ~8 호출
+DAILY_LIMIT = int(os.environ.get('NAVER_DAILY_LIMIT', '10000'))
+REQUEST_INTERVAL_SEC = 0.12
 
 if not NAVER_CLIENT_ID or not NAVER_CLIENT_SECRET:
     print('NAVER 키 없음 — skip')
@@ -31,7 +33,6 @@ def now_iso():
     return datetime.datetime.utcnow().isoformat() + 'Z'
 
 def days_ago(iso_str):
-    """ISO 시각 문자열이 며칠 전인지"""
     if not iso_str: return 9999
     try:
         dt = datetime.datetime.fromisoformat(iso_str.replace('Z',''))
@@ -39,7 +40,6 @@ def days_ago(iso_str):
     except: return 9999
 
 def permit_days_ago(permit_date):
-    """permitDate (yyyymmdd) 가 며칠 전인지"""
     if not permit_date or len(permit_date) < 8: return 9999
     try:
         dt = datetime.datetime.strptime(permit_date[:8], '%Y%m%d')
@@ -47,7 +47,6 @@ def permit_days_ago(permit_date):
     except: return 9999
 
 def search_naver_local(name, addr):
-    """네이버 search_local — 이름+주소 매칭 시도"""
     query = f'{name} {addr[:20]}' if addr else name
     url = f'https://openapi.naver.com/v1/search/local.json?query={quote(query)}&display=3&start=1'
     req = urllib.request.Request(url, headers={
@@ -59,14 +58,11 @@ def search_naver_local(name, addr):
             d = json.loads(r.read())
         items = d.get('items', [])
         if not items: return 'unregistered'
-        # 매장명 fuzzy match
         n_norm = name.replace(' ', '').lower()
         for it in items:
             title = it.get('title', '').replace('<b>','').replace('</b>','').replace(' ','').lower()
-            # 이름 일부 포함되면 registered
             if n_norm[:6] in title or title[:6] in n_norm:
                 return 'registered'
-        # 검색 결과 있지만 매장명 안 맞음 → 일단 unregistered
         return 'unregistered'
     except urllib.error.HTTPError as e:
         if e.code == 429: return None  # rate limit
@@ -80,7 +76,7 @@ if os.path.exists(CACHE_PATH):
     try: cache = json.load(open(CACHE_PATH))
     except: cache = {}
 
-# 모든 매장 로드 (YTD 월별 파일)
+# 모든 매장 로드
 all_stores = {}
 for f in sorted(glob.glob('data/ytd_2026/*.json')):
     try:
@@ -90,7 +86,6 @@ for f in sorted(glob.glob('data/ytd_2026/*.json')):
             if iid: all_stores[iid] = s
     except Exception: pass
 
-# trend30도 포함
 if os.path.exists('data/trend30_all.json'):
     try:
         d = json.load(open('data/trend30_all.json'))
@@ -101,49 +96,57 @@ if os.path.exists('data/trend30_all.json'):
 
 print(f'총 매장: {len(all_stores)}, 캐시 보유: {len(cache)}')
 
-# 우선순위 큐 구성
-queue_p1 = []  # unknown (없음) — 모두
-queue_p2 = []  # 신규 30일 안 unregistered
-queue_p3 = []  # 30일+ unregistered, 7일+ 전 확인
-queue_p4 = []  # 90일+ unregistered, 30일+ 전 확인
+# 사장님 단순 정책으로 우선순위 큐 구성
+queue_p1 = []  # unknown 0~30일 — 모두
+queue_p2 = []  # unregistered 0~30일 — 매일
+queue_p3 = []  # unregistered 30~60일 — 주 1회 (7일+ 전 확인)
 
+newly_locked = 0
+skipped_locked = 0
 skipped_registered = 0
 skipped_recent = 0
 
 for iid, s in all_stores.items():
     cached = cache.get(iid, {})
     nstat = cached.get('nstat')
+    locked = cached.get('locked', False)
     checked_days = days_ago(cached.get('checked_at',''))
     perm_days = permit_days_ago(s.get('permitDate',''))
     
+    # registered 영원히 SKIP
     if nstat == 'registered':
-        skipped_registered += 1
+        skipped_registered += 1; continue
+    # 이미 locked 영원히 SKIP
+    if locked:
+        skipped_locked += 1; continue
+    # 60일+ 미등록 — 자동 lock
+    if perm_days > 60 and nstat == 'unregistered':
+        cache[iid] = {**cached, 'locked': True, 'locked_at': now_iso()}
+        newly_locked += 1
         continue
+    # unknown 30일 안만 1순위
     if not nstat:
-        queue_p1.append(iid)
-    elif nstat == 'unregistered':
+        if perm_days <= 30: queue_p1.append(iid)
+        # 30일+ unknown은 의미 적음 — skip
+        continue
+    # unregistered
+    if nstat == 'unregistered':
         if perm_days <= 30:
             if checked_days >= 1: queue_p2.append(iid)
             else: skipped_recent += 1
-        elif perm_days <= 90:
+        elif perm_days <= 60:
             if checked_days >= 7: queue_p3.append(iid)
             else: skipped_recent += 1
-        else:
-            if checked_days >= 30: queue_p4.append(iid)
-            else: skipped_recent += 1
+        # 60일+는 위에서 lock 처리됨
 
-print(f'P1 (unknown): {len(queue_p1)}')
-print(f'P2 (신규 미등록): {len(queue_p2)}')
-print(f'P3 (30일+ 미등록 주1): {len(queue_p3)}')
-print(f'P4 (90일+ 미등록 월1): {len(queue_p4)}')
+print(f'P1 (unknown 0~30일): {len(queue_p1)}')
+print(f'P2 (unreg 0~30일 매일): {len(queue_p2)}')
+print(f'P3 (unreg 30~60일 주1): {len(queue_p3)}')
+print(f'newly locked (60일+): {newly_locked}, already locked: {skipped_locked}')
 print(f'SKIP registered: {skipped_registered}, recent: {skipped_recent}')
 
-# P3·P4는 한도 적용
-queue_p3 = queue_p3[:5000]
-queue_p4 = queue_p4[:500]
-
-# 전체 큐
-queue = queue_p1 + queue_p2 + queue_p3 + queue_p4
+# 한도 적용
+queue = queue_p1 + queue_p2 + queue_p3
 queue = queue[:DAILY_LIMIT]
 print(f'오늘 처리: {len(queue)}건')
 
@@ -172,9 +175,9 @@ for iid in queue:
     if processed % 100 == 0:
         print(f'  진행: {processed}/{len(queue)} (R={new_registered} U={new_unregistered})')
 
-# 캐시 저장
+# 저장
 with open(CACHE_PATH, 'w', encoding='utf-8') as f:
     json.dump(cache, f, ensure_ascii=False, separators=(',',':'))
 
-print(f'\n완료: 처리 {processed}, 신규 R={new_registered} U={new_unregistered}, errors={errors}')
+print(f'\n완료: 처리 {processed}, R+{new_registered} U+{new_unregistered}, errors {errors}, newly_locked {newly_locked}')
 print(f'캐시 총: {len(cache)} 매장')

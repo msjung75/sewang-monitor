@@ -1,0 +1,39 @@
+name: Nightly YTD Incremental
+on:
+  schedule:
+    - cron: '15 19 * * *'   # 매일 19:15 UTC = 04:15 KST
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fetch-yesterday:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compute yesterday (KST)
+        id: dates
+        run: |
+          YESTERDAY=$(TZ=Asia/Seoul date -d "yesterday" +%Y%m%d)
+          echo "from=$YESTERDAY" >> $GITHUB_OUTPUT
+          echo "to=$YESTERDAY" >> $GITHUB_OUTPUT
+          echo "Yesterday: $YESTERDAY"
+      - name: Fetch YTD daily
+        env:
+          FROM_DATE: ${{ steps.dates.outputs.from }}
+          TO_DATE: ${{ steps.dates.outputs.to }}
+        run: bash scripts/fetch-ytd-range.sh
+      - name: Aggregate YTD
+        run: python3 scripts/aggregate-ytd.py
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/ytd_2026/ data/ytd_2026_summary.json
+          if git diff --cached --quiet; then
+            echo "No changes"
+          else
+            git commit -m "YTD nightly: ${{ steps.dates.outputs.from }}"
+            git push
+          fi

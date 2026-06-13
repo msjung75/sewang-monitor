@@ -1,0 +1,40 @@
+name: Monthly YTD Re-check (last 30 days)
+on:
+  schedule:
+    - cron: '30 19 1 * *'   # 매월 1일 19:30 UTC = 04:30 KST
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  recheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compute last 30 days (KST)
+        id: dates
+        run: |
+          FROM_DATE=$(TZ=Asia/Seoul date -d "30 days ago" +%Y%m%d)
+          TO_DATE=$(TZ=Asia/Seoul date -d "yesterday" +%Y%m%d)
+          echo "from=$FROM_DATE" >> $GITHUB_OUTPUT
+          echo "to=$TO_DATE" >> $GITHUB_OUTPUT
+          echo "Recheck: $FROM_DATE → $TO_DATE"
+      - name: Fetch & re-check
+        env:
+          FROM_DATE: ${{ steps.dates.outputs.from }}
+          TO_DATE: ${{ steps.dates.outputs.to }}
+        run: bash scripts/fetch-ytd-range.sh
+      - name: Aggregate YTD
+        run: python3 scripts/aggregate-ytd.py
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/ytd_2026/ data/ytd_2026_summary.json
+          if git diff --cached --quiet; then
+            echo "No changes"
+          else
+            git commit -m "YTD monthly recheck: ${{ steps.dates.outputs.from }} → ${{ steps.dates.outputs.to }}"
+            git push
+          fi
