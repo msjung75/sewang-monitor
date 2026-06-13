@@ -41,8 +41,9 @@ export default async function handler(req, res) {
   const key = process.env.DATA_GO_KR_KEY;
   if (!key) return res.status(500).json({ error: 'DATA_GO_KR_KEY 미설정' });
 
-  const { days = '7', region = 'metro', type = 'all', from = '', to = '' } = req.query;
+  const { days = '7', region = 'metro', type = 'all', from = '', to = '', status: statusFilter = 'open' } = req.query;
   const maxPages = Math.min(parseInt(req.query.maxPages || '5', 10), 10);
+  // status: open(영업 only, default) | closed(폐업·취소·말소·중지·휴업) | all(전부)
 
   // 조회 시작일: from(YYYYMMDD) 우선, 없으면 KST 기준 N일 전
   let since, until = '';
@@ -75,7 +76,13 @@ export default async function handler(req, res) {
         seen.add(it.id);
         return true;
       })
-      .filter(it => !/폐업|취소|말소|중지|휴업/.test(it.status || ''))
+      .filter(it => {
+        const st = it.status || '';
+        const isClosed = /폐업|취소|말소|중지|휴업/.test(st);
+        if (statusFilter === 'all') return true;
+        if (statusFilter === 'closed') return isClosed;
+        return !isClosed; // open(default)
+      })
       .sort((a, b) => (b.permitDate || '').localeCompare(a.permitDate || ''));
     res.setHeader('Cache-Control', 's-maxage=1800, stale-while-revalidate=300');
     return res.status(200).json({ since, until, count: items.length, capped, items });

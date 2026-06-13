@@ -14,13 +14,15 @@ jobs:
   backfill:
     runs-on: ubuntu-latest
     strategy:
-      max-parallel: 1   # 동시 2개만 (API 안전)
+      max-parallel: 1
       fail-fast: false
       matrix:
         month: ['202601', '202602', '202603', '202604', '202605', '202606']
     steps:
       - uses: actions/checkout@v4
-      - name: Check if this month should run
+        with:
+          fetch-depth: 0
+      - name: Check gate
         id: gate
         run: |
           if [ "${{ inputs.month }}" = "all" ] || [ "${{ inputs.month }}" = "${{ matrix.month }}" ]; then
@@ -40,7 +42,7 @@ jobs:
           if [ "$NEXT" \> "$TODAY" ]; then NEXT="$TODAY"; fi
           echo "from=$FROM_DATE" >> $GITHUB_OUTPUT
           echo "to=$NEXT" >> $GITHUB_OUTPUT
-          echo "$M: $FROM_DATE → $NEXT"
+          echo "$M: $FROM_DATE -> $NEXT"
       - name: Fetch month
         if: steps.gate.outputs.run == 'true'
         env:
@@ -50,19 +52,38 @@ jobs:
       - name: Aggregate YTD
         if: steps.gate.outputs.run == 'true'
         run: python3 scripts/aggregate-ytd.py
-      - name: Commit if changed
+      - name: Commit (강력 retry)
         if: steps.gate.outputs.run == 'true'
         run: |
+          set -e
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          # 동시 push 충돌 방지 — pull --rebase 후 push
-          for i in 1 2 3; do
-            git pull --rebase || true
+          # 데이터 변경 확인
+          if [ ! -s "data/ytd_2026/${{ matrix.month }}.json" ]; then
+            echo "::error::no data file for ${{ matrix.month }}"
+            exit 1
+          fi
+          BYTES=$(stat -c %s "data/ytd_2026/${{ matrix.month }}.json")
+          echo "Month ${{ matrix.month }} file: $BYTES bytes"
+          # 강력 retry (5회) + sleep 점진 증가
+          for i in 1 2 3 4 5; do
+            git fetch origin main
+            git reset --soft origin/main
             git add data/ytd_2026/ data/ytd_2026_summary.json
             if git diff --cached --quiet; then
-              echo "No changes"; break
+              echo "No staged changes after rebase — possibly identical to main"
+              # 그래도 한 번 commit allow-empty로 추적
+              git commit --allow-empty -m "YTD backfill ${{ matrix.month }}: ${{ steps.dates.outputs.from }} -> ${{ steps.dates.outputs.to }} (no diff, ${BYTES}B file)"
+            else
+              git commit -m "YTD backfill ${{ matrix.month }}: ${{ steps.dates.outputs.from }} -> ${{ steps.dates.outputs.to }} (${BYTES}B)"
             fi
-            git commit -m "YTD backfill ${{ matrix.month }}: ${{ steps.dates.outputs.from }} → ${{ steps.dates.outputs.to }}"
-            if git push; then break; fi
-            sleep 5
+            if git push origin main; then
+              echo "Push success on try $i"
+              exit 0
+            fi
+            echo "Push fail on try $i, retry after sleep $((i*10))"
+            sleep $((i*10))
+            git reset --hard origin/main
           done
+          echo "::error::Push failed after 5 retries"
+          exit 1
