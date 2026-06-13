@@ -501,40 +501,28 @@ body{
 </div>
 
 <!-- ======= PAGE: 추적매장 ======= -->
-<!-- ======= PAGE: 사용자 관리 (admin only) ======= -->
+<!-- ======= PAGE: 사용자 관리 (admin only) v13 ======= -->
 <div class="page" id="pg-admin">
   <div class="alert-banner">
     <span class="aico">👥</span>
-    <div><strong style="color:var(--c1)">사용자 관리</strong> — 화이트리스트·역할·메모. (admin 전용)</div>
+    <div><strong style="color:var(--c1)">사용자 관리 (v13)</strong> — 승인·거부 즉시 자동 GitHub commit. (admin 전용)</div>
   </div>
   <div class="card" style="margin-bottom:12px">
-    <div class="card-title">📊 현재 사용자 현황</div>
+    <div class="card-title">📊 사용자 현황</div>
     <div id="admin-stats" style="font-size:12px;color:var(--txt2);line-height:1.8">로딩 중...</div>
+    <button onclick="loadAdminPanel()" style="margin-top:8px;padding:6px 12px;background:var(--surface2);border:1px solid var(--border2);color:var(--txt);border-radius:8px;font-size:11px;cursor:pointer">🔄 새로고침</button>
+  </div>
+  <div class="card" style="margin-bottom:12px;border:1px solid rgba(245,158,11,.35)">
+    <div class="card-title" style="color:#fbbf24">⏳ 승인 대기 (<span id="adm-pending-count">0</span>명)</div>
+    <div id="admin-pending-list"><div class="empty" style="padding:18px"><div class="etxt" style="font-size:11px">대기 중인 신청자 없음</div></div></div>
   </div>
   <div class="card" style="margin-bottom:12px">
-    <div class="card-title">✅ 승인된 사용자</div>
-    <div id="admin-users-list"><div class="empty" style="padding:24px"><div class="etxt" style="font-size:11px">로딩 중...</div></div></div>
+    <div class="card-title">✅ 활성 사용자 (<span id="adm-active-count">0</span>명)</div>
+    <div id="admin-users-list"><div class="empty" style="padding:18px"><div class="etxt" style="font-size:11px">로딩 중...</div></div></div>
   </div>
   <div class="card" style="margin-bottom:12px">
-    <div class="card-title">➕ 사용자 추가</div>
-    <div style="font-size:11px;color:var(--txt3);line-height:1.6;margin-bottom:10px">신청자가 카카오 로그인 시 본인 ID가 화면에 표시됩니다. 그 ID를 받아 아래에 입력하세요.</div>
-    <input id="adm-input-id" type="text" placeholder="카카오 ID (숫자)" style="width:100%;padding:9px 12px;border:1px solid var(--border2);background:var(--surface2);border-radius:9px;color:var(--txt);font-size:12px;margin-bottom:6px;box-sizing:border-box">
-    <input id="adm-input-name" type="text" placeholder="이름·소속 (예: 김영업·강남영업소)" style="width:100%;padding:9px 12px;border:1px solid var(--border2);background:var(--surface2);border-radius:9px;color:var(--txt);font-size:12px;margin-bottom:6px;box-sizing:border-box">
-    <select id="adm-input-role" style="width:100%;padding:9px 12px;border:1px solid var(--border2);background:var(--surface2);border-radius:9px;color:var(--txt);font-size:12px;margin-bottom:6px;box-sizing:border-box">
-      <option value="viewer">viewer · 공개 데이터만</option>
-      <option value="sales" selected>sales · 거래처·영업 데이터</option>
-      <option value="admin">admin · 사용자 관리 권한</option>
-    </select>
-    <input id="adm-input-memo" type="text" placeholder="메모 (선택)" style="width:100%;padding:9px 12px;border:1px solid var(--border2);background:var(--surface2);border-radius:9px;color:var(--txt);font-size:12px;margin-bottom:10px;box-sizing:border-box">
-    <button onclick="adminAddUser()" class="srch-btn">➕ 추가 (GitHub 편집 페이지로 이동)</button>
-  </div>
-  <div class="card" style="margin-bottom:12px">
-    <div class="card-title">🚫 차단된 사용자</div>
+    <div class="card-title">🚫 차단된 사용자 (<span id="adm-blocked-count">0</span>명)</div>
     <div id="admin-blocked-list"><div class="empty" style="padding:18px"><div class="etxt" style="font-size:11px">차단된 사용자 없음</div></div></div>
-  </div>
-  <div class="alert-banner" style="margin-top:12px;background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.3)">
-    <span class="aico">💡</span>
-    <div style="font-size:11px;line-height:1.6"><strong style="color:#fbbf24">자동 commit 업그레이드</strong><br>현재는 수동 편집. GitHub PAT를 env에 등록하면 「추가/거부」 즉시 자동 commit.</div>
   </div>
 </div>
 
@@ -2015,39 +2003,74 @@ async function loadAdminPanel(){
     var r = await fetch('/api/auth/kakao?action=list_users', { credentials:'same-origin' });
     var d = await r.json();
     if (!d.ok) { document.getElementById('admin-stats').textContent = '권한 오류 또는 API 응답 실패'; return; }
-    var users = d.users || []; var blocked = d.blocked || []; var byRole = {};
+    window._adminData = d;
+    var users = d.users || []; var blocked = d.blocked || []; var pending = d.pending || []; var byRole = {};
     users.forEach(function(u){ byRole[u.role||'unknown'] = (byRole[u.role||'unknown']||0)+1; });
-    var pendingN = (d.pending || []).length;
+    var pendingN = pending.length;
     document.getElementById('admin-stats').innerHTML =
-      '<div>총 승인 ' + users.length + '명 · 차단 ' + blocked.length + '명' + (pendingN ? ' · <strong style="color:#fbbf24">대기 ' + pendingN + '명</strong>' : '') + '</div>'
+      '<div>활성 <strong style="color:#10b981">' + users.length + '명</strong> · 차단 ' + blocked.length + '명' + (pendingN ? ' · <strong style="color:#fbbf24">대기 ' + pendingN + '명</strong>' : '') + '</div>'
       + '<div style="margin-top:4px;font-size:11px">' + (byRole['admin']||0) + ' admin · ' + (byRole['sales']||0) + ' sales · ' + (byRole['viewer']||0) + ' viewer</div>'
-      + '<div style="margin-top:4px;font-size:10px;color:var(--txt3)">env ADMIN_KAKAO_ID: ' + (d.admin_env ? '<span style="color:#10b981">설정됨</span>' : '<span style="color:#fbbf24">미설정</span>') + ' · RESEND_API_KEY: ' + (d.resend_env ? '<span style="color:#10b981">설정됨</span>' : '<span style="color:#fbbf24">미설정</span>') + '</div>';
+      + '<div style="margin-top:4px;font-size:10px;color:var(--txt3)">env: ADMIN_KAKAO_ID ' + (d.admin_env ? '<span style="color:#10b981">✓</span>' : '<span style="color:#fbbf24">✗</span>') + ' · GITHUB_TOKEN ' + (d.github_env ? '<span style="color:#10b981">✓</span>' : '<span style="color:#fbbf24">✗</span>') + ' · RESEND ' + (d.resend_env ? '<span style="color:#10b981">✓</span>' : '<span style="color:#fbbf24">✗</span>') + '</div>';
     // bnav 배지 업데이트
     var badge = document.getElementById('admin-pending-badge');
     if (badge) { badge.textContent = pendingN; badge.style.display = pendingN ? '' : 'none'; }
+    document.getElementById('adm-pending-count').textContent = pendingN;
+    document.getElementById('adm-active-count').textContent = users.length;
+    document.getElementById('adm-blocked-count').textContent = blocked.length;
+
+    // 승인 대기 섹션
+    var pel = document.getElementById('admin-pending-list');
+    if (!pendingN) {
+      pel.innerHTML = '<div class="empty" style="padding:18px"><div class="etxt" style="font-size:11px">대기 중인 신청자 없음</div></div>';
+    } else {
+      pel.innerHTML = pending.map(function(p, idx){
+        var t = (p.applied_at||'').slice(0,16).replace('T',' ');
+        return '<div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:10px;padding:12px;margin-bottom:8px">'
+          + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">'
+          + (p.profile ? '<img src="' + esc(p.profile) + '" style="width:40px;height:40px;border-radius:20px;border:1px solid var(--border2)" onerror="this.style.display=\'none\'">' : '')
+          + '<div style="flex:1"><div style="font-weight:700;color:var(--txt);font-size:13px">' + esc(p.nickname||'(닉네임 없음)') + '</div>'
+          + '<div style="font-size:10px;color:var(--txt3);margin-top:2px">ID: ' + esc(p.id) + ' · 신청 ' + esc(t) + '</div></div></div>'
+          + '<input id="pmemo-' + esc(p.id) + '" type="text" placeholder="메모 (회사·직책 — 예: 청주주류 한승훈 이사)" style="width:100%;padding:8px 10px;border:1px solid var(--border2);background:var(--surface2);border-radius:8px;color:var(--txt);font-size:11px;margin-bottom:6px;box-sizing:border-box">'
+          + '<select id="prole-' + esc(p.id) + '" style="width:100%;padding:8px 10px;border:1px solid var(--border2);background:var(--surface2);border-radius:8px;color:var(--txt);font-size:11px;margin-bottom:8px;box-sizing:border-box">'
+          + '<option value="viewer" selected>viewer · 공개 데이터만</option>'
+          + '<option value="sales">sales · 거래처·영업</option>'
+          + '<option value="admin">admin · 사용자 관리</option></select>'
+          + '<div style="display:flex;gap:6px">'
+          + '<button onclick="approveUser(\'' + esc(p.id) + '\')" style="flex:1;padding:9px;background:linear-gradient(135deg,#10b981,#059669);border:0;color:#fff;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer">✅ 승인</button>'
+          + '<button onclick="rejectUser(\'' + esc(p.id) + '\')" style="flex:1;padding:9px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.4);color:#fca5a5;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer">🚫 거부</button></div></div>';
+      }).join('');
+    }
+
+    // 활성 사용자 섹션
     var el = document.getElementById('admin-users-list');
     if (!users.length) {
-      el.innerHTML = '<div class="empty" style="padding:24px"><div class="etxt" style="font-size:11px">아직 등록된 사용자 없음<br>(사장님은 env ADMIN_KAKAO_ID로 admin 권한 부여)</div></div>';
+      el.innerHTML = '<div class="empty" style="padding:18px"><div class="etxt" style="font-size:11px">등록된 사용자 없음</div></div>';
     } else {
       el.innerHTML = users.map(function(u){
+        var rolePill = u.role==='admin'?'background:rgba(124,58,237,.2);color:#a78bfa':u.role==='sales'?'background:rgba(56,189,248,.2);color:#38bdf8':'background:rgba(148,163,184,.2);color:var(--txt2)';
         return '<div style="background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:10px 12px;margin-bottom:6px;font-size:12px">'
           + '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px">'
           + '<div style="font-weight:700;color:var(--txt)">' + esc(u.nickname || '(닉네임 없음)') + '</div>'
-          + '<span style="font-size:9px;padding:2px 8px;border-radius:10px;font-weight:700;'
-          + (u.role==='admin'?'background:rgba(124,58,237,.2);color:#a78bfa':u.role==='sales'?'background:rgba(56,189,248,.2);color:#38bdf8':'background:rgba(148,163,184,.2);color:var(--txt2)') + '">'
-          + esc(u.role||'?') + '</span></div>'
-          + '<div style="font-size:10px;color:var(--txt3);margin-top:3px">ID: ' + esc(u.id) + '</div>'
+          + '<span style="font-size:9px;padding:2px 8px;border-radius:10px;font-weight:700;' + rolePill + '">' + esc(u.role||'?') + '</span></div>'
+          + '<div style="font-size:10px;color:var(--txt3);margin-top:3px">ID: ' + esc(u.id) + (u.approved_at?' · 승인 '+esc((u.approved_at||'').slice(0,10)):'') + '</div>'
           + (u.memo ? '<div style="font-size:10px;color:var(--txt2);margin-top:3px">📝 ' + esc(u.memo) + '</div>' : '')
-          + (u.last_seen ? '<div style="font-size:9px;color:var(--txt3);margin-top:3px">최근 ' + esc(u.last_seen) + '</div>' : '')
-          + '</div>';
+          + '<div style="display:flex;gap:6px;margin-top:8px">'
+          + '<button onclick="changeRoleUser(\'' + esc(u.id) + '\', \'' + esc(u.role||'viewer') + '\')" style="flex:1;padding:6px;background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.3);color:#7dd3fc;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer">🔄 역할 변경</button>'
+          + '<button onclick="blockUser(\'' + esc(u.id) + '\', \'' + esc(u.nickname||'') + '\')" style="flex:1;padding:6px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#fca5a5;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer">🚫 차단</button>'
+          + '</div></div>';
       }).join('');
     }
+
+    // 차단 섹션
     var bel = document.getElementById('admin-blocked-list');
-    if (blocked.length) {
+    if (!blocked.length) {
+      bel.innerHTML = '<div class="empty" style="padding:18px"><div class="etxt" style="font-size:11px">차단된 사용자 없음</div></div>';
+    } else {
       bel.innerHTML = blocked.map(function(b){
         return '<div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:8px 12px;margin-bottom:5px;font-size:11px">'
-          + '<div style="color:#ef4444;font-weight:700">ID: ' + esc(b.id) + '</div>'
-          + (b.reason ? '<div style="color:var(--txt3);margin-top:2px">' + esc(b.reason) + '</div>' : '') + '</div>';
+          + '<div style="color:#ef4444;font-weight:700">' + esc(b.nickname||'(닉네임 없음)') + ' <span style="font-size:9px;color:var(--txt3)">ID: ' + esc(b.id) + '</span></div>'
+          + (b.reason ? '<div style="color:var(--txt3);margin-top:2px">사유: ' + esc(b.reason) + '</div>' : '')
+          + (b.blocked_at ? '<div style="color:var(--txt3);margin-top:2px;font-size:9px">차단 ' + esc((b.blocked_at||'').slice(0,10)) + '</div>' : '') + '</div>';
       }).join('');
     }
   } catch (e) {
@@ -2055,17 +2078,59 @@ async function loadAdminPanel(){
   }
 }
 
-function adminAddUser(){
-  var id = document.getElementById('adm-input-id').value.trim();
-  var name = document.getElementById('adm-input-name').value.trim();
-  var role = document.getElementById('adm-input-role').value;
-  var memo = document.getElementById('adm-input-memo').value.trim();
-  if (!/^\d+$/.test(id)) { alert('카카오 ID는 숫자만 입력하세요.'); return; }
-  if (!name) { alert('이름·소속을 입력하세요.'); return; }
-  var nowIso = new Date().toISOString().slice(0,10);
-  var entry = { id: id, nickname: name, role: role, memo: memo, approved_at: nowIso, last_seen: '' };
-  alert('아래 JSON을 data/allowlist.json의 users 배열에 추가:\n\n' + JSON.stringify(entry, null, 2) + '\n\n편집 페이지가 새 창으로 열립니다.');
-  window.open('https://github.com/msjung75/sewang-monitor/edit/main/data/allowlist.json', '_blank');
+async function adminPost(action, body){
+  var r = await fetch('/api/auth/kakao?action=' + action, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'same-origin',
+    body: JSON.stringify(body),
+  });
+  var d = await r.json();
+  return { ok: r.ok && d.ok, status: r.status, data: d };
+}
+
+async function approveUser(kakaoId){
+  var ad = window._adminData || {};
+  var p = (ad.pending || []).find(function(x){ return String(x.id) === String(kakaoId); });
+  if (!p) { alert('대기 목록에서 못 찾음 (새로고침 필요)'); return; }
+  var role = document.getElementById('prole-' + kakaoId).value;
+  var memo = document.getElementById('pmemo-' + kakaoId).value.trim();
+  if (!memo) { if(!confirm('메모 없이 승인할까요? (회사·직책 메모 권장)')) return; }
+  if (!confirm(p.nickname + '님을 ' + role + ' 권한으로 승인?\n자동 GitHub commit됩니다.')) return;
+  var res = await adminPost('approve', { kakao_id: kakaoId, role: role, memo: memo, nickname: p.nickname, profile: p.profile });
+  if (res.ok) { alert('✅ 승인 완료 (~30초 후 라이브 반영)'); setTimeout(loadAdminPanel, 1500); }
+  else { alert('실패 (' + res.status + '): ' + (res.data && res.data.message || res.data && res.data.error || 'unknown')); }
+}
+
+async function rejectUser(kakaoId){
+  var ad = window._adminData || {};
+  var p = (ad.pending || []).find(function(x){ return String(x.id) === String(kakaoId); });
+  var nick = (p && p.nickname) || '신청자';
+  var reason = prompt(nick + '님 거부 사유 (선택)', '');
+  if (reason === null) return;
+  if (!confirm(nick + '님을 거부 (차단 목록 추가)?')) return;
+  var res = await adminPost('reject', { kakao_id: kakaoId, reason: reason });
+  if (res.ok) { alert('🚫 거부 완료'); setTimeout(loadAdminPanel, 1500); }
+  else { alert('실패: ' + (res.data && res.data.error || res.status)); }
+}
+
+async function changeRoleUser(kakaoId, currentRole){
+  var newRole = prompt('새 역할 입력 (viewer / sales / admin)', currentRole);
+  if (!newRole) return;
+  if (['viewer','sales','admin'].indexOf(newRole) < 0) { alert('viewer / sales / admin 중 하나'); return; }
+  if (newRole === currentRole) { alert('이미 같은 역할'); return; }
+  var res = await adminPost('update_role', { kakao_id: kakaoId, role: newRole });
+  if (res.ok) { alert('역할 변경 완료'); setTimeout(loadAdminPanel, 1500); }
+  else { alert('실패: ' + (res.data && res.data.error || res.status)); }
+}
+
+async function blockUser(kakaoId, nickname){
+  if (!confirm(nickname + '님을 차단? (활성 → 차단)')) return;
+  var reason = prompt('차단 사유', '');
+  // remove from active + add to blocked. 간단하게 reject 사용
+  var res = await adminPost('reject', { kakao_id: kakaoId, reason: reason || '관리자 차단' });
+  if (res.ok) { alert('차단 완료'); setTimeout(loadAdminPanel, 1500); }
+  else { alert('실패: ' + (res.data && res.data.error || res.status)); }
 }
 </script>
 </body>
