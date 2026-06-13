@@ -232,6 +232,20 @@ async function actUpdateRole(kakaoId, role, memo) {
   await ghPutFile('data/allowlist.json', acontent, af.sha, `update_role: ${kakaoId} -> ${role}`);
   return { ok: true };
 }
+async function actUpdateUser(kakaoId, nickname, memo) {
+  if (!GITHUB_TOKEN) throw new Error('GITHUB_TOKEN 미설정');
+  const af = await ghGetFile('data/allowlist.json');
+  let acontent = af.content;
+  if (!acontent || Array.isArray(acontent)) throw new Error('allowlist 형식 오류');
+  const u = acontent.users.find(x => String(x.id) === String(kakaoId));
+  if (!u) throw new Error('user not found');
+  if (nickname !== undefined) u.nickname = nickname;
+  if (memo !== undefined) u.memo = memo;
+  u.updated_at = new Date().toISOString();
+  acontent.updated_at = new Date().toISOString();
+  await ghPutFile('data/allowlist.json', acontent, af.sha, `update_user: ${kakaoId} -> ${nickname || '(no name change)'}`);
+  return { ok: true };
+}
 async function actAddUser(kakaoId, role, nickname, memo) {
   if (!GITHUB_TOKEN) throw new Error('GITHUB_TOKEN 미설정');
   const af = await ghGetFile('data/allowlist.json');
@@ -417,6 +431,15 @@ export default async function handler(req, res) {
       const r = await actUpdateRole(String(kakao_id), role, memo);
       return res.status(200).json(r);
     }
+    if (action === 'update_user') {
+      const body = await readBody(req);
+      const { kakao_id, nickname, memo } = body;
+      if (!kakao_id) return res.status(400).json({ ok: false, error: 'kakao_id 필요' });
+      try {
+        const r = await actUpdateUser(String(kakao_id), nickname, memo);
+        return res.status(200).json(r);
+      } catch (e) { return res.status(400).json({ ok: false, error: e.message }); }
+    }
     if (action === 'remove') {
       const body = await readBody(req);
       const { kakao_id } = body;
@@ -425,7 +448,7 @@ export default async function handler(req, res) {
       return res.status(200).json(r);
     }
 
-    return res.status(400).json({ error: 'unknown_action', hint: 'action=login|me|logout|list_users|pending_count|add_user|approve|reject|update_role|remove' });
+    return res.status(400).json({ error: 'unknown_action', hint: 'action=login|me|logout|list_users|pending_count|add_user|approve|reject|update_role|update_user|remove' });
   } catch (err) {
     console.error('[auth_handler_failed]', err);
     return res.status(500).json({ error: 'auth_handler_failed', message: err.message });
