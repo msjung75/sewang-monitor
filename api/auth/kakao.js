@@ -430,6 +430,40 @@ export default async function handler(req, res) {
       return res.redirect(302, target);
     }
 
+    // ===== 공정위 brand 페이지 프록시 (DATA_GO_KR_KEY 보호) =====
+    if (action === 'franchise_page') {
+      const key = process.env.DATA_GO_KR_KEY;
+      if (!key) return res.status(500).json({ error: 'DATA_GO_KR_KEY 미설정' });
+      const pageNo = Math.max(1, parseInt(req.query.page || '1', 10));
+      const numOfRows = Math.min(1000, Math.max(1, parseInt(req.query.rows || '1000', 10)));
+      const year = req.query.year || '2024';
+      try {
+        const url = 'https://apis.data.go.kr/1130000/FftcBrandRlsInfo2_Service/getBrandinfo'
+          + '?serviceKey=' + encodeURIComponent(key)
+          + '&pageNo=' + pageNo + '&numOfRows=' + numOfRows
+          + '&resultType=json&jngBizCrtraYr=' + year;
+        const r = await fetch(url);
+        const text = await r.text();
+        let d;
+        try { d = JSON.parse(text); } catch(e){ return res.status(500).json({ error: 'parse' }); }
+        // 최소 필드만 — 응답 크기 줄이기
+        const items = (d.items || []).map(it => ({
+          n: it.brandNm || '',       // brand명
+          c: it.corpNm || '',         // 법인명
+          l: it.indutyLclasNm || '', // 업종대분류
+          m: it.indutyMlsfcNm || '', // 업종중분류
+        }));
+        res.setHeader('Cache-Control', 'public, s-maxage=86400, stale-while-revalidate=3600');
+        return res.status(200).json({
+          page: pageNo,
+          total: parseInt(d.totalCount || '0', 10),
+          items: items,
+        });
+      } catch (e) {
+        return res.status(500).json({ error: e.message });
+      }
+    }
+
     // ===== 클라이언트 안전 설정 (Kakao JS SDK 키 — 도메인 제한 적용) =====
     if (action === 'config') {
       res.setHeader('Cache-Control', 'public, s-maxage=600, stale-while-revalidate=60');

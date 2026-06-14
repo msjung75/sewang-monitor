@@ -1928,24 +1928,85 @@ function buildSegmentAliases(){
   console.log('[BRAND_ALIASES] segment alias 추가:', added, '· suffix 자동 통합:', autoAdded);
 }
 
-// v15.8: 공정위 가맹본부 11,685 brand 마스터 로드 — 자동 매칭
+// v15.9: 공정위 가맹본부 11,685 brand 마스터 — Vercel 프록시 + localStorage 영구 캐시
 async function loadFranchiseMaster(){
+  if (typeof BRAND_ALIASES === 'undefined') return;
+  // 1) localStorage 캐시 우선 (7일 유효)
   try {
-    var r = await fetch('/data/franchise_master.json', { cache: 'force-cache' });
-    if (!r.ok) return;
-    var d = await r.json();
-    window.FRANCHISE_MASTER = d;
-    // BRAND_ALIASES에 자동 등록 — compact key → 공식 brandNm
-    if (typeof BRAND_ALIASES === 'undefined' || !d.lookup) return;
-    var added = 0;
-    for (var compact in d.lookup) {
-      if (!BRAND_ALIASES[compact]) {
-        BRAND_ALIASES[compact] = d.lookup[compact];
-        added++;
+    var cached = localStorage.getItem('sewang_franchise_master');
+    if (cached) {
+      var c = JSON.parse(cached);
+      var age = Date.now() - (c.ts || 0);
+      if (age < 7 * 86400 * 1000 && c.lookup && Object.keys(c.lookup).length > 1000) {
+        applyFranchiseLookup(c.lookup);
+        return;
       }
     }
-    console.log('[FRANCHISE_MASTER] 공정위 brand 마스터 로드 — ' + Object.keys(d.lookup).length + '개 (BRAND_ALIASES +' + added + ')');
   } catch(e){}
+  // 2) 정적 파일이 있으면 그거 (다음달 cron 이후)
+  try {
+    var r = await fetch('/data/franchise_master.json', { cache: 'force-cache' });
+    if (r.ok) {
+      var d = await r.json();
+      if (d.lookup) {
+        applyFranchiseLookup(d.lookup);
+        try { localStorage.setItem('sewang_franchise_master', JSON.stringify({ ts: Date.now(), lookup: d.lookup })); } catch(e){}
+        return;
+      }
+    }
+  } catch(e){}
+  // 3) Vercel 프록시로 12 페이지 직접 fetch
+  console.log('[FRANCHISE_MASTER] 첫 로드 — Vercel 프록시로 11,685 brand 수집 시작 (한 번만)');
+  var lookup = {};
+  var totalFetched = 0;
+  try {
+    // 1페이지로 total 확인
+    var r0 = await fetch('/api/auth/kakao?action=franchise_page&page=1&rows=1000', { credentials: 'same-origin' });
+    var d0 = await r0.json();
+    if (!d0 || !d0.items) return;
+    var total = d0.total || 0;
+    var pages = Math.ceil(total / 1000);
+    addToLookup(lookup, d0.items);
+    totalFetched += d0.items.length;
+    // 나머지 페이지들
+    for (var p = 2; p <= pages && p <= 15; p++) {
+      try {
+        var rp = await fetch('/api/auth/kakao?action=franchise_page&page=' + p + '&rows=1000', { credentials: 'same-origin' });
+        var dp = await rp.json();
+        if (dp && dp.items) {
+          addToLookup(lookup, dp.items);
+          totalFetched += dp.items.length;
+        }
+      } catch(e){}
+    }
+    console.log('[FRANCHISE_MASTER] 수집 완료 — ' + totalFetched + ' brand → lookup ' + Object.keys(lookup).length);
+    applyFranchiseLookup(lookup);
+    try { localStorage.setItem('sewang_franchise_master', JSON.stringify({ ts: Date.now(), lookup: lookup })); } catch(e){}
+  } catch(e){
+    console.warn('[FRANCHISE_MASTER] fetch 실패:', e.message);
+  }
+}
+function addToLookup(lookup, items){
+  for (var i = 0; i < items.length; i++) {
+    var name = (items[i].n || '').trim();
+    if (!name) continue;
+    var compact = name.replace(/\s/g,'').toLowerCase();
+    lookup[compact] = name;
+  }
+}
+function applyFranchiseLookup(lookup){
+  if (typeof BRAND_ALIASES === 'undefined') return;
+  var added = 0;
+  for (var compact in lookup) {
+    if (!BRAND_ALIASES[compact]) {
+      BRAND_ALIASES[compact] = lookup[compact];
+      added++;
+    }
+  }
+  console.log('[FRANCHISE_MASTER] BRAND_ALIASES +' + added + ' (총 ' + Object.keys(lookup).length + ')');
+  // segment alias 재빌드 — 새 canonical key 반영
+  window._segmentAliasesBuilt = false;
+  if (typeof buildSegmentAliases === 'function') buildSegmentAliases();
 }
 async function loadYTDSummary(){
   try {
