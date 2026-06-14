@@ -2486,7 +2486,7 @@ function switchPage(pg){
   document.getElementById('pg-' + pg).classList.add('on');
   document.querySelector('.bnav-btn[data-pg="' + pg + '"]').classList.add('on');
   if (pg === 'track') renderTracked();
-  if (pg === 'map') initKakaoMap();
+  if (pg === 'map') { try { initKakaoMap(); } catch(e) { renderMapSidoStats(); } }
 }
 document.querySelectorAll('.bnav-btn').forEach(function(btn){
   btn.addEventListener('click', function(){ switchPage(btn.dataset.pg); });
@@ -3012,6 +3012,59 @@ async function mergeSelected(){
       if (q) frSearch(q);
     }, 1500);
   }, 800);
+}
+
+// ─── v15: 지도 — Kakao SDK 로드 가능하면 풀 지도, 아니면 시·도 통계만 ───
+function initKakaoMap(){
+  var mapEl = document.getElementById('kakao-map');
+  var loadEl = document.getElementById('map-loading');
+  if (!mapEl) return;
+  // Kakao JS SDK 로드 시도 — KAKAO_JS_APP_KEY env가 있으면 자동 주입 (사장님 추후)
+  if (typeof kakao === 'undefined' || !kakao.maps) {
+    if (loadEl) {
+      loadEl.innerHTML = '<div style="text-align:center;padding:20px"><div style="font-size:36px;margin-bottom:14px">🗺️</div>'
+        + '<div style="font-size:14px;font-weight:700;color:var(--txt);margin-bottom:8px">지도 SDK 미연동</div>'
+        + '<div style="font-size:11.5px;color:var(--txt3);line-height:1.6;max-width:280px">사장님이 <b style="color:var(--c1)">KAKAO_JS_APP_KEY</b>를 Vercel env에<br>등록하시면 풀 지도가 활성화됩니다.<br><br>지금은 ↓ 시·도별 분포 표만 제공</div></div>';
+    }
+  } else {
+    if (loadEl) loadEl.style.display = 'none';
+    var m = new kakao.maps.Map(mapEl, { center: new kakao.maps.LatLng(37.5665, 126.9780), level: 8 });
+    // 매장 지오코딩이 있으면 표시 (data/geocoded_ytd.json 필요)
+  }
+  renderMapSidoStats();
+}
+function renderMapSidoStats(){
+  var el = document.getElementById('map-sido-stats');
+  if (!el) return;
+  if (!window.YTD || !window.YTD.by_brand) {
+    el.innerHTML = '<div style="color:var(--txt3);font-size:12px">데이터 로딩 중…</div>';
+    return;
+  }
+  var sidoCnt = {};
+  for (var b in window.YTD.by_brand) {
+    var v = window.YTD.by_brand[b];
+    for (var m in v.monthly) {
+      var stores = v.monthly[m].stores || [];
+      for (var i = 0; i < stores.length; i++) {
+        var addr = stores[i].addr || '';
+        var match = addr.match(/^([가-힣]+(?:특별시|광역시|특별자치도|특별자치시|도))/);
+        if (match) sidoCnt[match[1]] = (sidoCnt[match[1]]||0) + 1;
+      }
+    }
+  }
+  var sorted = Object.keys(sidoCnt).map(function(k){ return [k, sidoCnt[k]]; })
+    .sort(function(a,b){ return b[1]-a[1]; }).slice(0, 10);
+  if (!sorted.length) { el.innerHTML = '<div style="color:var(--txt3)">데이터 없음</div>'; return; }
+  var maxN = sorted[0][1];
+  el.innerHTML = sorted.map(function(x){
+    var pct = (x[1]/maxN*100).toFixed(0);
+    var name = x[0].replace(/(특별시|광역시|특별자치도|특별자치시|도)$/, '');
+    return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">'
+      + '<div style="width:60px;font-size:12px;font-weight:700;color:var(--txt)">' + esc(name) + '</div>'
+      + '<div style="flex:1;height:8px;background:rgba(255,255,255,0.05);border-radius:4px;overflow:hidden"><div style="height:100%;width:' + pct + '%;background:linear-gradient(90deg,#34d399,#fbbf24)"></div></div>'
+      + '<div style="width:55px;font-size:12px;font-weight:800;text-align:right;color:var(--c3)">' + x[1].toLocaleString() + '곳</div>'
+      + '</div>';
+  }).join('');
 }
 
 // ─── v14: 거래처 매칭 (localStorage 전용 · 서버 노출 0) ───
