@@ -307,6 +307,48 @@ async function actRestoreBrand(brandName) {
   await ghPutFile('data/brand_overrides.json', c, f.sha, `restore_brand: ${brandName}`);
   return { ok: true, brandName };
 }
+async function actAddAlias(matchName, canonicalBrand, by) {
+  if (!GITHUB_TOKEN) throw new Error('GITHUB_TOKEN 미설정');
+  const f = await ghGetFile('data/brand_overrides.json');
+  let c = f.content || { excluded: [], category_overrides: {}, brand_aliases: {}, store_excluded: [], updated_at: '' };
+  if (!c.brand_aliases) c.brand_aliases = {};
+  c.brand_aliases[matchName] = canonicalBrand;
+  c.updated_at = new Date().toISOString();
+  await ghPutFile('data/brand_overrides.json', c, f.sha, `add_alias: ${matchName} -> ${canonicalBrand}`);
+  return { ok: true, matchName, canonicalBrand };
+}
+async function actRemoveAlias(matchName) {
+  if (!GITHUB_TOKEN) throw new Error('GITHUB_TOKEN 미설정');
+  const f = await ghGetFile('data/brand_overrides.json');
+  let c = f.content || { excluded: [], category_overrides: {}, brand_aliases: {}, store_excluded: [], updated_at: '' };
+  if (!c.brand_aliases) c.brand_aliases = {};
+  delete c.brand_aliases[matchName];
+  c.updated_at = new Date().toISOString();
+  await ghPutFile('data/brand_overrides.json', c, f.sha, `remove_alias: ${matchName}`);
+  return { ok: true, matchName };
+}
+async function actExcludeStore(storeId, storeName, by) {
+  if (!GITHUB_TOKEN) throw new Error('GITHUB_TOKEN 미설정');
+  const f = await ghGetFile('data/brand_overrides.json');
+  let c = f.content || { excluded: [], category_overrides: {}, brand_aliases: {}, store_excluded: [], updated_at: '' };
+  if (!c.store_excluded) c.store_excluded = [];
+  if (!c.store_excluded.some(x => x.id === storeId)) {
+    c.store_excluded.push({ id: storeId, name: storeName || '', by: by || '', at: new Date().toISOString() });
+  }
+  c.updated_at = new Date().toISOString();
+  await ghPutFile('data/brand_overrides.json', c, f.sha, `exclude_store: ${storeId}`);
+  return { ok: true, storeId };
+}
+async function actRestoreStore(storeId) {
+  if (!GITHUB_TOKEN) throw new Error('GITHUB_TOKEN 미설정');
+  const f = await ghGetFile('data/brand_overrides.json');
+  let c = f.content || { excluded: [], category_overrides: {}, brand_aliases: {}, store_excluded: [], updated_at: '' };
+  if (!c.store_excluded) c.store_excluded = [];
+  c.store_excluded = c.store_excluded.filter(x => x.id !== storeId);
+  c.updated_at = new Date().toISOString();
+  await ghPutFile('data/brand_overrides.json', c, f.sha, `restore_store: ${storeId}`);
+  return { ok: true, storeId };
+}
 async function actSetBrandCategory(brandName, category) {
   if (!GITHUB_TOKEN) throw new Error('GITHUB_TOKEN 미설정');
   if (!['sool','food','cafe',''].includes(category)) throw new Error('invalid category');
@@ -519,6 +561,34 @@ export default async function handler(req, res) {
         const r = await actSetBrandCategory(brand, category || '');
         return res.status(200).json(r);
       } catch (e) { return res.status(400).json({ ok: false, error: e.message }); }
+    }
+    if (action === 'add_alias') {
+      const body = await readBody(req);
+      const { match, brand } = body;
+      if (!match || !brand) return res.status(400).json({ ok: false, error: 'match, brand 필요' });
+      try { return res.status(200).json(await actAddAlias(match, brand, payload.n || '')); }
+      catch (e) { return res.status(400).json({ ok: false, error: e.message }); }
+    }
+    if (action === 'remove_alias') {
+      const body = await readBody(req);
+      const { match } = body;
+      if (!match) return res.status(400).json({ ok: false, error: 'match 필요' });
+      try { return res.status(200).json(await actRemoveAlias(match)); }
+      catch (e) { return res.status(400).json({ ok: false, error: e.message }); }
+    }
+    if (action === 'exclude_store') {
+      const body = await readBody(req);
+      const { store_id, store_name } = body;
+      if (!store_id) return res.status(400).json({ ok: false, error: 'store_id 필요' });
+      try { return res.status(200).json(await actExcludeStore(store_id, store_name || '', payload.n || '')); }
+      catch (e) { return res.status(400).json({ ok: false, error: e.message }); }
+    }
+    if (action === 'restore_store') {
+      const body = await readBody(req);
+      const { store_id } = body;
+      if (!store_id) return res.status(400).json({ ok: false, error: 'store_id 필요' });
+      try { return res.status(200).json(await actRestoreStore(store_id)); }
+      catch (e) { return res.status(400).json({ ok: false, error: e.message }); }
     }
 
     return res.status(400).json({ error: 'unknown_action', hint: 'action=login|me|logout|list_users|pending_count|add_user|approve|reject|update_role|update_user|remove' });
