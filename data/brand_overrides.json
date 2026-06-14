@@ -1,7 +1,13 @@
 {
-  "excluded": [],
+  "excluded": [
+    {
+      "name": "주식회사 쥬노",
+      "by": "정민성",
+      "at": "2026-06-14T01:52:37.604Z"
+    }
+  ],
   "category_overrides": {},
   "brand_aliases": {},
   "store_excluded": [],
-  "updated_at": ""
+  "updated_at": "2026-06-14T01:52:37.604Z"
 }
