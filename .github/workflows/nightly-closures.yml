@@ -1,0 +1,47 @@
+name: Nightly Closures (CLSBIZ_YMD)
+# 폐업일자 기준 cron — 옛 인허가 매장의 최근 폐업까지 포착
+# (LCPMT_YMD 기준은 신규 인허가만 잡힘 → 회전율 분석에 한계)
+on:
+  schedule:
+    - cron: '45 19 * * *'   # 매일 19:45 UTC = 04:45 KST (YTD cron 30분 뒤)
+  workflow_dispatch:
+    inputs:
+      days:
+        description: '최근 N일 폐업 (기본 14)'
+        required: false
+        default: '14'
+
+permissions:
+  contents: write
+
+jobs:
+  fetch-closures:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compute date range (KST)
+        id: dates
+        run: |
+          DAYS="${{ github.event.inputs.days || '14' }}"
+          SINCE=$(TZ=Asia/Seoul date -d "$DAYS days ago" +%Y%m%d)
+          UNTIL=$(TZ=Asia/Seoul date +%Y%m%d)
+          echo "since=$SINCE" >> $GITHUB_OUTPUT
+          echo "until=$UNTIL" >> $GITHUB_OUTPUT
+          echo "Window: $SINCE → $UNTIL ($DAYS days)"
+      - name: Fetch closures (17 시·도 × 4 type)
+        env:
+          DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+          SINCE: ${{ steps.dates.outputs.since }}
+          UNTIL: ${{ steps.dates.outputs.until }}
+        run: python3 scripts/fetch-closures.py
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/closures_recent.json
+          if git diff --cached --quiet; then
+            echo "No closures change"
+          else
+            git commit -m "Closures nightly: ${{ steps.dates.outputs.since }}~${{ steps.dates.outputs.until }}"
+            git push
+          fi

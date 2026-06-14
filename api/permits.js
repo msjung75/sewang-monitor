@@ -41,9 +41,10 @@ export default async function handler(req, res) {
   const key = process.env.DATA_GO_KR_KEY;
   if (!key) return res.status(500).json({ error: 'DATA_GO_KR_KEY 미설정' });
 
-  const { days = '7', region = 'metro', type = 'all', from = '', to = '', status: statusFilter = 'open' } = req.query;
+  const { days = '7', region = 'metro', type = 'all', from = '', to = '', status: statusFilter = 'open', dateField = 'permit' } = req.query;
   const maxPages = Math.min(parseInt(req.query.maxPages || '5', 10), 10);
   // status: open(영업 only, default) | closed(폐업·취소·말소·중지·휴업) | all(전부)
+  // dateField: permit(인허가일 LCPMT_YMD, default) | closed(폐업일자 CLSBIZ_YMD)
 
   // 조회 시작일: from(YYYYMMDD) 우선, 없으면 KST 기준 N일 전
   let since, until = '';
@@ -63,7 +64,7 @@ export default async function handler(req, res) {
   const prefixes = REGION_PREFIX[region] || REGION_PREFIX.metro;
 
   const jobs = [];
-  for (const t of types) for (const p of prefixes) jobs.push(fetchService(t, p, since, until, key, maxPages));
+  for (const t of types) for (const p of prefixes) jobs.push(fetchService(t, p, since, until, key, maxPages, dateField));
 
   try {
     const results = await Promise.all(jobs);
@@ -91,10 +92,12 @@ export default async function handler(req, res) {
   }
 }
 
-async function fetchService(typeKey, addrPrefix, since, until, key, maxPages) {
+async function fetchService(typeKey, addrPrefix, since, until, key, maxPages, dateField) {
   const svc = SERVICES[typeKey];
   const all = [];
   let capped = false;
+  // dateField=closed → CLSBIZ_YMD(폐업일자) 기준, default permit → LCPMT_YMD(인허가일)
+  const dateCol = dateField === 'closed' ? 'CLSBIZ_YMD' : 'LCPMT_YMD';
   for (let page = 1; page <= maxPages; page++) {
     const qs = new URLSearchParams({
       serviceKey: key,
@@ -102,8 +105,8 @@ async function fetchService(typeKey, addrPrefix, since, until, key, maxPages) {
       numOfRows: '100',
       returnType: 'json',
     });
-    qs.append('cond[LCPMT_YMD::GTE]', since);
-    if (until) qs.append('cond[LCPMT_YMD::LT]', until);
+    qs.append(`cond[${dateCol}::GTE]`, since);
+    if (until) qs.append(`cond[${dateCol}::LT]`, until);
     if (addrPrefix) qs.append('cond[ROAD_NM_ADDR::LIKE]', addrPrefix);
     const url = `https://apis.data.go.kr/1741000/${svc.base}/info?${qs.toString()}`;
 
@@ -121,6 +124,7 @@ async function fetchService(typeKey, addrPrefix, since, until, key, maxPages) {
 
     for (const it of arr) {
       const pd = String(it.LCPMT_YMD || '').replace(/[^0-9]/g, '').slice(0, 8);
+      const cd = String(it.CLSBIZ_YMD || '').replace(/[^0-9]/g, '').slice(0, 8);
       all.push({
         id: it.MNG_NO || ((it.BPLC_NM || '') + pd),
         name: it.BPLC_NM || '',
@@ -128,6 +132,7 @@ async function fetchService(typeKey, addrPrefix, since, until, key, maxPages) {
         typeLabel: svc.label,
         upte: it.SNTTN_BZSTAT_NM || '',
         permitDate: pd,
+        closedDate: cd,
         status: it.DTL_SALS_STTS_NM || it.SALS_STTS_NM || '',
         addr: it.ROAD_NM_ADDR || it.LOTNO_ADDR || '',
         tel: it.TELNO || '',
