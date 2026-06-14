@@ -432,14 +432,11 @@ export default async function handler(req, res) {
 
     // ===== 클라이언트 안전 설정 (Kakao JS SDK 키 등) =====
     if (action === 'config') {
-      res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=300');
+      res.setHeader('Cache-Control', 'no-store');  // 등록 직후 캐시 방지
       const k = process.env.KAKAO_JS_KEY || process.env.KAKAO_JS_APP_KEY || '';
-      // 디버그 — 어떤 KAKAO 변수가 보이는지 (값은 마스킹)
-      const envKeys = Object.keys(process.env).filter(x => x.toUpperCase().indexOf('KAKAO') >= 0);
       return res.status(200).json({
         kakaoJsKey: k,
-        // 디버그용 — 변수명만 list
-        _debug: { envKeys: envKeys, hasJsKey: !!process.env.KAKAO_JS_KEY, hasAppKey: !!process.env.KAKAO_JS_APP_KEY },
+        keyLen: k.length,  // 디버그: 값 길이만 (값 노출 X)
       });
     }
 
