@@ -1654,33 +1654,18 @@ function frFiltered(){
   // 다른 chip은 YTD 사용 (사장님 안)
   if (!window.YTD || !window.YTD.by_brand) return BRANDS;
   var excluded = window._excludedBrandSet || {};
-  // 1패스 효율적 그룹화 — alias + prefix 짧은 것 우선
-  // 모든 brand를 alias-length 짧은 순으로 정렬해서 처리
-  var brandList = [];
+  // 단순 1패스 그룹화 — O(n), BRAND_ALIASES 적용
+  var groups = {};
   for (var b in window.YTD.by_brand) {
     if (excluded[b]) continue;
+    var v = window.YTD.by_brand[b];
     var bCompact = b.replace(/\s/g,'').toLowerCase();
     var alias = (typeof BRAND_ALIASES !== 'undefined' && BRAND_ALIASES[bCompact]) || b;
-    brandList.push({ b: b, bCompact: bCompact, alias: alias, aliasCompact: alias.replace(/\s/g,'').toLowerCase() });
-  }
-  // 짧은 alias 먼저 처리 — canonical 정함
-  brandList.sort(function(a,b){ return a.aliasCompact.length - b.aliasCompact.length; });
-  var groups = {};
-  brandList.forEach(function(x){
-    var v = window.YTD.by_brand[x.b];
-    // prefix 매칭 — 짧은 alias가 너무 짧으면 무관한 brand 합쳐질 수 있음 (예: 「야화」가 「야화 혼술바」와 다름)
-    // 최소 5글자 + 명시적 BRAND_ALIASES 등록된 경우에만
-    var canonical = x.aliasCompact;
-    for (var existing in groups) {
-      if (existing.length >= 5 && existing.length < x.aliasCompact.length
-          && (x.bCompact.indexOf(existing) === 0 || x.aliasCompact.indexOf(existing) === 0)) {
-        canonical = existing; break;
-      }
+    var aliasCompact = alias.replace(/\s/g,'').toLowerCase();
+    if (!groups[aliasCompact]) {
+      groups[aliasCompact] = { brand: alias, total_open: 0, total_closed: 0, monthly: {} };
     }
-    if (!groups[canonical]) {
-      groups[canonical] = { brand: x.alias, total_open: 0, total_closed: 0, monthly: {} };
-    }
-    var g = groups[canonical];
+    var g = groups[aliasCompact];
     g.total_open += v.total_open;
     g.total_closed += v.total_closed;
     for (var m in v.monthly) {
@@ -1689,7 +1674,7 @@ function frFiltered(){
       g.monthly[m].closed += v.monthly[m].closed;
       g.monthly[m].stores = g.monthly[m].stores.concat(v.monthly[m].stores || []);
     }
-  });
+  }
   var arr = [];
   for (var k in groups) {
     var g = groups[k];
@@ -1790,11 +1775,41 @@ async function loadBrandOverrides(){
     try { renderFr(); } catch(e){}
   } catch(e) {}
 }
+// 명시적 BRAND_ALIASES 기반으로 YTD segment brand들의 alias를 한 번에 자동 추가
+function buildSegmentAliases(){
+  if (!window.YTD || !window.YTD.by_brand || typeof BRAND_ALIASES === 'undefined') return;
+  if (window._segmentAliasesBuilt) return;
+  window._segmentAliasesBuilt = true;
+  // 명시적 alias의 canonical keys (compact 기준, 길이 >= 5)
+  var canons = [];
+  for (var k in BRAND_ALIASES) {
+    if (k.length >= 5) canons.push({ key: k, val: BRAND_ALIASES[k] });
+  }
+  // 짧은 순으로 정렬 (짧은 prefix 우선)
+  canons.sort(function(a,b){ return a.key.length - b.key.length; });
+  // 모든 YTD brand 검사 — 이미 alias 있으면 skip
+  var added = 0;
+  for (var b in window.YTD.by_brand) {
+    var bCompact = b.replace(/\s/g,'').toLowerCase();
+    if (BRAND_ALIASES[bCompact]) continue;
+    for (var i = 0; i < canons.length; i++) {
+      var c = canons[i];
+      if (bCompact.length > c.key.length && bCompact.indexOf(c.key) === 0) {
+        BRAND_ALIASES[bCompact] = c.val;
+        added++;
+        break;
+      }
+    }
+  }
+  console.log('[BRAND_ALIASES] segment alias 자동 추가:', added);
+}
+
 async function loadYTDSummary(){
   try {
     var r = await fetch('/data/ytd_2026_summary.json?_=' + Date.now(), { cache: 'no-store' });
     if (!r.ok) return;
     window.YTD = await r.json();
+    buildSegmentAliases();
     // 「프랜차이즈」 상단 안내문 집계 표시
     var sumEl = document.getElementById('fr-ytd-summary');
     if (sumEl && window.YTD.by_month) {
