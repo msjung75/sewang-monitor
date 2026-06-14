@@ -727,6 +727,20 @@ body{
     <div class="card-title">🏷️ 카테고리 override</div>
     <div id="admin-category-overrides"></div>
   </div>
+  <!-- v14: 거래처 매칭 (사장님 브라우저 전용, 서버·repo 노출 0) -->
+  <div class="card" style="margin-bottom:12px;border-left:3px solid #34d399">
+    <div class="card-title">💼 거래처 매칭 <span style="font-size:9px;color:#34d399;background:rgba(52,211,153,.12);padding:2px 6px;border-radius:6px;margin-left:6px;font-weight:700">이 브라우저만 · 비공개</span></div>
+    <div style="font-size:11px;color:var(--txt3);line-height:1.6;margin-bottom:10px;padding:9px 11px;background:rgba(52,211,153,.05);border:1px solid rgba(52,211,153,.15);border-radius:8px">
+      🔒 등록한 거래처 brand는 <b style="color:#34d399">이 기기 localStorage</b>에만 저장됩니다.<br>
+      서버·GitHub repo·다른 직원·외부 — 어디에도 노출되지 않습니다.<br>
+      매칭되는 신규업장에 <b>💼 거래</b> 뱃지가 표시됩니다.
+    </div>
+    <div style="display:flex;gap:6px;margin-bottom:10px">
+      <input id="cust-input" type="text" placeholder="거래처 brand명 (예: ○○주점)" style="flex:1;padding:9px 11px;border:1px solid var(--border2);background:var(--surface2);border-radius:8px;color:var(--txt);font-size:12px">
+      <button onclick="addCustomer()" style="padding:9px 14px;background:linear-gradient(135deg,#34d399,#10b981);color:#fff;border:0;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">+ 추가</button>
+    </div>
+    <div id="customer-list"></div>
+  </div>
 </div>
 
 <div class="page" id="pg-track">
@@ -2071,9 +2085,12 @@ function selectBrand(encBrand, silent){
   var isAdminFr = window.ME && window.ME.role === 'admin';
   var fdt = document.getElementById('fr-detail-title');
   if (isAdminFr && fdt) {
-    fdt.innerHTML = '<span style="flex:1">🏪 ' + esc(g.brand) + '</span>'
-      + '<button onclick="brandMergeMenu(\'' + encodeURIComponent(g.brand) + '\')" style="padding:6px 12px;background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.35);color:#c4b5fd;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer;margin-right:5px">🔗 묶기</button>'
-      + '<button onclick="brandMenu(\'' + encodeURIComponent(g.brand) + '\')" style="padding:6px 12px;background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.3);color:#7dd3fc;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer">📋 분류</button>';
+    var isCust = isCustomerBrand(g.brand);
+    var custBadge = isCust ? '<span style="background:rgba(52,211,153,.18);color:#34d399;font-size:10px;font-weight:800;padding:3px 7px;border-radius:6px;margin-left:8px">💼 거래</span>' : '';
+    fdt.innerHTML = '<span style="flex:1">🏪 ' + esc(g.brand) + custBadge + '</span>'
+      + '<button onclick="brandMergeMenu(\'' + encodeURIComponent(g.brand) + '\')" style="padding:6px 10px;background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.35);color:#c4b5fd;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer;margin-right:5px">🔗 묶기</button>'
+      + '<button onclick="brandMenu(\'' + encodeURIComponent(g.brand) + '\')" style="padding:6px 10px;background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.3);color:#7dd3fc;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer;margin-right:5px">📋 분류</button>'
+      + '<button onclick="toggleCustomer(\'' + encodeURIComponent(g.brand) + '\')" style="padding:6px 10px;background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.3);color:#34d399;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer">' + (isCust ? '❌ 거래제거' : '💼 거래등록') + '</button>';
   }
   var el = document.getElementById('fr-detail');
   var ytd = ytdBrandData(g.brand);
@@ -2102,11 +2119,64 @@ function selectBrand(encBrand, silent){
       html += '</div></div>';
     }
     html += '</div></div>';
-    // 매장 리스트 (등록일 desc)
-    var allStores = [];
+    // ─── v16: 💡 인사이트 카드 (자동 분석) ───
+    var insightStores = [];
     Object.keys(ytd.monthly).forEach(function(m){
-      allStores = allStores.concat(ytd.monthly[m].stores || []);
+      insightStores = insightStores.concat(ytd.monthly[m].stores || []);
     });
+    var openCnt = ytd.total_open, closedCnt = ytd.total_closed;
+    var churnRate = (openCnt + closedCnt) ? (closedCnt / (openCnt + closedCnt) * 100).toFixed(0) : 0;
+    // 가속도 — 최근 3개월 vs 직전 3개월
+    var months = Object.keys(ytd.monthly).sort();
+    var recent3 = 0, prev3 = 0;
+    for (var mi = 0; mi < months.length; mi++) {
+      var mv = ytd.monthly[months[mi]];
+      var n = (mv.open||0);
+      if (mi < 3) prev3 += n; else recent3 += n;
+    }
+    var pace = '→ 유지', paceColor = 'var(--txt2)';
+    if (prev3 > 0) {
+      var diff = ((recent3 - prev3) / prev3 * 100);
+      if (diff > 30) { pace = '↗️ 가속 +' + diff.toFixed(0) + '%'; paceColor = '#34d399'; }
+      else if (diff < -30) { pace = '↘️ 감속 ' + diff.toFixed(0) + '%'; paceColor = '#f87171'; }
+      else pace = '→ 유지 (' + (diff>=0?'+':'') + diff.toFixed(0) + '%)';
+    }
+    // 지역 집중도 — TOP 3 시·도
+    var sidoCnt = {};
+    for (var si = 0; si < insightStores.length; si++) {
+      var addr = insightStores[si].addr || '';
+      var m1 = addr.match(/^([가-힣]+(?:특별시|광역시|특별자치도|특별자치시|도))/);
+      if (m1) sidoCnt[m1[1]] = (sidoCnt[m1[1]]||0) + 1;
+    }
+    var sidoTop = Object.keys(sidoCnt).map(function(k){ return [k, sidoCnt[k]]; })
+      .sort(function(a,b){ return b[1]-a[1]; }).slice(0, 3);
+    var sidoStr = sidoTop.length ? sidoTop.map(function(x){ return x[0].replace(/(특별시|광역시|특별자치도|특별자치시|도)$/, '') + ' ' + x[1]; }).join(' · ') : '데이터 부족';
+    // 외부 트렌드 링크
+    var brandQ = encodeURIComponent(g.brand);
+    html += '<div class="card" style="margin-bottom:12px;padding:16px;border-left:3px solid #fbbf24">';
+    html += '<div style="font-size:12px;color:var(--txt2);font-weight:700;margin-bottom:12px;letter-spacing:-0.2px">💡 자동 인사이트</div>';
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">';
+    html += '<div style="padding:10px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px">'
+      + '<div style="font-size:10px;color:var(--txt3);margin-bottom:4px">📈 출점 페이스</div>'
+      + '<div style="font-size:13px;font-weight:800;color:' + paceColor + '">' + pace + '</div></div>';
+    html += '<div style="padding:10px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px">'
+      + '<div style="font-size:10px;color:var(--txt3);margin-bottom:4px">🔄 회전율 (폐/합)</div>'
+      + '<div style="font-size:13px;font-weight:800;color:' + (churnRate>30?'#f87171':churnRate>15?'#fbbf24':'#34d399') + '">' + churnRate + '%</div></div>';
+    html += '</div>';
+    html += '<div style="padding:10px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;margin-bottom:10px">'
+      + '<div style="font-size:10px;color:var(--txt3);margin-bottom:4px">📍 지역 집중도 TOP 3</div>'
+      + '<div style="font-size:12px;font-weight:700;color:var(--txt)">' + sidoStr + '</div></div>';
+    // 외부 트렌드 분석 링크 — Google·Naver Trends·통합검색
+    html += '<div style="font-size:10px;color:var(--txt3);margin-bottom:6px">🔍 키워드 트렌드</div>';
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">';
+    html += '<a href="https://datalab.naver.com/keyword/trendSearch.naver?query=' + brandQ + '" target="_blank" style="display:block;padding:8px 10px;background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.25);border-radius:7px;color:#6ee7b7;font-size:11.5px;font-weight:700;text-decoration:none;text-align:center">📊 N 데이터랩</a>';
+    html += '<a href="https://trends.google.com/trends/explore?geo=KR&q=' + brandQ + '" target="_blank" style="display:block;padding:8px 10px;background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.25);border-radius:7px;color:#7dd3fc;font-size:11.5px;font-weight:700;text-decoration:none;text-align:center">📈 Google Trends</a>';
+    html += '<a href="https://search.naver.com/search.naver?query=' + brandQ + '+가맹문의" target="_blank" style="display:block;padding:8px 10px;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.25);border-radius:7px;color:#fcd34d;font-size:11.5px;font-weight:700;text-decoration:none;text-align:center">🤝 가맹문의 검색</a>';
+    html += '<a href="https://map.naver.com/p/search/' + brandQ + '" target="_blank" style="display:block;padding:8px 10px;background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.25);border-radius:7px;color:#c4b5fd;font-size:11.5px;font-weight:700;text-decoration:none;text-align:center">📍 N 플레이스 전체</a>';
+    html += '</div>';
+    html += '</div>';
+    // ─── 매장 리스트 ───
+    var allStores = insightStores;
     allStores.sort(function(a,b){ return (b.permitDate||'').localeCompare(a.permitDate||''); });
     html += '<div style="font-size:11px;color:var(--txt3);font-weight:600;margin-bottom:8px">올해 매장 ' + allStores.length + '곳 · 최신순</div>';
     html += allStores.slice(0,60).map(function(s){
@@ -2598,6 +2668,7 @@ function init(){
   loadNightlyCache(); // 새벽 cron 결과 자동 로드 (서울·경기만 있으면 보강, 전국이면 덮어쓰기)
   loadYTDSummary();   // YTD 6개월 summary (프랜차이즈 클릭 시 올해 출점/폐점 표시용)
   loadBrandOverrides(); // admin 브랜드 분류 관리 (제외/카테고리)
+  setTimeout(function(){ try { renderCustomers(); } catch(e){} }, 100); // v14 거래처 (localStorage)
   if (ST.trend30 && ST.trend30.stores) {
     ST.trend30.stores = ST.trend30.stores.filter(function(s){ return !isExcluded(s); });
   }
@@ -2941,6 +3012,94 @@ async function mergeSelected(){
       if (q) frSearch(q);
     }, 1500);
   }, 800);
+}
+
+// ─── v14: 거래처 매칭 (localStorage 전용 · 서버 노출 0) ───
+function loadCustomers(){
+  try {
+    var raw = localStorage.getItem('sewang_customers');
+    if (!raw) return [];
+    var d = JSON.parse(raw);
+    return Array.isArray(d.brands) ? d.brands : [];
+  } catch(e) { return []; }
+}
+function saveCustomers(arr){
+  try {
+    localStorage.setItem('sewang_customers', JSON.stringify({ brands: arr, updated: new Date().toISOString() }));
+  } catch(e) { alert('저장 실패: ' + e.message); }
+}
+function customerCompactSet(){
+  var set = {};
+  loadCustomers().forEach(function(b){ set[b.replace(/\s/g,'').toLowerCase()] = b; });
+  return set;
+}
+function isCustomerBrand(brand){
+  if (!brand) return false;
+  var c = brand.replace(/\s/g,'').toLowerCase();
+  var set = customerCompactSet();
+  if (set[c]) return true;
+  // alias 적용
+  if (typeof BRAND_ALIASES !== 'undefined' && BRAND_ALIASES[c]) {
+    var aliasC = BRAND_ALIASES[c].replace(/\s/g,'').toLowerCase();
+    if (set[aliasC]) return true;
+  }
+  return false;
+}
+function addCustomer(){
+  var input = document.getElementById('cust-input');
+  var name = (input.value||'').trim();
+  if (!name) { alert('brand명 입력'); return; }
+  var arr = loadCustomers();
+  if (arr.indexOf(name) >= 0) { alert('이미 등록됨'); return; }
+  arr.push(name);
+  saveCustomers(arr);
+  input.value = '';
+  renderCustomers();
+  showToast('💼', '거래처 추가', name);
+  // 화면 갱신
+  if (typeof frRender === 'function') frRender();
+}
+function removeCustomer(encName){
+  var name = decodeURIComponent(encName);
+  var arr = loadCustomers().filter(function(b){ return b !== name; });
+  saveCustomers(arr);
+  renderCustomers();
+  if (typeof frRender === 'function') frRender();
+}
+function toggleCustomer(encBrand){
+  var brand = decodeURIComponent(encBrand);
+  var arr = loadCustomers();
+  var idx = arr.indexOf(brand);
+  if (idx >= 0) {
+    arr.splice(idx, 1);
+    saveCustomers(arr);
+    showToast('❌', '거래처 제거', brand);
+  } else {
+    arr.push(brand);
+    saveCustomers(arr);
+    showToast('💼', '거래처 등록', brand + ' (이 브라우저만)');
+  }
+  renderCustomers();
+  // brand 헤더 재렌더 — selectBrand 다시 호출
+  if (typeof FR_SELECTED !== 'undefined' && FR_SELECTED === brand) {
+    selectBrand(encBrand, true);
+  }
+}
+function renderCustomers(){
+  var el = document.getElementById('customer-list');
+  if (!el) return;
+  var arr = loadCustomers();
+  if (!arr.length) {
+    el.innerHTML = '<div class="empty" style="padding:14px"><div class="etxt" style="font-size:11px;color:var(--txt3)">거래처 brand 등록 없음</div></div>';
+    return;
+  }
+  el.innerHTML = '<div style="font-size:10px;color:var(--txt3);margin-bottom:6px">총 <b style="color:#34d399">' + arr.length + '개</b></div>'
+    + arr.map(function(b){
+      return '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(52,211,153,.05);border:1px solid rgba(52,211,153,.15);border-radius:8px;margin-bottom:6px">'
+        + '<span style="flex:1;font-size:12px;font-weight:600;color:var(--txt)">💼 ' + esc(b) + '</span>'
+        + '<button onclick="removeCustomer(\'' + encodeURIComponent(b) + '\')" style="padding:4px 8px;background:transparent;border:1px solid rgba(239,68,68,0.35);color:#f87171;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer">삭제</button>'
+        + '</div>';
+    }).join('');
 }
 
 // 브랜드 통째로 다른 브랜드로 묶기 (admin) — 모든 매장이 자동 합산됨
