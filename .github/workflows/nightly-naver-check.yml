@@ -1,7 +1,7 @@
 name: Nightly Naver N-Check (priority queue)
 on:
   schedule:
-    - cron: '45 19 * * *'   # 매일 19:45 UTC = 04:45 KST (incremental 30분 뒤)
+    - cron: '30 20 * * *'   # 매일 20:30 UTC = 05:30 KST (YTD 04:15 + 1시간 이상 분리 — push 충돌 회피)
   workflow_dispatch:
     inputs:
       limit:
@@ -23,14 +23,30 @@ jobs:
           NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
           NAVER_DAILY_LIMIT: ${{ inputs.limit || '5000' }}
         run: python3 scripts/naver-nstat-check.py
-      - name: Commit cache
+      - name: Commit cache (with rebase retry)
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/naver_nstat_cache.json
           if git diff --cached --quiet; then
             echo "No changes"
-          else
-            git commit -m "N-check $(TZ=Asia/Seoul date +%Y-%m-%d): cache updated"
-            git push
+            exit 0
           fi
+          # 3회 재시도 — push 충돌 시 rebase 후 retry
+          for attempt in 1 2 3; do
+            git commit -m "N-check $(TZ=Asia/Seoul date +%Y-%m-%d): cache updated" 2>/dev/null || true
+            if git push; then
+              echo "Pushed on attempt $attempt"
+              exit 0
+            fi
+            echo "Push failed (attempt $attempt) — fetching + rebasing"
+            # 변경 보존 + rebase
+            git stash --include-untracked || true
+            git fetch origin main
+            git reset --hard origin/main
+            git stash pop || true
+            git add data/naver_nstat_cache.json
+            sleep 5
+          done
+          echo "All push attempts failed"
+          exit 1
