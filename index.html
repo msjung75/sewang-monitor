@@ -2053,6 +2053,62 @@ function addToLookup(lookup, items){
     lookup[compact] = name;
   }
 }
+
+// v15.13: 공정위 가맹점 수·매출 통계 lazy fetch + localStorage 7일 캐시
+async function loadFranchiseStats(){
+  // 캐시 확인
+  try {
+    var cached = localStorage.getItem('sewang_franchise_stats');
+    if (cached) {
+      var c = JSON.parse(cached);
+      if (Date.now() - (c.ts||0) < 7 * 86400 * 1000 && c.stats) {
+        window.FRANCHISE_STATS = c.stats;
+        return;
+      }
+    }
+  } catch(e){}
+  // 12 페이지 fetch — 1초당 5건 throttle
+  console.log('[FRANCHISE_STATS] 첫 로드 — 가맹점수·매출 수집 시작');
+  var stats = {}; // compact key → { f: 가맹점수, a: 평균매출 }
+  try {
+    var r0 = await fetch('/api/auth/kakao?action=franchise_stats&page=1&rows=1000', { credentials: 'same-origin' });
+    var d0 = await r0.json();
+    if (!d0 || !d0.items) return;
+    var pages = Math.ceil((d0.total||0) / 1000);
+    addStats(stats, d0.items);
+    for (var p = 2; p <= pages && p <= 15; p++) {
+      try {
+        var rp = await fetch('/api/auth/kakao?action=franchise_stats&page=' + p + '&rows=1000', { credentials: 'same-origin' });
+        var dp = await rp.json();
+        if (dp && dp.items) addStats(stats, dp.items);
+      } catch(e){}
+    }
+    window.FRANCHISE_STATS = stats;
+    try { localStorage.setItem('sewang_franchise_stats', JSON.stringify({ ts: Date.now(), stats: stats })); } catch(e){}
+    console.log('[FRANCHISE_STATS] 수집 완료 — ' + Object.keys(stats).length + ' brand');
+  } catch(e){
+    console.warn('[FRANCHISE_STATS] fetch 실패:', e.message);
+  }
+}
+function addStats(stats, items){
+  for (var i = 0; i < items.length; i++) {
+    var name = (items[i].n || '').trim();
+    if (!name) continue;
+    var compact = name.replace(/\s/g,'').toLowerCase();
+    stats[compact] = { f: items[i].f || 0, a: items[i].a || 0 };
+  }
+}
+function lookupFranchiseStats(brand){
+  if (!window.FRANCHISE_STATS) return null;
+  var compact = brand.replace(/\s/g,'').toLowerCase();
+  if (window.FRANCHISE_STATS[compact]) return window.FRANCHISE_STATS[compact];
+  // alias 적용
+  if (typeof BRAND_ALIASES !== 'undefined' && BRAND_ALIASES[compact]) {
+    var aliasCompact = BRAND_ALIASES[compact].replace(/\s/g,'').toLowerCase();
+    if (window.FRANCHISE_STATS[aliasCompact]) return window.FRANCHISE_STATS[aliasCompact];
+  }
+  return null;
+}
 function applyFranchiseLookup(lookup){
   if (typeof BRAND_ALIASES === 'undefined') return;
   var added = 0, trimAdded = 0;
@@ -2099,6 +2155,8 @@ async function loadYTDSummary(){
     buildSegmentAliases();
     // v15.11: 옛 인허가 매장 폐업 lazy fetch (백그라운드)
     setTimeout(function(){ try { loadClosuresLazy(); } catch(e){} }, 1500);
+    // v15.13: 공정위 가맹점수·매출 lazy fetch (백그라운드)
+    setTimeout(function(){ try { loadFranchiseStats(); } catch(e){} }, 3000);
     // 「프랜차이즈」 상단 안내문 집계 표시
     var sumEl = document.getElementById('fr-ytd-summary');
     if (sumEl && window.YTD.by_month) {
@@ -2406,6 +2464,22 @@ function selectBrand(encBrand, silent){
     html += '<div style="padding:10px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;margin-bottom:10px">'
       + '<div style="font-size:10px;color:var(--txt3);margin-bottom:4px">📍 지역 집중도 TOP 3</div>'
       + '<div style="font-size:12px;font-weight:700;color:var(--txt)">' + sidoStr + '</div></div>';
+    // v15.13: 공정위 등록 가맹점수 vs 우리 잡은 매장수 비교
+    var fStat = lookupFranchiseStats(g.brand);
+    if (fStat && fStat.f > 0) {
+      var ourCnt = insightStores.length;
+      var gap = ((ourCnt - fStat.f) / fStat.f * 100).toFixed(0);
+      var gapColor = Math.abs(gap) > 30 ? '#fbbf24' : '#34d399';
+      var avgSlsM = fStat.a ? Math.round(fStat.a / 1000) : 0; // 천원 → 백만원
+      html += '<div style="padding:10px;background:rgba(56,189,248,0.06);border:1px solid rgba(56,189,248,0.2);border-radius:8px;margin-bottom:10px">'
+        + '<div style="font-size:10px;color:var(--txt3);margin-bottom:6px">📋 공정위 등록 (2024년 기준)</div>'
+        + '<div style="display:flex;gap:10px;font-size:12px;font-weight:700;flex-wrap:wrap">'
+        + '<div style="flex:1;min-width:90px"><span style="color:var(--txt3)">전국 가맹점 </span><span style="color:#7dd3fc">' + fStat.f.toLocaleString() + '개</span></div>'
+        + (avgSlsM ? '<div style="flex:1;min-width:90px"><span style="color:var(--txt3)">평균매출 </span><span style="color:#fbbf24">' + avgSlsM.toLocaleString() + '백만</span></div>' : '')
+        + '</div>'
+        + '<div style="font-size:11px;color:var(--txt3);margin-top:6px">우리 잡은 올해 매장 <b style="color:var(--txt2)">' + ourCnt + '개</b> · 전국 대비 <b style="color:' + gapColor + '">' + (gap >= 0 ? '+' : '') + gap + '%</b></div>'
+        + '</div>';
+    }
     // 외부 트렌드 분석 링크 — 사장님 안: Google Trends + N 플레이스 전체만
     html += '<div style="font-size:10px;color:var(--txt3);margin-bottom:6px">🔍 키워드 트렌드</div>';
     html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">';
