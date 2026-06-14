@@ -430,6 +430,38 @@ export default async function handler(req, res) {
       return res.redirect(302, target);
     }
 
+    // ===== 공정위 brand 가맹점 현황 프록시 (15110241 — 매장수·매출) =====
+    if (action === 'franchise_stats') {
+      const key = process.env.DATA_GO_KR_KEY;
+      if (!key) return res.status(500).json({ error: 'DATA_GO_KR_KEY 미설정' });
+      const pageNo = Math.max(1, parseInt(req.query.page || '1', 10));
+      const numOfRows = Math.min(1000, Math.max(1, parseInt(req.query.rows || '1000', 10)));
+      const year = req.query.year || '2024';
+      try {
+        const url = 'https://apis.data.go.kr/1130000/FftcBrandFrcsStatsService/getBrandFrcsStats'
+          + '?serviceKey=' + encodeURIComponent(key)
+          + '&pageNo=' + pageNo + '&numOfRows=' + numOfRows
+          + '&resultType=json&yr=' + year;
+        const r = await fetch(url);
+        const text = await r.text();
+        let d;
+        try { d = JSON.parse(text); } catch(e){ return res.status(500).json({ error: 'parse' }); }
+        const items = (d.items || []).map(it => ({
+          n: it.brandNm || '',
+          f: parseInt(it.frcsCnt || '0', 10) || 0,      // 가맹점수
+          a: parseInt(it.avrgSlsAmt || '0', 10) || 0,    // 평균매출(천원)
+        }));
+        res.setHeader('Cache-Control', 'public, s-maxage=86400, stale-while-revalidate=3600');
+        return res.status(200).json({
+          page: pageNo,
+          total: parseInt(d.totalCount || '0', 10),
+          items: items,
+        });
+      } catch (e) {
+        return res.status(500).json({ error: e.message });
+      }
+    }
+
     // ===== 공정위 brand 페이지 프록시 (DATA_GO_KR_KEY 보호) =====
     if (action === 'franchise_page') {
       const key = process.env.DATA_GO_KR_KEY;

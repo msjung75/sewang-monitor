@@ -2381,28 +2381,6 @@ function selectBrand(encBrand, silent){
       else if (diff < -30) { pace = '↘️ 감속 ' + diff.toFixed(0) + '%'; paceColor = '#f87171'; }
       else pace = '→ 유지 (' + (diff>=0?'+':'') + diff.toFixed(0) + '%)';
     }
-    // v15.12: 백화점·몰 입점 매장 분리 (사장님 영업 노하우)
-    var DEPT_RE = /(백화점|아울렛|몰|스퀘어|플라자|복합문화|타워|센터|월드|파크|점|stn|station)/i;
-    var DEPT_STRONG = /(백화점|아울렛|복합쇼핑|스타필드|롯데몰|현대몰|신세계|애비뉴엘)/i;
-    var deptStores = 0, deptClosed = 0;
-    var nonDeptOpen = 0, nonDeptClosed = 0;
-    for (var di = 0; di < insightStores.length; di++) {
-      var s = insightStores[di];
-      var addrL = (s.addr || '').toLowerCase();
-      var nameL = (s.name || '').toLowerCase();
-      var isDept = DEPT_STRONG.test(addrL + ' ' + nameL);
-      if (isDept) {
-        deptStores++;
-        if (s.closed) deptClosed++;
-      } else {
-        if (s.closed) nonDeptClosed++;
-        else nonDeptOpen++;
-      }
-    }
-    var deptRatio = insightStores.length ? Math.round(deptStores / insightStores.length * 100) : 0;
-    // 비-백화점 매장만의 회전율 — 더 정확한 사양 판단
-    var coreChurn = (nonDeptOpen + nonDeptClosed) ? Math.round(nonDeptClosed / (nonDeptOpen + nonDeptClosed) * 100) : 0;
-
     // 지역 집중도 — TOP 3 시·도
     var sidoCnt = {};
     for (var si = 0; si < insightStores.length; si++) {
@@ -2428,17 +2406,6 @@ function selectBrand(encBrand, silent){
     html += '<div style="padding:10px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;margin-bottom:10px">'
       + '<div style="font-size:10px;color:var(--txt3);margin-bottom:4px">📍 지역 집중도 TOP 3</div>'
       + '<div style="font-size:12px;font-weight:700;color:var(--txt)">' + sidoStr + '</div></div>';
-    // v15.12: 백화점 입점 비율 + 코어 회전율 (사장님 영업 노하우)
-    if (deptStores > 0) {
-      html += '<div style="padding:10px;background:rgba(167,139,250,0.06);border:1px solid rgba(167,139,250,0.2);border-radius:8px;margin-bottom:10px">'
-        + '<div style="font-size:10px;color:var(--txt3);margin-bottom:6px">🏬 백화점·복합몰 입점 분리 <span style="color:#a78bfa;font-weight:700">(단기 회전 정상)</span></div>'
-        + '<div style="display:flex;gap:10px;font-size:12px;font-weight:700">'
-        + '<div style="flex:1"><span style="color:var(--txt3)">백화점 비율 </span><span style="color:#c4b5fd">' + deptRatio + '%</span> (' + deptStores + '개)</div>'
-        + '<div style="flex:1"><span style="color:var(--txt3)">코어 회전율 </span><span style="color:' + (coreChurn>30?'#f87171':coreChurn>15?'#fbbf24':'#34d399') + '">' + coreChurn + '%</span></div>'
-        + '</div>'
-        + '<div style="font-size:10px;color:var(--txt3);margin-top:6px;line-height:1.4">백화점 매장은 단기 계약·시즌 마케팅으로 회전율 자연 높음. <b>코어 회전율</b>로 진짜 사양 판단.</div>'
-        + '</div>';
-    }
     // 외부 트렌드 분석 링크 — 사장님 안: Google Trends + N 플레이스 전체만
     html += '<div style="font-size:10px;color:var(--txt3);margin-bottom:6px">🔍 키워드 트렌드</div>';
     html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">';
