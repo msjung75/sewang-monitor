@@ -618,10 +618,18 @@ body{
     </table>
   </div>
 
-  <!-- 검색창 — 순위 테이블 아래 (사장님 안) -->
-  <div style="margin-bottom:12px;position:relative">
-    <input id="fr-search" type="text" placeholder="🔍 브랜드·매장 검색 (순위에 없는 것도 검색)" style="width:100%;padding:13px 16px;border:1px solid var(--border2);background:var(--surface);border-radius:12px;color:var(--txt);font-size:14px;box-sizing:border-box;backdrop-filter:blur(10px)" oninput="frSearch(this.value)">
-    <div id="fr-search-results" style="display:none;margin-top:6px;background:var(--surface);border:1px solid var(--border-hi);border-radius:12px;max-height:400px;overflow-y:auto;box-shadow:0 12px 32px rgba(0,0,0,0.5);backdrop-filter:blur(20px)"></div>
+  <!-- 검색창 + 묶기 멀티 선택 (사장님 안) -->
+  <div style="margin-bottom:12px">
+    <input id="fr-search" type="text" placeholder="🔍 브랜드·매장 검색 (순위에 없는 것도)" style="width:100%;padding:13px 16px;border:1px solid var(--border2);background:var(--surface);border-radius:12px;color:var(--txt);font-size:14px;box-sizing:border-box;backdrop-filter:blur(10px)" oninput="frSearch(this.value)">
+    <div id="fr-merge-bar" style="display:none;margin-top:8px;padding:10px 12px;background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.3);border-radius:10px">
+      <div style="font-size:11px;color:#c4b5fd;font-weight:700;margin-bottom:6px">🔗 선택한 매장을 묶을 브랜드 이름</div>
+      <div style="display:flex;gap:6px">
+        <input id="fr-merge-target" type="text" placeholder="예: 이자카야잔잔" style="flex:1;padding:9px 12px;border:1px solid rgba(167,139,250,0.4);background:var(--surface);border-radius:8px;color:var(--txt);font-size:13px;box-sizing:border-box">
+        <button onclick="mergeSelected()" style="padding:9px 16px;background:linear-gradient(135deg,#a78bfa,#7c3aed);color:#fff;border:0;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">✅ 완료</button>
+      </div>
+      <div id="fr-merge-count" style="font-size:11px;color:var(--txt3);margin-top:6px"></div>
+    </div>
+    <div id="fr-search-results" style="display:none;margin-top:6px;background:var(--surface);border:1px solid var(--border-hi);border-radius:12px;max-height:500px;overflow-y:auto;box-shadow:0 12px 32px rgba(0,0,0,0.5);backdrop-filter:blur(20px)"></div>
   </div>
 
   <div class="sdiv" id="fr-detail-title" style="display:none">신규 출점 지점</div>
@@ -1914,8 +1922,13 @@ function ytdBrandData(brand){
 // 「프랜차이즈」 검색 — alias 그룹화 적용 (사장님이 묶은 것 반영)
 function frSearch(q){
   var box = document.getElementById('fr-search-results');
+  var mergeBar0 = document.getElementById('fr-merge-bar');
   q = (q||'').trim();
-  if (!q || !window.YTD || !window.YTD.by_brand) { box.style.display = 'none'; return; }
+  if (!q || !window.YTD || !window.YTD.by_brand) {
+    box.style.display = 'none';
+    if (mergeBar0) mergeBar0.style.display = 'none';
+    return;
+  }
   var qLow = q.toLowerCase();
   var qCompact = qLow.replace(/\s/g,'');
   var brands = window.YTD.by_brand;
@@ -1966,19 +1979,41 @@ function frSearch(q){
       }
     }
   }
-  // 합 큰 순 정렬, 최대 15개
+  // 합 큰 순 정렬, 최대 50개 (사장님 안 — 묶기 위해 많이)
   hits.sort(function(a,b){ return b.total - a.total; });
-  hits = hits.slice(0, 15);
+  hits = hits.slice(0, 50);
+  var isAdmin = window.ME && window.ME.role === 'admin';
+  var mergeBar = document.getElementById('fr-merge-bar');
   if (!hits.length) {
     box.innerHTML = '<div style="padding:14px;color:var(--txt3);font-size:13px;text-align:center">매칭 브랜드 없음</div>';
+    if (mergeBar) mergeBar.style.display = 'none';
   } else {
-    box.innerHTML = '<div style="padding:8px 14px;font-size:10px;color:var(--txt3);font-weight:700;letter-spacing:0.4px;text-transform:uppercase;border-bottom:1px solid var(--border);background:rgba(56,189,248,0.05)">올해 누적 (1~6월) 기준 · 브랜드 + 매장명 검색</div>' + hits.map(function(h){
+    var header = '<div style="padding:8px 14px;font-size:10px;color:var(--txt3);font-weight:700;letter-spacing:0.4px;text-transform:uppercase;border-bottom:1px solid var(--border);background:rgba(56,189,248,0.05);display:flex;justify-content:space-between;align-items:center">'
+      + '<span>「' + esc(q) + '」 매칭 ' + hits.length + '개</span>';
+    if (isAdmin && hits.length >= 2) {
+      header += '<span style="font-size:10px;font-weight:700"><a href="#" onclick="frToggleAll(true);return false" style="color:#a78bfa;text-decoration:none;margin-right:8px">☑️ 전체</a><a href="#" onclick="frToggleAll(false);return false" style="color:var(--txt3);text-decoration:none">□ 해제</a></span>';
+    }
+    header += '</div>';
+    box.innerHTML = header + hits.map(function(h){
       var storeHint = h.isStore && h.matchStore ? '<div style="font-size:10px;color:var(--txt3);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">↳ ' + esc(h.matchStore) + '</div>' : '';
-      return '<div onclick="frSearchClick(\'' + encodeURIComponent(h.name) + '\')" style="padding:11px 14px;border-bottom:1px solid var(--border);cursor:pointer;font-size:13px;display:flex;justify-content:space-between;align-items:center;gap:10px" onmouseover="this.style.background=\'rgba(56,189,248,0.08)\'" onmouseout="this.style.background=\'\'">'
-        + '<div style="flex:1;overflow:hidden"><div style="font-weight:700;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(h.name) + '</div>' + storeHint + '</div>'
-        + '<div style="font-size:11px;font-weight:700;white-space:nowrap;flex-shrink:0"><span style="color:#34d399">출점 ' + h.open + '</span> · <span style="color:#f87171">폐점 ' + h.closed + '</span></div>'
+      var cb = isAdmin ? '<input type="checkbox" class="fr-merge-cb" data-brand="' + encodeURIComponent(h.name) + '" onclick="event.stopPropagation();frUpdateMergeCount()" style="width:18px;height:18px;cursor:pointer;accent-color:#a78bfa;flex-shrink:0">' : '';
+      return '<div style="padding:11px 14px;border-bottom:1px solid var(--border);font-size:13px;display:flex;align-items:center;gap:10px" onmouseover="this.style.background=\'rgba(56,189,248,0.08)\'" onmouseout="this.style.background=\'\'">'
+        + cb
+        + '<div onclick="frSearchClick(\'' + encodeURIComponent(h.name) + '\')" style="flex:1;overflow:hidden;cursor:pointer"><div style="font-weight:700;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(h.name) + '</div>' + storeHint + '</div>'
+        + '<div style="font-size:11px;font-weight:700;white-space:nowrap;flex-shrink:0"><span style="color:#34d399">+' + h.open + '</span> · <span style="color:#f87171">-' + h.closed + '</span></div>'
         + '</div>';
     }).join('');
+    // admin이고 2개 이상이면 묶기 바 자동 표시 + target 자동 제안
+    if (isAdmin && hits.length >= 2 && mergeBar) {
+      mergeBar.style.display = 'block';
+      var tgt = document.getElementById('fr-merge-target');
+      if (tgt && !tgt.value) {
+        tgt.value = hits[0].name;  // 가장 큰 brand 자동 제안
+      }
+      frUpdateMergeCount();
+    } else if (mergeBar) {
+      mergeBar.style.display = 'none';
+    }
   }
   box.style.display = 'block';
   // 검색 결과 자동 스크롤 (화면 밖 잘림 방지)
@@ -1999,12 +2034,17 @@ function frSearchClick(encBrand){
     }
   }, 150);
 }
-// 외부 클릭 시 검색 결과 닫기
+// 외부 클릭 시 검색 결과·묶기 바 닫기
 document.addEventListener('click', function(e){
   var s = document.getElementById('fr-search');
   var r = document.getElementById('fr-search-results');
+  var mb = document.getElementById('fr-merge-bar');
   if (!s || !r) return;
-  if (e.target !== s && !r.contains(e.target)) r.style.display = 'none';
+  if (e.target === s) return;
+  if (r.contains(e.target)) return;
+  if (mb && mb.contains(e.target)) return;
+  r.style.display = 'none';
+  if (mb) mb.style.display = 'none';
 });
 
 function selectBrand(encBrand, silent){
@@ -2858,6 +2898,51 @@ async function brandMenu(encBrand){
     else alert('실패: ' + (r.data && r.data.error));
   }
 }
+// ─── 검색 dropdown 멀티 선택 묶기 (사장님 안 v13.9) ───
+function frToggleAll(on){
+  var cbs = document.querySelectorAll('#fr-search-results .fr-merge-cb');
+  for (var i = 0; i < cbs.length; i++) cbs[i].checked = on;
+  frUpdateMergeCount();
+}
+function frUpdateMergeCount(){
+  var cbs = document.querySelectorAll('#fr-search-results .fr-merge-cb:checked');
+  var el = document.getElementById('fr-merge-count');
+  if (el) {
+    if (cbs.length) el.innerHTML = '☑️ <b style="color:#c4b5fd">' + cbs.length + '개</b> 선택됨 — 위 이름으로 묶기';
+    else el.innerHTML = '☐ 위 목록에서 묶을 매장 체크 (또는 <a href="#" onclick="frToggleAll(true);return false" style="color:#a78bfa">전체</a>)';
+  }
+}
+async function mergeSelected(){
+  var target = (document.getElementById('fr-merge-target').value||'').trim();
+  if (!target) { alert('묶을 브랜드 이름을 먼저 입력하세요'); return; }
+  var cbs = document.querySelectorAll('#fr-search-results .fr-merge-cb:checked');
+  if (!cbs.length) { alert('묶을 매장을 선택하세요'); return; }
+  var brands = [];
+  for (var i = 0; i < cbs.length; i++) brands.push(decodeURIComponent(cbs[i].dataset.brand));
+  if (!confirm('아래 ' + brands.length + '개를 「' + target + '」으로 묶을까요?\n\n' + brands.slice(0,8).join('\n') + (brands.length>8?'\n…외 '+(brands.length-8)+'개':''))) return;
+  showToast('🔗', '묶는 중…', brands.length + '개 brand 합산');
+  var ok = 0, fail = 0;
+  for (var i = 0; i < brands.length; i++) {
+    try {
+      var r = await adminPost('add_alias', { match: brands[i], brand: target });
+      if (r.ok) ok++; else fail++;
+    } catch(e) { fail++; }
+  }
+  showToast(ok>0?'✅':'❌', '묶기 완료', '성공 ' + ok + ' · 실패 ' + fail);
+  // 정리
+  document.getElementById('fr-merge-target').value = '';
+  document.getElementById('fr-search-results').style.display = 'none';
+  document.getElementById('fr-merge-bar').style.display = 'none';
+  setTimeout(function(){
+    loadBrandOverrides();
+    // 새 alias 반영 위해 같은 키워드로 재검색
+    setTimeout(function(){
+      var q = document.getElementById('fr-search').value;
+      if (q) frSearch(q);
+    }, 1500);
+  }, 800);
+}
+
 // 브랜드 통째로 다른 브랜드로 묶기 (admin) — 모든 매장이 자동 합산됨
 async function brandMergeMenu(encBrand){
   var brand = decodeURIComponent(encBrand);
