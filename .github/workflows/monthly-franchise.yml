@@ -2,8 +2,9 @@ name: Monthly Franchise Master (공정위 11,685 brand)
 # 매월 1일 KST 04:00 — 공정위 가맹본부 brand 마스터 전체 수집
 # 클라이언트 자동 매칭으로 사장님 수작업 alias 등록 부담 0
 on:
-  schedule:
-    - cron: '0 19 1 * *'   # 매월 1일 19:00 UTC = 04:00 KST 다음날
+  # schedule 제거 — DATA_GO_KR_KEY GitHub Secret 미등록 시 매월 실패 알림 옴
+  # 클라이언트가 v15.9 Vercel 프록시로 우회하므로 cron 불필요
+  # Secret 등록 후 schedule 다시 활성화 가능
   workflow_dispatch:
     inputs:
       year:
