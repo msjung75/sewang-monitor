@@ -430,6 +430,14 @@ export default async function handler(req, res) {
       return res.redirect(302, target);
     }
 
+    // ===== 클라이언트 안전 설정 (Kakao JS SDK 키 등) =====
+    if (action === 'config') {
+      res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=300');
+      return res.status(200).json({
+        kakaoJsKey: process.env.KAKAO_JS_KEY || process.env.KAKAO_JS_APP_KEY || '',
+      });
+    }
+
     // ===== 로그인 redirect =====
     if (action === 'login') {
       if (!KAKAO_REST_KEY) return res.status(500).send('KAKAO_REST_KEY 미설정');

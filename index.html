@@ -3026,24 +3026,86 @@ async function mergeSelected(){
   }, 800);
 }
 
-// ─── v15: 지도 — Kakao SDK 로드 가능하면 풀 지도, 아니면 시·도 통계만 ───
+// ─── v15: 지도 — Kakao JS SDK 로드 + 시·도 통계 ───
+var KAKAO_SDK_LOADED = false;
+function loadKakaoSDK(cb){
+  if (KAKAO_SDK_LOADED) { cb(); return; }
+  fetch('/api/auth/kakao?action=config', { credentials: 'same-origin' }).then(function(r){ return r.json(); }).then(function(d){
+    if (!d.kakaoJsKey) { cb(new Error('no key')); return; }
+    var s = document.createElement('script');
+    s.src = 'https://dapi.kakao.com/v2/maps/sdk.js?autoload=false&appkey=' + d.kakaoJsKey;
+    s.onload = function(){ kakao.maps.load(function(){ KAKAO_SDK_LOADED = true; cb(); }); };
+    s.onerror = function(){ cb(new Error('sdk load failed')); };
+    document.head.appendChild(s);
+  }).catch(function(e){ cb(e); });
+}
 function initKakaoMap(){
   var mapEl = document.getElementById('kakao-map');
   var loadEl = document.getElementById('map-loading');
   if (!mapEl) return;
-  // Kakao JS SDK 로드 시도 — KAKAO_JS_APP_KEY env가 있으면 자동 주입 (사장님 추후)
-  if (typeof kakao === 'undefined' || !kakao.maps) {
-    if (loadEl) {
-      loadEl.innerHTML = '<div style="text-align:center;padding:20px"><div style="font-size:36px;margin-bottom:14px">🗺️</div>'
-        + '<div style="font-size:14px;font-weight:700;color:var(--txt);margin-bottom:8px">지도 SDK 미연동</div>'
-        + '<div style="font-size:11.5px;color:var(--txt3);line-height:1.6;max-width:280px">사장님이 <b style="color:var(--c1)">KAKAO_JS_APP_KEY</b>를 Vercel env에<br>등록하시면 풀 지도가 활성화됩니다.<br><br>지금은 ↓ 시·도별 분포 표만 제공</div></div>';
+  renderMapSidoStats(); // 즉시 시·도 통계 표시
+  loadKakaoSDK(function(err){
+    if (err || typeof kakao === 'undefined' || !kakao.maps) {
+      if (loadEl) {
+        loadEl.innerHTML = '<div style="text-align:center;padding:20px"><div style="font-size:36px;margin-bottom:14px">🗺️</div>'
+          + '<div style="font-size:14px;font-weight:700;color:var(--txt);margin-bottom:8px">지도 SDK 로드 실패</div>'
+          + '<div style="font-size:11.5px;color:var(--txt3);line-height:1.6;max-width:280px">↓ 시·도별 분포만 표시됩니다.<br>(' + (err ? err.message : 'SDK undefined') + ')</div></div>';
+      }
+      return;
     }
-  } else {
     if (loadEl) loadEl.style.display = 'none';
-    var m = new kakao.maps.Map(mapEl, { center: new kakao.maps.LatLng(37.5665, 126.9780), level: 8 });
-    // 매장 지오코딩이 있으면 표시 (data/geocoded_ytd.json 필요)
-  }
-  renderMapSidoStats();
+    var center = new kakao.maps.LatLng(36.5, 127.8); // 한국 중앙
+    var m = new kakao.maps.Map(mapEl, { center: center, level: 13 });
+    window.MAP_KAKAO = m;
+    renderMapMarkers(m);
+  });
+}
+function renderMapMarkers(map){
+  // data/geocoded_ytd.json — 향후 cron 동작 후 채워짐. 지금은 빈 상태
+  fetch('/data/geocoded_ytd.json').then(function(r){ return r.ok ? r.json() : null; }).then(function(d){
+    if (!d || !d.stores) {
+      // 지오코딩 데이터 아직 없음 — 시·도별 중심점에 카운트만 표시
+      var sidoCenters = {
+        '서울특별시': [37.5665, 126.9780], '경기도': [37.4138, 127.5183],
+        '인천광역시': [37.4563, 126.7052], '부산광역시': [35.1796, 129.0756],
+        '대구광역시': [35.8714, 128.6014], '광주광역시': [35.1595, 126.8526],
+        '대전광역시': [36.3504, 127.3845], '울산광역시': [35.5384, 129.3114],
+        '세종특별자치시': [36.4801, 127.2890], '강원특별자치도': [37.8228, 128.1555],
+        '충청북도': [36.6357, 127.4914], '충청남도': [36.6588, 126.6727],
+        '전북특별자치도': [35.7175, 127.1530], '전라남도': [34.8161, 126.4630],
+        '경상북도': [36.5760, 128.5056], '경상남도': [35.4606, 128.2132],
+        '제주특별자치도': [33.4996, 126.5312],
+      };
+      if (!window.YTD || !window.YTD.by_brand) return;
+      var sidoCnt = {};
+      for (var b in window.YTD.by_brand) {
+        var v = window.YTD.by_brand[b];
+        for (var mm in v.monthly) {
+          var stores = v.monthly[mm].stores || [];
+          for (var i = 0; i < stores.length; i++) {
+            var match = (stores[i].addr||'').match(/^([가-힣]+(?:특별시|광역시|특별자치도|특별자치시|도))/);
+            if (match) sidoCnt[match[1]] = (sidoCnt[match[1]]||0) + 1;
+          }
+        }
+      }
+      for (var sido in sidoCnt) {
+        var c = sidoCenters[sido];
+        if (!c) continue;
+        var pos = new kakao.maps.LatLng(c[0], c[1]);
+        var content = '<div style="padding:8px 12px;background:rgba(124,58,237,0.95);color:#fff;border-radius:14px;font-size:13px;font-weight:800;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,0.4)">'
+          + sido.replace(/(특별시|광역시|특별자치도|특별자치시|도)$/, '') + ' ' + sidoCnt[sido].toLocaleString() + '</div>';
+        new kakao.maps.CustomOverlay({ map: map, position: pos, content: content, yAnchor: 0.5 });
+      }
+    } else {
+      // 향후 — 매장 좌표가 있으면 핀 마커 표시
+      var cluster = (d.stores || []).slice(0, 500);
+      for (var i = 0; i < cluster.length; i++) {
+        var s = cluster[i];
+        if (!s.lat || !s.lng) continue;
+        new kakao.maps.Marker({ map: map, position: new kakao.maps.LatLng(s.lat, s.lng) });
+      }
+    }
+  }).catch(function(){});
 }
 function renderMapSidoStats(){
   var el = document.getElementById('map-sido-stats');
