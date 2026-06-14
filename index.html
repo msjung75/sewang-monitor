@@ -527,6 +527,23 @@ body{
     <div class="chip" data-v="danran">단란주점</div>
     <div class="chip" data-v="yuheung">유흥주점</div>
   </div>
+  <!-- v15.14: N등록 통계 카드 -->
+  <div id="nstat-summary" style="display:none;margin-bottom:8px;padding:11px 13px;background:linear-gradient(135deg,rgba(52,211,153,0.06),rgba(56,189,248,0.06));border:1px solid rgba(52,211,153,0.2);border-radius:10px">
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;font-size:11px;color:var(--txt3);font-weight:700;letter-spacing:0.3px">
+      <span>🔍 N등록 분석</span>
+      <span id="nstat-updated" style="font-weight:500;color:var(--txt3);font-size:10px"></span>
+    </div>
+    <div style="display:flex;gap:8px;font-size:12px">
+      <div style="flex:1;text-align:center"><div style="font-size:18px;font-weight:800;color:#34d399" id="nstat-reg">0</div><div style="font-size:10px;color:var(--txt3)">등록</div></div>
+      <div style="flex:1;text-align:center"><div style="font-size:18px;font-weight:800;color:#fbbf24" id="nstat-unreg">0</div><div style="font-size:10px;color:var(--txt3)">미등록</div></div>
+      <div style="flex:1;text-align:center"><div style="font-size:18px;font-weight:800;color:#7dd3fc" id="nstat-pct">0%</div><div style="font-size:10px;color:var(--txt3)">등록률</div></div>
+      <div style="flex:1;text-align:center"><div style="font-size:18px;font-weight:800;color:var(--txt2)" id="nstat-total">0</div><div style="font-size:10px;color:var(--txt3)">전체 체크</div></div>
+    </div>
+    <div style="display:flex;height:6px;background:rgba(255,255,255,0.05);border-radius:3px;overflow:hidden;margin-top:8px">
+      <div id="nstat-bar-reg" style="background:#34d399;width:0%"></div>
+      <div id="nstat-bar-unreg" style="background:#fbbf24;width:0%"></div>
+    </div>
+  </div>
   <div class="chips" id="chip-nstat">
     <div class="chip on" data-v="">전체 상태</div>
     <div class="chip" data-v="gold">N미등록</div>
@@ -1573,6 +1590,23 @@ function bindChipSido(){
 }
 
 function renderNew(){
+  // v15.14: N등록 통계 카드 갱신
+  var summaryEl = document.getElementById('nstat-summary');
+  if (summaryEl && window.NSTAT_SUMMARY && window.NSTAT_SUMMARY.checked > 0) {
+    summaryEl.style.display = 'block';
+    var s = window.NSTAT_SUMMARY;
+    var pct = s.checked ? Math.round(s.reg / s.checked * 100) : 0;
+    document.getElementById('nstat-reg').textContent = s.reg.toLocaleString();
+    document.getElementById('nstat-unreg').textContent = s.unreg.toLocaleString();
+    document.getElementById('nstat-pct').textContent = pct + '%';
+    document.getElementById('nstat-total').textContent = s.checked.toLocaleString();
+    document.getElementById('nstat-bar-reg').style.width = pct + '%';
+    document.getElementById('nstat-bar-unreg').style.width = (100 - pct) + '%';
+    if (s.updated_at) {
+      var date = new Date(s.updated_at);
+      document.getElementById('nstat-updated').textContent = '· ' + date.toLocaleDateString('ko-KR', { month: 'numeric', day: 'numeric' }) + ' 갱신';
+    }
+  }
   var list = filteredPermits();
   var cnt = document.getElementById('new-count');
   var total = ST.permits.length;
@@ -2867,6 +2901,35 @@ function updateClock(isFetch){
 setInterval(function(){ updateClock(); }, 30000);
 updateClock();
 
+// v15.14: N등록 cron 결과 로드 — naver_nstat_cache.json 머지
+async function loadNaverNstatCache(){
+  try {
+    var r = await fetch('/data/naver_nstat_cache.json', { cache: 'no-store' });
+    if (!r.ok) return;
+    var d = await r.json();
+    var stores = d.stores || d.items || d;
+    if (!stores || typeof stores !== 'object') return;
+    if (!ST.naver) ST.naver = {};
+    var reg = 0, unreg = 0, checked = 0;
+    for (var id in stores) {
+      var s = stores[id];
+      if (!s) continue;
+      // 형식: { id: { found: true/false, checked_at: '...', ... } }
+      if (s.found !== undefined) {
+        ST.naver[id] = s;
+        checked++;
+        if (s.found) reg++; else unreg++;
+      } else if (s.registered !== undefined) {
+        ST.naver[id] = { found: s.registered, checked_at: s.checked_at, ...s };
+        checked++;
+        if (s.registered) reg++; else unreg++;
+      }
+    }
+    window.NSTAT_SUMMARY = { reg: reg, unreg: unreg, checked: checked, updated_at: d.updated_at || d.generated_at };
+    console.log('[NSTAT] N등록 cache 로드 — 등록 ' + reg + ' / 미등록 ' + unreg + ' / 총 ' + checked);
+    try { renderNew(); } catch(e){}
+  } catch(e){ console.warn('[NSTAT] load failed:', e.message); }
+}
 async function loadNightlyCache(){
   try {
     var r = await fetch('/data/trend30_all.json', { cache: 'no-store' });
@@ -2978,6 +3041,7 @@ function init(){
   bindChipSido();
   bindNewSearch();
   loadNightlyCache(); // 새벽 cron 결과 자동 로드 (서울·경기만 있으면 보강, 전국이면 덮어쓰기)
+  loadNaverNstatCache(); // v15.14: N등록 cron 결과 머지
   loadYTDSummary();   // YTD 6개월 summary (프랜차이즈 클릭 시 올해 출점/폐점 표시용)
   loadBrandOverrides(); // admin 브랜드 분류 관리 (제외/카테고리)
   setTimeout(function(){ try { renderCustomers(); } catch(e){} }, 100); // v14 거래처 (localStorage)
