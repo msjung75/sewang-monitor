@@ -845,9 +845,9 @@ var BRAND_ALIASES = {
   '인생맥주': '인쌩맥주',  // 사장님 토픽 비공식 표기
 
   // 혼술바 체인 — 행안부 한 단어 표기 통합
-  '야화': '야화 혼술바',
   '야화혼술': '야화 혼술바',
   '야화혼술바': '야화 혼술바',
+  // 「야화」 단독은 야화 혼술바 아닐 수 있음 — 사장님 안: 「야화」+「혼술바」 둘 다 있어야 매칭
   '자유의지혼술바': '자유의지 혼술바',
   '헤르츠혼술바': '헤르츠 혼술바',
   '온도혼술바': '온도 혼술바',
@@ -1652,16 +1652,50 @@ function frFiltered(){
   var kind = activeChip('chip-fr-kind');
   if (kind === 'cafe') return CAFE_BRANDS;  // 카페·빵은 30일 (별도 데이터 흐름)
   // 다른 chip은 YTD 사용 (사장님 안)
-  if (!window.YTD || !window.YTD.by_brand) return BRANDS;  // fallback: YTD 미로드 시 30일
+  if (!window.YTD || !window.YTD.by_brand) return BRANDS;
   var excluded = window._excludedBrandSet || {};
-  var catOv = window.BRAND_OVERRIDES && window.BRAND_OVERRIDES.category_overrides || {};
-  var arr = [];
+  // 1패스 효율적 그룹화 — alias + prefix 짧은 것 우선
+  // 모든 brand를 alias-length 짧은 순으로 정렬해서 처리
+  var brandList = [];
   for (var b in window.YTD.by_brand) {
-    if (excluded[b]) continue;  // admin이 제외한 브랜드
-    var v = window.YTD.by_brand[b];
-    var total = v.total_open + v.total_closed;
+    if (excluded[b]) continue;
+    var bCompact = b.replace(/\s/g,'').toLowerCase();
+    var alias = (typeof BRAND_ALIASES !== 'undefined' && BRAND_ALIASES[bCompact]) || b;
+    brandList.push({ b: b, bCompact: bCompact, alias: alias, aliasCompact: alias.replace(/\s/g,'').toLowerCase() });
+  }
+  // 짧은 alias 먼저 처리 — canonical 정함
+  brandList.sort(function(a,b){ return a.aliasCompact.length - b.aliasCompact.length; });
+  var groups = {};
+  brandList.forEach(function(x){
+    var v = window.YTD.by_brand[x.b];
+    // prefix 매칭 — 짧은 alias가 너무 짧으면 무관한 brand 합쳐질 수 있음 (예: 「야화」가 「야화 혼술바」와 다름)
+    // 최소 5글자 + 명시적 BRAND_ALIASES 등록된 경우에만
+    var canonical = x.aliasCompact;
+    for (var existing in groups) {
+      if (existing.length >= 5 && existing.length < x.aliasCompact.length
+          && (x.bCompact.indexOf(existing) === 0 || x.aliasCompact.indexOf(existing) === 0)) {
+        canonical = existing; break;
+      }
+    }
+    if (!groups[canonical]) {
+      groups[canonical] = { brand: x.alias, total_open: 0, total_closed: 0, monthly: {} };
+    }
+    var g = groups[canonical];
+    g.total_open += v.total_open;
+    g.total_closed += v.total_closed;
+    for (var m in v.monthly) {
+      if (!g.monthly[m]) g.monthly[m] = { open: 0, closed: 0, stores: [] };
+      g.monthly[m].open += v.monthly[m].open;
+      g.monthly[m].closed += v.monthly[m].closed;
+      g.monthly[m].stores = g.monthly[m].stores.concat(v.monthly[m].stores || []);
+    }
+  });
+  var arr = [];
+  for (var k in groups) {
+    var g = groups[k];
+    var total = g.total_open + g.total_closed;
     if (total < 2) continue;
-    arr.push({ brand: b, total_open: v.total_open, total_closed: v.total_closed, total: total, monthly: v.monthly, _ytd: true });
+    arr.push({ brand: g.brand, total_open: g.total_open, total_closed: g.total_closed, total: total, monthly: g.monthly, _ytd: true });
   }
   // kind=cafe는 category_overrides에서 cafe만 추출
   if (kind === 'cafe' && Object.keys(catOv).length) {
@@ -1805,14 +1839,11 @@ function ytdBrandData(brand){
     if (typeof BRAND_ALIASES !== 'undefined' && (BRAND_ALIASES[kCompact] === brandAlias)) {
       push(k); continue;
     }
-    // 3) prefix 매치 — kCompact가 aliasCompact로 시작 + 한 글자 이상 더 김 (예: 야화혼술바 + OO점)
-    if (aliasCompact.length >= 4 && kCompact.indexOf(aliasCompact) === 0 && kCompact.length > aliasCompact.length) {
+    // 3) prefix 매치 — aliasCompact 5글자 이상 + kCompact가 aliasCompact로 시작
+    if (aliasCompact.length >= 5 && kCompact.indexOf(aliasCompact) === 0 && kCompact.length > aliasCompact.length) {
       push(k); continue;
     }
-    // 4) brand가 짧고 k가 brand로 시작 (예: 검색 "야화" → "야화혼술바", "야화 혼술바 OO점" 등 모두)
-    if (compact.length >= 2 && kCompact.indexOf(compact) === 0 && kCompact.length > compact.length) {
-      push(k); continue;
-    }
+    // 4번 (짧은 prefix) 제거 — 사장님 안: "야화" 단독이 "야화 혼술바"로 잘못 매칭되는 문제 fix
   }
   if (!found.length) return null;
   if (found.length === 1) return found[0];
