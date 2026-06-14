@@ -1,5 +1,5 @@
-// PWA Service Worker v13 (사용자 관리 풀 UI)
-const CACHE = 'sewang-pwa-v13_6-brand-ov';
+// PWA Service Worker v15.6 (data/*.json 캐시 무력화)
+const CACHE = 'sewang-pwa-v15_6-data-revalidate';
 const SHELL = ['/', '/index.html', '/manifest.json', '/icon.svg'];
 
 self.addEventListener('install', e => {
@@ -10,9 +10,9 @@ self.addEventListener('activate', e => {
 });
 self.addEventListener('fetch', e => {
   const u = new URL(e.request.url);
-  // 인증·데이터·API는 항상 network (cache 우회)
+  // 인증·데이터·API는 항상 network (cache 우회 + 강제 no-store)
   if (u.pathname.startsWith('/api/') || u.pathname.startsWith('/data/')) {
-    e.respondWith(fetch(e.request));
+    e.respondWith(fetch(e.request, { cache: 'no-store' }));
     return;
   }
   // 정적 셸은 cache-first

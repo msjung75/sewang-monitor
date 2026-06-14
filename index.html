@@ -1803,9 +1803,23 @@ window.YTD = null;
 window.BRAND_OVERRIDES = { excluded: [], category_overrides: {}, brand_aliases: {}, store_excluded: [] };
 async function loadBrandOverrides(){
   try {
-    var r = await fetch('/data/brand_overrides.json?_=' + Date.now(), { cache: 'no-store' });
-    if (!r.ok) return;
-    var d = await r.json();
+    // 2회 시도 — 첫 응답이 옛 캐시이면 재요청 (Vercel CDN edge cache 회피)
+    var d = null;
+    for (var attempt = 0; attempt < 2; attempt++) {
+      var r = await fetch('/data/brand_overrides.json?v=' + Date.now() + '_' + attempt, {
+        cache: 'no-store',
+        headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache' }
+      });
+      if (!r.ok) { if (attempt === 0) continue; return; }
+      d = await r.json();
+      // 검증 — alias 수가 0이고 첫 시도면 재시도 (옛 응답 의심)
+      if (attempt === 0 && Object.keys(d.brand_aliases || {}).length === 0 && Object.keys(d.excluded || {}).length === 0) {
+        await new Promise(function(rs){ setTimeout(rs, 300); });
+        continue;
+      }
+      break;
+    }
+    if (!d) return;
     window.BRAND_OVERRIDES = {
       excluded: d.excluded || [],
       category_overrides: d.category_overrides || {},
