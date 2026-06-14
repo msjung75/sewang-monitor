@@ -12,7 +12,9 @@
     }
   ],
   "category_overrides": {},
-  "brand_aliases": {},
+  "brand_aliases": {
+    "이자카야잔잔 전주신시가지직영점": "이자카야잔잔"
+  },
   "store_excluded": [],
-  "updated_at": "2026-06-14T01:54:29.364Z"
+  "updated_at": "2026-06-14T02:34:38.920Z"
 }
