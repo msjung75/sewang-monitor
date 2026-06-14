@@ -2027,6 +2027,14 @@ function selectBrand(encBrand, silent){
   if (!g) { alert('해당 브랜드 데이터 없음'); return; }
   document.getElementById('fr-detail-title').style.display = 'flex';
   document.getElementById('fr-detail-title').textContent = '🏪 ' + g.brand;
+  // admin: 브랜드 헤더에 「🔗 다른 브랜드로 묶기」 + 「📋 카테고리/제외」 버튼
+  var isAdminFr = window.ME && window.ME.role === 'admin';
+  var fdt = document.getElementById('fr-detail-title');
+  if (isAdminFr && fdt) {
+    fdt.innerHTML = '<span style="flex:1">🏪 ' + esc(g.brand) + '</span>'
+      + '<button onclick="brandMergeMenu(\'' + encodeURIComponent(g.brand) + '\')" style="padding:6px 12px;background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.35);color:#c4b5fd;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer;margin-right:5px">🔗 묶기</button>'
+      + '<button onclick="brandMenu(\'' + encodeURIComponent(g.brand) + '\')" style="padding:6px 12px;background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.3);color:#7dd3fc;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer">📋 분류</button>';
+  }
   var el = document.getElementById('fr-detail');
   var ytd = ytdBrandData(g.brand);
   var html = '';
@@ -2850,6 +2858,25 @@ async function brandMenu(encBrand){
     else alert('실패: ' + (r.data && r.data.error));
   }
 }
+// 브랜드 통째로 다른 브랜드로 묶기 (admin) — 모든 매장이 자동 합산됨
+async function brandMergeMenu(encBrand){
+  var brand = decodeURIComponent(encBrand);
+  var target = prompt(
+    '「' + brand + '」을 어떤 브랜드로 묶을까요?\n\n예: 「아키토리잔잔」 「이자카야잔잔...」 → 「이자카야잔잔」\n묶으면 검색·합산에 같은 브랜드로 표시됩니다.',
+    ''
+  );
+  if (!target) return;
+  target = target.trim();
+  if (!target) return;
+  var r = await adminPost('add_alias', { match: brand, brand: target });
+  if (r.ok) {
+    showToast('🔗','브랜드 묶기 완료', brand + ' → ' + target);
+    setTimeout(loadBrandOverrides, 1500);
+  } else {
+    alert('실패: ' + (r.data && r.data.error || r.status));
+  }
+}
+
 // 매장 단위 admin 메뉴 — 제외 / 브랜드 alias 등록
 async function storeMenu(encStoreId, encName){
   var sid = decodeURIComponent(encStoreId);
