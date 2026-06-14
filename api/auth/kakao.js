@@ -430,13 +430,11 @@ export default async function handler(req, res) {
       return res.redirect(302, target);
     }
 
-    // ===== 클라이언트 안전 설정 (Kakao JS SDK 키 등) =====
+    // ===== 클라이언트 안전 설정 (Kakao JS SDK 키 — 도메인 제한 적용) =====
     if (action === 'config') {
-      res.setHeader('Cache-Control', 'no-store');  // 등록 직후 캐시 방지
-      const k = process.env.KAKAO_JS_KEY || process.env.KAKAO_JS_APP_KEY || '';
+      res.setHeader('Cache-Control', 'public, s-maxage=600, stale-while-revalidate=60');
       return res.status(200).json({
-        kakaoJsKey: k,
-        keyLen: k.length,  // 디버그: 값 길이만 (값 노출 X)
+        kakaoJsKey: process.env.KAKAO_JS_KEY || process.env.KAKAO_JS_APP_KEY || '',
       });
     }
 
