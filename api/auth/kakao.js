@@ -438,6 +438,36 @@ export default async function handler(req, res) {
       });
     }
 
+    // ===== 지오코딩 (주소 → 좌표) — 카카오 REST API 프록시 (키 보호) =====
+    if (action === 'geocode') {
+      const addr = (req.query.addr || '').trim();
+      if (!addr) return res.status(400).json({ error: 'addr 파라미터 필요' });
+      const restKey = process.env.KAKAO_REST_KEY || process.env.KAKAO_REST_API_KEY;
+      if (!restKey) return res.status(500).json({ error: 'KAKAO_REST_KEY 미설정' });
+      try {
+        const r = await fetch('https://dapi.kakao.com/v2/local/search/address.json?query=' + encodeURIComponent(addr), {
+          headers: { 'Authorization': 'KakaoAK ' + restKey }
+        });
+        const d = await r.json();
+        const doc = (d.documents || [])[0];
+        if (!doc) {
+          // 주소 검색 실패 시 키워드 검색 fallback
+          const r2 = await fetch('https://dapi.kakao.com/v2/local/search/keyword.json?query=' + encodeURIComponent(addr) + '&size=1', {
+            headers: { 'Authorization': 'KakaoAK ' + restKey }
+          });
+          const d2 = await r2.json();
+          const doc2 = (d2.documents || [])[0];
+          if (!doc2) return res.status(200).json({ ok: false });
+          res.setHeader('Cache-Control', 'public, s-maxage=86400');
+          return res.status(200).json({ ok: true, lat: parseFloat(doc2.y), lng: parseFloat(doc2.x), source: 'keyword' });
+        }
+        res.setHeader('Cache-Control', 'public, s-maxage=86400');
+        return res.status(200).json({ ok: true, lat: parseFloat(doc.y), lng: parseFloat(doc.x), source: 'address' });
+      } catch (e) {
+        return res.status(500).json({ error: e.message });
+      }
+    }
+
     // ===== 로그인 redirect =====
     if (action === 'login') {
       if (!KAKAO_REST_KEY) return res.status(500).send('KAKAO_REST_KEY 미설정');

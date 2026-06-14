@@ -2119,6 +2119,13 @@ function selectBrand(encBrand, silent){
       html += '</div></div>';
     }
     html += '</div></div>';
+    // ─── v15.4: 🗺️ 이 brand 매장 지도 보기 (전 사용자) ───
+    var brandQEnc = encodeURIComponent(g.brand);
+    html += '<div class="card" style="margin-bottom:12px;padding:14px;border-left:3px solid #a78bfa">';
+    html += '<button onclick="openBrandMap(\'' + brandQEnc + '\')" style="width:100%;padding:13px;background:linear-gradient(135deg,#a78bfa,#7c3aed);color:#fff;border:0;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">';
+    html += '<span style="font-size:20px">🗺️</span> 매장 위치 지도 보기 <span style="opacity:0.85;font-size:12px;font-weight:600">(' + (ytd.total_open + ytd.total_closed) + '개)</span>';
+    html += '</button>';
+    html += '</div>';
     // ─── v16: 💡 인사이트 카드 (자동 분석) ───
     var insightStores = [];
     Object.keys(ytd.monthly).forEach(function(m){
@@ -3026,6 +3033,116 @@ async function mergeSelected(){
   }, 800);
 }
 
+// ─── v15.4: 「프랜차이즈」 → 「🗺️」 brand 매장 핀 ───
+window.MAP_BRAND_FOCUS = null;  // 선택된 brand 저장
+function openBrandMap(encBrand){
+  window.MAP_BRAND_FOCUS = decodeURIComponent(encBrand);
+  // 페이지 전환
+  document.querySelectorAll('.bnav-btn').forEach(function(b){ b.classList.remove('on'); });
+  var mapBtn = document.querySelector('[data-pg="map"]');
+  if (mapBtn) mapBtn.classList.add('on');
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('on'); });
+  var pgMap = document.getElementById('pg-map');
+  if (pgMap) pgMap.classList.add('on');
+  // 지도 init + brand 매장 지오코딩
+  setTimeout(function(){ initKakaoMap(); }, 50);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+// 지오코딩 캐시 — localStorage 영구
+function loadGeoCache(){
+  try { return JSON.parse(localStorage.getItem('sewang_geo_cache')||'{}'); } catch(e){ return {}; }
+}
+function saveGeoCache(c){
+  try { localStorage.setItem('sewang_geo_cache', JSON.stringify(c)); } catch(e){}
+}
+async function geocodeAddr(addr){
+  if (!addr) return null;
+  var cache = loadGeoCache();
+  if (cache[addr]) return cache[addr];
+  try {
+    var r = await fetch('/api/auth/kakao?action=geocode&addr=' + encodeURIComponent(addr), { credentials: 'same-origin' });
+    var d = await r.json();
+    if (d.ok && d.lat && d.lng) {
+      cache[addr] = { lat: d.lat, lng: d.lng };
+      saveGeoCache(cache);
+      return cache[addr];
+    }
+  } catch(e){}
+  return null;
+}
+async function renderBrandMarkers(map, brand){
+  if (!window.YTD || !window.YTD.by_brand) return;
+  // 모든 매칭 brand(alias) 매장 수집
+  var compact = brand.replace(/\s/g,'').toLowerCase();
+  var brandAlias = (typeof BRAND_ALIASES !== 'undefined' && BRAND_ALIASES[compact]) || brand;
+  var aliasCompact = brandAlias.replace(/\s/g,'').toLowerCase();
+  var stores = [];
+  for (var k in window.YTD.by_brand) {
+    var kc = k.replace(/\s/g,'').toLowerCase();
+    var kAlias = (typeof BRAND_ALIASES !== 'undefined' && BRAND_ALIASES[kc]) || k;
+    var kac = kAlias.replace(/\s/g,'').toLowerCase();
+    var match = (kc === aliasCompact || kac === aliasCompact || kc === compact);
+    if (!match && aliasCompact.length >= 5 && kc.indexOf(aliasCompact) === 0) match = true;
+    if (!match) continue;
+    var v = window.YTD.by_brand[k];
+    for (var m in v.monthly) {
+      var sArr = v.monthly[m].stores || [];
+      for (var i = 0; i < sArr.length; i++) stores.push(sArr[i]);
+    }
+  }
+  // 진행률 표시
+  var progressEl = document.createElement('div');
+  progressEl.id = 'map-progress';
+  progressEl.style.cssText = 'position:absolute;top:12px;left:50%;transform:translateX(-50%);padding:8px 14px;background:rgba(167,139,250,0.95);color:#fff;border-radius:20px;font-size:12px;font-weight:700;z-index:10;box-shadow:0 4px 12px rgba(0,0,0,0.3)';
+  progressEl.textContent = '🗺️ 「' + brand + '」 매장 위치 로딩…';
+  var mapContainer = document.getElementById('kakao-map').parentElement;
+  mapContainer.appendChild(progressEl);
+  // 좌표 변환 (throttled — 카카오 일 30만 한도 안 넘게)
+  var coords = [];
+  var done = 0;
+  for (var i = 0; i < stores.length; i++) {
+    var s = stores[i];
+    if (!s.addr) { done++; continue; }
+    var pos = await geocodeAddr(s.addr);
+    if (pos) coords.push({ pos: pos, store: s });
+    done++;
+    if (done % 5 === 0) progressEl.textContent = '🗺️ 로딩 ' + done + ' / ' + stores.length;
+    // throttle — 5건 마다 살짝 쉬기
+    if (done % 10 === 0) await new Promise(function(r){ setTimeout(r, 100); });
+  }
+  // 진행률 제거
+  progressEl.remove();
+  // bounds 계산 + 마커 표시
+  if (!coords.length) {
+    var noResult = document.createElement('div');
+    noResult.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);padding:14px 18px;background:rgba(0,0,0,0.85);color:#fff;border-radius:12px;font-size:13px';
+    noResult.textContent = '주소 → 좌표 변환 결과 없음';
+    mapContainer.appendChild(noResult);
+    return;
+  }
+  var bounds = new kakao.maps.LatLngBounds();
+  for (var i = 0; i < coords.length; i++) {
+    var c = coords[i];
+    var pos = new kakao.maps.LatLng(c.pos.lat, c.pos.lng);
+    bounds.extend(pos);
+    var s = c.store;
+    var closed = s.closed;
+    var pinColor = closed ? '#f87171' : '#34d399';
+    var content = '<div style="padding:4px 8px;background:' + pinColor + ';color:#fff;border-radius:12px;font-size:11px;font-weight:700;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,0.4);cursor:pointer" onclick="window.open(\'https://map.naver.com/p/search/' + encodeURIComponent(s.name) + '\',\'_blank\')">'
+      + (closed ? '🚫 ' : '🆕 ') + esc(s.name) + '</div>';
+    new kakao.maps.CustomOverlay({ map: map, position: pos, content: content, yAnchor: 0.5 });
+  }
+  if (coords.length > 1) map.setBounds(bounds);
+  else map.setCenter(new kakao.maps.LatLng(coords[0].pos.lat, coords[0].pos.lng)), map.setLevel(4);
+  // 헤더 통계
+  var hdrEl = document.createElement('div');
+  hdrEl.style.cssText = 'position:absolute;bottom:14px;left:14px;padding:8px 12px;background:rgba(0,0,0,0.78);color:#fff;border-radius:10px;font-size:11.5px;font-weight:700;backdrop-filter:blur(8px);z-index:9';
+  var openN = stores.filter(function(s){ return !s.closed; }).length;
+  var closedN = stores.filter(function(s){ return s.closed; }).length;
+  hdrEl.innerHTML = '🏪 ' + esc(brand) + ' · <span style="color:#34d399">출점 ' + openN + '</span> · <span style="color:#f87171">폐 ' + closedN + '</span> · 핀 ' + coords.length;
+  mapContainer.appendChild(hdrEl);
+}
+
 // ─── v15: 지도 — Kakao JS SDK 로드 + 시·도 통계 ───
 var KAKAO_SDK_LOADED = false;
 function loadKakaoSDK(cb){
@@ -3054,10 +3171,21 @@ function initKakaoMap(){
       return;
     }
     if (loadEl) loadEl.style.display = 'none';
-    var center = new kakao.maps.LatLng(36.5, 127.8); // 한국 중앙
+    // 기존 오버레이 제거
+    var oldHdr = document.getElementById('map-progress');
+    if (oldHdr) oldHdr.remove();
+    // 지도 항상 새로 생성 (재사용 시 마커 잔존 회피)
+    mapEl.innerHTML = '';
+    var center = new kakao.maps.LatLng(36.5, 127.8);
     var m = new kakao.maps.Map(mapEl, { center: center, level: 13 });
     window.MAP_KAKAO = m;
-    renderMapMarkers(m);
+    if (window.MAP_BRAND_FOCUS) {
+      var brand = window.MAP_BRAND_FOCUS;
+      window.MAP_BRAND_FOCUS = null; // 한 번만
+      renderBrandMarkers(m, brand);
+    } else {
+      renderMapMarkers(m);
+    }
   });
 }
 function renderMapMarkers(map){
