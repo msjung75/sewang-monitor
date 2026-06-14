@@ -23,46 +23,54 @@ jobs:
           NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
           NAVER_DAILY_LIMIT: ${{ inputs.limit || '5000' }}
         run: python3 scripts/naver-nstat-check.py
-      - name: Commit via GitHub Contents API (rebase 충돌 무관)
+      - name: Commit via GitHub Contents API (Python — 큰 파일 안전)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
         run: |
           if [ ! -f data/naver_nstat_cache.json ]; then
             echo "No cache file generated"
             exit 0
           fi
-          PATH_DATA="data/naver_nstat_cache.json"
-          CONTENT=$(base64 -w 0 "$PATH_DATA")
-          # 기존 sha 확인
-          SHA=$(curl -s -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
-            "https://api.github.com/repos/${{ github.repository }}/contents/$PATH_DATA" \
-            | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('sha',''))" 2>/dev/null)
-          MSG="N-check $(TZ=Asia/Seoul date +%Y-%m-%d): cache updated"
-          if [ -z "$SHA" ]; then
-            BODY=$(printf '{"message":"%s","content":"%s"}' "$MSG" "$CONTENT")
-          else
-            BODY=$(printf '{"message":"%s","content":"%s","sha":"%s"}' "$MSG" "$CONTENT" "$SHA")
-          fi
-          # 3회 재시도
-          for attempt in 1 2 3; do
-            RESPONSE=$(curl -s -w "\n%{http_code}" -X PUT \
-              -H "Authorization: Bearer $GH_TOKEN" \
-              -H "Accept: application/vnd.github+json" \
-              "https://api.github.com/repos/${{ github.repository }}/contents/$PATH_DATA" \
-              -d "$BODY")
-            STATUS=$(echo "$RESPONSE" | tail -n1)
-            if [ "$STATUS" = "200" ] || [ "$STATUS" = "201" ]; then
-              echo "Committed via API (attempt $attempt, status $STATUS)"
-              exit 0
-            fi
-            echo "Attempt $attempt failed (status $STATUS)"
-            echo "$RESPONSE" | head -n -1
-            # sha 다시 가져와서 retry (다른 commit이 들어갔을 수 있음)
-            SHA=$(curl -s -H "Authorization: Bearer $GH_TOKEN" \
-              "https://api.github.com/repos/${{ github.repository }}/contents/$PATH_DATA" \
-              | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('sha',''))" 2>/dev/null)
-            BODY=$(printf '{"message":"%s","content":"%s","sha":"%s"}' "$MSG" "$CONTENT" "$SHA")
-            sleep 3
-          done
-          echo "All attempts failed"
-          exit 1
+          python3 << 'PYEOF'
+          import base64, json, os, time, urllib.request, urllib.error
+          token = os.environ['GH_TOKEN']
+          repo = os.environ['REPO']
+          path = 'data/naver_nstat_cache.json'
+          api = f'https://api.github.com/repos/{repo}/contents/{path}'
+          headers = {'Authorization': f'Bearer {token}', 'Accept': 'application/vnd.github+json', 'User-Agent': 'naver-check'}
+
+          with open(path, 'rb') as f:
+              content_b64 = base64.b64encode(f.read()).decode('ascii')
+          msg = f'N-check {time.strftime("%Y-%m-%d", time.localtime())}: cache updated'
+
+          def get_sha():
+              try:
+                  req = urllib.request.Request(api, headers=headers)
+                  with urllib.request.urlopen(req) as r:
+                      return json.loads(r.read()).get('sha', '')
+              except Exception:
+                  return ''
+
+          sha = get_sha()
+          for attempt in range(3):
+              body = {'message': msg, 'content': content_b64}
+              if sha: body['sha'] = sha
+              data = json.dumps(body).encode()
+              req = urllib.request.Request(api, data=data, headers={**headers, 'Content-Type': 'application/json'}, method='PUT')
+              try:
+                  with urllib.request.urlopen(req) as r:
+                      print(f'✅ Committed via API (attempt {attempt+1}, status {r.status})')
+                      break
+              except urllib.error.HTTPError as e:
+                  print(f'Attempt {attempt+1} failed: {e.code} {e.reason}')
+                  print(e.read().decode()[:300])
+                  if e.code == 409:
+                      time.sleep(3)
+                      sha = get_sha()  # 다른 commit 들어갔을 수 있음
+                  else:
+                      time.sleep(3)
+          else:
+              print('All 3 attempts failed')
+              import sys; sys.exit(1)
+          PYEOF
