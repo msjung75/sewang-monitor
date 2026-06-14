@@ -1788,25 +1788,30 @@ async function loadYTDSummary(){
 function ytdBrandData(brand){
   if (!window.YTD || !window.YTD.by_brand) return null;
   var compact = brand.replace(/\s/g,'').toLowerCase();
-  // BRAND_ALIASES 정규화 거친 키와 일치하는 모든 YTD brand 찾아서 합산
   var brandAlias = (typeof BRAND_ALIASES !== 'undefined' && BRAND_ALIASES[compact]) || brand;
   var aliasCompact = brandAlias.replace(/\s/g,'').toLowerCase();
   var found = [];
+  var foundKeys = {};
+  function push(k){ if (!foundKeys[k]) { found.push(window.YTD.by_brand[k]); foundKeys[k] = 1; } }
   for (var k in window.YTD.by_brand) {
     var kCompact = k.replace(/\s/g,'').toLowerCase();
     var kAlias = (typeof BRAND_ALIASES !== 'undefined' && BRAND_ALIASES[kCompact]) || k;
     var kAliasCompact = kAlias.replace(/\s/g,'').toLowerCase();
-    if (kCompact === compact || kAliasCompact === aliasCompact || kCompact === aliasCompact || kAliasCompact === compact) {
-      found.push(window.YTD.by_brand[k]);
+    // 1) 정확 매치 (compact 또는 alias compact)
+    if (kCompact === aliasCompact || kAliasCompact === aliasCompact || kCompact === compact || kAliasCompact === compact) {
+      push(k); continue;
     }
-  }
-  if (!found.length) {
-    // 정확 매치 실패 시 substring 매칭 fallback
-    for (var k in window.YTD.by_brand) {
-      var kCompact = k.replace(/\s/g,'').toLowerCase();
-      if ((compact.length >= 3 && kCompact.indexOf(compact) === 0) || (kCompact.length >= 3 && compact.indexOf(kCompact) === 0)) {
-        found.push(window.YTD.by_brand[k]);
-      }
+    // 2) BRAND_ALIASES에서 k가 같은 brand로 매핑
+    if (typeof BRAND_ALIASES !== 'undefined' && (BRAND_ALIASES[kCompact] === brandAlias)) {
+      push(k); continue;
+    }
+    // 3) prefix 매치 — kCompact가 aliasCompact로 시작 + 한 글자 이상 더 김 (예: 야화혼술바 + OO점)
+    if (aliasCompact.length >= 4 && kCompact.indexOf(aliasCompact) === 0 && kCompact.length > aliasCompact.length) {
+      push(k); continue;
+    }
+    // 4) brand가 짧고 k가 brand로 시작 (예: 검색 "야화" → "야화혼술바", "야화 혼술바 OO점" 등 모두)
+    if (compact.length >= 2 && kCompact.indexOf(compact) === 0 && kCompact.length > compact.length) {
+      push(k); continue;
     }
   }
   if (!found.length) return null;
