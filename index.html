@@ -1928,11 +1928,31 @@ function buildSegmentAliases(){
   console.log('[BRAND_ALIASES] segment alias 추가:', added, '· suffix 자동 통합:', autoAdded);
 }
 
+// v15.8: 공정위 가맹본부 11,685 brand 마스터 로드 — 자동 매칭
+async function loadFranchiseMaster(){
+  try {
+    var r = await fetch('/data/franchise_master.json', { cache: 'force-cache' });
+    if (!r.ok) return;
+    var d = await r.json();
+    window.FRANCHISE_MASTER = d;
+    // BRAND_ALIASES에 자동 등록 — compact key → 공식 brandNm
+    if (typeof BRAND_ALIASES === 'undefined' || !d.lookup) return;
+    var added = 0;
+    for (var compact in d.lookup) {
+      if (!BRAND_ALIASES[compact]) {
+        BRAND_ALIASES[compact] = d.lookup[compact];
+        added++;
+      }
+    }
+    console.log('[FRANCHISE_MASTER] 공정위 brand 마스터 로드 — ' + Object.keys(d.lookup).length + '개 (BRAND_ALIASES +' + added + ')');
+  } catch(e){}
+}
 async function loadYTDSummary(){
   try {
     var r = await fetch('/data/ytd_2026_summary.json?_=' + Date.now(), { cache: 'no-store' });
     if (!r.ok) return;
     window.YTD = await r.json();
+    await loadFranchiseMaster();  // 공정위 마스터 먼저
     buildSegmentAliases();
     // 「프랜차이즈」 상단 안내문 집계 표시
     var sumEl = document.getElementById('fr-ytd-summary');

@@ -430,25 +430,6 @@ export default async function handler(req, res) {
       return res.redirect(302, target);
     }
 
-    // ===== 공정위 가맹사업 API 테스트 (v15.8) =====
-    if (action === 'franchise_test') {
-      const key = process.env.DATA_GO_KR_KEY;
-      if (!key) return res.status(500).json({ error: 'DATA_GO_KR_KEY 미설정' });
-      try {
-        // 정확한 endpoint: apis.data.go.kr/1130000/FftcBrandRlsInfo2_Service/getBrandinfo
-        const url = 'https://apis.data.go.kr/1130000/FftcBrandRlsInfo2_Service/getBrandinfo'
-          + '?serviceKey=' + encodeURIComponent(key)
-          + '&pageNo=1&numOfRows=5&resultType=json&jngBizCrtraYr=2024';
-        const r = await fetch(url);
-        const text = await r.text();
-        let parsed;
-        try { parsed = JSON.parse(text); } catch(e){ parsed = { raw: text.slice(0,800) }; }
-        return res.status(200).json({ status: r.status, parsed });
-      } catch (e) {
-        return res.status(500).json({ error: e.message });
-      }
-    }
-
     // ===== 클라이언트 안전 설정 (Kakao JS SDK 키 — 도메인 제한 적용) =====
     if (action === 'config') {
       res.setHeader('Cache-Control', 'public, s-maxage=600, stale-while-revalidate=60');
