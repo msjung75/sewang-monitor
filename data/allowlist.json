@@ -23,8 +23,16 @@
       "role": "owner",
       "memo": "오비맥주 차장",
       "approved_at": "2026-06-14T01:06:42.505Z"
+    },
+    {
+      "id": "4943700386",
+      "nickname": "김재훈",
+      "profile": "",
+      "role": "owner",
+      "memo": "생마차 대표",
+      "approved_at": "2026-06-14T02:37:39.089Z"
     }
   ],
   "blocked": [],
-  "updated_at": "2026-06-14T01:06:42.505Z"
+  "updated_at": "2026-06-14T02:37:39.089Z"
 }
