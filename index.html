@@ -1900,7 +1900,7 @@ function ytdBrandData(brand){
   return merged;
 }
 
-// 「프랜차이즈」 검색 (브랜드 + 매장명 둘 다, 모든 YTD)
+// 「프랜차이즈」 검색 — alias 그룹화 적용 (사장님이 묶은 것 반영)
 function frSearch(q){
   var box = document.getElementById('fr-search-results');
   q = (q||'').trim();
@@ -1908,33 +1908,51 @@ function frSearch(q){
   var qLow = q.toLowerCase();
   var qCompact = qLow.replace(/\s/g,'');
   var brands = window.YTD.by_brand;
-  // 1차: 브랜드명 매칭
-  var hits = [];
-  var hitNames = {};
+  // 1차: alias 그룹화 — canonical brand로 통합 (사장님이 묶은 거 자동 합산)
+  var grouped = {};
   for (var b in brands) {
-    var bLow = b.toLowerCase();
-    var bCompact = bLow.replace(/\s/g,'');
-    if (bLow.indexOf(qLow) >= 0 || bCompact.indexOf(qCompact) >= 0) {
-      var v = brands[b];
-      hits.push({ name: b, open: v.total_open, closed: v.total_closed, total: v.total_open + v.total_closed, isStore: false });
-      hitNames[b] = 1;
+    var bCompact = b.replace(/\s/g,'').toLowerCase();
+    var alias = (typeof BRAND_ALIASES !== 'undefined' && BRAND_ALIASES[bCompact]) || b;
+    var key = alias.replace(/\s/g,'').toLowerCase();
+    if (!grouped[key]) {
+      grouped[key] = { name: alias, total_open: 0, total_closed: 0, members: [] };
+    }
+    grouped[key].total_open += brands[b].total_open;
+    grouped[key].total_closed += brands[b].total_closed;
+    grouped[key].members.push(b);
+  }
+  // 2차: canonical brand 이름 매칭
+  var hits = [];
+  var hitKeys = {};
+  for (var k in grouped) {
+    var g = grouped[k];
+    var bLow = g.name.toLowerCase();
+    var bCompactK = bLow.replace(/\s/g,'');
+    if (bLow.indexOf(qLow) >= 0 || bCompactK.indexOf(qCompact) >= 0) {
+      hits.push({ name: g.name, open: g.total_open, closed: g.total_closed, total: g.total_open + g.total_closed, isStore: false });
+      hitKeys[k] = 1;
     }
   }
-  // 2차: 매장명 매칭 (브랜드별 stores 순회) — 브랜드명에 없어도 매장명에 있으면 그 브랜드 추가
-  for (var b in brands) {
-    if (hitNames[b]) continue;
-    var v = brands[b];
-    for (var m in v.monthly) {
-      var stores = v.monthly[m].stores || [];
-      for (var i = 0; i < stores.length; i++) {
-        var sName = (stores[i].name || '').toLowerCase();
-        if (sName.indexOf(qLow) >= 0 || sName.replace(/\s/g,'').indexOf(qCompact) >= 0) {
-          hits.push({ name: b, open: v.total_open, closed: v.total_closed, total: v.total_open + v.total_closed, isStore: true, matchStore: stores[i].name });
-          hitNames[b] = 1;
-          break;
+  // 3차: 매장명 매칭 (alias 거쳐서 canonical brand로 표시)
+  for (var k in grouped) {
+    if (hitKeys[k]) continue;
+    var g = grouped[k];
+    var found = false;
+    for (var mi = 0; mi < g.members.length && !found; mi++) {
+      var v = brands[g.members[mi]];
+      for (var month in v.monthly) {
+        var stores = v.monthly[month].stores || [];
+        for (var i = 0; i < stores.length; i++) {
+          var sName = (stores[i].name || '').toLowerCase();
+          if (sName.indexOf(qLow) >= 0 || sName.replace(/\s/g,'').indexOf(qCompact) >= 0) {
+            hits.push({ name: g.name, open: g.total_open, closed: g.total_closed, total: g.total_open + g.total_closed, isStore: true, matchStore: stores[i].name });
+            hitKeys[k] = 1;
+            found = true;
+            break;
+          }
         }
+        if (found) break;
       }
-      if (hitNames[b]) break;
     }
   }
   // 합 큰 순 정렬, 최대 15개
