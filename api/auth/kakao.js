@@ -438,7 +438,7 @@ export default async function handler(req, res) {
         // 정확한 endpoint: apis.data.go.kr/1130000/FftcBrandRlsInfo2_Service/getBrandinfo
         const url = 'https://apis.data.go.kr/1130000/FftcBrandRlsInfo2_Service/getBrandinfo'
           + '?serviceKey=' + encodeURIComponent(key)
-          + '&pageNo=1&numOfRows=5&resultType=json&yr=2024';
+          + '&pageNo=1&numOfRows=5&resultType=json&jngBizCrtraYr=2024';
         const r = await fetch(url);
         const text = await r.text();
         let parsed;
