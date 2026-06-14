@@ -22,17 +22,26 @@ def is_excluded(name, upte):
 def is_closed(status):
     return any(k in (status or '') for k in ['폐업','취소','말소','중지','휴업'])
 def brand_of(name):
+    """v15.7 강화 — 띄어쓰기·붙여쓰기·괄호 suffix 다중 패턴 통합"""
     if not name: return None
-    n = name.strip()
+    n = re.sub(r'\s+', ' ', name).strip()
+    # 1) "(지역명)점" 또는 "(주소) 점" 괄호 suffix 제거
+    n = re.sub(r'\s*\([^)]+\)\s*점?\s*$', '', n).strip()
+    # 2) 띄어쓰기 있는 "OO점" 형식 — 마지막 토큰이 ~점으로 끝나면 떼기
     parts = re.split(r'\s+', n)
     if len(parts) >= 2:
         last = parts[-1]
-        if last.endswith('점') and len(last) <= 5:
-            return ' '.join(parts[:-1])
-    # 공백 없는 한 단어 매장: '인쌩맥주구미봉곡점' → '인쌩맥주' (정규식 시도)
-    m = re.match(r'^([가-힣a-zA-Z0-9]+?)(구|시|동|읍|면|점|지점|매장)?(점)?$', n)
-    if m and m.group(1) and len(m.group(1)) >= 3:
-        return m.group(1)
+        if re.search(r'점$', last) and len(last) <= 12:  # OO점, OO직영점, OO본점 등
+            base = ' '.join(parts[:-1]).strip()
+            if len(base) >= 3: return base
+    # 3) 붙여쓴 "OO점" 형식 (예: 역전할머니맥주충북진천광혜원점)
+    #    base가 4자 이상 한글이고 끝이 한글 1~8자 + 점인 경우
+    m = re.match(r'^([가-힣a-zA-Z0-9·\-]{4,})([가-힣a-zA-Z0-9]{1,10}점)\s*$', n)
+    if m: return m.group(1)
+    # 4) "OO 직영점/가맹점/본점/지점" suffix 변형
+    m2 = re.match(r'^(.+?)(직영점|가맹점|본점|지점|매장)\s*$', n)
+    if m2 and len(m2.group(1)) >= 3:
+        return m2.group(1).strip()
     return n
 def sido_short(addr):
     if not addr: return '기타'

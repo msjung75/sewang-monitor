@@ -1846,18 +1846,39 @@ async function loadBrandOverrides(){
   } catch(e) {}
 }
 // 명시적 BRAND_ALIASES 기반으로 YTD segment brand들의 alias를 한 번에 자동 추가
+// v15.7: suffix 패턴 — "OO점", "OO직영점", "OO본점", "OO지점", "(지역)점" 등
+var STORE_SUFFIX_RE = /([가-힣A-Za-z0-9·\-\(\)\s]{1,30})(직영점|가맹점|본점|지점|점)\s*$/;
+// "(지역) 점" 등 괄호 변형
+var BRACKET_SUFFIX_RE = /\s*\([^)]+\)\s*점?\s*$/;
+
+// brand명에서 매장명 suffix 떼서 base brand 추출
+function extractBaseBrand(name){
+  if (!name) return name;
+  var s = name.replace(/\s+/g, ' ').trim();
+  // 1) 괄호 suffix 제거
+  s = s.replace(BRACKET_SUFFIX_RE, '').trim();
+  // 2) "OO점" suffix 제거 (단, base가 4자 이상 남아야)
+  var m = s.match(STORE_SUFFIX_RE);
+  if (m) {
+    var trimmed = s.slice(0, s.length - m[2].length - m[1].length).trim();
+    if (trimmed.length >= 4) return trimmed;
+    // base가 너무 짧으면 suffix 부분만 다시 검토 (예: "역전할머니맥주OO점" → "역전할머니맥주")
+    var baseAttempt = s.replace(/[가-힣A-Za-z0-9]{1,8}점\s*$/, '').trim();
+    if (baseAttempt.length >= 4) return baseAttempt;
+  }
+  return s;
+}
+
 function buildSegmentAliases(){
   if (!window.YTD || !window.YTD.by_brand || typeof BRAND_ALIASES === 'undefined') return;
   if (window._segmentAliasesBuilt) return;
   window._segmentAliasesBuilt = true;
-  // 명시적 alias의 canonical keys (compact 기준, 길이 >= 5)
+  // Pass 1: 명시적 BRAND_ALIASES canonical keys (compact, ≥5자) prefix 매칭
   var canons = [];
   for (var k in BRAND_ALIASES) {
     if (k.length >= 5) canons.push({ key: k, val: BRAND_ALIASES[k] });
   }
-  // 짧은 순으로 정렬 (짧은 prefix 우선)
   canons.sort(function(a,b){ return a.key.length - b.key.length; });
-  // 모든 YTD brand 검사 — 이미 alias 있으면 skip
   var added = 0;
   for (var b in window.YTD.by_brand) {
     var bCompact = b.replace(/\s/g,'').toLowerCase();
@@ -1871,7 +1892,40 @@ function buildSegmentAliases(){
       }
     }
   }
-  console.log('[BRAND_ALIASES] segment alias 자동 추가:', added);
+  // Pass 2: 자동 base brand 추출 — suffix "OO점" 떼고 같은 base가 3개 이상이면 자동 묶기
+  // (사장님 지적 — 「역전할머니맥주OO점」 「역전할머니맥주 OO점」 자동 통합)
+  var baseGroups = {};
+  for (var b2 in window.YTD.by_brand) {
+    if (BRAND_ALIASES[b2.replace(/\s/g,'').toLowerCase()]) continue; // 이미 alias 있으면 skip
+    var base = extractBaseBrand(b2);
+    if (base === b2 || !base || base.length < 4) continue;
+    var baseCompact = base.replace(/\s/g,'').toLowerCase();
+    if (!baseGroups[baseCompact]) baseGroups[baseCompact] = { base: base, members: [] };
+    baseGroups[baseCompact].members.push(b2);
+  }
+  // base가 3개 이상 매장에서 발견되면 자동 통합 (단일 매장은 그냥 둠 — 잘못 묶을 위험)
+  // 또는 base 자체가 YTD에 존재하면 통합 (자기 자신 + 변형들)
+  var autoAdded = 0;
+  for (var bc in baseGroups) {
+    var grp = baseGroups[bc];
+    var baseExistsInYTD = !!window.YTD.by_brand[grp.base];
+    if (grp.members.length >= 3 || baseExistsInYTD) {
+      // base 자체에도 alias 매핑 (자기 자신 — 묶음의 canonical)
+      if (!BRAND_ALIASES[bc]) {
+        BRAND_ALIASES[bc] = grp.base;
+        autoAdded++;
+      }
+      // 모든 멤버를 base로 통합
+      for (var mi = 0; mi < grp.members.length; mi++) {
+        var mc = grp.members[mi].replace(/\s/g,'').toLowerCase();
+        if (!BRAND_ALIASES[mc]) {
+          BRAND_ALIASES[mc] = grp.base;
+          autoAdded++;
+        }
+      }
+    }
+  }
+  console.log('[BRAND_ALIASES] segment alias 추가:', added, '· suffix 자동 통합:', autoAdded);
 }
 
 async function loadYTDSummary(){
