@@ -1996,14 +1996,37 @@ function addToLookup(lookup, items){
 }
 function applyFranchiseLookup(lookup){
   if (typeof BRAND_ALIASES === 'undefined') return;
-  var added = 0;
+  var added = 0, trimAdded = 0;
   for (var compact in lookup) {
+    var name = lookup[compact];
+    // 1) 정식 등록
     if (!BRAND_ALIASES[compact]) {
-      BRAND_ALIASES[compact] = lookup[compact];
+      BRAND_ALIASES[compact] = name;
       added++;
     }
+    // 2) 끝 연도(2/4자 숫자) trim 버전 — 「역전할머니맥주1982」→「역전할머니맥주」
+    //    + "OO치킨", "OO피자" 같은 일반 suffix는 그대로 (정확도 위해 연도 패턴만)
+    var trimmed = name.replace(/\s*[0-9]{2,4}\s*$/, '').trim();
+    if (trimmed && trimmed !== name && trimmed.length >= 3) {
+      var tCompact = trimmed.replace(/\s/g,'').toLowerCase();
+      if (!BRAND_ALIASES[tCompact]) {
+        BRAND_ALIASES[tCompact] = name; // trim 버전 → 공식 brand
+        trimAdded++;
+      }
+    }
+    // 3) 영문/한글 혼합 brand에서 한글 부분만 trim
+    //    (예: "BHC" 그대로 두고 "BHC치킨" → "BHC"도 alias로)
+    var enOnly = name.match(/^([A-Z]{2,5})[가-힣]/);
+    if (enOnly) {
+      var en = enOnly[1];
+      var enCompact = en.toLowerCase();
+      if (!BRAND_ALIASES[enCompact]) {
+        BRAND_ALIASES[enCompact] = name;
+        trimAdded++;
+      }
+    }
   }
-  console.log('[FRANCHISE_MASTER] BRAND_ALIASES +' + added + ' (총 ' + Object.keys(lookup).length + ')');
+  console.log('[FRANCHISE_MASTER] BRAND_ALIASES +' + added + ' (trim alias +' + trimAdded + ', 총 ' + Object.keys(lookup).length + ')');
   // segment alias 재빌드 — 새 canonical key 반영
   window._segmentAliasesBuilt = false;
   if (typeof buildSegmentAliases === 'function') buildSegmentAliases();
