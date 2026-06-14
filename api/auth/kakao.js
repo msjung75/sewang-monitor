@@ -435,11 +435,14 @@ export default async function handler(req, res) {
       const key = process.env.DATA_GO_KR_KEY;
       if (!key) return res.status(500).json({ error: 'DATA_GO_KR_KEY 미설정' });
       try {
-        const url = 'https://api.odcloud.kr/api/15125467/v1/uddi:dc60d29b-e676-4fa0-9d57-c8e2ee5c4b62?page=1&perPage=5&serviceKey=' + encodeURIComponent(key);
+        // 정확한 endpoint: apis.data.go.kr/1130000/FftcBrandRlsInfo2_Service/getBrandinfo
+        const url = 'https://apis.data.go.kr/1130000/FftcBrandRlsInfo2_Service/getBrandinfo'
+          + '?serviceKey=' + encodeURIComponent(key)
+          + '&pageNo=1&numOfRows=5&resultType=json&yr=2024';
         const r = await fetch(url);
         const text = await r.text();
         let parsed;
-        try { parsed = JSON.parse(text); } catch(e){ parsed = { raw: text.slice(0,500) }; }
+        try { parsed = JSON.parse(text); } catch(e){ parsed = { raw: text.slice(0,800) }; }
         return res.status(200).json({ status: r.status, parsed });
       } catch (e) {
         return res.status(500).json({ error: e.message });
