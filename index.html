@@ -1928,6 +1928,65 @@ function buildSegmentAliases(){
   console.log('[BRAND_ALIASES] segment alias 추가:', added, '· suffix 자동 통합:', autoAdded);
 }
 
+// v15.11: 옛 인허가 매장 폐업 — Vercel 프록시로 lazy fetch + 24h 캐시
+async function loadClosuresLazy(){
+  try {
+    var cached = localStorage.getItem('sewang_closures');
+    if (cached) {
+      var c = JSON.parse(cached);
+      if (Date.now() - (c.ts||0) < 86400 * 1000 && c.items) {
+        mergeClosuresIntoYTD(c.items);
+        return;
+      }
+    }
+  } catch(e){}
+  // 권역: 서울+경기+인천 (수도권 + 4 타입)
+  try {
+    var r = await fetch('/api/permits?region=metro&type=all&days=14&dateField=closed&status=closed&maxPages=10', { credentials:'same-origin' });
+    var d = await r.json();
+    var items = d.items || [];
+    if (items.length) {
+      localStorage.setItem('sewang_closures', JSON.stringify({ ts: Date.now(), items: items }));
+      mergeClosuresIntoYTD(items);
+      console.log('[CLOSURES] lazy fetch 완료 — ' + items.length + '건 폐업 머지');
+    }
+  } catch(e){ console.warn('[CLOSURES] lazy fetch 실패:', e.message); }
+}
+function mergeClosuresIntoYTD(closures){
+  if (!window.YTD || !window.YTD.by_brand) return;
+  var brandOfFn = (typeof brandOf === 'function') ? brandOf : function(n){ return n; };
+  var added = 0;
+  for (var i = 0; i < closures.length; i++) {
+    var c = closures[i];
+    if (!c.closedDate || c.closedDate.length !== 8) continue;
+    var yyyymm = c.closedDate.slice(0, 6);
+    if (yyyymm < '202601') continue;  // 올해 폐업만
+    var brand = brandOfFn(c.name) || c.name;
+    if (!window.YTD.by_brand[brand]) {
+      window.YTD.by_brand[brand] = { total_open: 0, total_closed: 0, monthly: {} };
+    }
+    var b = window.YTD.by_brand[brand];
+    if (!b.monthly[yyyymm]) b.monthly[yyyymm] = { open: 0, closed: 0, stores: [] };
+    // dedupe — 같은 id 있는지
+    var exists = b.monthly[yyyymm].stores.some(function(s){ return s.id === c.id; });
+    if (!exists) {
+      var store = {
+        id: c.id, name: c.name, addr: c.addr,
+        permitDate: c.permitDate, closedDate: c.closedDate,
+        type: c.type, closed: true,
+      };
+      b.monthly[yyyymm].stores.push(store);
+      b.monthly[yyyymm].closed += 1;
+      b.total_closed += 1;
+      added++;
+    }
+  }
+  if (added > 0) {
+    console.log('[CLOSURES] YTD merge: +' + added + ' 폐업 매장');
+    if (typeof renderFr === 'function') try { renderFr(); } catch(e){}
+  }
+}
+
 // v15.9: 공정위 가맹본부 11,685 brand 마스터 — Vercel 프록시 + localStorage 영구 캐시
 async function loadFranchiseMaster(){
   if (typeof BRAND_ALIASES === 'undefined') return;
@@ -2038,6 +2097,8 @@ async function loadYTDSummary(){
     window.YTD = await r.json();
     await loadFranchiseMaster();  // 공정위 마스터 먼저
     buildSegmentAliases();
+    // v15.11: 옛 인허가 매장 폐업 lazy fetch (백그라운드)
+    setTimeout(function(){ try { loadClosuresLazy(); } catch(e){} }, 1500);
     // 「프랜차이즈」 상단 안내문 집계 표시
     var sumEl = document.getElementById('fr-ytd-summary');
     if (sumEl && window.YTD.by_month) {

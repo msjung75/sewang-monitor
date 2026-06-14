@@ -2,8 +2,8 @@ name: Nightly Closures (CLSBIZ_YMD)
 # 폐업일자 기준 cron — 옛 인허가 매장의 최근 폐업까지 포착
 # (LCPMT_YMD 기준은 신규 인허가만 잡힘 → 회전율 분석에 한계)
 on:
-  schedule:
-    - cron: '45 19 * * *'   # 매일 19:45 UTC = 04:45 KST (YTD cron 30분 뒤)
+  # schedule 비활성화 — GitHub Secret DATA_GO_KR_KEY 미등록으로 실패. Vercel 프록시 우회로 대체
+  # secret 등록 후 schedule 다시 활성화 가능
   workflow_dispatch:
     inputs:
       days:
