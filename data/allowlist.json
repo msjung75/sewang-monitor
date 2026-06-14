@@ -15,8 +15,16 @@
       "role": "viewer",
       "memo": "청주종합주류 대표 한승훈",
       "approved_at": "2026-06-13T10:56:22.556Z"
+    },
+    {
+      "id": "4943582724",
+      "nickname": "이호창(Chang)",
+      "profile": "",
+      "role": "owner",
+      "memo": "오비맥주 차장",
+      "approved_at": "2026-06-14T01:06:42.505Z"
     }
   ],
   "blocked": [],
-  "updated_at": "2026-06-13T10:56:22.556Z"
+  "updated_at": "2026-06-14T01:06:42.505Z"
 }
