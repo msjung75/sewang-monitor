@@ -59,11 +59,12 @@
     },
     {
       "id": "4946577243",
-      "nickname": "종환",
+      "nickname": "배종환",
       "profile": "http://k.kakaocdn.net/dn/b8cDMD/dJMcaac9lIz/ffkrO8zoJ1JaKjqYKj8zhK/img_640x640.jpg",
       "role": "staff",
       "memo": "세왕 부장",
-      "approved_at": "2026-06-15T23:38:35.157Z"
+      "approved_at": "2026-06-15T23:38:35.157Z",
+      "updated_at": "2026-06-15T23:56:00.235Z"
     },
     {
       "id": "4946605464",
@@ -75,5 +76,5 @@
     }
   ],
   "blocked": [],
-  "updated_at": "2026-06-15T23:48:59.823Z"
+  "updated_at": "2026-06-15T23:56:00.235Z"
 }
