@@ -1,4 +1,11 @@
 {
-  "pending": [],
-  "updated_at": "2026-06-15T23:38:35.063Z"
+  "pending": [
+    {
+      "id": "4946605464",
+      "nickname": "현우",
+      "profile": "http://k.kakaocdn.net/dn/hcWEF/dJMcaipkilp/YDx6Engs3w7Fq837QOnEyK/img_640x640.jpg",
+      "applied_at": "2026-06-15T23:47:47.759Z"
+    }
+  ],
+  "updated_at": "2026-06-15T23:47:47.759Z"
 }
