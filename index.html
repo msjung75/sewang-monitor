@@ -676,6 +676,27 @@ body{
 </div>
 
 <!-- ======= PAGE: 🗺️ 지도 ======= -->
+<!-- v15.17: 프랜차이즈 brand 빠른 모달 -->
+<div id="fr-brand-modal" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px;box-sizing:border-box" onclick="if(event.target===this)closeFrBrandModal()">
+  <div style="max-width:560px;width:100%;max-height:90vh;overflow-y:auto;background:var(--surface);border:1px solid var(--border-hi);border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,0.6);padding:18px 18px 24px">
+    <div style="display:flex;justify-content:space-between;align-items:start;gap:10px;margin-bottom:14px">
+      <div style="flex:1">
+        <div id="fr-modal-title" style="font-size:17px;font-weight:800;color:var(--txt);letter-spacing:-0.3px">🏪 brand</div>
+        <div id="fr-modal-sub" style="font-size:11.5px;color:var(--txt3);margin-top:3px"></div>
+      </div>
+      <button onclick="closeFrBrandModal()" style="background:rgba(255,255,255,0.06);border:0;color:var(--txt2);width:30px;height:30px;border-radius:50%;font-size:16px;cursor:pointer">×</button>
+    </div>
+    <div id="fr-modal-month"></div>
+    <div id="fr-modal-sido" style="margin-top:14px"></div>
+    <div id="fr-modal-stores" style="margin-top:14px"></div>
+    <div id="fr-modal-closed-section" style="margin-top:14px;display:none"></div>
+    <div style="margin-top:16px;display:flex;gap:8px">
+      <button id="fr-modal-detail-btn" onclick="closeFrBrandModal();gotoFrTab(window._frModalBrand);" style="flex:1;padding:11px;background:rgba(167,139,250,0.15);border:1px solid rgba(167,139,250,0.35);color:#c4b5fd;border-radius:9px;font-size:12.5px;font-weight:700;cursor:pointer">📊 자세히 보기 (프랜차이즈 탭)</button>
+      <button onclick="closeFrBrandModal();window._mapBrand=window._frModalBrand;openBrandMap(encodeURIComponent(window._frModalBrand));" style="flex:1;padding:11px;background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.3);color:#34d399;border-radius:9px;font-size:12.5px;font-weight:700;cursor:pointer">🗺️ 지도 보기</button>
+    </div>
+  </div>
+</div>
+
 <!-- ======= PAGE: 📈 추이 분석 (v15.16) ======= -->
 <div class="page" id="pg-trend">
   <div class="alert-banner">
@@ -2699,7 +2720,7 @@ function renderCharts(){
   var mini = document.getElementById('tbl-fr-mini');
   if (BRANDS.length) {
     mini.innerHTML = BRANDS.slice(0, 5).map(function(g, i){
-      return '<tr style="cursor:pointer" onclick="switchPage(\'fr\');selectBrand(\'' + encodeURIComponent(g.brand) + '\')">'
+      return '<tr style="cursor:pointer" onclick="openFrBrandModal(\'' + g.brand.replace(/\'/g, "\\'") + '\')">'
         + '<td class="rn">' + (i+1) + '</td>'
         + '<td style="font-size:12px;font-weight:600">' + esc(g.brand) + '</td>'
         + '<td><span class="tag t-fr">' + g.stores.length + '개 지점</span></td></tr>';
@@ -2978,6 +2999,129 @@ function updateClock(isFetch){
 }
 setInterval(function(){ updateClock(); }, 30000);
 updateClock();
+
+// v15.17: 프랜차이즈 brand 빠른 모달
+window._frModalBrand = null;
+function openFrBrandModal(brand){
+  if (!brand || !window.YTD || !window.YTD.by_brand) return;
+  window._frModalBrand = brand;
+  // alias 그룹화 (frFiltered 로직과 동일)
+  var compact = brand.replace(/\s/g,'').toLowerCase();
+  var aliasC = ((typeof BRAND_ALIASES !== 'undefined' && BRAND_ALIASES[compact]) || brand).replace(/\s/g,'').toLowerCase();
+  var canonical = ((typeof BRAND_ALIASES !== 'undefined' && BRAND_ALIASES[compact]) || brand);
+  var byMonth = {}; // yyyymm → { open, closed }
+  var stores = [];
+  var closedStores = [];
+  var sidoCnt = {};
+  for (var b in window.YTD.by_brand) {
+    var bc = b.replace(/\s/g,'').toLowerCase();
+    var bA = ((typeof BRAND_ALIASES !== 'undefined' && BRAND_ALIASES[bc]) || b).replace(/\s/g,'').toLowerCase();
+    if (bA !== aliasC && bc !== aliasC) continue;
+    var v = window.YTD.by_brand[b];
+    for (var m in v.monthly) {
+      if (m < '202601') continue;
+      var arr = v.monthly[m].stores || [];
+      for (var i = 0; i < arr.length; i++) {
+        var s = arr[i];
+        if (window._excludedStoreSet && window._excludedStoreSet[s.id]) continue;
+        if (isExcluded(s)) continue;
+        if (!byMonth[m]) byMonth[m] = { open: 0, closed: 0 };
+        if (s.closed) { byMonth[m].closed++; closedStores.push(s); }
+        else { byMonth[m].open++; stores.push(s); }
+        var match = (s.addr||'').match(/^([가-힣]+(?:특별시|광역시|특별자치도|특별자치시|도))/);
+        if (match) sidoCnt[match[1]] = (sidoCnt[match[1]]||0) + 1;
+      }
+    }
+  }
+  // 헤더
+  document.getElementById('fr-modal-title').textContent = '🏪 ' + canonical;
+  var totalO = 0, totalC = 0;
+  for (var m in byMonth) { totalO += byMonth[m].open; totalC += byMonth[m].closed; }
+  document.getElementById('fr-modal-sub').innerHTML = '올해 <span style="color:#34d399;font-weight:700">+' + totalO + '</span> 출점 · <span style="color:#f87171;font-weight:700">-' + totalC + '</span> 폐점';
+  // 월별 mini 차트
+  var months = ['202601','202602','202603','202604','202605','202606'];
+  var labels = ['1','2','3','4','5','6'];
+  var maxN = 1;
+  months.forEach(function(m){ if (byMonth[m]) maxN = Math.max(maxN, byMonth[m].open + byMonth[m].closed); });
+  var mhtml = '<div style="font-size:11px;color:var(--txt3);margin-bottom:6px;font-weight:700">📅 월별 신규/폐점</div>';
+  mhtml += '<div style="display:flex;gap:5px;align-items:flex-end;height:80px">';
+  months.forEach(function(m, i){
+    var d = byMonth[m] || { open:0, closed:0 };
+    var oh = d.open / maxN * 70;
+    var ch = d.closed / maxN * 70;
+    mhtml += '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:1px">'
+      + '<div style="font-size:9px;color:#34d399;height:10px;font-weight:700">' + (d.open||'') + '</div>'
+      + '<div style="width:100%;display:flex;flex-direction:column;justify-content:flex-end;height:55px">'
+      + (d.closed ? '<div style="background:#f87171;height:' + ch.toFixed(0) + 'px;border-radius:2px 2px 0 0"></div>' : '')
+      + '<div style="background:#34d399;height:' + oh.toFixed(0) + 'px;border-radius:2px 2px 0 0;margin-top:1px"></div>'
+      + '</div>'
+      + '<div style="font-size:9px;color:var(--txt2);font-weight:600">' + labels[i] + '월</div>'
+      + '</div>';
+  });
+  mhtml += '</div>';
+  document.getElementById('fr-modal-month').innerHTML = mhtml;
+  // 시·도 mini
+  var sidoSorted = Object.keys(sidoCnt).map(function(k){ return [k, sidoCnt[k]]; }).sort(function(a,b){ return b[1]-a[1]; }).slice(0,6);
+  var shtml = '<div style="font-size:11px;color:var(--txt3);margin-bottom:6px;font-weight:700">📍 시·도 분포 TOP 6</div>';
+  if (sidoSorted.length) {
+    var sMax = sidoSorted[0][1];
+    sidoSorted.forEach(function(x){
+      var name = x[0].replace(/(특별시|광역시|특별자치도|특별자치시|도)$/, '');
+      var pct = (x[1]/sMax*100).toFixed(0);
+      shtml += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;font-size:11px">'
+        + '<div style="width:42px;font-weight:600">' + esc(name) + '</div>'
+        + '<div style="flex:1;height:6px;background:rgba(255,255,255,0.05);border-radius:3px"><div style="height:100%;width:' + pct + '%;background:#7dd3fc;border-radius:3px"></div></div>'
+        + '<div style="width:30px;text-align:right;font-weight:700;color:#7dd3fc">' + x[1] + '</div>'
+        + '</div>';
+    });
+  } else shtml += '<div style="color:var(--txt3);font-size:11px">데이터 없음</div>';
+  document.getElementById('fr-modal-sido').innerHTML = shtml;
+  // 매장 리스트 (최신순 최대 10)
+  stores.sort(function(a,b){ return (b.permitDate||'').localeCompare(a.permitDate||''); });
+  var ssh = '<div style="font-size:11px;color:var(--txt3);margin-bottom:6px;font-weight:700">🆕 최근 출점 매장 (TOP 10)</div>';
+  if (stores.length) {
+    ssh += stores.slice(0,10).map(function(s){
+      var pd = s.permitDate||''; var pdF = pd.length===8 ? pd.slice(4,6)+'/'+pd.slice(6,8) : '';
+      return '<div style="padding:7px 9px;background:rgba(52,211,153,0.04);border:1px solid rgba(52,211,153,0.12);border-radius:7px;margin-bottom:5px;font-size:11.5px;display:flex;justify-content:space-between;gap:6px"><span style="flex:1;font-weight:600">' + esc(s.name||'') + '</span><span style="color:var(--txt3);font-size:10px">' + pdF + '</span></div>';
+    }).join('');
+  } else ssh += '<div style="color:var(--txt3);font-size:11px">매장 없음</div>';
+  document.getElementById('fr-modal-stores').innerHTML = ssh;
+  // staff+ 폐점 세부
+  var role = window.ME && window.ME.role;
+  var cs = document.getElementById('fr-modal-closed-section');
+  if ((role === 'staff' || role === 'admin' || role === 'sales') && closedStores.length) {
+    closedStores.sort(function(a,b){ return (b.closedDate||b.permitDate||'').localeCompare(a.closedDate||a.permitDate||''); });
+    var html = '<div style="font-size:11px;color:#f87171;margin-bottom:6px;font-weight:700">🚫 폐점 매장 세부 (' + closedStores.length + '건, staff+ 전용)</div>';
+    html += closedStores.slice(0,8).map(function(s){
+      var cd = s.closedDate || s.permitDate || '';
+      var cdF = cd.length===8 ? cd.slice(0,4)+'.'+cd.slice(4,6)+'.'+cd.slice(6,8) : '';
+      return '<div style="padding:7px 9px;background:rgba(248,113,113,0.05);border:1px solid rgba(248,113,113,0.15);border-radius:7px;margin-bottom:5px;font-size:11px"><div style="font-weight:600;color:#f87171">' + esc(s.name||'') + '</div><div style="color:var(--txt3);margin-top:3px">' + esc(s.addr||'').slice(0,40) + ' · 폐 ' + cdF + '</div></div>';
+    }).join('');
+    cs.innerHTML = html;
+    cs.style.display = 'block';
+  } else {
+    cs.style.display = 'none';
+  }
+  document.getElementById('fr-brand-modal').style.display = 'flex';
+}
+function closeFrBrandModal(){
+  document.getElementById('fr-brand-modal').style.display = 'none';
+}
+function gotoFrTab(brand){
+  // 프랜차이즈 탭 전환 + 검색에 brand 표시 → 선택
+  document.querySelectorAll('.bnav-btn').forEach(function(b){ b.classList.remove('on'); });
+  var btn = document.querySelector('[data-pg="fr"]');
+  if (btn) btn.classList.add('on');
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('on'); });
+  var pg = document.getElementById('pg-fr');
+  if (pg) pg.classList.add('on');
+  setTimeout(function(){ try { selectBrand(encodeURIComponent(brand), false); } catch(e){} }, 100);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+// ESC로 모달 닫기
+document.addEventListener('keydown', function(e){
+  if (e.key === 'Escape') closeFrBrandModal();
+});
 
 // v15.16: 「📈 추이」 탭 — 카테고리·brand·성장·시도 분포
 function isCatStore(s, cat){
