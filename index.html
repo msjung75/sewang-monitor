@@ -3207,7 +3207,7 @@ function renderTrendBrand(q){
   q = (q||'').trim().toLowerCase().replace(/\s/g,'');
   var resEl = document.getElementById('trend-brand-result');
   if (!q || q.length < 2 || !window.YTD || !window.YTD.by_brand) {
-    resEl.innerHTML = '<div style="color:var(--txt3);font-size:12px;padding:14px;text-align:center">brand 입력하면 1~6월 출점/폐점 차트</div>';
+    resEl.innerHTML = '<div style="color:var(--txt3);font-size:12px;padding:14px;text-align:center">brand 입력하면 1~6월 출점/폐점 차트 (alias 통합)</div>';
     return;
   }
   // matching brands
@@ -3217,14 +3217,19 @@ function renderTrendBrand(q){
     var alias = (typeof BRAND_ALIASES !== 'undefined' && BRAND_ALIASES[bc]) || b;
     var ac = alias.replace(/\s/g,'').toLowerCase();
     if (bc.indexOf(q) >= 0 || ac.indexOf(q) >= 0) {
-      if (!hits[ac]) hits[ac] = { name: alias, monthly: {} };
+      if (!hits[ac]) hits[ac] = { name: alias, monthly: {}, sample: null };
       var v = window.YTD.by_brand[b];
       for (var m in v.monthly) {
         if (m < '202601') continue;
         if (!hits[ac].monthly[m]) hits[ac].monthly[m] = { open:0, closed:0 };
         var stores = v.monthly[m].stores || [];
         for (var i = 0; i < stores.length; i++) {
-          if (stores[i].closed) hits[ac].monthly[m].closed++; else hits[ac].monthly[m].open++;
+          var st = stores[i];
+          // v16.3: isExcluded 자동 필터
+          if (window._excludedStoreSet && window._excludedStoreSet[st.id]) continue;
+          if (isExcluded(st)) continue;
+          if (st.closed) hits[ac].monthly[m].closed++; else hits[ac].monthly[m].open++;
+          if (!hits[ac].sample && !st.closed) hits[ac].sample = st;
         }
       }
     }
@@ -3251,7 +3256,14 @@ function renderTrendBrand(q){
     var tO = 0, tC = 0;
     for (var m in g.monthly) { tO += g.monthly[m].open; tC += g.monthly[m].closed; }
     html += '<div style="margin-bottom:14px;padding:12px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:10px">';
-    html += '<div style="font-size:13px;font-weight:700;color:var(--txt);margin-bottom:8px">' + esc(g.name) + ' <span style="font-size:11px;font-weight:500"><span style="color:#34d399">+' + tO + '</span> · <span style="color:#f87171">-' + tC + '</span></span></div>';
+    // 카테고리 caption
+    var catLabel = '';
+    if (g.sample) {
+      if (isCatStore(g.sample, 'sool')) catLabel = '<span style="font-size:9px;background:rgba(52,211,153,.18);color:#34d399;padding:2px 5px;border-radius:4px;margin-left:5px;font-weight:800">🍺 주점</span>';
+      else if (isCatStore(g.sample, 'cafe')) catLabel = '<span style="font-size:9px;background:rgba(251,191,36,.18);color:#fbbf24;padding:2px 5px;border-radius:4px;margin-left:5px;font-weight:800">☕ 카페</span>';
+      else catLabel = '<span style="font-size:9px;background:rgba(125,211,252,.18);color:#7dd3fc;padding:2px 5px;border-radius:4px;margin-left:5px;font-weight:800">🍽️ 음식점</span>';
+    }
+    html += '<div style="font-size:13px;font-weight:700;color:var(--txt);margin-bottom:8px">' + esc(g.name) + catLabel + ' <span style="font-size:11px;font-weight:500"><span style="color:#34d399">+' + tO + '</span> · <span style="color:#f87171">-' + tC + '</span></span></div>';
     html += '<div style="display:flex;gap:4px;align-items:flex-end;height:60px">';
     for (var i = 0; i < 6; i++) {
       var m = '20260' + (i+1);
