@@ -521,12 +521,12 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
     </table>
   </div>
 
-  <!-- v17.0: 월별 업종 stack (사장님 의도 — 어떤 업종이 늘고 있는지) -->
-  <div class="card" id="card-monthly-trend" style="margin-top:14px">
-    <div class="card-title">🍽️ 월별 업종별 창업 추이 <span style="color:var(--txt3);font-size:10px;font-weight:500;margin-left:auto">2026년 1~6월</span></div>
-    <div id="monthly-trend-summary" style="font-size:11.5px;color:var(--txt2);margin-bottom:12px;line-height:1.5">업종별 신규 출점 로딩 중…</div>
-    <div id="monthly-trend-chart"><div style="color:var(--txt3);font-size:11.5px;text-align:center;padding:22px">⏳ 업종 분류 중…</div></div>
-    <div id="monthly-trend-legend" style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:10px;font-size:9.5px;color:var(--txt3)"></div>
+  <!-- v17.2: 대시보드는 최근 30일 단기 스냅샷 (사장님 구조 분리) -->
+  <div class="card" id="card-30day-breakdown" style="margin-top:14px">
+    <div class="card-title">📊 최근 30일 업종별 신규 오픈 <span style="color:var(--txt3);font-size:10px;font-weight:500;margin-left:auto">단기 스냅샷</span></div>
+    <div id="day30-summary" style="font-size:11.5px;color:var(--txt2);margin-bottom:12px;line-height:1.5">최근 30일 데이터 로딩 중…</div>
+    <div id="day30-chart"></div>
+    <div style="font-size:10px;color:var(--txt3);text-align:center;margin-top:8px">📈 6개월 정밀 분석은 「추이」 탭에서 확인</div>
   </div>
 
 </div>
@@ -713,9 +713,17 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
     <div class="chip" data-v="food">🍽️ 음식점</div>
     <div class="chip" data-v="cafe">☕ 카페·빵</div>
   </div>
-  <!-- 월별 stack chart -->
+  <!-- v17.2: 추세 탭은 6개월 YTD 정밀 분석 -->
+  <!-- 월별 업종별 stacked bar (사장님 의도) -->
+  <div class="card" id="card-monthly-trend" style="margin-bottom:12px;padding:16px">
+    <div class="card-title">🍽️ 월별 업종별 창업 추이 <span style="color:var(--txt3);font-size:10px;font-weight:500;margin-left:auto">2026년 1~6월</span></div>
+    <div id="monthly-trend-summary" style="font-size:11.5px;color:var(--txt2);margin-bottom:12px;line-height:1.5">업종별 신규 출점 로딩 중…</div>
+    <div id="monthly-trend-chart"><div style="color:var(--txt3);font-size:11.5px;text-align:center;padding:22px">⏳ 업종 분류 중…</div></div>
+    <div id="monthly-trend-legend" style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:10px;font-size:9.5px;color:var(--txt3)"></div>
+  </div>
+  <!-- 월별 신규 출점 (총합 막대) -->
   <div class="card" style="margin-bottom:12px;padding:16px">
-    <div class="card-title">📅 월별 신규 출점 (1~6월)</div>
+    <div class="card-title">📅 월별 신규/폐점 (1~6월)</div>
     <div id="trend-month-summary" style="font-size:11.5px;color:var(--txt2);margin-bottom:10px"></div>
     <div id="trend-month-chart"></div>
   </div>
@@ -1486,6 +1494,7 @@ function renderAll(){
   renderGold();
   renderFr();
   renderBuzz();
+  try { render30DayBreakdown(); } catch(e){}  // v17.2 대시보드 30일 카드
 }
 
 function renderStats(){
@@ -2300,6 +2309,7 @@ async function loadYTDSummary(){
     setTimeout(function(){ try { loadFranchiseStats(); } catch(e){} }, 3000);
     // v15.15: 월별 창업 추이 카드
     try { renderMonthlyTrend(); } catch(e){}
+    try { render30DayBreakdown(); } catch(e){}
     // 「프랜차이즈」 상단 안내문 집계 표시
     var sumEl = document.getElementById('fr-ytd-summary');
     if (sumEl && window.YTD.by_month) {
@@ -3362,6 +3372,47 @@ function renderTrendSidoDist(cat){
 }
 
 // v15.15: 월별 창업 추이 (대시보드 카드)
+// v17.2: 대시보드 — 최근 30일 업종별 신규 오픈 (단기 스냅샷)
+function render30DayBreakdown(){
+  var chartEl = document.getElementById('day30-chart');
+  var sumEl = document.getElementById('day30-summary');
+  if (!chartEl) return;
+  if (!ST.permits || !ST.permits.length) {
+    chartEl.innerHTML = '<div style="color:var(--txt3);font-size:11.5px;text-align:center;padding:18px">⏳ 30일 데이터 로딩 중…</div>';
+    setTimeout(render30DayBreakdown, 2000);
+    return;
+  }
+  var catCnt = {};
+  var total = 0;
+  for (var i = 0; i < ST.permits.length; i++) {
+    var s = ST.permits[i];
+    try { if (typeof isExcluded === 'function' && isExcluded(s)) continue; } catch(e){}
+    if (s.closed) continue;
+    var cat = detailCategory(s);
+    catCnt[cat] = (catCnt[cat]||0) + 1;
+    total++;
+  }
+  if (total === 0) {
+    chartEl.innerHTML = '<div style="color:var(--txt3);font-size:11.5px;text-align:center;padding:18px">30일 데이터 없음</div>';
+    return;
+  }
+  var ordered = Object.keys(catCnt).sort(function(a,b){ return catCnt[b]-catCnt[a]; });
+  var top1 = ordered[0];
+  var top1Info = DETAIL_CAT_INFO[top1] || {};
+  if (sumEl) sumEl.innerHTML = '최근 30일 <b style="color:#34d399">' + total.toLocaleString() + '</b>건 신규 · TOP1 <b style="color:' + top1Info.color + '">' + top1Info.label + ' ' + catCnt[top1].toLocaleString() + '건 (' + Math.round(catCnt[top1]/total*100) + '%)</b>';
+  var maxN = catCnt[top1] || 1;
+  var html = ordered.map(function(c){
+    var info = DETAIL_CAT_INFO[c] || { label:c, color:'#94a3b8' };
+    var n = catCnt[c];
+    var w = n/maxN*100;
+    return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:11.5px">'
+      + '<div style="width:72px;color:var(--txt2);font-weight:600">' + info.label + '</div>'
+      + '<div style="flex:1;height:9px;background:rgba(255,255,255,0.05);border-radius:5px;overflow:hidden"><div style="height:100%;width:' + w.toFixed(1) + '%;background:' + info.color + ';border-radius:5px"></div></div>'
+      + '<div style="width:60px;text-align:right;font-weight:800;color:' + info.color + '">' + n.toLocaleString() + '</div>'
+      + '</div>';
+  }).join('');
+  chartEl.innerHTML = html;
+}
 // v17.1: 업종 세분화 분류 — 매장명 + 업태 (사장님: 기타 모호 → 키워드 대폭 강화)
 function detailCategory(s){
   var n = (s.name||'').toLowerCase();
