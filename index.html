@@ -3091,10 +3091,14 @@ function renderTrendBrand(q){
   resEl.innerHTML = html;
 }
 function renderTrendTopGrowth(cat){
-  var growth = [];
+  // v15.16.1 fix: alias 그룹화 후 성장률 — 「야화 혼술바」 split 방지
+  var grouped = {}; // aliasCompact → { brand, early, late }
   for (var b in window.YTD.by_brand) {
+    var compact = b.replace(/\s/g,'').toLowerCase();
+    var alias = (typeof BRAND_ALIASES !== 'undefined' && BRAND_ALIASES[compact]) || b;
+    var aliasCompact = alias.replace(/\s/g,'').toLowerCase();
+    if (!grouped[aliasCompact]) grouped[aliasCompact] = { brand: alias, early: 0, late: 0 };
     var v = window.YTD.by_brand[b];
-    var early = 0, late = 0;
     for (var m in v.monthly) {
       if (m < '202601' || m > '202606') continue;
       var stores = v.monthly[m].stores || [];
@@ -3107,21 +3111,24 @@ function renderTrendTopGrowth(cat){
         n++;
       }
       var mm = parseInt(m.slice(4,6), 10);
-      if (mm <= 3) early += n; else late += n;
+      if (mm <= 3) grouped[aliasCompact].early += n;
+      else grouped[aliasCompact].late += n;
     }
-    if (late >= 3 && late > early) {
-      var pct = early === 0 ? 999 : Math.round((late - early) / early * 100);
-      growth.push({ brand: b, early: early, late: late, pct: pct });
+  }
+  var growth = [];
+  for (var k in grouped) {
+    var g = grouped[k];
+    if (g.late >= 3 && g.late > g.early) {
+      g.pct = g.early === 0 ? 999 : Math.round((g.late - g.early) / g.early * 100);
+      growth.push(g);
     }
   }
   growth.sort(function(a,b){ if (b.late !== a.late) return b.late - a.late; return b.pct - a.pct; });
   var html = '';
   growth.slice(0, 10).forEach(function(g, i){
-    var compact = g.brand.replace(/\s/g,'').toLowerCase();
-    var alias = (typeof BRAND_ALIASES !== 'undefined' && BRAND_ALIASES[compact]) || g.brand;
-    html += '<div onclick="document.getElementById(\'trend-brand-search\').value=\'' + esc(alias) + '\';renderTrendBrand(\'' + esc(alias) + '\')" style="display:flex;align-items:center;gap:10px;padding:9px 11px;background:rgba(52,211,153,0.05);border:1px solid rgba(52,211,153,0.15);border-radius:8px;margin-bottom:6px;cursor:pointer;font-size:12px">'
+    html += '<div onclick="document.getElementById(\'trend-brand-search\').value=\'' + esc(g.brand) + '\';renderTrendBrand(\'' + esc(g.brand) + '\')" style="display:flex;align-items:center;gap:10px;padding:9px 11px;background:rgba(52,211,153,0.05);border:1px solid rgba(52,211,153,0.15);border-radius:8px;margin-bottom:6px;cursor:pointer;font-size:12px">'
       + '<div style="width:22px;font-weight:800;color:#34d399">' + (i+1) + '</div>'
-      + '<div style="flex:1;font-weight:700">' + esc(alias) + '</div>'
+      + '<div style="flex:1;font-weight:700">' + esc(g.brand) + '</div>'
       + '<div style="color:var(--txt3);font-size:10.5px">초 ' + g.early + ' → 후 ' + g.late + '</div>'
       + '<div style="color:#34d399;font-weight:800">+' + (g.pct >= 999 ? 'NEW' : g.pct + '%') + '</div>'
       + '</div>';
