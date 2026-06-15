@@ -525,14 +525,12 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
     </table>
   </div>
 
-  <!-- v15.15: 월별 창업 추이 -->
+  <!-- v17.0: 월별 업종 stack (사장님 의도 — 어떤 업종이 늘고 있는지) -->
   <div class="card" id="card-monthly-trend" style="margin-top:14px">
-    <div class="card-title">📈 올해 월별 창업 추이 <span style="color:var(--txt3);font-size:10px;font-weight:500;margin-left:auto">2026년 1~6월</span></div>
-    <div id="monthly-trend-summary" style="font-size:11.5px;color:var(--txt2);margin-bottom:12px;line-height:1.5">올해 누적 데이터 로딩 중…</div>
-    <div id="monthly-trend-chart"><div style="color:var(--txt3);font-size:11.5px;text-align:center;padding:22px">⏳ 1~6월 데이터 로딩 중…<br><span style="font-size:10px;color:var(--txt3);margin-top:8px;display:inline-block">10초 안 안 나오면 헤더 👤 → 🔄 강제 새로고침</span></div></div>
-    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
-      <div style="font-size:10px;color:var(--txt3)"><span style="color:#34d399">■</span> 출점 <span style="color:#f87171;margin-left:8px">■</span> 폐점</div>
-    </div>
+    <div class="card-title">🍽️ 월별 업종별 창업 추이 <span style="color:var(--txt3);font-size:10px;font-weight:500;margin-left:auto">2026년 1~6월</span></div>
+    <div id="monthly-trend-summary" style="font-size:11.5px;color:var(--txt2);margin-bottom:12px;line-height:1.5">업종별 신규 출점 로딩 중…</div>
+    <div id="monthly-trend-chart"><div style="color:var(--txt3);font-size:11.5px;text-align:center;padding:22px">⏳ 업종 분류 중…</div></div>
+    <div id="monthly-trend-legend" style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:10px;font-size:9.5px;color:var(--txt3)"></div>
   </div>
 
 </div>
@@ -3368,16 +3366,119 @@ function renderTrendSidoDist(cat){
 }
 
 // v15.15: 월별 창업 추이 (대시보드 카드)
+// v17.0: 업종 세분화 분류 — 매장명 + 업태
+function detailCategory(s){
+  var n = (s.name||'').toLowerCase();
+  var u = (s.upte||'').toLowerCase();
+  var t = n + ' ' + u;
+  if (/주점|호프|선술|이자카야|포차|혼술|와인바|칵테일/i.test(t) || /유흥|단란/i.test(u)) return 'sool';
+  if (/카페|커피|cafe|coffee|빵|베이커리|디저트|도넛|와플|아이스크림/i.test(t)) return 'cafe';
+  if (/치킨|chicken|닭|호프집/i.test(t)) return 'chicken';
+  if (/고기|삼겹|갈비|곱창|막창|불고기|구이|돼지|소고기|한우/i.test(t)) return 'meat';
+  if (/일식|이자카야|라멘|우동|초밥|돈까스|소바|텐동|규동|스시/i.test(t)) return 'japanese';
+  if (/중식|짜장|짬뽕|마라|훠궈|마라탕|양꼬치|중화/i.test(t)) return 'chinese';
+  if (/한식|김밥|분식|백반|국밥|찌개|덮밥|비빔밥|족발|보쌈|순대|국수|냉면/i.test(t)) return 'korean';
+  if (/피자|pizza|버거|burger|타코|샌드위치|토스트|패스트/i.test(t)) return 'western';
+  return 'other';
+}
+var DETAIL_CAT_INFO = {
+  sool:     { label: '주점·바',  color: '#34d399' },
+  chicken:  { label: '치킨',     color: '#fbbf24' },
+  meat:     { label: '고기·구이',color: '#ef4444' },
+  korean:   { label: '한식',     color: '#a78bfa' },
+  japanese: { label: '일식',     color: '#7dd3fc' },
+  chinese:  { label: '중식',     color: '#f97316' },
+  western:  { label: '양식·패스트', color: '#ec4899' },
+  cafe:     { label: '카페·빵',  color: '#facc15' },
+  other:    { label: '기타',     color: '#94a3b8' },
+};
 function renderMonthlyTrend(){
   var chartEl = document.getElementById('monthly-trend-chart');
   var sumEl = document.getElementById('monthly-trend-summary');
+  var legEl = document.getElementById('monthly-trend-legend');
   if (!chartEl) return;
   // YTD 로드 전 retry
   if (!window.YTD || !window.YTD.by_brand) {
-    chartEl.innerHTML = '<div style="color:var(--txt3);font-size:11.5px;text-align:center;padding:18px">⏳ 올해 누적 데이터 로딩 중…</div>';
+    chartEl.innerHTML = '<div style="color:var(--txt3);font-size:11.5px;text-align:center;padding:18px">⏳ 데이터 로딩 중…</div>';
     setTimeout(renderMonthlyTrend, 1500);
     return;
   }
+  // v17.0: 월별 × 업종별 출점 집계
+  var byMonth = {}; // yyyymm → { cat → count }
+  var catTotal = {};
+  for (var b in window.YTD.by_brand) {
+    var v = window.YTD.by_brand[b];
+    for (var m in v.monthly) {
+      if (m < '202601' || m > '202612') continue;
+      var stores = v.monthly[m].stores || [];
+      for (var i = 0; i < stores.length; i++) {
+        var s = stores[i];
+        if (s.closed) continue;
+        if (window._excludedStoreSet && window._excludedStoreSet[s.id]) continue;
+        try { if (typeof isExcluded === 'function' && isExcluded(s)) continue; } catch(e){}
+        var cat = detailCategory(s);
+        if (!byMonth[m]) byMonth[m] = {};
+        byMonth[m][cat] = (byMonth[m][cat]||0) + 1;
+        catTotal[cat] = (catTotal[cat]||0) + 1;
+      }
+    }
+  }
+  var months = Object.keys(byMonth).sort();
+  if (!months.length) {
+    chartEl.innerHTML = '<div style="color:var(--txt3);font-size:11.5px;text-align:center;padding:18px">데이터 없음 (1~6월 cron 후 표시)</div>';
+    return;
+  }
+  // 누적 max
+  var maxN = 1;
+  months.forEach(function(m){
+    var sum = 0;
+    Object.values(byMonth[m]).forEach(function(n){ sum += n; });
+    if (sum > maxN) maxN = sum;
+  });
+  // 카테고리 정렬 (총량 내림차순)
+  var catOrder = Object.keys(catTotal).sort(function(a,b){ return catTotal[b]-catTotal[a]; });
+  // 요약
+  var totalAll = 0;
+  catOrder.forEach(function(c){ totalAll += catTotal[c]; });
+  var top1 = catOrder[0];
+  var top1Pct = totalAll ? Math.round(catTotal[top1]/totalAll*100) : 0;
+  sumEl.innerHTML = '누적 <b style="color:#34d399">' + totalAll.toLocaleString() + '</b> 신규 · TOP1 <b style="color:' + (DETAIL_CAT_INFO[top1]||{}).color + '">' + (DETAIL_CAT_INFO[top1]||{}).label + ' ' + catTotal[top1].toLocaleString() + '건 (' + top1Pct + '%)</b>';
+  // 월별 stacked bar (가로)
+  var monLabels = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+  var html = '';
+  months.forEach(function(m){
+    var idx = parseInt(m.slice(4,6),10) - 1;
+    var monData = byMonth[m];
+    var rowTotal = 0;
+    Object.values(monData).forEach(function(n){ rowTotal += n; });
+    html += '<div style="margin-bottom:8px">'
+      + '<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;font-size:10.5px"><span style="width:32px;color:var(--txt2);font-weight:700">' + monLabels[idx] + '</span><span style="color:var(--txt3)">+' + rowTotal.toLocaleString() + '</span></div>'
+      + '<div style="display:flex;width:100%;height:18px;border-radius:4px;overflow:hidden;background:rgba(255,255,255,0.04)">';
+    catOrder.forEach(function(cat){
+      var n = monData[cat] || 0;
+      if (!n) return;
+      var w = n / maxN * 100;
+      var info = DETAIL_CAT_INFO[cat] || { color:'#94a3b8', label:cat };
+      html += '<div title="' + info.label + ' ' + n + '" style="background:' + info.color + ';width:' + w.toFixed(1) + '%;min-width:1px"></div>';
+    });
+    html += '</div></div>';
+  });
+  chartEl.innerHTML = html;
+  // 범례
+  if (legEl) {
+    legEl.innerHTML = catOrder.slice(0, 9).map(function(cat){
+      var info = DETAIL_CAT_INFO[cat] || { color:'#94a3b8', label:cat };
+      return '<span style="display:inline-flex;align-items:center;gap:4px"><span style="width:9px;height:9px;background:' + info.color + ';border-radius:2px;display:inline-block"></span><span>' + info.label + ' ' + catTotal[cat].toLocaleString() + '</span></span>';
+    }).join('');
+  }
+  return; // 옛 코드 skip
+}
+// 옛 함수 body (사용 안 함 — return으로 skip)
+function _renderMonthlyTrendOld(){
+  var chartEl = document.getElementById('monthly-trend-chart');
+  var sumEl = document.getElementById('monthly-trend-summary');
+  if (!chartEl) return;
+  if (!window.YTD || !window.YTD.by_brand) return;
   // 월별 출/폐 집계
   var byMonth = {}; // yyyymm → { open, closed }
   var totalOpen = 0, totalClosed = 0;
