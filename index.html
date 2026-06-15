@@ -3664,12 +3664,19 @@ function init(){
         });
       });
     }).catch(function(){});
-    // 새 sw 활성화되면 자동 reload (단 사용자가 toast 보고 결정)
+    // v16.9: 새 sw 메시지 수신 → 즉시 자동 reload (사장님 작업 중단보다 캐시 갱신이 우선)
     var _reloaded = false;
-    navigator.serviceWorker.addEventListener('controllerchange', function(){
+    function _autoReload(reason){
       if (_reloaded) return;
       _reloaded = true;
-      // 자동 reload 대신 toast로 안내 — 사장님 작업 중단 방지
+      console.log('[SW] 자동 새로고침:', reason);
+      location.reload();
+    }
+    navigator.serviceWorker.addEventListener('controllerchange', function(){
+      _autoReload('controllerchange');
+    });
+    navigator.serviceWorker.addEventListener('message', function(e){
+      if (e.data && e.data.type === 'SW_UPDATED_RELOAD') _autoReload('sw msg');
     });
   }
   // v16.6: PWA 설치 prompt (Android Chrome 등) — iOS는 별도 메시지

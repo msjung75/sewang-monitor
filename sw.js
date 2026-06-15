@@ -1,5 +1,5 @@
-// PWA Service Worker v15.20 — 자동 업데이트 보장 (index.html network-first)
-const CACHE = 'sewang-pwa-v15_20-auto-update';
+// PWA Service Worker v16.9 — 옛 SW 사용자 강제 reload
+const CACHE = 'sewang-pwa-v16_9-force-update';
 const SHELL = ['/manifest.json', '/icon.svg'];  // index.html 제거 — 항상 network-first
 
 self.addEventListener('install', e => {
@@ -15,6 +15,11 @@ self.addEventListener('activate', e => {
     caches.keys()
       .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
       .then(() => self.clients.claim())  // 즉시 모든 탭 제어
+      .then(() => self.clients.matchAll({type: 'window'}))
+      .then(clients => {
+        // 모든 열린 탭에 RELOAD 메시지 → index.html 자동 새로고침
+        clients.forEach(c => c.postMessage({ type: 'SW_UPDATED_RELOAD' }));
+      })
   );
 });
 
