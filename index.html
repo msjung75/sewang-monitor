@@ -37,16 +37,23 @@
   --txt2: #cbd5e1;      /* 보조 텍스트 — 회색→밝은회색 (가독성 ↑) */
   --txt3: #94a3b8;      /* 캡션 — 한 단계 밝게 */
   --txt4: #64748b;      /* 비활성 */
-  /* v13.2 가독성 토큰 */
-  --fs-xs: 11.5px;
-  --fs-sm: 13px;
-  --fs-base: 15px;
-  --fs-md: 16px;
-  --fs-lg: 18px;
-  --fs-xl: 22px;
-  --fs-2xl: 28px;
-  --fs-3xl: 40px;
-  --fs-4xl: 52px;
+  /* v17.4 가독성 토큰 (사장님: 「눈 시리다」 + 1단계) */
+  --fs-xs: 12.5px;
+  --fs-sm: 14px;
+  --fs-base: 16px;
+  --fs-md: 17px;
+  --fs-lg: 19px;
+  --fs-xl: 23px;
+  --fs-2xl: 30px;
+  --fs-3xl: 42px;
+  --fs-4xl: 54px;
+  /* 줄간격·여백 통일 */
+  --lh-tight: 1.35;
+  --lh-base: 1.55;
+  --sp-1: 6px;
+  --sp-2: 10px;
+  --sp-3: 14px;
+  --sp-4: 18px;
   --shadow-sm: 0 1px 2px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.04) inset;
   --shadow-card: 0 4px 24px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.04) inset;
   --shadow-hi: 0 12px 40px rgba(56,189,248,0.15), 0 0 0 1px rgba(56,189,248,0.18) inset;
@@ -72,11 +79,26 @@ body{
   color:var(--txt);
   font-family:-apple-system,'Pretendard Variable','Pretendard','Noto Sans KR',BlinkMacSystemFont,'Segoe UI',sans-serif;
   font-size:var(--fs-base);
-  line-height:1.6;
+  line-height:var(--lh-base);
   -webkit-font-smoothing:antialiased;
   -moz-osx-font-smoothing:grayscale;
   letter-spacing:-0.01em;
 }
+/* v17.4: 카드·텍스트 일관성 */
+.card-title{font-size:var(--fs-md);font-weight:800;letter-spacing:-0.3px;margin-bottom:var(--sp-3);display:flex;align-items:center;gap:6px;color:var(--txt)}
+.empty{padding:var(--sp-4) var(--sp-3);text-align:center}
+.empty .eico{font-size:32px;margin-bottom:8px}
+.empty .etxt{color:var(--txt3);font-size:var(--fs-sm);line-height:var(--lh-base)}
+/* 빈 상태 spinner */
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(125,211,252,0.3);border-top-color:#7dd3fc;border-radius:50%;animation:spin 0.8s linear infinite;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* 표 가독성 */
+.rtbl{font-size:var(--fs-sm);line-height:var(--lh-tight)}
+.rtbl th{font-size:11px;color:var(--txt3);font-weight:700;letter-spacing:0.4px;text-transform:uppercase;padding:8px 6px}
+.rtbl td{padding:10px 6px}
+/* 입력 일관성 */
+input[type=text],input[type=search]{transition:border-color 0.2s,box-shadow 0.2s}
+input[type=text]:focus,input[type=search]:focus{outline:none;border-color:rgba(125,211,252,0.6);box-shadow:0 0 0 3px rgba(125,211,252,0.15)}
 /* tabular numerals for numbers */
 .num,.stat-n,.kpi-n,.metric-n{font-variant-numeric:tabular-nums;font-feature-settings:'tnum';letter-spacing:-0.02em}
 
