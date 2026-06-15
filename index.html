@@ -665,6 +665,45 @@ body{
 </div>
 
 <!-- ======= PAGE: 🗺️ 지도 ======= -->
+<!-- ======= PAGE: 📈 추이 분석 (v15.16) ======= -->
+<div class="page" id="pg-trend">
+  <div class="alert-banner">
+    <span class="aico">📈</span>
+    <div>
+      <strong style="color:var(--c1)">올해 창업 추이 분석</strong><br>
+      <span style="font-size:12px">월별 패턴 · 브랜드 성장 · 지역 분포 · 카테고리별 흐름</span>
+    </div>
+  </div>
+  <div class="chips" id="chip-trend-cat" style="margin-bottom:10px">
+    <div class="chip on" data-v="all">전체</div>
+    <div class="chip" data-v="sool">🍺 주점</div>
+    <div class="chip" data-v="food">🍽️ 음식점</div>
+    <div class="chip" data-v="cafe">☕ 카페·빵</div>
+  </div>
+  <!-- 월별 stack chart -->
+  <div class="card" style="margin-bottom:12px;padding:16px">
+    <div class="card-title">📅 월별 신규 출점 (1~6월)</div>
+    <div id="trend-month-summary" style="font-size:11.5px;color:var(--txt2);margin-bottom:10px"></div>
+    <div id="trend-month-chart"></div>
+  </div>
+  <!-- 브랜드 검색 → 월별 라인 -->
+  <div class="card" style="margin-bottom:12px;padding:16px">
+    <div class="card-title">🔍 브랜드 월별 추이</div>
+    <input id="trend-brand-search" type="text" placeholder="브랜드명 입력 (예: 야화 혼술바)" style="width:100%;padding:10px 12px;border:1px solid var(--border2);background:var(--surface);border-radius:10px;color:var(--txt);font-size:13px;margin-bottom:12px;box-sizing:border-box" oninput="renderTrendBrand(this.value)">
+    <div id="trend-brand-result" style="min-height:40px"><div style="color:var(--txt3);font-size:12px;padding:14px;text-align:center">위 검색창에 brand 입력하면 1~6월 출점/폐점 차트 표시</div></div>
+  </div>
+  <!-- TOP 성장 브랜드 -->
+  <div class="card" style="margin-bottom:12px;padding:16px">
+    <div class="card-title">🚀 TOP 성장 브랜드 (최근 3개월 vs 직전)</div>
+    <div id="trend-top-growth"></div>
+  </div>
+  <!-- 시·도 분포 -->
+  <div class="card" style="margin-bottom:12px;padding:16px">
+    <div class="card-title">📍 시·도 분포</div>
+    <div id="trend-sido-dist"></div>
+  </div>
+</div>
+
 <div class="page" id="pg-map">
   <div class="alert-banner">
     <span class="aico">🗺️</span>
@@ -814,6 +853,9 @@ body{
   <button class="bnav-btn" id="bnav-admin" data-pg="admin" style="display:none;position:relative">
     <span class="ico">👥</span>관리
     <span id="admin-pending-badge" style="display:none;position:absolute;top:4px;right:14px;min-width:18px;height:18px;padding:0 5px;background:#ef4444;color:white;border-radius:9px;font-size:9px;font-weight:800;line-height:18px;text-align:center;box-shadow:0 0 8px rgba(239,68,68,0.4)">0</span>
+  </button>
+  <button class="bnav-btn" data-pg="trend">
+    <span class="ico">📈</span>추이
   </button>
   <button class="bnav-btn" data-pg="map">
     <span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></span>지도
@@ -2845,12 +2887,13 @@ function switchPage(pg){
   document.querySelector('.bnav-btn[data-pg="' + pg + '"]').classList.add('on');
   if (pg === 'track') renderTracked();
   if (pg === 'map') { try { initKakaoMap(); } catch(e) { renderMapSidoStats(); } }
+  if (pg === 'trend') { try { renderTrendTab(); } catch(e){} }
 }
 document.querySelectorAll('.bnav-btn').forEach(function(btn){
   btn.addEventListener('click', function(){ switchPage(btn.dataset.pg); });
 });
 
-['chip-days','chip-region','chip-type','chip-nstat','chip-gold-sort','chip-track','chip-fr-kind','chip-fr-source','chip-map-mode','chip-map-cat'].forEach(function(id){
+['chip-days','chip-region','chip-type','chip-nstat','chip-gold-sort','chip-track','chip-fr-kind','chip-fr-source','chip-map-mode','chip-map-cat','chip-trend-cat'].forEach(function(id){
   document.querySelectorAll('#' + id + ' .chip').forEach(function(c){
     c.addEventListener('click', function(){
       document.querySelectorAll('#' + id + ' .chip').forEach(function(x){ x.classList.remove('on'); });
@@ -2859,6 +2902,7 @@ document.querySelectorAll('.bnav-btn').forEach(function(btn){
       else if (id === 'chip-gold-sort') renderGold();
       else if (id === 'chip-track') renderTracked();
       else if (id === 'chip-fr-kind' || id === 'chip-fr-source') { FR_SELECTED = null; renderFr(); }
+      else if (id === 'chip-trend-cat') renderTrendTab();
       else if (id === 'chip-region') {
         // 「전국」 chip → 즉시 nightly cache 표시 (실시간 fetch 차단)
         if (c.dataset.v === 'all') {
@@ -2912,6 +2956,197 @@ function updateClock(isFetch){
 }
 setInterval(function(){ updateClock(); }, 30000);
 updateClock();
+
+// v15.16: 「📈 추이」 탭 — 카테고리·brand·성장·시도 분포
+function isCatStore(s, cat){
+  if (cat === 'all') return true;
+  var sool = /주점|호프|바|bar|이자카야|포차|선술집|혼술/i;
+  var cafe = /커피|카페|cafe|coffee|빵|베이커리|파리바게뜨|뚜레/i;
+  var n = (s.name||'') + ' ' + (s.upte||'');
+  if (cat === 'sool') return sool.test(n);
+  if (cat === 'cafe') return cafe.test(n);
+  if (cat === 'food') return !sool.test(n) && !cafe.test(n);
+  return true;
+}
+function renderTrendTab(){
+  var cat = activeChip('chip-trend-cat') || 'all';
+  if (!window.YTD || !window.YTD.by_brand) return;
+  // 월별 집계 — 카테고리 필터
+  var byMonth = {};
+  for (var b in window.YTD.by_brand) {
+    var v = window.YTD.by_brand[b];
+    for (var m in v.monthly) {
+      if (m < '202601') continue;
+      var stores = v.monthly[m].stores || [];
+      for (var i = 0; i < stores.length; i++) {
+        var s = stores[i];
+        if (!isCatStore(s, cat)) continue;
+        if (window._excludedStoreSet && window._excludedStoreSet[s.id]) continue;
+        if (!byMonth[m]) byMonth[m] = { open: 0, closed: 0 };
+        if (s.closed) byMonth[m].closed++; else byMonth[m].open++;
+      }
+    }
+  }
+  var months = Object.keys(byMonth).sort();
+  var maxN = 1;
+  months.forEach(function(m){ if (byMonth[m].open + byMonth[m].closed > maxN) maxN = byMonth[m].open + byMonth[m].closed; });
+  var totalO = 0, totalC = 0;
+  months.forEach(function(m){ totalO += byMonth[m].open; totalC += byMonth[m].closed; });
+  var sumEl = document.getElementById('trend-month-summary');
+  if (sumEl) sumEl.innerHTML = '누적 <b style="color:#34d399">' + totalO.toLocaleString() + '</b> 출점 · <b style="color:#f87171">' + totalC.toLocaleString() + '</b> 폐점';
+  var labels = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+  var html = '';
+  months.forEach(function(m){
+    var idx = parseInt(m.slice(4,6),10) - 1;
+    var d = byMonth[m];
+    var ow = d.open / maxN * 100;
+    var cw = d.closed / maxN * 100;
+    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;font-size:11.5px">'
+      + '<div style="width:34px;color:var(--txt2);font-weight:600">' + labels[idx] + '</div>'
+      + '<div style="flex:1">'
+      + '<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px"><div style="height:9px;background:#34d399;border-radius:3px;width:' + ow.toFixed(1) + '%;min-width:' + (d.open?3:0) + 'px"></div><span style="color:#34d399;font-weight:700">+' + d.open.toLocaleString() + '</span></div>'
+      + '<div style="display:flex;align-items:center;gap:6px"><div style="height:9px;background:#f87171;border-radius:3px;width:' + cw.toFixed(1) + '%;min-width:' + (d.closed?3:0) + 'px"></div><span style="color:#f87171;font-weight:700">-' + d.closed.toLocaleString() + '</span></div>'
+      + '</div></div>';
+  });
+  document.getElementById('trend-month-chart').innerHTML = html;
+  renderTrendTopGrowth(cat);
+  renderTrendSidoDist(cat);
+}
+function renderTrendBrand(q){
+  q = (q||'').trim().toLowerCase().replace(/\s/g,'');
+  var resEl = document.getElementById('trend-brand-result');
+  if (!q || q.length < 2 || !window.YTD || !window.YTD.by_brand) {
+    resEl.innerHTML = '<div style="color:var(--txt3);font-size:12px;padding:14px;text-align:center">brand 입력하면 1~6월 출점/폐점 차트</div>';
+    return;
+  }
+  // matching brands
+  var hits = {};
+  for (var b in window.YTD.by_brand) {
+    var bc = b.replace(/\s/g,'').toLowerCase();
+    var alias = (typeof BRAND_ALIASES !== 'undefined' && BRAND_ALIASES[bc]) || b;
+    var ac = alias.replace(/\s/g,'').toLowerCase();
+    if (bc.indexOf(q) >= 0 || ac.indexOf(q) >= 0) {
+      if (!hits[ac]) hits[ac] = { name: alias, monthly: {} };
+      var v = window.YTD.by_brand[b];
+      for (var m in v.monthly) {
+        if (m < '202601') continue;
+        if (!hits[ac].monthly[m]) hits[ac].monthly[m] = { open:0, closed:0 };
+        var stores = v.monthly[m].stores || [];
+        for (var i = 0; i < stores.length; i++) {
+          if (stores[i].closed) hits[ac].monthly[m].closed++; else hits[ac].monthly[m].open++;
+        }
+      }
+    }
+  }
+  var arr = Object.values(hits);
+  if (!arr.length) {
+    resEl.innerHTML = '<div style="color:var(--txt3);font-size:12px;padding:14px;text-align:center">매칭 brand 없음</div>';
+    return;
+  }
+  arr.sort(function(a,b){
+    var aT = 0, bT = 0;
+    for (var m in a.monthly) aT += a.monthly[m].open + a.monthly[m].closed;
+    for (var m in b.monthly) bT += b.monthly[m].open + b.monthly[m].closed;
+    return bT - aT;
+  });
+  var labels = ['1','2','3','4','5','6'];
+  var html = '';
+  arr.slice(0,5).forEach(function(g){
+    var maxN = 1;
+    for (var i = 0; i < 6; i++) {
+      var m = '20260' + (i+1);
+      if (g.monthly[m]) maxN = Math.max(maxN, g.monthly[m].open + g.monthly[m].closed);
+    }
+    var tO = 0, tC = 0;
+    for (var m in g.monthly) { tO += g.monthly[m].open; tC += g.monthly[m].closed; }
+    html += '<div style="margin-bottom:14px;padding:12px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:10px">';
+    html += '<div style="font-size:13px;font-weight:700;color:var(--txt);margin-bottom:8px">' + esc(g.name) + ' <span style="font-size:11px;font-weight:500"><span style="color:#34d399">+' + tO + '</span> · <span style="color:#f87171">-' + tC + '</span></span></div>';
+    html += '<div style="display:flex;gap:4px;align-items:flex-end;height:60px">';
+    for (var i = 0; i < 6; i++) {
+      var m = '20260' + (i+1);
+      var d = g.monthly[m] || { open:0, closed:0 };
+      var oH = d.open / maxN * 50;
+      var cH = d.closed / maxN * 50;
+      html += '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:1px">'
+        + '<div style="font-size:9px;color:var(--txt3);height:10px">+' + d.open + '</div>'
+        + '<div style="width:100%;display:flex;flex-direction:column;justify-content:flex-end;height:40px">'
+        + (d.closed ? '<div style="background:#f87171;height:' + cH.toFixed(0) + 'px;border-radius:2px 2px 0 0"></div>' : '')
+        + '<div style="background:#34d399;height:' + oH.toFixed(0) + 'px;border-radius:2px 2px 0 0;margin-top:1px"></div>'
+        + '</div>'
+        + '<div style="font-size:9px;color:var(--txt2);font-weight:600">' + labels[i] + '월</div>'
+        + '</div>';
+    }
+    html += '</div></div>';
+  });
+  resEl.innerHTML = html;
+}
+function renderTrendTopGrowth(cat){
+  var growth = [];
+  for (var b in window.YTD.by_brand) {
+    var v = window.YTD.by_brand[b];
+    var early = 0, late = 0;
+    for (var m in v.monthly) {
+      if (m < '202601' || m > '202606') continue;
+      var stores = v.monthly[m].stores || [];
+      var n = 0;
+      for (var i = 0; i < stores.length; i++) {
+        var s = stores[i];
+        if (s.closed) continue;
+        if (!isCatStore(s, cat)) continue;
+        if (window._excludedStoreSet && window._excludedStoreSet[s.id]) continue;
+        n++;
+      }
+      var mm = parseInt(m.slice(4,6), 10);
+      if (mm <= 3) early += n; else late += n;
+    }
+    if (late >= 3 && late > early) {
+      var pct = early === 0 ? 999 : Math.round((late - early) / early * 100);
+      growth.push({ brand: b, early: early, late: late, pct: pct });
+    }
+  }
+  growth.sort(function(a,b){ if (b.late !== a.late) return b.late - a.late; return b.pct - a.pct; });
+  var html = '';
+  growth.slice(0, 10).forEach(function(g, i){
+    var compact = g.brand.replace(/\s/g,'').toLowerCase();
+    var alias = (typeof BRAND_ALIASES !== 'undefined' && BRAND_ALIASES[compact]) || g.brand;
+    html += '<div onclick="document.getElementById(\'trend-brand-search\').value=\'' + esc(alias) + '\';renderTrendBrand(\'' + esc(alias) + '\')" style="display:flex;align-items:center;gap:10px;padding:9px 11px;background:rgba(52,211,153,0.05);border:1px solid rgba(52,211,153,0.15);border-radius:8px;margin-bottom:6px;cursor:pointer;font-size:12px">'
+      + '<div style="width:22px;font-weight:800;color:#34d399">' + (i+1) + '</div>'
+      + '<div style="flex:1;font-weight:700">' + esc(alias) + '</div>'
+      + '<div style="color:var(--txt3);font-size:10.5px">초 ' + g.early + ' → 후 ' + g.late + '</div>'
+      + '<div style="color:#34d399;font-weight:800">+' + (g.pct >= 999 ? 'NEW' : g.pct + '%') + '</div>'
+      + '</div>';
+  });
+  document.getElementById('trend-top-growth').innerHTML = html || '<div style="color:var(--txt3);font-size:12px;padding:14px;text-align:center">데이터 부족</div>';
+}
+function renderTrendSidoDist(cat){
+  var sidoCnt = {};
+  for (var b in window.YTD.by_brand) {
+    var v = window.YTD.by_brand[b];
+    for (var m in v.monthly) {
+      var stores = v.monthly[m].stores || [];
+      for (var i = 0; i < stores.length; i++) {
+        var s = stores[i];
+        if (s.closed) continue;
+        if (!isCatStore(s, cat)) continue;
+        if (window._excludedStoreSet && window._excludedStoreSet[s.id]) continue;
+        var match = (s.addr||'').match(/^([가-힣]+(?:특별시|광역시|특별자치도|특별자치시|도))/);
+        if (match) sidoCnt[match[1]] = (sidoCnt[match[1]]||0) + 1;
+      }
+    }
+  }
+  var sorted = Object.keys(sidoCnt).map(function(k){ return [k, sidoCnt[k]]; }).sort(function(a,b){ return b[1]-a[1]; });
+  if (!sorted.length) { document.getElementById('trend-sido-dist').innerHTML = '<div style="color:var(--txt3);text-align:center;padding:14px">데이터 없음</div>'; return; }
+  var maxN = sorted[0][1];
+  var html = '';
+  sorted.slice(0, 17).forEach(function(x){
+    var name = x[0].replace(/(특별시|광역시|특별자치도|특별자치시|도)$/, '');
+    var pct = (x[1] / maxN * 100).toFixed(0);
+    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><div style="width:50px;font-size:12px;font-weight:700">' + esc(name) + '</div>'
+      + '<div style="flex:1;height:8px;background:rgba(255,255,255,0.05);border-radius:4px;overflow:hidden"><div style="height:100%;width:' + pct + '%;background:linear-gradient(90deg,#7dd3fc,#a78bfa)"></div></div>'
+      + '<div style="width:55px;font-size:11.5px;font-weight:800;text-align:right;color:#c4b5fd">' + x[1].toLocaleString() + '</div></div>';
+  });
+  document.getElementById('trend-sido-dist').innerHTML = html;
+}
 
 // v15.15: 월별 창업 추이 (대시보드 카드)
 function renderMonthlyTrend(){
