@@ -751,9 +751,19 @@ body{
     <div class="chip" data-v="30d">🆕 최근 30일</div>
   </div>
   <div class="chips" id="chip-map-cat" style="margin-bottom:10px">
-    <div class="chip on" data-v="">전체</div>
+    <div class="chip on" data-v="all">전체</div>
     <div class="chip" data-v="sool">🍺 주점</div>
     <div class="chip" data-v="food">🍽️ 음식점</div>
+    <div class="chip" data-v="cafe">☕ 카페·빵</div>
+  </div>
+  <!-- v16.1: 월 슬라이더 -->
+  <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:10px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+      <div style="font-size:11px;color:var(--txt3);font-weight:700">📅 기간 선택</div>
+      <div id="map-month-label" style="font-size:11.5px;font-weight:700;color:#7dd3fc">1~6월 전체</div>
+    </div>
+    <input type="range" id="map-month-slider" min="0" max="6" value="0" step="1" oninput="onMapMonthChange(this.value)" style="width:100%;accent-color:#7dd3fc">
+    <div style="display:flex;justify-content:space-between;font-size:9.5px;color:var(--txt3);margin-top:3px"><span>전체</span><span>1월</span><span>2월</span><span>3월</span><span>4월</span><span>5월</span><span>6월</span></div>
   </div>
 
   <div style="position:relative;width:100%;height:60vh;min-height:400px;border-radius:14px;overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow-card);margin-bottom:12px">
@@ -2947,6 +2957,7 @@ document.querySelectorAll('.bnav-btn').forEach(function(btn){
       else if (id === 'chip-track') renderTracked();
       else if (id === 'chip-fr-kind' || id === 'chip-fr-source') { FR_SELECTED = null; renderFr(); }
       else if (id === 'chip-trend-cat') renderTrendTab();
+      else if (id === 'chip-map-cat' || id === 'chip-map-mode') renderMapSidoStats();
       else if (id === 'chip-region') {
         // 「전국」 chip → 즉시 nightly cache 표시 (실시간 fetch 차단)
         if (c.dataset.v === 'all') {
@@ -4180,6 +4191,14 @@ function renderMapMarkers(map){
     }
   }).catch(function(){});
 }
+window._mapSelectedMonth = 0; // 0=전체, 1~6=월
+function onMapMonthChange(v){
+  window._mapSelectedMonth = parseInt(v, 10);
+  var labels = ['1~6월 전체', '1월', '2월', '3월', '4월', '5월', '6월'];
+  var lblEl = document.getElementById('map-month-label');
+  if (lblEl) lblEl.textContent = labels[window._mapSelectedMonth];
+  renderMapSidoStats();
+}
 function renderMapSidoStats(){
   var el = document.getElementById('map-sido-stats');
   if (!el) return;
@@ -4187,20 +4206,39 @@ function renderMapSidoStats(){
     el.innerHTML = '<div style="color:var(--txt3);font-size:12px">데이터 로딩 중…</div>';
     return;
   }
+  // v16.1: 카테고리·월 필터
+  var cat = (typeof activeChip === 'function' ? activeChip('chip-map-cat') : 'all') || 'all';
+  var selMonth = window._mapSelectedMonth || 0;
+  var monthFilter = selMonth ? ('20260' + selMonth) : null;
   var sidoCnt = {};
+  var totalCnt = 0;
   for (var b in window.YTD.by_brand) {
     var v = window.YTD.by_brand[b];
     for (var m in v.monthly) {
+      if (monthFilter && m !== monthFilter) continue;
       var stores = v.monthly[m].stores || [];
       for (var i = 0; i < stores.length; i++) {
-        var addr = stores[i].addr || '';
-        var match = addr.match(/^([가-힣]+(?:특별시|광역시|특별자치도|특별자치시|도))/);
-        if (match) sidoCnt[match[1]] = (sidoCnt[match[1]]||0) + 1;
+        var s = stores[i];
+        if (s.closed) continue;
+        if (window._excludedStoreSet && window._excludedStoreSet[s.id]) continue;
+        if (isExcluded(s)) continue;
+        if (typeof isCatStore === 'function' && !isCatStore(s, cat)) continue;
+        var match = (s.addr || '').match(/^([가-힣]+(?:특별시|광역시|특별자치도|특별자치시|도))/);
+        if (match) { sidoCnt[match[1]] = (sidoCnt[match[1]]||0) + 1; totalCnt++; }
       }
     }
   }
   var sorted = Object.keys(sidoCnt).map(function(k){ return [k, sidoCnt[k]]; })
-    .sort(function(a,b){ return b[1]-a[1]; }).slice(0, 10);
+    .sort(function(a,b){ return b[1]-a[1]; }).slice(0, 17);
+  // 헤더에 total
+  var titleEl = document.querySelector('#pg-map .card-title');
+  if (titleEl && titleEl.textContent.indexOf('시·도') >= 0) {
+    titleEl.innerHTML = '📍 시·도별 분포 <span style="color:var(--txt3);font-size:10px;font-weight:500;margin-left:auto">' + totalCnt.toLocaleString() + '개 매장</span>';
+  }
+  // 카카오맵 오버레이도 갱신
+  if (window.MAP_KAKAO && !window._frModalBrand && typeof renderMapMarkers === 'function') {
+    try { renderMapMarkers(window.MAP_KAKAO); } catch(e){}
+  }
   if (!sorted.length) { el.innerHTML = '<div style="color:var(--txt3)">데이터 없음</div>'; return; }
   var maxN = sorted[0][1];
   el.innerHTML = sorted.map(function(x){
