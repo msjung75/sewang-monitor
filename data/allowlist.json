@@ -56,8 +56,16 @@
       "role": "staff",
       "memo": "세왕이사",
       "approved_at": "2026-06-15T23:38:20.579Z"
+    },
+    {
+      "id": "4946577243",
+      "nickname": "종환",
+      "profile": "http://k.kakaocdn.net/dn/b8cDMD/dJMcaac9lIz/ffkrO8zoJ1JaKjqYKj8zhK/img_640x640.jpg",
+      "role": "staff",
+      "memo": "세왕 부장",
+      "approved_at": "2026-06-15T23:38:35.157Z"
     }
   ],
   "blocked": [],
-  "updated_at": "2026-06-15T23:38:20.579Z"
+  "updated_at": "2026-06-15T23:38:35.157Z"
 }
