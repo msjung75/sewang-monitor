@@ -48,8 +48,16 @@
       "role": "staff",
       "memo": "세왕상사 이사",
       "approved_at": "2026-06-15T11:58:14.114Z"
+    },
+    {
+      "id": "4946576770",
+      "nickname": "이원철",
+      "profile": "",
+      "role": "staff",
+      "memo": "세왕이사",
+      "approved_at": "2026-06-15T23:38:20.579Z"
     }
   ],
   "blocked": [],
-  "updated_at": "2026-06-15T12:34:53.746Z"
+  "updated_at": "2026-06-15T23:38:20.579Z"
 }
