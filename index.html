@@ -3404,13 +3404,17 @@ function render30DayBreakdown(){
     setTimeout(render30DayBreakdown, 2000);
     return;
   }
+  // v17.4.1: 분류 미정 / 일반 음식점 제외
+  var EXCLUDE_CAT = { other: 1, food: 1 };
   var catCnt = {};
   var total = 0;
+  var skipCnt = 0;
   for (var i = 0; i < ST.permits.length; i++) {
     var s = ST.permits[i];
     try { if (typeof isExcluded === 'function' && isExcluded(s)) continue; } catch(e){}
     if (s.closed) continue;
     var cat = detailCategory(s);
+    if (EXCLUDE_CAT[cat]) { skipCnt++; continue; }
     catCnt[cat] = (catCnt[cat]||0) + 1;
     total++;
   }
@@ -3421,7 +3425,7 @@ function render30DayBreakdown(){
   var ordered = Object.keys(catCnt).sort(function(a,b){ return catCnt[b]-catCnt[a]; });
   var top1 = ordered[0];
   var top1Info = DETAIL_CAT_INFO[top1] || {};
-  if (sumEl) sumEl.innerHTML = '최근 30일 <b style="color:#34d399">' + total.toLocaleString() + '</b>건 신규 · TOP1 <b style="color:' + top1Info.color + '">' + top1Info.label + ' ' + catCnt[top1].toLocaleString() + '건 (' + Math.round(catCnt[top1]/total*100) + '%)</b>';
+  if (sumEl) sumEl.innerHTML = '최근 30일 <b style="color:#34d399">' + total.toLocaleString() + '</b>건 신규 · TOP1 <b style="color:' + top1Info.color + '">' + top1Info.label + ' ' + catCnt[top1].toLocaleString() + '건 (' + Math.round(catCnt[top1]/total*100) + '%)</b><br><span style="font-size:10.5px;color:var(--txt3)">※ 기타·분류 미정 ' + skipCnt.toLocaleString() + '건 제외</span>';
   var maxN = catCnt[top1] || 1;
   var html = ordered.map(function(c){
     var info = DETAIL_CAT_INFO[c] || { label:c, color:'#94a3b8' };
@@ -3502,8 +3506,11 @@ function renderMonthlyTrend(){
     return;
   }
   // v17.0: 월별 × 업종별 출점 집계
+  // v17.4.1: 「분류 미정 / 일반 음식점」 제외 — 다른 카테고리 시각화 명확하게
+  var EXCLUDE_CAT = { other: 1, food: 1 };
   var byMonth = {}; // yyyymm → { cat → count }
   var catTotal = {};
+  var skipCnt = 0;
   for (var b in window.YTD.by_brand) {
     var v = window.YTD.by_brand[b];
     for (var m in v.monthly) {
@@ -3515,12 +3522,14 @@ function renderMonthlyTrend(){
         if (window._excludedStoreSet && window._excludedStoreSet[s.id]) continue;
         try { if (typeof isExcluded === 'function' && isExcluded(s)) continue; } catch(e){}
         var cat = detailCategory(s);
+        if (EXCLUDE_CAT[cat]) { skipCnt++; continue; }  // 제외
         if (!byMonth[m]) byMonth[m] = {};
         byMonth[m][cat] = (byMonth[m][cat]||0) + 1;
         catTotal[cat] = (catTotal[cat]||0) + 1;
       }
     }
   }
+  window._monthlyTrendSkipCnt = skipCnt;
   var months = Object.keys(byMonth).sort();
   if (!months.length) {
     chartEl.innerHTML = '<div style="color:var(--txt3);font-size:11.5px;text-align:center;padding:18px">데이터 없음 (1~6월 cron 후 표시)</div>';
@@ -3540,7 +3549,7 @@ function renderMonthlyTrend(){
   catOrder.forEach(function(c){ totalAll += catTotal[c]; });
   var top1 = catOrder[0];
   var top1Pct = totalAll ? Math.round(catTotal[top1]/totalAll*100) : 0;
-  sumEl.innerHTML = '누적 <b style="color:#34d399">' + totalAll.toLocaleString() + '</b> 신규 · TOP1 <b style="color:' + (DETAIL_CAT_INFO[top1]||{}).color + '">' + (DETAIL_CAT_INFO[top1]||{}).label + ' ' + catTotal[top1].toLocaleString() + '건 (' + top1Pct + '%)</b>';
+  sumEl.innerHTML = '누적 <b style="color:#34d399">' + totalAll.toLocaleString() + '</b> 신규 · TOP1 <b style="color:' + (DETAIL_CAT_INFO[top1]||{}).color + '">' + (DETAIL_CAT_INFO[top1]||{}).label + ' ' + catTotal[top1].toLocaleString() + '건 (' + top1Pct + '%)</b><br><span style="font-size:10.5px;color:var(--txt3)">※ 기타·분류 미정 ' + (skipCnt||0).toLocaleString() + '건 제외</span>';
   // 월별 stacked bar (가로)
   var monLabels = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
   var html = '';
