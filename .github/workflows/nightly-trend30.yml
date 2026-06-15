@@ -1,8 +1,10 @@
 name: nightly-trend30
 on:
   schedule:
-    # 메일 19:00 UTC = KST 04:00
-    - cron: '0 19 * * *'
+    # v16.8: 다중 schedule (silent skip 방어)
+    - cron: '0 19 * * *'    # 04:00 KST (메인)
+    - cron: '30 21 * * *'   # 06:30 KST (재시도)
+    - cron: '30 23 * * *'   # 08:30 KST (재시도)
   workflow_dispatch: {}
 
 jobs:
@@ -12,16 +14,16 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
-      - name: Fetch 17 sido 30days
+      - name: Fetch 17 시·도 30일치
         run: bash scripts/nightly-fetch.sh
-      - name: Commit and push
+      - name: Commit & push trend30_all.json
         run: |
           git config user.email "actions@github.com"
           git config user.name "github-actions[bot]"
           git add data/trend30_all.json
           if git diff --cached --quiet; then
-            echo "no changes"
+            echo "no changes to commit"
           else
-            git commit -m "[skip ci] nightly trend30 $(TZ=Asia/Seoul date +%Y-%m-%dT%H:%MZ)"
+            git commit -m "[skip ci] nightly trend30 update $(TZ=Asia/Seoul date +%Y-%m-%dT%H:%MZ)"
             git push
           fi

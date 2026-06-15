@@ -1,7 +1,10 @@
 name: Nightly Naver N-Check (priority queue)
 on:
   schedule:
-    - cron: '30 20 * * *'   # 매일 20:30 UTC = 05:30 KST (YTD 04:15 + 1시간 이상 분리 — push 충돌 회피)
+    # v16.8: 다중 schedule (silent skip 방어)
+    - cron: '30 20 * * *'   # 05:30 KST (메인)
+    - cron: '30 22 * * *'   # 07:30 KST (재시도)
+    - cron: '30 0 * * *'    # 09:30 KST (재시도)
   workflow_dispatch:
     inputs:
       limit:

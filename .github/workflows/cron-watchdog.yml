@@ -1,0 +1,87 @@
+name: Cron Watchdog (자가 치유)
+# v16.8: 매일 11:00 KST에 「오늘 데이터 있나?」 점검 + 누락 시 자동 트리거
+on:
+  schedule:
+    - cron: '0 2 * * *'    # 매일 11:00 KST
+    - cron: '0 5 * * *'    # 매일 14:00 KST (재확인)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write    # 다른 workflow dispatch 권한
+
+jobs:
+  watchdog:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compute today (KST yesterday for YTD)
+        id: dates
+        run: |
+          YESTERDAY=$(TZ=Asia/Seoul date -d "yesterday" +%Y%m%d)
+          echo "yesterday=$YESTERDAY" >> $GITHUB_OUTPUT
+          echo "Checking for: $YESTERDAY"
+      - name: Check YTD file + dispatch if missing
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          FILE="data/ytd_2026/${{ steps.dates.outputs.yesterday }}.json"
+          if [ -f "$FILE" ]; then
+            SIZE=$(stat -c%s "$FILE" 2>/dev/null || stat -f%z "$FILE" 2>/dev/null)
+            if [ "$SIZE" -gt "1000" ]; then
+              echo "✅ YTD $FILE 있음 (size $SIZE) — skip"
+              exit 0
+            fi
+          fi
+          echo "⚠️ YTD $FILE 없음 — 즉시 트리거"
+          curl -sS -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/workflows/nightly-ytd-incremental.yml/dispatches" \
+            -d '{"ref":"main"}'
+          echo "Dispatched nightly-ytd-incremental"
+      - name: Check Naver cache fresh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          FILE="data/naver_nstat_cache.json"
+          if [ -f "$FILE" ]; then
+            # 12시간 이내 갱신?
+            MOD=$(stat -c%Y "$FILE" 2>/dev/null || stat -f%m "$FILE" 2>/dev/null)
+            NOW=$(date +%s)
+            AGE=$((NOW - MOD))
+            if [ "$AGE" -lt "43200" ]; then
+              echo "✅ Naver cache fresh (${AGE}s)"
+              exit 0
+            fi
+            echo "⚠️ Naver cache stale (${AGE}s) — 트리거"
+          else
+            echo "⚠️ Naver cache 없음 — 트리거"
+          fi
+          curl -sS -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/workflows/nightly-naver-check.yml/dispatches" \
+            -d '{"ref":"main","inputs":{"limit":"5000"}}'
+          echo "Dispatched nightly-naver-check"
+      - name: Check trend30 fresh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          FILE="data/trend30_all.json"
+          if [ -f "$FILE" ]; then
+            MOD=$(stat -c%Y "$FILE" 2>/dev/null || stat -f%m "$FILE" 2>/dev/null)
+            NOW=$(date +%s)
+            AGE=$((NOW - MOD))
+            if [ "$AGE" -lt "43200" ]; then
+              echo "✅ trend30 fresh (${AGE}s)"
+              exit 0
+            fi
+            echo "⚠️ trend30 stale — 트리거"
+          fi
+          curl -sS -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/workflows/nightly-trend30.yml/dispatches" \
+            -d '{"ref":"main"}'
+          echo "Dispatched nightly-trend30"

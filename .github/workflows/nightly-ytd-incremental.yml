@@ -1,7 +1,11 @@
 name: Nightly YTD Incremental
+# v16.8: 다중 schedule (GitHub Actions silent skip 방어)
 on:
   schedule:
-    - cron: '15 19 * * *'   # 매일 19:15 UTC = 04:15 KST
+    - cron: '15 19 * * *'   # 04:15 KST (메인)
+    - cron: '0 21 * * *'    # 06:00 KST (1차 재시도)
+    - cron: '0 23 * * *'    # 08:00 KST (2차 재시도)
+    - cron: '0 1 * * *'     # 10:00 KST (3차 재시도)
   workflow_dispatch:
 
 permissions:
@@ -19,14 +23,31 @@ jobs:
           echo "from=$YESTERDAY" >> $GITHUB_OUTPUT
           echo "to=$YESTERDAY" >> $GITHUB_OUTPUT
           echo "Yesterday: $YESTERDAY"
+      - name: Check if today's data already exists (idempotent)
+        id: check
+        run: |
+          TODAY=$(TZ=Asia/Seoul date +%Y%m%d)
+          YESTERDAY_FILE="data/ytd_2026/${{ steps.dates.outputs.from }}.json"
+          if [ -f "$YESTERDAY_FILE" ]; then
+            SIZE=$(stat -c%s "$YESTERDAY_FILE" 2>/dev/null || stat -f%z "$YESTERDAY_FILE" 2>/dev/null)
+            if [ "$SIZE" -gt "1000" ]; then
+              echo "already_done=true" >> $GITHUB_OUTPUT
+              echo "Today already processed (size $SIZE) — skip"
+              exit 0
+            fi
+          fi
+          echo "already_done=false" >> $GITHUB_OUTPUT
       - name: Fetch YTD daily
+        if: steps.check.outputs.already_done != 'true'
         env:
           FROM_DATE: ${{ steps.dates.outputs.from }}
           TO_DATE: ${{ steps.dates.outputs.to }}
         run: bash scripts/fetch-ytd-range.sh
       - name: Aggregate YTD
+        if: steps.check.outputs.already_done != 'true'
         run: python3 scripts/aggregate-ytd.py
       - name: Commit if changed
+        if: steps.check.outputs.already_done != 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -35,5 +56,11 @@ jobs:
             echo "No changes"
           else
             git commit -m "YTD nightly: ${{ steps.dates.outputs.from }}"
-            git push
+            for i in 1 2 3; do
+              if git push; then exit 0; fi
+              echo "push retry $i"
+              git pull --rebase || true
+              sleep 5
+            done
+            exit 1
           fi
