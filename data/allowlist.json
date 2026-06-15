@@ -39,8 +39,16 @@
       "role": "owner",
       "memo": "잔잔 김병섭대표",
       "approved_at": "2026-06-15T08:24:17.017Z"
+    },
+    {
+      "id": "4946069634",
+      "nickname": "김환",
+      "profile": "",
+      "role": "staff",
+      "memo": "세왕상사 이사",
+      "approved_at": "2026-06-15T11:58:14.114Z"
     }
   ],
   "blocked": [],
-  "updated_at": "2026-06-15T08:24:17.017Z"
+  "updated_at": "2026-06-15T11:58:14.114Z"
 }
