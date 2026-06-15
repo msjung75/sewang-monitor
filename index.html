@@ -3398,26 +3398,30 @@ async function loadNaverNstatCache(){
     var r = await fetch('/data/naver_nstat_cache.json', { cache: 'no-store' });
     if (!r.ok) return;
     var d = await r.json();
-    var stores = d.stores || d.items || d;
+    // 실제 구조: top-level이 { storeId: { nstat: 'registered'|'unregistered'|'locked', checked_at, name } }
+    var stores = (d && d.stores) ? d.stores : ((d && d.items) ? d.items : d);
     if (!stores || typeof stores !== 'object') return;
     if (!ST.naver) ST.naver = {};
-    var reg = 0, unreg = 0, checked = 0;
+    var reg = 0, unreg = 0, locked = 0, checked = 0;
+    var latestCheck = '';
     for (var id in stores) {
       var s = stores[id];
-      if (!s) continue;
-      // 형식: { id: { found: true/false, checked_at: '...', ... } }
-      if (s.found !== undefined) {
-        ST.naver[id] = s;
+      if (!s || typeof s !== 'object') continue;
+      // nstat 키 지원 + 옛 found/registered 키 호환
+      var found = (s.nstat === 'registered') || (s.found === true) || (s.registered === true);
+      var notFound = (s.nstat === 'unregistered') || (s.found === false) || (s.registered === false);
+      var isLocked = (s.nstat === 'locked');
+      if (found || notFound || isLocked) {
+        ST.naver[id] = { found: found, checked_at: s.checked_at, name: s.name, nstat: s.nstat };
         checked++;
-        if (s.found) reg++; else unreg++;
-      } else if (s.registered !== undefined) {
-        ST.naver[id] = { found: s.registered, checked_at: s.checked_at, ...s };
-        checked++;
-        if (s.registered) reg++; else unreg++;
+        if (found) reg++;
+        else if (notFound) unreg++;
+        if (isLocked) locked++;
+        if (s.checked_at && s.checked_at > latestCheck) latestCheck = s.checked_at;
       }
     }
-    window.NSTAT_SUMMARY = { reg: reg, unreg: unreg, checked: checked, updated_at: d.updated_at || d.generated_at };
-    console.log('[NSTAT] N등록 cache 로드 — 등록 ' + reg + ' / 미등록 ' + unreg + ' / 총 ' + checked);
+    window.NSTAT_SUMMARY = { reg: reg, unreg: unreg, locked: locked, checked: checked, updated_at: latestCheck };
+    console.log('[NSTAT] N등록 cache 로드 — 등록 ' + reg + ' / 미등록 ' + unreg + ' / locked ' + locked + ' / 총 ' + checked);
     try { renderNew(); } catch(e){}
   } catch(e){ console.warn('[NSTAT] load failed:', e.message); }
 }
