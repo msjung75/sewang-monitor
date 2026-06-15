@@ -422,9 +422,19 @@ body{
       <div style="font-size:9px;color:var(--txt3);margin-top:1px">인허가 기반 영업지원 시스템</div>
     </div>
   </div>
-  <div class="hdr-meta">
-    <div id="hdr-time" style="font-size:11px;color:var(--c1)">--</div>
-    <div id="hdr-date" style="font-size:9px;color:var(--txt3)">--</div>
+  <div class="hdr-meta" style="display:flex;align-items:center;gap:10px">
+    <div>
+      <div id="hdr-time" style="font-size:11px;color:var(--c1);text-align:right">--</div>
+      <div id="hdr-date" style="font-size:9px;color:var(--txt3);text-align:right">--</div>
+    </div>
+    <!-- v15.18: 사용자 메뉴 (로그아웃) -->
+    <div id="hdr-user-menu" style="position:relative">
+      <button id="hdr-user-btn" onclick="toggleUserMenu()" style="background:rgba(255,255,255,0.06);border:1px solid var(--border2);border-radius:50%;width:34px;height:34px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;padding:0">👤</button>
+      <div id="hdr-user-dropdown" style="display:none;position:absolute;right:0;top:42px;min-width:180px;background:var(--surface);border:1px solid var(--border-hi);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.5);z-index:1000;backdrop-filter:blur(20px);overflow:hidden">
+        <div style="padding:11px 14px;border-bottom:1px solid var(--border);font-size:11px"><span id="hdr-user-name" style="color:var(--txt);font-weight:700">--</span><br><span id="hdr-user-role" style="color:var(--txt3);font-size:10px"></span></div>
+        <button onclick="logoutUser()" style="display:flex;width:100%;align-items:center;gap:8px;padding:11px 14px;background:transparent;border:0;color:#f87171;font-size:12.5px;font-weight:600;cursor:pointer;text-align:left">⤴️ 로그아웃</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -3296,6 +3306,16 @@ async function checkAuth(){
     var d = await r.json();
     if (d && d.authenticated && d.user) {
       window.ME = d.user;
+      // v15.18: 헤더 사용자 메뉴 채우기
+      setTimeout(function(){
+        var n = document.getElementById('hdr-user-name');
+        var ro = document.getElementById('hdr-user-role');
+        if (n && d.user) n.textContent = d.user.nickname || '사용자';
+        if (ro && d.user) {
+          var roleLabel = { admin:'🔑 관리자', staff:'🏢 세왕 직원', owner:'👤 업주', sales:'💼 영업', viewer:'👀 뷰어' }[d.user.role] || d.user.role;
+          ro.textContent = roleLabel;
+        }
+      }, 100);
       return true;
     }
     return false;
@@ -3304,6 +3324,30 @@ async function checkAuth(){
     return false;
   }
 }
+// v15.18: 사용자 메뉴 토글 + 로그아웃
+function toggleUserMenu(){
+  var dd = document.getElementById('hdr-user-dropdown');
+  if (!dd) return;
+  dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+}
+async function logoutUser(){
+  if (!confirm('로그아웃 하시겠습니까?')) return;
+  try {
+    await fetch('/api/auth/kakao?action=logout', { credentials:'same-origin' });
+  } catch(e){}
+  // 모든 localStorage 캐시 정리 (선택 — 다음 사용자 보호)
+  // 로그인 화면으로 리다이렉트
+  location.href = '/';
+}
+// 외부 클릭 시 사용자 메뉴 닫기
+document.addEventListener('click', function(e){
+  var btn = document.getElementById('hdr-user-btn');
+  var dd = document.getElementById('hdr-user-dropdown');
+  if (!btn || !dd) return;
+  if (e.target === btn || btn.contains(e.target)) return;
+  if (dd.contains(e.target)) return;
+  dd.style.display = 'none';
+});
 
 function showLoginScreen(){
   // URL 쿼리에서 안내 정보 추출
