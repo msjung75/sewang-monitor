@@ -34,11 +34,12 @@
     },
     {
       "id": "4945804637",
-      "nickname": "z",
+      "nickname": "김병섭",
       "profile": "http://img1.kakaocdn.net/thumb/R640x640.q70/?fname=http://t1.kakaocdn.net/account_images/default_profile.jpeg",
       "role": "owner",
       "memo": "잔잔 김병섭대표",
-      "approved_at": "2026-06-15T08:24:17.017Z"
+      "approved_at": "2026-06-15T08:24:17.017Z",
+      "updated_at": "2026-06-15T12:34:53.746Z"
     },
     {
       "id": "4946069634",
@@ -50,5 +51,5 @@
     }
   ],
   "blocked": [],
-  "updated_at": "2026-06-15T11:58:14.114Z"
+  "updated_at": "2026-06-15T12:34:53.746Z"
 }
