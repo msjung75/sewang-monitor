@@ -3656,7 +3656,62 @@ function init(){
       // 자동 reload 대신 toast로 안내 — 사장님 작업 중단 방지
     });
   }
+  // v16.6: PWA 설치 prompt (Android Chrome 등) — iOS는 별도 메시지
+  window.addEventListener('beforeinstallprompt', function(e){
+    e.preventDefault();
+    window._installPrompt = e;
+    showInstallBanner();
+  });
+  // iOS Safari는 beforeinstallprompt 미지원 — UA 감지로 1회 안내
+  setTimeout(function(){
+    try {
+      var ua = navigator.userAgent;
+      var isIOS = /iPhone|iPad|iPod/i.test(ua) && !window.MSStream;
+      var isStandalone = window.matchMedia && window.matchMedia('(display-mode: standalone)').matches;
+      if (isIOS && !isStandalone && !localStorage.getItem('install_dismissed_v1')) {
+        showIosInstallBanner();
+      }
+    } catch(e){}
+  }, 3000);
   // v12: 라이브 fetch 비활성화 — loadNightlyCache가 정적 캐시(data/*.json)에서만 로드
+}
+function showInstallBanner(){
+  if (localStorage.getItem('install_dismissed_v1')) {
+    var dismissedAt = parseInt(localStorage.getItem('install_dismissed_v1'), 10);
+    if (Date.now() - dismissedAt < 7 * 86400 * 1000) return;
+  }
+  if (document.getElementById('install-banner')) return;
+  var b = document.createElement('div');
+  b.id = 'install-banner';
+  b.style.cssText = 'position:fixed;bottom:90px;left:14px;right:14px;z-index:9000;padding:14px 16px;background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#fff;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,0.4);display:flex;align-items:center;gap:12px;animation:slideUp 0.4s ease';
+  b.innerHTML = '<div style="flex:1"><div style="font-size:13px;font-weight:800;margin-bottom:2px">📥 홈화면에 추가</div><div style="font-size:11px;opacity:0.9">앱처럼 빠르게 실행 (오프라인 가능)</div></div>'
+    + '<button onclick="acceptInstall()" style="padding:8px 14px;background:rgba(255,255,255,0.25);border:0;color:#fff;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer">설치</button>'
+    + '<button onclick="dismissInstall()" style="padding:8px 10px;background:transparent;border:0;color:#fff;font-size:18px;cursor:pointer;opacity:0.8">×</button>';
+  document.body.appendChild(b);
+}
+function showIosInstallBanner(){
+  if (document.getElementById('install-banner')) return;
+  var b = document.createElement('div');
+  b.id = 'install-banner';
+  b.style.cssText = 'position:fixed;bottom:90px;left:14px;right:14px;z-index:9000;padding:14px 16px;background:linear-gradient(135deg,#38bdf8,#a78bfa);color:#fff;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,0.4);display:flex;align-items:center;gap:12px';
+  b.innerHTML = '<div style="flex:1"><div style="font-size:13px;font-weight:800;margin-bottom:2px">📥 홈화면 추가 안내</div><div style="font-size:11px;opacity:0.95;line-height:1.4">Safari 하단 <b>공유 버튼</b> → <b>홈 화면에 추가</b></div></div>'
+    + '<button onclick="dismissInstall()" style="padding:8px 10px;background:transparent;border:0;color:#fff;font-size:18px;cursor:pointer">×</button>';
+  document.body.appendChild(b);
+}
+async function acceptInstall(){
+  var p = window._installPrompt;
+  if (!p) { dismissInstall(); return; }
+  try {
+    p.prompt();
+    var choice = await p.userChoice;
+    if (choice.outcome === 'accepted') localStorage.setItem('install_dismissed_v1', Date.now());
+  } catch(e){}
+  dismissInstall();
+}
+function dismissInstall(){
+  localStorage.setItem('install_dismissed_v1', Date.now());
+  var b = document.getElementById('install-banner');
+  if (b) b.remove();
 }
 // 🚨 보안 (v12.4): 승인 안 된 사용자(pending/blocked)는 메인 앱 차단
 function showPendingScreen(){
