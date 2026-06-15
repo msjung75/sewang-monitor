@@ -64,8 +64,16 @@
       "role": "staff",
       "memo": "세왕 부장",
       "approved_at": "2026-06-15T23:38:35.157Z"
+    },
+    {
+      "id": "4946605464",
+      "nickname": "현우",
+      "profile": "http://k.kakaocdn.net/dn/hcWEF/dJMcaipkilp/YDx6Engs3w7Fq837QOnEyK/img_640x640.jpg",
+      "role": "staff",
+      "memo": "세왕 부장",
+      "approved_at": "2026-06-15T23:48:59.823Z"
     }
   ],
   "blocked": [],
-  "updated_at": "2026-06-15T23:38:35.157Z"
+  "updated_at": "2026-06-15T23:48:59.823Z"
 }
