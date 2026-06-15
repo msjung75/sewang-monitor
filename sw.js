@@ -1,21 +1,51 @@
-// PWA Service Worker v15.6 (data/*.json 캐시 무력화)
-const CACHE = 'sewang-pwa-v15_6-data-revalidate';
-const SHELL = ['/', '/index.html', '/manifest.json', '/icon.svg'];
+// PWA Service Worker v15.20 — 자동 업데이트 보장 (index.html network-first)
+const CACHE = 'sewang-pwa-v15_20-auto-update';
+const SHELL = ['/manifest.json', '/icon.svg'];  // index.html 제거 — 항상 network-first
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
+  e.waitUntil(
+    caches.open(CACHE)
+      .then(c => c.addAll(SHELL))
+      .then(() => self.skipWaiting())  // 새 sw 즉시 활성화
+  );
 });
+
 self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim()));
+  e.waitUntil(
+    caches.keys()
+      .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
+      .then(() => self.clients.claim())  // 즉시 모든 탭 제어
+  );
 });
+
+self.addEventListener('message', e => {
+  // 클라이언트가 SKIP_WAITING 요청 시 즉시 활성화
+  if (e.data && e.data.type === 'SKIP_WAITING') self.skipWaiting();
+});
+
 self.addEventListener('fetch', e => {
   const u = new URL(e.request.url);
-  // 인증·데이터·API는 항상 network (cache 우회 + 강제 no-store)
+  // API·데이터: 항상 network (no-store)
   if (u.pathname.startsWith('/api/') || u.pathname.startsWith('/data/')) {
     e.respondWith(fetch(e.request, { cache: 'no-store' }));
     return;
   }
-  // 정적 셸은 cache-first
+  // index.html / 루트 / .html: network-first (캐시는 offline fallback만)
+  if (u.pathname === '/' || u.pathname.endsWith('.html') || u.pathname.endsWith('/index')) {
+    e.respondWith(
+      fetch(e.request, { cache: 'no-store' })
+        .then(resp => {
+          if (resp.ok && e.request.method === 'GET') {
+            const clone = resp.clone();
+            caches.open(CACHE).then(c => c.put(e.request, clone));
+          }
+          return resp;
+        })
+        .catch(() => caches.match(e.request))  // 네트워크 실패 시 캐시 fallback
+    );
+    return;
+  }
+  // 정적 자원 (icon, manifest 등): cache-first
   e.respondWith(caches.match(e.request).then(r => r || fetch(e.request).then(resp => {
     if (resp.ok && e.request.method === 'GET') {
       const clone = resp.clone();

@@ -432,6 +432,7 @@ body{
       <button id="hdr-user-btn" onclick="toggleUserMenu()" style="background:rgba(255,255,255,0.06);border:1px solid var(--border2);border-radius:50%;width:34px;height:34px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;padding:0">👤</button>
       <div id="hdr-user-dropdown" style="display:none;position:absolute;right:0;top:42px;min-width:180px;background:var(--surface);border:1px solid var(--border-hi);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.5);z-index:1000;backdrop-filter:blur(20px);overflow:hidden">
         <div style="padding:11px 14px;border-bottom:1px solid var(--border);font-size:11px"><span id="hdr-user-name" style="color:var(--txt);font-weight:700">--</span><br><span id="hdr-user-role" style="color:var(--txt3);font-size:10px"></span></div>
+        <button onclick="hardReload()" style="display:flex;width:100%;align-items:center;gap:8px;padding:11px 14px;background:transparent;border:0;color:#7dd3fc;font-size:12.5px;font-weight:600;cursor:pointer;text-align:left;border-bottom:1px solid var(--border)">🔄 강제 새로고침 (캐시 클리어)</button>
         <button onclick="logoutUser()" style="display:flex;width:100%;align-items:center;gap:8px;padding:11px 14px;background:transparent;border:0;color:#f87171;font-size:12.5px;font-weight:600;cursor:pointer;text-align:left">⤴️ 로그아웃</button>
       </div>
     </div>
@@ -3341,6 +3342,31 @@ async function checkAuth(){
     return false;
   }
 }
+// v15.20: 새 버전 토스트 + hard reload
+function showUpdateToast(){
+  if (document.getElementById('update-toast')) return;
+  var t = document.createElement('div');
+  t.id = 'update-toast';
+  t.style.cssText = 'position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:9999;padding:12px 18px;background:linear-gradient(135deg,#a78bfa,#7c3aed);color:#fff;border-radius:12px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(124,58,237,0.4);animation:slideDown .4s ease';
+  t.innerHTML = '🔄 새 버전이 있습니다 <button onclick="hardReload()" style="padding:6px 14px;background:rgba(255,255,255,0.25);border:0;color:#fff;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer">새로고침</button><button onclick="this.parentElement.remove()" style="padding:6px 10px;background:transparent;border:0;color:#fff;font-size:14px;cursor:pointer;opacity:0.7">×</button>';
+  document.body.appendChild(t);
+}
+async function hardReload(){
+  try {
+    // SW + 캐시 + localStorage 보존 (사장님 선호: localStorage는 그대로)
+    if ('caches' in window) {
+      var keys = await caches.keys();
+      await Promise.all(keys.map(function(k){ return caches.delete(k); }));
+    }
+    if (navigator.serviceWorker) {
+      var regs = await navigator.serviceWorker.getRegistrations();
+      for (var i = 0; i < regs.length; i++) await regs[i].unregister();
+    }
+  } catch(e){}
+  // 강제 새로고침 — 캐시 우회
+  location.href = location.pathname + '?_=' + Date.now();
+}
+
 // v15.18: 사용자 메뉴 토글 + 로그아웃
 function toggleUserMenu(){
   var dd = document.getElementById('hdr-user-dropdown');
@@ -3417,7 +3443,29 @@ function init(){
     renderAll();
   }
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js').catch(function(){});
+    navigator.serviceWorker.register('/sw.js').then(function(reg){
+      // v15.20: 5분마다 업데이트 체크 — 새 버전 즉시 감지
+      setInterval(function(){ try { reg.update(); } catch(e){} }, 5 * 60 * 1000);
+      // 새 sw가 install되면 즉시 활성화 요청
+      reg.addEventListener('updatefound', function(){
+        var nw = reg.installing;
+        if (!nw) return;
+        nw.addEventListener('statechange', function(){
+          if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+            // 새 버전 대기 중 — toast 표시
+            showUpdateToast();
+            nw.postMessage({ type: 'SKIP_WAITING' });
+          }
+        });
+      });
+    }).catch(function(){});
+    // 새 sw 활성화되면 자동 reload (단 사용자가 toast 보고 결정)
+    var _reloaded = false;
+    navigator.serviceWorker.addEventListener('controllerchange', function(){
+      if (_reloaded) return;
+      _reloaded = true;
+      // 자동 reload 대신 toast로 안내 — 사장님 작업 중단 방지
+    });
   }
   // v12: 라이브 fetch 비활성화 — loadNightlyCache가 정적 캐시(data/*.json)에서만 로드
 }
