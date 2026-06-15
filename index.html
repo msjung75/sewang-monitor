@@ -3362,19 +3362,33 @@ function renderTrendSidoDist(cat){
 }
 
 // v15.15: 월별 창업 추이 (대시보드 카드)
-// v17.0: 업종 세분화 분류 — 매장명 + 업태
+// v17.1: 업종 세분화 분류 — 매장명 + 업태 (사장님: 기타 모호 → 키워드 대폭 강화)
 function detailCategory(s){
   var n = (s.name||'').toLowerCase();
   var u = (s.upte||'').toLowerCase();
   var t = n + ' ' + u;
-  if (/주점|호프|선술|이자카야|포차|혼술|와인바|칵테일/i.test(t) || /유흥|단란/i.test(u)) return 'sool';
-  if (/카페|커피|cafe|coffee|빵|베이커리|디저트|도넛|와플|아이스크림/i.test(t)) return 'cafe';
-  if (/치킨|chicken|닭|호프집/i.test(t)) return 'chicken';
-  if (/고기|삼겹|갈비|곱창|막창|불고기|구이|돼지|소고기|한우/i.test(t)) return 'meat';
-  if (/일식|이자카야|라멘|우동|초밥|돈까스|소바|텐동|규동|스시/i.test(t)) return 'japanese';
-  if (/중식|짜장|짬뽕|마라|훠궈|마라탕|양꼬치|중화/i.test(t)) return 'chinese';
-  if (/한식|김밥|분식|백반|국밥|찌개|덮밥|비빔밥|족발|보쌈|순대|국수|냉면/i.test(t)) return 'korean';
-  if (/피자|pizza|버거|burger|타코|샌드위치|토스트|패스트/i.test(t)) return 'western';
+  // 주점·바
+  if (/주점|호프|선술|이자카야|포차|혼술|와인바|칵테일|맥주|소주|바\b|샴페인|사케/i.test(t) || /유흥|단란/i.test(u)) return 'sool';
+  // 카페·빵 (편의점·디저트 포함)
+  if (/카페|커피|cafe|coffee|빵|베이커리|제과|디저트|도넛|꽈배기|와플|아이스크림|빙수|마카롱|크로플|크로아상|티라미수|파이/i.test(t)) return 'cafe';
+  // 치킨
+  if (/치킨|chicken|호프집|닭볶|닭갈비|찜닭|닭한마리|닭발|닭강정|영양닭/i.test(t)) return 'chicken';
+  // 고기·구이
+  if (/고기|삼겹|갈비|곱창|막창|불고기|구이|돼지|소고기|한우|등심|안심|차돌|업진살|항정살|특수부위|숯불|연탄/i.test(t)) return 'meat';
+  // 일식 (라멘·소바·돈가스 포함)
+  if (/일식|이자카야|라멘|우동|초밥|돈까스|돈가스|소바|텐동|규동|스시|텐푸라|야키토리|오뎅|오니기리|규카츠|돈부리/i.test(t)) return 'japanese';
+  // 중식
+  if (/중식|짜장|짬뽕|마라|훠궈|마라탕|양꼬치|중화|딤섬|꿔바|만두|탕수육|광동|북경/i.test(t)) return 'chinese';
+  // 아시안 (베트남·태국·인도)
+  if (/베트남|쌀국수|반미|팟타이|태국|타이|인도|카레|난|치킨난|동남아|월남쌈|분짜|훈제오리|쌀롤/i.test(t)) return 'asian';
+  // 양식·패스트
+  if (/피자|pizza|버거|burger|타코|샌드위치|토스트|패스트|스테이크|파스타|리조또|이탈리|french|프렌치|핫도그|차오|미국|멕시칸|스파게티/i.test(t)) return 'western';
+  // 해산물·횟집
+  if (/횟집|회\b|물회|해산물|해물|조개|굴|새우|꽃게|문어|낙지|장어|아구|아귀|복어|복집|숭어|광어|미역|해녀|쭈꾸미|주꾸미|어시장|어디|회바른|해수산/i.test(t)) return 'seafood';
+  // 분식·간식
+  if (/떡볶이|볶이|튀김|순대|꼬치|어묵|붕어빵|핫바|토스트|김밥|분식|학교앞|간식|컵라면|호떡/i.test(t)) return 'snack';
+  // 한식 (탕·찌개·국밥·전골·찜)
+  if (/한식|국밥|찌개|덮밥|비빔밥|족발|보쌈|순대|국수|냉면|설렁탕|설농탕|해장국|해장|감자탕|육개장|갈비탕|곰탕|도가니|해물탕|미역국|청국장|뼈해장|전골|두부|찜|찐|뷔페|밥상|집밥|소문난|식당|백반|한정식|쌈밥|돼지국|순두부|평양|냉채|샤브|샤부/i.test(t)) return 'korean';
   return 'other';
 }
 var DETAIL_CAT_INFO = {
@@ -3384,9 +3398,12 @@ var DETAIL_CAT_INFO = {
   korean:   { label: '한식',     color: '#a78bfa' },
   japanese: { label: '일식',     color: '#7dd3fc' },
   chinese:  { label: '중식',     color: '#f97316' },
+  asian:    { label: '아시안',   color: '#10b981' },
   western:  { label: '양식·패스트', color: '#ec4899' },
+  seafood:  { label: '해산물·횟집', color: '#06b6d4' },
+  snack:    { label: '분식·간식', color: '#84cc16' },
   cafe:     { label: '카페·빵',  color: '#facc15' },
-  other:    { label: '기타',     color: '#94a3b8' },
+  other:    { label: '분류 미정',color: '#94a3b8' },
 };
 function renderMonthlyTrend(){
   var chartEl = document.getElementById('monthly-trend-chart');
