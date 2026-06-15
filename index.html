@@ -3371,7 +3371,13 @@ function renderTrendSidoDist(cat){
 function renderMonthlyTrend(){
   var chartEl = document.getElementById('monthly-trend-chart');
   var sumEl = document.getElementById('monthly-trend-summary');
-  if (!chartEl || !window.YTD || !window.YTD.by_brand) return;
+  if (!chartEl) return;
+  // YTD 로드 전 retry
+  if (!window.YTD || !window.YTD.by_brand) {
+    chartEl.innerHTML = '<div style="color:var(--txt3);font-size:11.5px;text-align:center;padding:18px">⏳ 올해 누적 데이터 로딩 중…</div>';
+    setTimeout(renderMonthlyTrend, 1500);
+    return;
+  }
   // 월별 출/폐 집계
   var byMonth = {}; // yyyymm → { open, closed }
   var totalOpen = 0, totalClosed = 0;
@@ -3384,14 +3390,17 @@ function renderMonthlyTrend(){
       for (var i = 0; i < stores.length; i++) {
         var s = stores[i];
         if (window._excludedStoreSet && window._excludedStoreSet[s.id]) continue;
-        if (isExcluded(s)) continue;  // v15.19
+        try { if (typeof isExcluded === 'function' && isExcluded(s)) continue; } catch(e){}
         if (s.closed) { byMonth[m].closed++; totalClosed++; }
         else { byMonth[m].open++; totalOpen++; }
       }
     }
   }
   var months = Object.keys(byMonth).sort();
-  if (!months.length) return;
+  if (!months.length) {
+    chartEl.innerHTML = '<div style="color:var(--txt3);font-size:11.5px;text-align:center;padding:18px">월별 데이터 없음 (1~6월 백필 후 표시)</div>';
+    return;
+  }
   var maxN = 1;
   months.forEach(function(m){ if (byMonth[m].open + byMonth[m].closed > maxN) maxN = byMonth[m].open + byMonth[m].closed; });
   // 요약
