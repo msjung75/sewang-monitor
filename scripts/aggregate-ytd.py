@@ -131,8 +131,12 @@ for s in filtered:
             'name': s.get('name'),
             'addr': s.get('addr',''),
             'permitDate': s.get('permitDate'),
+            'closedDate': s.get('closedDate',''),
             'status': s.get('status',''),
             'closed': closed,
+            'type': s.get('type',''),         # v17.3: 인허가 종류 (ilban/hyuge/danran/yuheung)
+            'typeLabel': s.get('typeLabel',''),  # 일반음식점/휴게음식점/단란주점/유흥주점
+            'upte': s.get('upte',''),         # 업태 (한식/일식/카페 등)
         })
 
 # 2건 이상 출점 브랜드만 (노이즈 제거)

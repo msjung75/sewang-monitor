@@ -3418,12 +3418,19 @@ function detailCategory(s){
   var n = (s.name||'').toLowerCase();
   var u = (s.upte||'').toLowerCase();
   var t = n + ' ' + u;
+  // v17.3: 인허가 종류 강제 (yuheung/danran은 무조건 주점)
+  if (s.type === 'yuheung' || s.type === 'danran') return 'sool';
+  if (s.type === 'hyuge') {
+    if (/카페|커피|cafe|coffee|빵|베이커리|디저트/i.test(t)) return 'cafe';
+    if (/떡볶이|김밥|분식|꽈배기|도넛|튀김/i.test(t)) return 'snack';
+    return 'cafe'; // 휴게음식점 default = 카페
+  }
   // 주점·바
   if (/주점|호프|선술|이자카야|포차|혼술|와인바|칵테일|맥주|소주|바\b|샴페인|사케/i.test(t) || /유흥|단란/i.test(u)) return 'sool';
   // 카페·빵 (편의점·디저트 포함)
   if (/카페|커피|cafe|coffee|빵|베이커리|제과|디저트|도넛|꽈배기|와플|아이스크림|빙수|마카롱|크로플|크로아상|티라미수|파이/i.test(t)) return 'cafe';
-  // 치킨
-  if (/치킨|chicken|호프집|닭볶|닭갈비|찜닭|닭한마리|닭발|닭강정|영양닭/i.test(t)) return 'chicken';
+  // 치킨 (한국 치킨 brand 키워드 강화)
+  if (/치킨|chicken|닭볶|닭갈비|찜닭|닭한마리|닭발|닭강정|영양닭|통닭|비비큐|bbq|bhc|노랑통닭|네네치킨|굽네|페리카나|또래오래|호식이|땅땅|훌리|가마치|호치킨|크리스피|크리스피로|육회바른|핫후라이/i.test(t)) return 'chicken';
   // 고기·구이
   if (/고기|삼겹|갈비|곱창|막창|불고기|구이|돼지|소고기|한우|등심|안심|차돌|업진살|항정살|특수부위|숯불|연탄/i.test(t)) return 'meat';
   // 일식 (라멘·소바·돈가스 포함)
@@ -3438,8 +3445,12 @@ function detailCategory(s){
   if (/횟집|회\b|물회|해산물|해물|조개|굴|새우|꽃게|문어|낙지|장어|아구|아귀|복어|복집|숭어|광어|미역|해녀|쭈꾸미|주꾸미|어시장|어디|회바른|해수산/i.test(t)) return 'seafood';
   // 분식·간식
   if (/떡볶이|볶이|튀김|순대|꼬치|어묵|붕어빵|핫바|토스트|김밥|분식|학교앞|간식|컵라면|호떡/i.test(t)) return 'snack';
-  // 한식 (탕·찌개·국밥·전골·찜)
-  if (/한식|국밥|찌개|덮밥|비빔밥|족발|보쌈|순대|국수|냉면|설렁탕|설농탕|해장국|해장|감자탕|육개장|갈비탕|곰탕|도가니|해물탕|미역국|청국장|뼈해장|전골|두부|찜|찐|뷔페|밥상|집밥|소문난|식당|백반|한정식|쌈밥|돼지국|순두부|평양|냉채|샤브|샤부/i.test(t)) return 'korean';
+  // 한식 (탕·찌개·국밥·전골·찜·삼계탕 등)
+  if (/한식|국밥|찌개|덮밥|비빔밥|족발|보쌈|순대|국수|냉면|설렁탕|설농탕|해장국|해장|감자탕|육개장|갈비탕|곰탕|도가니|해물탕|미역국|청국장|뼈해장|전골|두부|찜|뷔페|밥상|집밥|소문난|백반|한정식|쌈밥|돼지국|순두부|평양|냉채|샤브|샤부|삼계탕|솥밥|솥|쌀국|콩나물국|아구찜|두루치기|돼지|설농|설농탕|순대국|해장|밥집|쌈|국수|반|보리굴비|꼬마김밥|닭한마리/i.test(t)) return 'korean';
+  // v17.3 fallback: 분류 안 된 매장 → 「일반 음식점」 (예: ○○푸드, ○○하우스, ○○키친, ○○라운지, ○○식당)
+  if (/푸드|food|하우스|house|라운지|lounge|키친|kitchen|식당|레스토|restaurant|밥상|다이닝|dining|그릴|grill|펍|pub|기시본점|호점|역점|원점|본점|골목|미식|토속/i.test(t)) return 'food';
+  // v17.3: 인허가 「일반음식점」 type이면 → food 강제 (음식점 종류 안 잡혀도 일반 음식점)
+  if (s.type === 'ilban') return 'food';
   return 'other';
 }
 var DETAIL_CAT_INFO = {
@@ -3454,6 +3465,7 @@ var DETAIL_CAT_INFO = {
   seafood:  { label: '해산물·횟집', color: '#06b6d4' },
   snack:    { label: '분식·간식', color: '#84cc16' },
   cafe:     { label: '카페·빵',  color: '#facc15' },
+  food:     { label: '일반 음식점',color: '#0ea5e9' },
   other:    { label: '분류 미정',color: '#94a3b8' },
 };
 function renderMonthlyTrend(){
