@@ -1003,17 +1003,22 @@ function brandOf(name){
   return null;
 }
 // 주류 미취급 업종 제외 (커피/카페/빵집/디저트/햄버거/패스트푸드 등)
-var EXCLUDE_NAME = /커피|카페|까페|cafe|coffee|caffe|빵|베이커리|제과|베이글|도넛|도너츠|디저트|케이크|케익|와플|크로플|마카롱|버거|햄버거|샌드위치|토스트|브런치|치즈|아이스크림|빙수|젤라또|요거트|쥬스|주스|스무디|밀크티|버블티|공차|스타벅스|이디야|메가엠지씨|메가mgc|컴포즈|빽다방|투썸|폴바셋|할리스|파스쿠찌|더벤티|던킨|배스킨|베스킨|블루보틀|커피빈|요거트프레소|설빙|청수당|커피명가|드롭탑|핸드드립|파리바게|뚜레쥬르|맘스터치|롯데리아|kfc|맥도날드|버거킹|서브웨이|편의점|놀부|놀고먹다|씨유|cu편의점|^cu|cu(?=[^a-z])|cu한|세븐일레븐|7-eleven|7eleven|gs25|지에스25|이마트24|emart24|미니스톱|ministop|365플러스|바이더웨이|홈플러스익스프레스|이마트에브리데이|롯데마트|노브랜드|농가의식탁|에이치에스마켓|대신에프앤|daeshinf&n|daeshin|지오에프앤|지오에브앤|보해명가|노배드바이브스|nobadvibes|서울키친|메가혼밥|올데이스테이|alldaystay|이안만두/i;
+var EXCLUDE_NAME = /커피|카페|까페|cafe|coffee|caffe|빵|베이커리|제과|베이글|도넛|도너츠|디저트|케이크|케익|와플|크로플|마카롱|버거|햄버거|샌드위치|토스트|브런치|치즈|아이스크림|빙수|젤라또|요거트|쥬스|주스|스무디|밀크티|버블티|공차|스타벅스|이디야|메가엠지씨|메가mgc|컴포즈|빽다방|투썸|폴바셋|할리스|파스쿠찌|더벤티|던킨|배스킨|베스킨|블루보틀|커피빈|요거트프레소|설빙|청수당|커피명가|드롭탑|핸드드립|파리바게|뚜레쥬르|맘스터치|롯데리아|kfc|맥도날드|버거킹|서브웨이|편의점|놀부|놀고먹다|씨유|cu편의점|^cu|cu(?=[^a-z])|cu한|세븐일레븐|7-eleven|7eleven|gs25|지에스25|이마트24|emart24|미니스톱|ministop|365플러스|바이더웨이|홈플러스익스프레스|이마트에브리데이|롯데마트|노브랜드|농가의식탁|에이치에스마켓|대신에프앤|daeshinf&n|daeshin|지오에프앤|지오에브앤|보해명가|노배드바이브스|nobadvibes|서울키친|메가혼밥|올데이스테이|alldaystay|이안만두|주바른|팝업|popup/i;
 var EXCLUDE_UPTE = /커피|까페|카페|다방|패스트푸드|제과|아이스크림|편의점|기타휴게|브런치|티전문|차전문/;
 // 법인·위탁운영체 (푸드코트/구내식당/급식 — 주류 영업 대상 아님)
 var EXCLUDE_CORP = /에프엔비|에프앤비|f&b|fnb|티에프|푸드시스템|푸드서비스|푸드코트|급식|구내식당|컨세션|케이터링|명륜당티에프|미르에프엔비|리은푸드|라온푸드/i;
+// v15.19: 백화점·아울렛·복합몰 팝업 매장 — 사장님 영업 대상 아님 (단기 임대)
+var EXCLUDE_ADDR = /백화점|아울렛|outlet|프리미엄아울렛|복합쇼핑|복합문화|스타필드|롯데몰|현대몰|신세계백화점|롯데백화점|현대백화점|갤러리아|akplaza|ak플라자|nc백화점|더현대|코엑스몰|타임스퀘어|ifc몰|영등포타임스퀘어|애비뉴엘|지하상가/i;
 function isExcluded(s){
   var n = normName(s.name);
   var compact = n.replace(/\s/g, '');
+  var addr = s.addr || '';
   // EXCLUDE_NAME/CORP는 normalized name + compact 양쪽 매칭 → '농가의 식탁'·'농가의식탁' 모두 차단
+  // v15.19: 주소가 백화점·복합몰이면 팝업 매장으로 간주 → 제외
   return EXCLUDE_NAME.test(n) || EXCLUDE_NAME.test(compact)
       || EXCLUDE_UPTE.test(s.upte || '')
-      || EXCLUDE_CORP.test(n) || EXCLUDE_CORP.test(compact);
+      || EXCLUDE_CORP.test(n) || EXCLUDE_CORP.test(compact)
+      || EXCLUDE_ADDR.test(addr);
 }
 // 중복 매장 제거 — id 우선, 없으면 name+addr+permitDate 조합
 function permitKey(s){
@@ -1803,6 +1808,7 @@ function frFiltered(){
       for (var i = 0; i < stores.length; i++) {
         var s = stores[i];
         if (storeExcluded[s.id]) continue;
+        if (isExcluded(s)) continue;  // v15.19: 백화점·팝업·EXCLUDE 자동 필터
         if (s.closed) { g.monthly[m].closed += 1; g.total_closed += 1; }
         else { g.monthly[m].open += 1; g.total_open += 1; }
         g.monthly[m].stores.push(s);
@@ -2992,6 +2998,7 @@ function renderTrendTab(){
         var s = stores[i];
         if (!isCatStore(s, cat)) continue;
         if (window._excludedStoreSet && window._excludedStoreSet[s.id]) continue;
+        if (isExcluded(s)) continue;  // v15.19
         if (!byMonth[m]) byMonth[m] = { open: 0, closed: 0 };
         if (s.closed) byMonth[m].closed++; else byMonth[m].open++;
       }
@@ -3108,6 +3115,7 @@ function renderTrendTopGrowth(cat){
         if (s.closed) continue;
         if (!isCatStore(s, cat)) continue;
         if (window._excludedStoreSet && window._excludedStoreSet[s.id]) continue;
+        if (isExcluded(s)) continue;  // v15.19
         n++;
       }
       var mm = parseInt(m.slice(4,6), 10);
@@ -3146,6 +3154,7 @@ function renderTrendSidoDist(cat){
         if (s.closed) continue;
         if (!isCatStore(s, cat)) continue;
         if (window._excludedStoreSet && window._excludedStoreSet[s.id]) continue;
+        if (isExcluded(s)) continue;  // v15.19
         var match = (s.addr||'').match(/^([가-힣]+(?:특별시|광역시|특별자치도|특별자치시|도))/);
         if (match) sidoCnt[match[1]] = (sidoCnt[match[1]]||0) + 1;
       }
@@ -3182,6 +3191,7 @@ function renderMonthlyTrend(){
       for (var i = 0; i < stores.length; i++) {
         var s = stores[i];
         if (window._excludedStoreSet && window._excludedStoreSet[s.id]) continue;
+        if (isExcluded(s)) continue;  // v15.19
         if (s.closed) { byMonth[m].closed++; totalClosed++; }
         else { byMonth[m].open++; totalOpen++; }
       }

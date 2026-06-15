@@ -11,13 +11,23 @@ EXCLUDE_KEYWORDS = [
     '커피','카페','coffee','cafe','스타벅스','이디야','투썸','커피빈','메가커피','컴포즈','폴바셋',
     '빵','베이커리','파리바게뜨','뚜레쥬르','롯데리아','맥도날드','버거킹','KFC','맘스터치',
     'CU','GS25','세븐일레븐','이마트24','미니스톱',
+    '주바른','팝업','popup',  # v15.19: 팝업 brand
 ]
-def is_excluded(name, upte):
+# v15.19: 백화점·복합몰 주소 → 단기 임대 팝업 매장 (영업 대상 X)
+EXCLUDE_ADDR_KEYWORDS = [
+    '백화점','아울렛','outlet','프리미엄아울렛','복합쇼핑','스타필드','롯데몰','현대몰',
+    '신세계백화점','롯데백화점','현대백화점','갤러리아','AK플라자','NC백화점',
+    '더현대','코엑스몰','타임스퀘어','IFC몰','애비뉴엘','지하상가',
+]
+def is_excluded(name, upte, addr=''):
     if not name: return False
     n = name.lower()
     if any(k.lower() in n for k in EXCLUDE_KEYWORDS): return True
     u = (upte or '').lower()
     if any(k in u for k in ['커피','빵','편의점']): return True
+    if addr:
+        a = addr.lower()
+        if any(k.lower() in a for k in EXCLUDE_ADDR_KEYWORDS): return True
     return False
 def is_closed(status):
     return any(k in (status or '') for k in ['폐업','취소','말소','중지','휴업'])
@@ -72,7 +82,7 @@ for f in sorted(glob.glob('data/ytd_2026/*.json')):
         all_stores.extend(stores)
     except Exception: pass
 
-filtered = [s for s in all_stores if not is_excluded(s.get('name',''), s.get('upte',''))]
+filtered = [s for s in all_stores if not is_excluded(s.get('name',''), s.get('upte',''), s.get('addr',''))]
 print(f'raw: {len(all_stores)} → filtered: {len(filtered)}')
 
 summary = {
@@ -89,7 +99,7 @@ summary = {
 
 # 월별
 for month, stores in months.items():
-    fs = [s for s in stores if not is_excluded(s.get('name',''), s.get('upte',''))]
+    fs = [s for s in stores if not is_excluded(s.get('name',''), s.get('upte',''), s.get('addr',''))]
     open_n = sum(1 for s in fs if not is_closed(s.get('status','')))
     closed_n = len(fs) - open_n
     summary['by_month'][month] = {
