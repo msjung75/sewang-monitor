@@ -1976,10 +1976,15 @@ function buildSegmentAliases(){
   if (!window.YTD || !window.YTD.by_brand || typeof BRAND_ALIASES === 'undefined') return;
   if (window._segmentAliasesBuilt) return;
   window._segmentAliasesBuilt = true;
-  // Pass 1: 명시적 BRAND_ALIASES canonical keys (compact, ≥5자) prefix 매칭
+  // Pass 1: 명시적 BRAND_ALIASES canonical keys prefix 매칭
+  // - 일반: ≥5자
+  // - 사장님 명시 self-alias (key == val compact): ≥4자 허용 (예: 「삼동소바」)
   var canons = [];
   for (var k in BRAND_ALIASES) {
-    if (k.length >= 5) canons.push({ key: k, val: BRAND_ALIASES[k] });
+    var val = BRAND_ALIASES[k];
+    var valCompact = val.replace(/\s/g,'').toLowerCase();
+    if (k.length >= 5) canons.push({ key: k, val: val });
+    else if (k.length >= 4 && k === valCompact) canons.push({ key: k, val: val });
   }
   canons.sort(function(a,b){ return a.key.length - b.key.length; });
   var added = 0;
