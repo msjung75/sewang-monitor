@@ -507,6 +507,16 @@ body{
     </table>
   </div>
 
+  <!-- v15.15: 월별 창업 추이 -->
+  <div class="card" id="card-monthly-trend" style="margin-top:14px">
+    <div class="card-title">📈 올해 월별 창업 추이 <span style="color:var(--txt3);font-size:10px;font-weight:500;margin-left:auto">2026년 1~6월</span></div>
+    <div id="monthly-trend-summary" style="font-size:11.5px;color:var(--txt2);margin-bottom:12px;line-height:1.5"></div>
+    <div id="monthly-trend-chart"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+      <div style="font-size:10px;color:var(--txt3)"><span style="color:#34d399">■</span> 출점 <span style="color:#f87171;margin-left:8px">■</span> 폐점</div>
+    </div>
+  </div>
+
 </div>
 
 <!-- ======= PAGE: 신규업장 ======= -->
@@ -2191,6 +2201,8 @@ async function loadYTDSummary(){
     setTimeout(function(){ try { loadClosuresLazy(); } catch(e){} }, 1500);
     // v15.13: 공정위 가맹점수·매출 lazy fetch (백그라운드)
     setTimeout(function(){ try { loadFranchiseStats(); } catch(e){} }, 3000);
+    // v15.15: 월별 창업 추이 카드
+    try { renderMonthlyTrend(); } catch(e){}
     // 「프랜차이즈」 상단 안내문 집계 표시
     var sumEl = document.getElementById('fr-ytd-summary');
     if (sumEl && window.YTD.by_month) {
@@ -2900,6 +2912,60 @@ function updateClock(isFetch){
 }
 setInterval(function(){ updateClock(); }, 30000);
 updateClock();
+
+// v15.15: 월별 창업 추이 (대시보드 카드)
+function renderMonthlyTrend(){
+  var chartEl = document.getElementById('monthly-trend-chart');
+  var sumEl = document.getElementById('monthly-trend-summary');
+  if (!chartEl || !window.YTD || !window.YTD.by_brand) return;
+  // 월별 출/폐 집계
+  var byMonth = {}; // yyyymm → { open, closed }
+  var totalOpen = 0, totalClosed = 0;
+  for (var b in window.YTD.by_brand) {
+    var v = window.YTD.by_brand[b];
+    for (var m in v.monthly) {
+      if (m < '202601') continue;
+      if (!byMonth[m]) byMonth[m] = { open: 0, closed: 0 };
+      var stores = v.monthly[m].stores || [];
+      for (var i = 0; i < stores.length; i++) {
+        var s = stores[i];
+        if (window._excludedStoreSet && window._excludedStoreSet[s.id]) continue;
+        if (s.closed) { byMonth[m].closed++; totalClosed++; }
+        else { byMonth[m].open++; totalOpen++; }
+      }
+    }
+  }
+  var months = Object.keys(byMonth).sort();
+  if (!months.length) return;
+  var maxN = 1;
+  months.forEach(function(m){ if (byMonth[m].open + byMonth[m].closed > maxN) maxN = byMonth[m].open + byMonth[m].closed; });
+  // 요약
+  var avgOpen = Math.round(totalOpen / months.length);
+  var lastM = byMonth[months[months.length-1]];
+  var firstM = byMonth[months[0]];
+  var trendIco = lastM.open > avgOpen * 1.1 ? '↗️ 증가' : lastM.open < avgOpen * 0.9 ? '↘️ 감소' : '→ 유지';
+  sumEl.innerHTML = '올해 누적 <b style="color:#34d399">' + totalOpen.toLocaleString() + '</b> 출점 · <b style="color:#f87171">' + totalClosed.toLocaleString() + '</b> 폐점 · 월평균 <b>' + avgOpen.toLocaleString() + '</b> · 추세 <b>' + trendIco + '</b>';
+  // 가로 막대 차트
+  var labels = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+  var html = '';
+  months.forEach(function(m){
+    var idx = parseInt(m.slice(4,6), 10) - 1;
+    var d = byMonth[m];
+    var openW = d.open / maxN * 100;
+    var closedW = d.closed / maxN * 100;
+    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:11.5px">'
+      + '<div style="width:32px;color:var(--txt2);font-weight:600">' + labels[idx] + '</div>'
+      + '<div style="flex:1">'
+      + '<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">'
+      + '<div style="height:8px;background:#34d399;border-radius:3px;width:' + openW.toFixed(1) + '%;min-width:' + (d.open?3:0) + 'px"></div>'
+      + '<span style="color:#34d399;font-weight:700;font-size:11px">+' + d.open.toLocaleString() + '</span></div>'
+      + '<div style="display:flex;align-items:center;gap:6px">'
+      + '<div style="height:8px;background:#f87171;border-radius:3px;width:' + closedW.toFixed(1) + '%;min-width:' + (d.closed?3:0) + 'px"></div>'
+      + '<span style="color:#f87171;font-weight:700;font-size:11px">-' + d.closed.toLocaleString() + '</span></div>'
+      + '</div></div>';
+  });
+  chartEl.innerHTML = html;
+}
 
 // v15.14: N등록 cron 결과 로드 — naver_nstat_cache.json 머지
 async function loadNaverNstatCache(){
