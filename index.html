@@ -4106,7 +4106,7 @@ function loadKakaoSDK(cb){
   fetch('/api/auth/kakao?action=config', { credentials: 'same-origin' }).then(function(r){ return r.json(); }).then(function(d){
     if (!d.kakaoJsKey) { cb(new Error('no key')); return; }
     var s = document.createElement('script');
-    s.src = 'https://dapi.kakao.com/v2/maps/sdk.js?autoload=false&appkey=' + d.kakaoJsKey;
+    s.src = 'https://dapi.kakao.com/v2/maps/sdk.js?autoload=false&libraries=clusterer&appkey=' + d.kakaoJsKey;
     s.onload = function(){ kakao.maps.load(function(){ KAKAO_SDK_LOADED = true; cb(); }); };
     s.onerror = function(){ cb(new Error('sdk load failed')); };
     document.head.appendChild(s);
@@ -4144,52 +4144,121 @@ function initKakaoMap(){
     }
   });
 }
+// v16.1: 카테고리별 색상 + 시·도 중심 오버레이 + 캐시 좌표 클러스터
+function categoryColor(s){
+  if (typeof isCatStore !== 'function') return '#a78bfa';
+  if (isCatStore(s, 'sool')) return '#34d399'; // 주점
+  if (isCatStore(s, 'cafe')) return '#fbbf24'; // 카페
+  return '#7dd3fc'; // 음식점
+}
+function clearMapOverlays(map){
+  if (window.MAP_OVERLAYS) {
+    window.MAP_OVERLAYS.forEach(function(o){ try { o.setMap(null); } catch(e){} });
+  }
+  window.MAP_OVERLAYS = [];
+  if (window.MAP_CLUSTER) try { window.MAP_CLUSTER.clear(); } catch(e){}
+}
 function renderMapMarkers(map){
-  // data/geocoded_ytd.json — 향후 cron 동작 후 채워짐. 지금은 빈 상태
-  fetch('/data/geocoded_ytd.json').then(function(r){ return r.ok ? r.json() : null; }).then(function(d){
-    if (!d || !d.stores) {
-      // 지오코딩 데이터 아직 없음 — 시·도별 중심점에 카운트만 표시
-      var sidoCenters = {
-        '서울특별시': [37.5665, 126.9780], '경기도': [37.4138, 127.5183],
-        '인천광역시': [37.4563, 126.7052], '부산광역시': [35.1796, 129.0756],
-        '대구광역시': [35.8714, 128.6014], '광주광역시': [35.1595, 126.8526],
-        '대전광역시': [36.3504, 127.3845], '울산광역시': [35.5384, 129.3114],
-        '세종특별자치시': [36.4801, 127.2890], '강원특별자치도': [37.8228, 128.1555],
-        '충청북도': [36.6357, 127.4914], '충청남도': [36.6588, 126.6727],
-        '전북특별자치도': [35.7175, 127.1530], '전라남도': [34.8161, 126.4630],
-        '경상북도': [36.5760, 128.5056], '경상남도': [35.4606, 128.2132],
-        '제주특별자치도': [33.4996, 126.5312],
-      };
-      if (!window.YTD || !window.YTD.by_brand) return;
-      var sidoCnt = {};
-      for (var b in window.YTD.by_brand) {
-        var v = window.YTD.by_brand[b];
-        for (var mm in v.monthly) {
-          var stores = v.monthly[mm].stores || [];
-          for (var i = 0; i < stores.length; i++) {
-            var match = (stores[i].addr||'').match(/^([가-힣]+(?:특별시|광역시|특별자치도|특별자치시|도))/);
-            if (match) sidoCnt[match[1]] = (sidoCnt[match[1]]||0) + 1;
-          }
+  clearMapOverlays(map);
+  if (!window.YTD || !window.YTD.by_brand) return;
+  // v16.1: 카테고리·월·exclude 필터
+  var cat = (typeof activeChip === 'function' ? activeChip('chip-map-cat') : 'all') || 'all';
+  var selMonth = window._mapSelectedMonth || 0;
+  var monthFilter = selMonth ? ('20260' + selMonth) : null;
+
+  var sidoCenters = {
+    '서울특별시': [37.5665, 126.9780], '경기도': [37.4138, 127.5183],
+    '인천광역시': [37.4563, 126.7052], '부산광역시': [35.1796, 129.0756],
+    '대구광역시': [35.8714, 128.6014], '광주광역시': [35.1595, 126.8526],
+    '대전광역시': [36.3504, 127.3845], '울산광역시': [35.5384, 129.3114],
+    '세종특별자치시': [36.4801, 127.2890], '강원특별자치도': [37.8228, 128.1555],
+    '충청북도': [36.6357, 127.4914], '충청남도': [36.6588, 126.6727],
+    '전북특별자치도': [35.7175, 127.1530], '전라남도': [34.8161, 126.4630],
+    '경상북도': [36.5760, 128.5056], '경상남도': [35.4606, 128.2132],
+    '제주특별자치도': [33.4996, 126.5312],
+  };
+  var sidoCnt = {};
+  var sidoColorMix = {};
+  var geoCache = (function(){ try { return JSON.parse(localStorage.getItem('sewang_geo_cache')||'{}'); } catch(e){ return {}; }})();
+  var cachedMarkers = [];
+  for (var b in window.YTD.by_brand) {
+    var v = window.YTD.by_brand[b];
+    for (var mm in v.monthly) {
+      if (monthFilter && mm !== monthFilter) continue;
+      var stores = v.monthly[mm].stores || [];
+      for (var i = 0; i < stores.length; i++) {
+        var s = stores[i];
+        if (s.closed) continue;
+        if (window._excludedStoreSet && window._excludedStoreSet[s.id]) continue;
+        if (isExcluded(s)) continue;
+        if (cat !== 'all' && !isCatStore(s, cat)) continue;
+        var match = (s.addr||'').match(/^([가-힣]+(?:특별시|광역시|특별자치도|특별자치시|도))/);
+        if (match) {
+          sidoCnt[match[1]] = (sidoCnt[match[1]]||0) + 1;
+          var c = categoryColor(s);
+          if (!sidoColorMix[match[1]]) sidoColorMix[match[1]] = {};
+          sidoColorMix[match[1]][c] = (sidoColorMix[match[1]][c]||0) + 1;
         }
-      }
-      for (var sido in sidoCnt) {
-        var c = sidoCenters[sido];
-        if (!c) continue;
-        var pos = new kakao.maps.LatLng(c[0], c[1]);
-        var content = '<div style="padding:8px 12px;background:rgba(124,58,237,0.95);color:#fff;border-radius:14px;font-size:13px;font-weight:800;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,0.4)">'
-          + sido.replace(/(특별시|광역시|특별자치도|특별자치시|도)$/, '') + ' ' + sidoCnt[sido].toLocaleString() + '</div>';
-        new kakao.maps.CustomOverlay({ map: map, position: pos, content: content, yAnchor: 0.5 });
-      }
-    } else {
-      // 향후 — 매장 좌표가 있으면 핀 마커 표시
-      var cluster = (d.stores || []).slice(0, 500);
-      for (var i = 0; i < cluster.length; i++) {
-        var s = cluster[i];
-        if (!s.lat || !s.lng) continue;
-        new kakao.maps.Marker({ map: map, position: new kakao.maps.LatLng(s.lat, s.lng) });
+        // 캐시된 좌표가 있으면 클러스터 마커
+        var pos = geoCache[s.addr];
+        if (pos && pos.lat && pos.lng) cachedMarkers.push({ pos: pos, store: s });
       }
     }
-  }).catch(function(){});
+  }
+  // 카카오맵 클러스터 (캐시 좌표가 있는 매장만)
+  if (cachedMarkers.length && kakao.maps.MarkerClusterer) {
+    var markers = cachedMarkers.map(function(c){
+      var imgSrc = 'data:image/svg+xml;base64,' + btoa('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="' + categoryColor(c.store) + '" stroke="white" stroke-width="2"/></svg>');
+      var marker = new kakao.maps.Marker({
+        position: new kakao.maps.LatLng(c.pos.lat, c.pos.lng),
+        image: new kakao.maps.MarkerImage(imgSrc, new kakao.maps.Size(20,20)),
+      });
+      kakao.maps.event.addListener(marker, 'click', function(){
+        showMapStorePanel(c.store);
+      });
+      return marker;
+    });
+    if (!window.MAP_CLUSTER) {
+      window.MAP_CLUSTER = new kakao.maps.MarkerClusterer({
+        map: map, averageCenter: true, minLevel: 5,
+        styles: [
+          { width:'40px', height:'40px', background:'rgba(124,58,237,0.92)', color:'#fff', textAlign:'center', borderRadius:'20px', lineHeight:'40px', fontWeight:'800', fontSize:'13px' },
+          { width:'48px', height:'48px', background:'rgba(167,139,250,0.92)', color:'#fff', textAlign:'center', borderRadius:'24px', lineHeight:'48px', fontWeight:'800', fontSize:'14px' },
+        ],
+      });
+    }
+    window.MAP_CLUSTER.addMarkers(markers);
+  }
+  // 시·도 중심 오버레이 (카테고리 색상 mixed)
+  for (var sido in sidoCnt) {
+    var sc = sidoCenters[sido];
+    if (!sc) continue;
+    var sPos = new kakao.maps.LatLng(sc[0], sc[1]);
+    // 가장 많은 카테고리 색상
+    var mix = sidoColorMix[sido] || {};
+    var topColor = '#a78bfa';
+    var topN = 0;
+    for (var col in mix) { if (mix[col] > topN) { topN = mix[col]; topColor = col; }}
+    var content = '<div style="padding:8px 12px;background:' + topColor + ';color:#fff;border-radius:14px;font-size:13px;font-weight:800;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,0.4);border:2px solid rgba(255,255,255,0.3)">'
+      + sido.replace(/(특별시|광역시|특별자치도|특별자치시|도)$/, '') + ' ' + sidoCnt[sido].toLocaleString() + '</div>';
+    var ov = new kakao.maps.CustomOverlay({ map: map, position: sPos, content: content, yAnchor: 0.5 });
+    window.MAP_OVERLAYS.push(ov);
+  }
+}
+// 선택된 매장 사이드 패널
+function showMapStorePanel(s){
+  var el = document.getElementById('map-selected-store');
+  if (!el) return;
+  var addrShort = (s.addr || '').slice(0, 60);
+  el.style.display = 'block';
+  el.innerHTML = '<div class="card" style="margin-bottom:12px;padding:14px;border-left:3px solid ' + categoryColor(s) + '">'
+    + '<div style="display:flex;justify-content:space-between;gap:8px;align-items:start;margin-bottom:8px">'
+    + '<div style="flex:1"><div style="font-size:14px;font-weight:800">' + esc(s.name||'') + '</div>'
+    + '<div style="font-size:11px;color:var(--txt3);margin-top:3px">' + esc(addrShort) + '</div></div>'
+    + '<button onclick="document.getElementById(\'map-selected-store\').style.display=\'none\'" style="background:transparent;border:0;color:var(--txt3);font-size:16px;cursor:pointer">×</button></div>'
+    + '<div style="display:flex;gap:6px"><a href="https://map.naver.com/p/search/' + encodeURIComponent(s.name||'') + '" target="_blank" style="flex:1;padding:8px;background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.3);color:#34d399;border-radius:7px;font-size:11.5px;font-weight:700;text-align:center;text-decoration:none">📍 N 플레이스</a>'
+    + '<a href="https://search.naver.com/search.naver?query=' + encodeURIComponent(s.name||'') + '" target="_blank" style="flex:1;padding:8px;background:rgba(56,189,248,0.12);border:1px solid rgba(56,189,248,0.3);color:#7dd3fc;border-radius:7px;font-size:11.5px;font-weight:700;text-align:center;text-decoration:none">🔍 N 검색</a>'
+    + '</div></div>';
 }
 window._mapSelectedMonth = 0; // 0=전체, 1~6=월
 function onMapMonthChange(v){
