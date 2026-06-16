@@ -462,6 +462,41 @@ export default async function handler(req, res) {
       }
     }
 
+    // ===== 네이버 데이터랩 검색 트렌드 (brand 화제성) =====
+    if (action === 'naver_trend') {
+      const cid = process.env.NAVER_CLIENT_ID;
+      const csec = process.env.NAVER_CLIENT_SECRET;
+      if (!cid || !csec) return res.status(500).json({ error: 'NAVER 키 미설정' });
+      const keyword = (req.query.q || '').trim();
+      if (!keyword) return res.status(400).json({ error: 'q 필요' });
+      // 최근 6개월
+      const end = new Date();
+      const start = new Date(end.getTime() - 180 * 86400 * 1000);
+      const fmt = d => d.toISOString().slice(0,10);
+      try {
+        const r = await fetch('https://openapi.naver.com/v1/datalab/search', {
+          method: 'POST',
+          headers: {
+            'X-Naver-Client-Id': cid,
+            'X-Naver-Client-Secret': csec,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            startDate: fmt(start),
+            endDate: fmt(end),
+            timeUnit: 'month',
+            keywordGroups: [{ groupName: keyword, keywords: [keyword] }],
+          }),
+        });
+        const d = await r.json();
+        const data = (d.results && d.results[0] && d.results[0].data) || [];
+        res.setHeader('Cache-Control', 'public, s-maxage=86400, stale-while-revalidate=3600');
+        return res.status(200).json({ keyword, data });
+      } catch (e) {
+        return res.status(500).json({ error: e.message });
+      }
+    }
+
     // ===== 공정위 brand 페이지 프록시 (DATA_GO_KR_KEY 보호) =====
     if (action === 'franchise_page') {
       const key = process.env.DATA_GO_KR_KEY;
