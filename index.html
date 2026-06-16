@@ -546,11 +546,14 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
   <!-- v17.8.1: 데이터 기준일 미니 stamp -->
   <div id="data-freshness-stamp" style="margin-top:8px;font-size:10.5px;color:var(--txt3);text-align:center;padding:8px 10px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;gap:6px"><span>🕐</span><span id="data-freshness-text">데이터 갱신 시각 확인 중…</span></div>
 
-  <!-- v17.6: SNS 트렌드 미니 카드 (TOP 성장 brand의 N 데이터랩 검색량) -->
+  <!-- v17.13: SNS 화제성 카드 (카테고리 라벨 + 화제성 근거 모달) -->
   <div class="card" id="card-sns-trend" style="margin-top:14px">
-    <div class="card-title">📱 SNS 화제성 TOP 5 <span style="color:var(--txt3);font-size:10px;font-weight:500;margin-left:auto">N 데이터랩 6개월</span></div>
+    <div class="card-title">📱 SNS 화제성 TOP 5 <span style="color:var(--txt3);font-size:10px;font-weight:500;margin-left:auto">주점·치킨·고기 가중</span></div>
     <div id="sns-trend-list"><div style="color:var(--txt3);font-size:11px;text-align:center;padding:14px">⏳ TOP 성장 brand 트렌드 분석 중…</div></div>
-    <div style="font-size:10px;color:var(--txt3);text-align:center;margin-top:8px">※ brand 클릭 → 상세 트렌드</div>
+    <div style="font-size:10px;color:var(--txt3);text-align:center;margin-top:8px;line-height:1.5">
+      📊 <b>산출 기준:</b> 최근 3개월 신규 오픈 ≥ 5건 + 카테고리 가중 + 검색량 추세<br>
+      <span style="color:var(--txt3);opacity:0.7">※ 주점·치킨·고기·한식·일식 brand 우선 · 클릭 → 화제성 근거</span>
+    </div>
   </div>
 
   <!-- v17.2: 대시보드는 최근 30일 단기 스냅샷 (사장님 구조 분리) -->
@@ -706,6 +709,39 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
   <div class="sdiv" id="fr-detail-title" style="display:none">신규 출점 지점</div>
   <div id="fr-detail"></div>
 
+</div>
+
+<!-- v17.13: SNS 화제성 근거 모달 (사장님: "왜 화제성이 높은가 보고 싶다") -->
+<div id="sns-rationale-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:16px;box-sizing:border-box" onclick="if(event.target===this)closeSnsModal()">
+  <div style="max-width:540px;width:100%;max-height:92vh;overflow-y:auto;background:var(--surface);border:1px solid var(--border-hi);border-radius:14px;box-shadow:0 24px 64px rgba(0,0,0,0.7);padding:18px 16px 22px">
+    <div style="display:flex;justify-content:space-between;align-items:start;gap:10px;margin-bottom:14px">
+      <div style="flex:1">
+        <div id="sns-modal-cat-badge" style="display:inline-block;font-size:10px;padding:2px 8px;border-radius:5px;font-weight:700;margin-bottom:6px"></div>
+        <div id="sns-modal-title" style="font-size:18px;font-weight:800;color:var(--txt);letter-spacing:-0.3px">🔥 brand</div>
+        <div id="sns-modal-sub" style="font-size:11.5px;color:var(--txt2);margin-top:4px"></div>
+      </div>
+      <button onclick="closeSnsModal()" style="background:rgba(255,255,255,0.06);border:0;color:var(--txt2);width:30px;height:30px;border-radius:50%;font-size:16px;cursor:pointer">×</button>
+    </div>
+    <!-- 종합 평가 1줄 -->
+    <div id="sns-modal-verdict" style="background:linear-gradient(135deg,rgba(125,211,252,0.08),rgba(167,139,250,0.05));border:1px solid rgba(125,211,252,0.2);border-radius:9px;padding:10px 12px;font-size:12px;line-height:1.5;color:var(--txt);margin-bottom:14px"></div>
+    <!-- 네이버 검색량 sparkline -->
+    <div id="sns-modal-trend" style="margin-bottom:14px"></div>
+    <!-- 신규 오픈 3구간 -->
+    <div id="sns-modal-opens" style="margin-bottom:14px"></div>
+    <!-- 인스타·YouTube (Phase 2) placeholder -->
+    <div id="sns-modal-buzz" style="margin-bottom:14px"></div>
+    <!-- 최근 매장 mini -->
+    <div id="sns-modal-stores" style="margin-bottom:8px"></div>
+    <!-- 산출 기준 -->
+    <div style="font-size:10px;color:var(--txt3);line-height:1.5;padding-top:8px;border-top:1px solid rgba(255,255,255,0.06)">
+      📐 <b>점수 공식:</b> 신규오픈(3M) × 카테고리가중 × (1 + 검색추세/100)<br>
+      <span style="opacity:0.7">※ 카테고리 가중: 주점 3.0 / 치킨·고기 2.5 / 한식·일식 1.5 / 그외 1.0 · 데이터 없는 brand는 fallback</span>
+    </div>
+    <div style="margin-top:14px;display:flex;gap:8px">
+      <button onclick="closeSnsModal();gotoFrTab(window._snsModalBrand)" style="flex:1;padding:11px;background:rgba(167,139,250,0.15);border:1px solid rgba(167,139,250,0.35);color:#c4b5fd;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer">📊 프랜차이즈 탭</button>
+      <button onclick="closeSnsModal();window._mapBrand=window._snsModalBrand;openBrandMap(encodeURIComponent(window._snsModalBrand))" style="flex:1;padding:11px;background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.3);color:#34d399;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer">🗺️ 지도</button>
+    </div>
+  </div>
 </div>
 
 <!-- ======= PAGE: 🗺️ 지도 ======= -->
@@ -3630,60 +3666,110 @@ function updateDataFreshness(){
   el.innerHTML = '🏛️ 행안부 마지막 인허가 데이터: <b style="color:' + color + '">' + d + '</b> (' + daysOld + '일 전)' + (daysOld > 3 ? '<br><span style="font-size:9.5px">※ 행안부 API 갱신 지연 가능 (영업일 + 2~5일)</span>' : '');
 }
 
-// v17.6: SNS 트렌드 — TOP 성장 brand의 N 데이터랩 검색량 (lazy fetch + 7일 캐시)
+// v17.13: SNS 화제성 — 카테고리 가중 점수 + 「데이터 X」 fallback 명시
+// 사장님 정책: 주점·치킨·고기·한식·일식 우선, 「데이터 X」 brand는 명확히 표시
+var SNS_FOCUS_WEIGHT = { sool: 3.0, chicken: 2.5, meat: 2.5, korean: 1.5, japanese: 1.5, western: 1.2, seafood: 1.2, food: 1.0, asian: 1.0, chinese: 1.0, snack: 0.8, cafe: 0.5, other: 0.6 };
+
 async function loadSnsTrend(){
   var listEl = document.getElementById('sns-trend-list');
   if (!listEl || !window.YTD || !window.YTD.by_brand) return;
-  // 캐시
+  // 캐시 (1일 — buzz 데이터 빠르게 갱신)
   try {
-    var cached = localStorage.getItem('sewang_sns_trend');
+    var cached = localStorage.getItem('sewang_sns_trend_v17_13');
     if (cached) {
       var c = JSON.parse(cached);
-      if (Date.now() - (c.ts||0) < 7 * 86400 * 1000 && c.brands) {
+      if (Date.now() - (c.ts||0) < 86400 * 1000 && c.brands) {
         renderSnsTrendList(c.brands);
         return;
       }
     }
   } catch(e){}
-  // TOP 5 성장 brand 추출
+  // brand 그룹화 + 카테고리 + 매장 list 수집
   var grouped = {};
   for (var b in window.YTD.by_brand) {
     var compact = b.replace(/\s/g,'').toLowerCase();
     var alias = (typeof BRAND_ALIASES !== 'undefined' && BRAND_ALIASES[compact]) || b;
     var ac = alias.replace(/\s/g,'').toLowerCase();
-    if (!grouped[ac]) grouped[ac] = { brand: alias, late: 0 };
+    if (!grouped[ac]) grouped[ac] = { brand: alias, late: 0, total3M: 0, total1M: 0, total6M: 0, categories: {}, sampleStores: [] };
     var v = window.YTD.by_brand[b];
+    var now = new Date();
+    var thisYM = '' + now.getFullYear() + ('0' + (now.getMonth()+1)).slice(-2);
     for (var m in v.monthly) {
-      var mm = parseInt(m.slice(4,6),10);
-      if (mm < 4 || mm > 6) continue;
       var stores = v.monthly[m].stores || [];
       for (var i = 0; i < stores.length; i++) {
         var s = stores[i];
         if (s.closed) continue;
         try { if (typeof isExcluded === 'function' && isExcluded(s)) continue; } catch(e){}
-        grouped[ac].late++;
+        // 1·3·6개월 구간
+        var pd = (s.permitDate || '').slice(0,6);
+        if (pd) {
+          var diffM = (parseInt(thisYM.slice(0,4),10) - parseInt(pd.slice(0,4),10)) * 12 + (parseInt(thisYM.slice(4,6),10) - parseInt(pd.slice(4,6),10));
+          if (diffM <= 1) grouped[ac].total1M++;
+          if (diffM <= 3) { grouped[ac].total3M++; grouped[ac].late++; }
+          if (diffM <= 6) grouped[ac].total6M++;
+        }
+        // 카테고리 집계
+        try {
+          var cat = (typeof detailCategory === 'function') ? detailCategory(s) : 'food';
+          grouped[ac].categories[cat] = (grouped[ac].categories[cat]||0) + 1;
+        } catch(e){}
+        // 최근 매장 mini list (최대 5건)
+        if (grouped[ac].sampleStores.length < 5) {
+          grouped[ac].sampleStores.push({ name: s.name, addr: s.addr, permitDate: s.permitDate, typeLabel: s.typeLabel });
+        }
       }
     }
+    // 주 카테고리 결정
+    var maxCat = 'food', maxN = 0;
+    for (var c in grouped[ac].categories) if (grouped[ac].categories[c] > maxN) { maxN = grouped[ac].categories[c]; maxCat = c; }
+    grouped[ac].mainCat = maxCat;
+    grouped[ac].focusWeight = SNS_FOCUS_WEIGHT[maxCat] || 0.6;
   }
-  var top = Object.values(grouped).filter(function(g){ return g.late >= 5 && g.brand.length >= 2; }).sort(function(a,b){ return b.late - a.late; }).slice(0, 5);
-  if (!top.length) { listEl.innerHTML = '<div style="color:var(--txt3);font-size:11px;text-align:center;padding:14px">분석할 brand 없음</div>'; return; }
-  // 각 brand 트렌드 fetch
+  // 후보: 3개월 신규 ≥ 5건 + brand 길이 ≥ 2 + 카테고리 가중 ≥ 0.8 (cafe/snack 제외 효과)
+  var candidates = Object.values(grouped).filter(function(g){
+    return g.late >= 5 && g.brand.length >= 2;
+  });
+  if (!candidates.length) { listEl.innerHTML = '<div style="color:var(--txt3);font-size:11px;text-align:center;padding:14px">분석할 brand 없음</div>'; return; }
+  // 1차 정렬: late × focusWeight (검색 fetch 전 후보 선정)
+  candidates.sort(function(a,b){ return (b.late * b.focusWeight) - (a.late * a.focusWeight); });
+  var topCandidates = candidates.slice(0, 10);  // 데이터 X 보완용 여분
+  // 각 brand 검색 추세 fetch
   var results = [];
-  for (var i = 0; i < top.length; i++) {
-    var g = top[i];
+  for (var i = 0; i < topCandidates.length; i++) {
+    var g = topCandidates[i];
+    var arr = [], growth = 0, hasData = false;
     try {
       var r = await fetch('/api/auth/kakao?action=naver_trend&q=' + encodeURIComponent(g.brand), { credentials:'same-origin' });
       var d = await r.json();
-      var arr = (d.data || []).map(function(x){ return x.ratio; });
-      var lastN = arr.slice(-3).reduce(function(a,b){ return a+b; }, 0);
-      var firstN = arr.slice(0,3).reduce(function(a,b){ return a+b; }, 0);
-      var growth = firstN ? Math.round((lastN-firstN)/firstN*100) : 0;
-      results.push({ brand: g.brand, openN: g.late, sparkline: arr, growth: growth });
-    } catch(e) { results.push({ brand: g.brand, openN: g.late, sparkline: [], growth: 0 }); }
+      arr = (d.data || []).map(function(x){ return x.ratio; });
+      if (arr.length) {
+        var lastN = arr.slice(-3).reduce(function(a,b){ return a+b; }, 0);
+        var firstN = arr.slice(0,3).reduce(function(a,b){ return a+b; }, 0);
+        growth = firstN ? Math.round((lastN-firstN)/firstN*100) : 0;
+        hasData = true;
+      }
+    } catch(e) {}
+    // 점수: 데이터 있으면 검색 추세 반영, 없으면 fallback (가중 × 신규 오픈)
+    var score = hasData
+      ? g.late * g.focusWeight * (1 + Math.max(Math.min(growth, 300), -50) / 100)
+      : g.late * g.focusWeight * 0.7;  // 페널티 30%
+    results.push({
+      brand: g.brand, openN: g.late, total1M: g.total1M, total3M: g.total3M, total6M: g.total6M,
+      sparkline: arr, growth: growth, hasData: hasData,
+      mainCat: g.mainCat, focusWeight: g.focusWeight,
+      sampleStores: g.sampleStores, score: score
+    });
   }
-  try { localStorage.setItem('sewang_sns_trend', JSON.stringify({ ts: Date.now(), brands: results })); } catch(e){}
-  renderSnsTrendList(results);
+  // 점수순 TOP 5 (데이터 있는 brand 우선 효과)
+  results.sort(function(a,b){
+    if (a.hasData !== b.hasData) return a.hasData ? -1 : 1;  // 데이터 있는 게 우선
+    return b.score - a.score;
+  });
+  var top5 = results.slice(0, 5);
+  try { localStorage.setItem('sewang_sns_trend_v17_13', JSON.stringify({ ts: Date.now(), brands: top5 })); } catch(e){}
+  renderSnsTrendList(top5);
 }
+
 function renderSnsTrendList(brands){
   var listEl = document.getElementById('sns-trend-list');
   if (!listEl) return;
@@ -3691,16 +3777,105 @@ function renderSnsTrendList(brands){
   listEl.innerHTML = brands.map(function(b, i){
     var arr = b.sparkline || [];
     var maxV = Math.max.apply(null, arr.concat([1]));
-    var spark = arr.length ? '<svg width="60" height="24" viewBox="0 0 60 24" style="vertical-align:middle">'
-      + '<polyline fill="none" stroke="#7dd3fc" stroke-width="1.5" points="' + arr.map(function(v,idx){ return (idx/(arr.length-1)*58+1) + ',' + (22 - v/maxV*20); }).join(' ') + '"/>'
-      + '</svg>' : '<span style="color:var(--txt3);font-size:9px">데이터 X</span>';
+    var spark = arr.length ? '<svg width="48" height="22" viewBox="0 0 48 22" style="vertical-align:middle">'
+      + '<polyline fill="none" stroke="#7dd3fc" stroke-width="1.5" points="' + arr.map(function(v,idx){ return (idx/(arr.length-1)*46+1) + ',' + (20 - v/maxV*18); }).join(' ') + '"/>'
+      + '</svg>' : '<span style="color:var(--txt3);font-size:9px;font-style:italic">검색 데이터 X</span>';
     var gc = b.growth > 20 ? '#34d399' : b.growth < -20 ? '#f87171' : 'var(--txt3)';
-    return '<div onclick="if(typeof openFrBrandModal===\'function\')openFrBrandModal(\'' + esc(b.brand).replace(/\'/g,"\\'") + '\')" style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(125,211,252,0.04);border:1px solid rgba(125,211,252,0.15);border-radius:8px;margin-bottom:5px;cursor:pointer;font-size:11.5px">'
-      + '<div style="width:22px;font-weight:800;color:var(--txt3)">' + (i+1) + '</div>'
-      + '<div style="flex:1;font-weight:700">' + esc(b.brand) + '</div>'
+    var catInfo = (typeof DETAIL_CAT_INFO !== 'undefined' && DETAIL_CAT_INFO[b.mainCat]) || { label: '음식점', color: '#94a3b8' };
+    var catBadge = '<span style="font-size:9px;padding:1px 5px;background:' + catInfo.color + '22;color:' + catInfo.color + ';border-radius:4px;font-weight:700;letter-spacing:-0.2px">' + catInfo.label + '</span>';
+    var growthHtml = b.hasData
+      ? '<div style="color:' + gc + ';font-weight:800;font-size:11px;width:48px;text-align:right">' + (b.growth>=0?'+':'') + b.growth + '%</div>'
+      : '<div style="color:var(--txt3);font-weight:700;font-size:10px;width:48px;text-align:right">신규 ' + b.openN + '</div>';
+    return '<div onclick="openSnsModal(\'' + esc(b.brand).replace(/\'/g,"\\'") + '\')" style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(125,211,252,0.04);border:1px solid rgba(125,211,252,0.15);border-radius:8px;margin-bottom:5px;cursor:pointer;font-size:11.5px">'
+      + '<div style="width:20px;font-weight:800;color:var(--txt3);text-align:center">' + (i+1) + '</div>'
+      + '<div style="flex:1;display:flex;flex-direction:column;gap:3px;min-width:0">'
+      +   '<div style="font-weight:700;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(b.brand) + '</div>'
+      +   '<div style="display:flex;gap:5px;align-items:center;font-size:10px;color:var(--txt3)">' + catBadge + '<span>신규 ' + b.openN + '건</span></div>'
+      + '</div>'
       + spark
-      + '<div style="color:' + gc + ';font-weight:800;font-size:11px;width:50px;text-align:right">' + (b.growth>=0?'+':'') + b.growth + '%</div></div>';
+      + growthHtml
+      + '</div>';
   }).join('');
+}
+
+// v17.13: 화제성 근거 모달
+window._snsModalBrand = null;
+function openSnsModal(brand){
+  var cacheStr = localStorage.getItem('sewang_sns_trend_v17_13');
+  if (!cacheStr) return;
+  var c; try { c = JSON.parse(cacheStr); } catch(e){ return; }
+  var b = (c.brands || []).find(function(x){ return x.brand === brand; });
+  if (!b) return;
+  window._snsModalBrand = brand;
+  var modal = document.getElementById('sns-rationale-modal');
+  if (!modal) return;
+  // 카테고리 badge
+  var catInfo = DETAIL_CAT_INFO[b.mainCat] || { label: '음식점', color: '#94a3b8' };
+  var badgeEl = document.getElementById('sns-modal-cat-badge');
+  badgeEl.textContent = catInfo.label;
+  badgeEl.style.background = catInfo.color + '22';
+  badgeEl.style.color = catInfo.color;
+  document.getElementById('sns-modal-title').innerHTML = '🔥 ' + esc(b.brand);
+  document.getElementById('sns-modal-sub').innerHTML = '최근 3개월 신규 <b style="color:#34d399">' + b.total3M + '</b>건 · 6개월 누적 <b>' + b.total6M + '</b>건';
+  // 종합 평가
+  var verdict = '';
+  var reasons = [];
+  if (b.total1M >= 3) reasons.push('🚀 최근 1개월 <b>' + b.total1M + '</b>건 급증');
+  else if (b.total3M >= 10) reasons.push('📈 3개월간 꾸준한 출점 <b>' + b.total3M + '</b>건');
+  if (b.hasData && b.growth >= 20) reasons.push('🔍 네이버 검색량 <b style="color:#34d399">+' + b.growth + '%</b>');
+  else if (b.hasData && b.growth >= 0) reasons.push('🔍 검색량 ' + (b.growth>=0?'+':'') + b.growth + '%');
+  else if (!b.hasData) reasons.push('⚠️ <span style="color:#f87171">검색 데이터 없음</span> (Apify 보강 예정)');
+  if (b.focusWeight >= 2) reasons.push('🥃 ' + catInfo.label + ' (도매 핵심 카테고리)');
+  verdict = reasons.join(' · ');
+  document.getElementById('sns-modal-verdict').innerHTML = '💡 <b>왜 화제성 TOP?</b><br>' + verdict;
+  // 검색 추세 큰 sparkline
+  var trendEl = document.getElementById('sns-modal-trend');
+  if (b.hasData && b.sparkline && b.sparkline.length) {
+    var arr = b.sparkline;
+    var maxV = Math.max.apply(null, arr.concat([1]));
+    var pts = arr.map(function(v,idx){ return (idx/(arr.length-1)*460+10) + ',' + (90 - v/maxV*80); }).join(' ');
+    var gc = b.growth > 20 ? '#34d399' : b.growth < -20 ? '#f87171' : '#7dd3fc';
+    trendEl.innerHTML = '<div style="font-size:11px;color:var(--txt2);margin-bottom:6px;font-weight:600">📊 네이버 검색량 6개월 추세 <span style="color:' + gc + ';font-weight:800;float:right">' + (b.growth>=0?'+':'') + b.growth + '%</span></div>'
+      + '<svg width="100%" viewBox="0 0 480 100" style="background:rgba(125,211,252,0.04);border-radius:8px">'
+      + '<polyline fill="none" stroke="' + gc + '" stroke-width="2" points="' + pts + '"/>'
+      + '<polyline fill="' + gc + '22" stroke="none" points="10,90 ' + pts + ' 470,90"/>'
+      + '</svg>';
+  } else {
+    trendEl.innerHTML = '<div style="background:rgba(248,113,113,0.06);border:1px dashed rgba(248,113,113,0.25);border-radius:8px;padding:10px;font-size:11px;color:var(--txt2);text-align:center">⚠️ 네이버 데이터랩 검색 데이터 없음<br><span style="font-size:10px;color:var(--txt3)">신규 오픈 수 기준으로 화제성 평가 · Apify Instagram 통합 예정</span></div>';
+  }
+  // 신규 오픈 3구간
+  var openMax = Math.max(b.total1M, b.total3M, b.total6M, 1);
+  document.getElementById('sns-modal-opens').innerHTML =
+    '<div style="font-size:11px;color:var(--txt2);margin-bottom:8px;font-weight:600">🏪 신규 오픈 추이 (행안부)</div>'
+    + ['1개월','3개월','6개월'].map(function(lbl, idx){
+        var n = [b.total1M, b.total3M, b.total6M][idx];
+        var w = n / openMax * 100;
+        return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;font-size:11px">'
+          + '<div style="width:48px;color:var(--txt2)">' + lbl + '</div>'
+          + '<div style="flex:1;height:8px;background:rgba(255,255,255,0.05);border-radius:4px;overflow:hidden"><div style="height:100%;width:' + w.toFixed(1) + '%;background:#34d399;border-radius:4px"></div></div>'
+          + '<div style="width:42px;text-align:right;font-weight:700;color:#34d399">' + n + '건</div>'
+          + '</div>';
+      }).join('');
+  // 인스타·YouTube placeholder (Phase 2)
+  document.getElementById('sns-modal-buzz').innerHTML = '<div style="background:rgba(167,139,250,0.06);border:1px dashed rgba(167,139,250,0.25);border-radius:8px;padding:10px;font-size:11px;color:var(--txt2)">'
+    + '<div style="font-weight:600;margin-bottom:4px">📸 인스타·YouTube 화제성</div>'
+    + '<div style="font-size:10px;color:var(--txt3)">⏳ Apify 인스타그램 해시태그 스크레이퍼 통합 예정 — 게시물·릴스·해시태그 언급량 (v17.13 Phase 2)</div>'
+    + '</div>';
+  // 매장 mini list
+  var storesHtml = (b.sampleStores || []).slice(0, 5).map(function(s){
+    var sido = (typeof regionOf === 'function') ? regionOf(s.addr) : '';
+    return '<div style="display:flex;justify-content:space-between;padding:5px 8px;background:rgba(255,255,255,0.02);border-radius:5px;margin-bottom:3px;font-size:10.5px">'
+      + '<div style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><b>' + esc(s.name) + '</b> <span style="color:var(--txt3)">· ' + esc(sido) + '</span></div>'
+      + '<div style="color:var(--txt3);font-size:10px;margin-left:8px">' + (s.permitDate ? s.permitDate.slice(0,4)+'.'+s.permitDate.slice(4,6)+'.'+s.permitDate.slice(6,8) : '') + '</div>'
+      + '</div>';
+  }).join('');
+  document.getElementById('sns-modal-stores').innerHTML = '<div style="font-size:11px;color:var(--txt2);margin-bottom:6px;font-weight:600">📍 최근 매장 (최대 5건)</div>' + (storesHtml || '<div style="color:var(--txt3);font-size:10px;text-align:center;padding:10px">매장 정보 없음</div>');
+  modal.style.display = 'flex';
+}
+function closeSnsModal(){
+  var modal = document.getElementById('sns-rationale-modal');
+  if (modal) modal.style.display = 'none';
+  window._snsModalBrand = null;
 }
 
 // v17.2: 대시보드 — 최근 30일 업종별 신규 오픈 (단기 스냅샷)
