@@ -765,6 +765,17 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
     <div class="card-title">📍 시·도 분포</div>
     <div id="trend-sido-dist"></div>
   </div>
+  <!-- v17.5: 폐업 세부 분석 -->
+  <div class="card" style="margin-bottom:12px;padding:16px;border-left:3px solid #f87171">
+    <div class="card-title">🚫 폐업 분석 <span style="color:var(--txt3);font-size:10px;font-weight:500;margin-left:auto">1~6월</span></div>
+    <div id="trend-close-summary" style="font-size:11.5px;color:var(--txt2);margin-bottom:12px;line-height:1.5"></div>
+    <div style="font-size:11px;color:var(--txt3);margin-bottom:6px;font-weight:700">📅 월별 폐업 (업종별)</div>
+    <div id="trend-close-month" style="margin-bottom:14px"></div>
+    <div style="font-size:11px;color:var(--txt3);margin-bottom:6px;font-weight:700">📍 시·도별 폐업 TOP</div>
+    <div id="trend-close-sido" style="margin-bottom:14px"></div>
+    <div style="font-size:11px;color:var(--txt3);margin-bottom:6px;font-weight:700">🔄 회전율 TOP brand (폐/(신+폐))</div>
+    <div id="trend-close-churn"></div>
+  </div>
 </div>
 
 <div class="page" id="pg-map">
@@ -3235,6 +3246,113 @@ function renderTrendTab(){
   document.getElementById('trend-month-chart').innerHTML = html;
   renderTrendTopGrowth(cat);
   renderTrendSidoDist(cat);
+  try { renderTrendCloseAnalysis(); } catch(e){}
+}
+// v17.5: 폐업 세부 분석
+function renderTrendCloseAnalysis(){
+  if (!window.YTD || !window.YTD.by_brand) return;
+  var byMonthCat = {};   // yyyymm → cat → count
+  var sidoCnt = {};
+  var brandStats = {};   // alias → {open, closed}
+  var totalClose = 0;
+  for (var b in window.YTD.by_brand) {
+    var bc = b.replace(/\s/g,'').toLowerCase();
+    var alias = (typeof BRAND_ALIASES !== 'undefined' && BRAND_ALIASES[bc]) || b;
+    var ac = alias.replace(/\s/g,'').toLowerCase();
+    if (!brandStats[ac]) brandStats[ac] = { brand: alias, open: 0, closed: 0 };
+    var v = window.YTD.by_brand[b];
+    for (var m in v.monthly) {
+      if (m < '202601' || m > '202612') continue;
+      var stores = v.monthly[m].stores || [];
+      for (var i = 0; i < stores.length; i++) {
+        var s = stores[i];
+        if (window._excludedStoreSet && window._excludedStoreSet[s.id]) continue;
+        try { if (typeof isExcluded === 'function' && isExcluded(s)) continue; } catch(e){}
+        if (s.closed) {
+          brandStats[ac].closed++;
+          totalClose++;
+          var cat = detailCategory(s);
+          if (!byMonthCat[m]) byMonthCat[m] = {};
+          byMonthCat[m][cat] = (byMonthCat[m][cat]||0) + 1;
+          var match = (s.addr||'').match(/^([가-힣]+(?:특별시|광역시|특별자치도|특별자치시|도))/);
+          if (match) sidoCnt[match[1]] = (sidoCnt[match[1]]||0) + 1;
+        } else {
+          brandStats[ac].open++;
+        }
+      }
+    }
+  }
+  // 요약
+  var sumEl = document.getElementById('trend-close-summary');
+  if (sumEl) sumEl.innerHTML = '올해 누적 <b style="color:#f87171">' + totalClose.toLocaleString() + '</b>건 폐업 (월평균 ' + Math.round(totalClose/6).toLocaleString() + ')';
+  // 월별 폐업 stack
+  var monthEl = document.getElementById('trend-close-month');
+  if (monthEl) {
+    var months = Object.keys(byMonthCat).sort();
+    var maxN = 1;
+    months.forEach(function(m){ var s=0; Object.values(byMonthCat[m]).forEach(function(n){ s+=n; }); if (s>maxN) maxN=s; });
+    var monLabels = ['1월','2월','3월','4월','5월','6월'];
+    var html = '';
+    months.forEach(function(m){
+      var idx = parseInt(m.slice(4,6),10)-1;
+      var monData = byMonthCat[m];
+      var rowT = 0;
+      Object.values(monData).forEach(function(n){ rowT+=n; });
+      var catList = Object.keys(monData).sort(function(a,b){ return monData[b]-monData[a]; });
+      html += '<div style="margin-bottom:6px"><div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;font-size:10.5px"><span style="width:32px;color:var(--txt2);font-weight:700">' + monLabels[idx] + '</span><span style="color:#f87171;font-weight:700">-' + rowT.toLocaleString() + '</span></div>'
+        + '<div style="display:flex;width:100%;height:14px;border-radius:4px;overflow:hidden;background:rgba(255,255,255,0.04)">';
+      catList.forEach(function(cat){
+        var n = monData[cat];
+        var w = n/maxN*100;
+        var info = DETAIL_CAT_INFO[cat] || { color:'#94a3b8', label:cat };
+        html += '<div title="' + info.label + ' ' + n + '" style="background:' + info.color + ';width:' + w.toFixed(1) + '%;min-width:1px"></div>';
+      });
+      html += '</div></div>';
+    });
+    monthEl.innerHTML = html;
+  }
+  // 시·도 분포
+  var sidoEl = document.getElementById('trend-close-sido');
+  if (sidoEl) {
+    var sortedSido = Object.keys(sidoCnt).map(function(k){ return [k, sidoCnt[k]]; }).sort(function(a,b){ return b[1]-a[1]; }).slice(0,8);
+    if (!sortedSido.length) sidoEl.innerHTML = '<div style="color:var(--txt3);font-size:11px;text-align:center;padding:10px">데이터 없음</div>';
+    else {
+      var sMax = sortedSido[0][1];
+      sidoEl.innerHTML = sortedSido.map(function(x){
+        var name = x[0].replace(/(특별시|광역시|특별자치도|특별자치시|도)$/, '');
+        var pct = (x[1]/sMax*100).toFixed(0);
+        return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;font-size:11px">'
+          + '<div style="width:50px;font-weight:700;color:var(--txt)">' + esc(name) + '</div>'
+          + '<div style="flex:1;height:7px;background:rgba(255,255,255,0.05);border-radius:4px;overflow:hidden"><div style="height:100%;width:' + pct + '%;background:#f87171;border-radius:4px"></div></div>'
+          + '<div style="width:48px;text-align:right;font-weight:800;color:#f87171">' + x[1].toLocaleString() + '</div></div>';
+      }).join('');
+    }
+  }
+  // 회전율 TOP brand (폐업 3건 이상만)
+  var churnEl = document.getElementById('trend-close-churn');
+  if (churnEl) {
+    var bArr = [];
+    for (var k in brandStats) {
+      var bs = brandStats[k];
+      if (bs.closed < 3) continue;
+      var tot = bs.open + bs.closed;
+      if (tot < 5) continue;
+      bs.churn = Math.round(bs.closed/tot*100);
+      bArr.push(bs);
+    }
+    bArr.sort(function(a,b){ if (b.churn !== a.churn) return b.churn - a.churn; return b.closed - a.closed; });
+    if (!bArr.length) churnEl.innerHTML = '<div style="color:var(--txt3);font-size:11px;text-align:center;padding:10px">폐업 3건 이상 brand 없음</div>';
+    else {
+      churnEl.innerHTML = bArr.slice(0,10).map(function(g,i){
+        var c = g.churn > 60 ? '#f87171' : g.churn > 35 ? '#fbbf24' : '#34d399';
+        return '<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(248,113,113,0.05);border:1px solid rgba(248,113,113,0.15);border-radius:8px;margin-bottom:5px;font-size:11.5px;cursor:pointer" onclick="if(typeof openFrBrandModal===\'function\')openFrBrandModal(\'' + esc(g.brand).replace(/\'/g,"\\'") + '\')">'
+          + '<div style="width:22px;font-weight:800;color:var(--txt3)">' + (i+1) + '</div>'
+          + '<div style="flex:1;font-weight:700">' + esc(g.brand) + '</div>'
+          + '<div style="color:var(--txt3);font-size:10.5px">+' + g.open + ' / -' + g.closed + '</div>'
+          + '<div style="color:' + c + ';font-weight:800;font-size:13px;width:42px;text-align:right">' + g.churn + '%</div></div>';
+      }).join('');
+    }
+  }
 }
 function renderTrendBrand(q){
   q = (q||'').trim().toLowerCase().replace(/\s/g,'');
