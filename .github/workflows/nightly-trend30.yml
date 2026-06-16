@@ -16,14 +16,51 @@ jobs:
       - uses: actions/checkout@v4
       - name: Fetch 17 시·도 30일치
         run: bash scripts/nightly-fetch.sh
-      - name: Commit & push trend30_all.json
+      - name: Commit via GitHub Contents API (rebase 충돌 무관)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
         run: |
-          git config user.email "actions@github.com"
-          git config user.name "github-actions[bot]"
-          git add data/trend30_all.json
-          if git diff --cached --quiet; then
-            echo "no changes to commit"
-          else
-            git commit -m "[skip ci] nightly trend30 update $(TZ=Asia/Seoul date +%Y-%m-%dT%H:%MZ)"
-            git push
+          if [ ! -f data/trend30_all.json ]; then
+            echo "No trend30 file generated"
+            exit 0
           fi
+          python3 << 'PYEOF'
+          import base64, json, os, time, urllib.request, urllib.error
+          token = os.environ['GH_TOKEN']
+          repo = os.environ['REPO']
+          path = 'data/trend30_all.json'
+          api = f'https://api.github.com/repos/{repo}/contents/{path}'
+          headers = {'Authorization': f'Bearer {token}', 'Accept': 'application/vnd.github+json', 'User-Agent': 'trend30'}
+          with open(path, 'rb') as f:
+              content_b64 = base64.b64encode(f.read()).decode('ascii')
+          msg = f'[skip ci] nightly trend30 update {time.strftime("%Y-%m-%dT%H:%MZ", time.localtime())}'
+          def get_sha():
+              try:
+                  req = urllib.request.Request(api, headers=headers)
+                  with urllib.request.urlopen(req) as r:
+                      return json.loads(r.read()).get('sha', '')
+              except Exception:
+                  return ''
+          sha = get_sha()
+          for attempt in range(3):
+              body = {'message': msg, 'content': content_b64}
+              if sha: body['sha'] = sha
+              data = json.dumps(body).encode()
+              req = urllib.request.Request(api, data=data, headers={**headers, 'Content-Type': 'application/json'}, method='PUT')
+              try:
+                  with urllib.request.urlopen(req) as r:
+                      print(f'✅ Committed via API (attempt {attempt+1}, status {r.status})')
+                      break
+              except urllib.error.HTTPError as e:
+                  print(f'Attempt {attempt+1} failed: {e.code} {e.reason}')
+                  print(e.read().decode()[:300])
+                  if e.code == 409:
+                      time.sleep(3)
+                      sha = get_sha()
+                  else:
+                      time.sleep(3)
+          else:
+              print('All 3 attempts failed')
+              import sys; sys.exit(1)
+          PYEOF
