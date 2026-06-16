@@ -926,20 +926,20 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
     <div class="card-title">🏷️ 카테고리 override</div>
     <div id="admin-category-overrides"></div>
   </div>
-  <!-- v17.11: 도매사 명부 placeholder (admin 전용) -->
+  <!-- v17.11: 도매사 명부 (서울·경기·인천 361사) — admin/staff+ 전용 -->
   <div class="card" style="margin-bottom:12px;border-left:3px solid #fbbf24">
-    <div class="card-title">📚 도매사 명부 <span style="font-size:9px;color:#fbbf24;background:rgba(251,191,36,.12);padding:2px 6px;border-radius:6px;margin-left:6px;font-weight:700">곧 출시</span></div>
-    <div style="font-size:11.5px;color:var(--txt2);line-height:1.6;padding:10px 12px;background:rgba(251,191,36,.04);border:1px solid rgba(251,191,36,.18);border-radius:8px">
-      📋 「서울·경기·인천 도매사 명부 2025」 통합 예정:<br>
-      • 전국 주류 도매사 리스트 (사명·주소·전화)<br>
-      • 매장 ↔ 도매사 매핑 (admin 수동 등록)<br>
-      • 매장 카드에 「🏷️ 도매사 표시」 자동 라벨<br>
-      • 거래처 명단과 교차 검증<br>
-      <span style="font-size:10px;color:var(--txt3);margin-top:6px;display:block">※ 사장님 도매사 엑셀 파일 업로드 후 활성화. 외부 노출 금지 — admin/staff+ 전용.</span>
+    <div class="card-title">📚 도매사 명부 <span id="ws-count-badge" style="font-size:9px;color:#fbbf24;background:rgba(251,191,36,.12);padding:2px 6px;border-radius:6px;margin-left:6px;font-weight:700">로딩</span></div>
+    <div style="font-size:10.5px;color:var(--txt3);margin-bottom:8px;line-height:1.5">
+      ※ 서울경기인천_도매사명부_2025 기반 · admin/staff+ 전용 · 외부 노출 금지
     </div>
-    <div style="margin-top:10px">
-      <button onclick="alert('도매사 엑셀 파일 업로드는 다음 commit에서 활성화됩니다.\\n현재는 placeholder UI만 표시 중.')" style="width:100%;padding:10px;background:rgba(251,191,36,0.12);border:1px solid rgba(251,191,36,0.3);color:#fbbf24;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">📤 도매사 명부 업로드 (준비 중)</button>
+    <input id="ws-search" type="text" placeholder="🔍 도매사·대표·주소 검색" oninput="renderWholesalers()" style="width:100%;padding:9px 11px;border:1px solid var(--border2);background:var(--surface);border-radius:8px;color:var(--txt);font-size:12.5px;margin-bottom:8px;box-sizing:border-box">
+    <div class="chips" id="chip-ws-sido" style="margin-bottom:8px">
+      <div class="chip on" data-v="">전체</div>
+      <div class="chip" data-v="서울">서울</div>
+      <div class="chip" data-v="경기">경기</div>
+      <div class="chip" data-v="인천">인천</div>
     </div>
+    <div id="ws-list" style="max-height:420px;overflow-y:auto"></div>
   </div>
   <!-- v14: 거래처 매칭 (사장님 브라우저 전용, 서버·repo 노출 0) -->
   <div class="card" style="margin-bottom:12px;border-left:3px solid #34d399">
@@ -3123,7 +3123,7 @@ document.querySelectorAll('.bnav-btn').forEach(function(btn){
   btn.addEventListener('click', function(){ switchPage(btn.dataset.pg); });
 });
 
-['chip-days','chip-region','chip-type','chip-nstat','chip-gold-sort','chip-track','chip-track-sort','chip-fr-kind','chip-fr-source','chip-map-mode','chip-map-cat','chip-trend-cat'].forEach(function(id){
+['chip-days','chip-region','chip-type','chip-nstat','chip-gold-sort','chip-track','chip-track-sort','chip-fr-kind','chip-fr-source','chip-map-mode','chip-map-cat','chip-trend-cat','chip-ws-sido'].forEach(function(id){
   document.querySelectorAll('#' + id + ' .chip').forEach(function(c){
     c.addEventListener('click', function(){
       document.querySelectorAll('#' + id + ' .chip').forEach(function(x){ x.classList.remove('on'); });
@@ -3131,6 +3131,7 @@ document.querySelectorAll('.bnav-btn').forEach(function(btn){
       if (id === 'chip-type' || id === 'chip-nstat') renderNew();
       else if (id === 'chip-gold-sort') renderGold();
       else if (id === 'chip-track' || id === 'chip-track-sort') renderTracked();
+      else if (id === 'chip-ws-sido') renderWholesalers();
       else if (id === 'chip-fr-kind' || id === 'chip-fr-source') { FR_SELECTED = null; renderFr(); }
       else if (id === 'chip-trend-cat') renderTrendTab();
       else if (id === 'chip-map-cat' || id === 'chip-map-mode') renderMapSidoStats();
@@ -3680,6 +3681,51 @@ async function loadSnsBuzz(){
       console.log('[sns_buzz] loaded:', Object.keys(window.SNS_BUZZ.brands||{}).length, 'brands @', window.SNS_BUZZ.at);
     }
   } catch(e) { console.log('[sns_buzz] not yet available:', e.message); }
+}
+
+// v17.11: 도매사 명부 (서울·경기·인천 361사 — admin 전용)
+window.WS_DATA = null;
+async function loadWholesalers(){
+  try {
+    var r = await fetch('/data/wholesalers.json?t=' + Math.floor(Date.now()/3600000), { cache: 'no-store' });
+    if (!r.ok) return;
+    window.WS_DATA = await r.json();
+    console.log('[wholesalers] loaded:', window.WS_DATA.total, '사');
+    var badge = document.getElementById('ws-count-badge');
+    if (badge) badge.textContent = window.WS_DATA.total + '사';
+    renderWholesalers();
+  } catch(e) { console.log('[wholesalers] load fail:', e.message); }
+}
+function renderWholesalers(){
+  var listEl = document.getElementById('ws-list');
+  if (!listEl || !window.WS_DATA) return;
+  var sidoChip = (typeof activeChip === 'function') ? activeChip('chip-ws-sido') : '';
+  var qEl = document.getElementById('ws-search');
+  var q = (qEl ? qEl.value : '').trim().toLowerCase();
+  var list = window.WS_DATA.wholesalers.slice();
+  if (sidoChip) list = list.filter(function(w){ return w.sido === sidoChip; });
+  if (q) list = list.filter(function(w){
+    var hay = ((w.name||'') + ' ' + (w.ceo||'') + ' ' + (w.addr||'') + ' ' + (w.gu||'')).toLowerCase();
+    return hay.indexOf(q) >= 0;
+  });
+  if (!list.length) {
+    listEl.innerHTML = '<div style="color:var(--txt3);font-size:11px;text-align:center;padding:14px">검색 결과 없음</div>';
+    return;
+  }
+  var sidoColor = { '서울':'#7dd3fc', '경기':'#34d399', '인천':'#fbbf24' };
+  var hdr = '<div style="font-size:10.5px;color:var(--txt3);margin-bottom:6px"><b>' + list.length + '</b>사' + (q ? ' (검색)' : '') + '</div>';
+  listEl.innerHTML = hdr + list.slice(0, 100).map(function(w){
+    var color = sidoColor[w.sido] || '#94a3b8';
+    var telLink = w.tel ? '<a href="tel:' + esc(w.tel.replace(/[^0-9]/g,'')) + '" style="color:var(--c1);text-decoration:none">📞 ' + esc(w.tel) + '</a>' : '';
+    return '<div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-left:2px solid ' + color + ';border-radius:6px;padding:8px 10px;margin-bottom:5px;font-size:11.5px;line-height:1.5">'
+      + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px">'
+      +   '<div style="font-weight:700;color:var(--txt)">' + esc(w.name) + (w.ceo ? ' <span style="color:var(--txt3);font-weight:400;font-size:10.5px">· ' + esc(w.ceo) + '</span>' : '') + '</div>'
+      +   '<span style="font-size:9px;padding:1px 6px;background:' + color + '22;color:' + color + ';border-radius:4px;font-weight:700">' + esc(w.sido) + (w.gu ? ' ' + esc(w.gu) : '') + '</span>'
+      + '</div>'
+      + (w.addr ? '<div style="color:var(--txt3);font-size:10.5px;margin-top:3px">📍 ' + esc(w.addr) + '</div>' : '')
+      + (telLink ? '<div style="font-size:10.5px;margin-top:3px">' + telLink + '</div>' : '')
+      + '</div>';
+  }).join('') + (list.length > 100 ? '<div style="color:var(--txt3);font-size:10px;text-align:center;padding:8px">↑ 100사 표시 · 더 검색하세요</div>' : '');
 }
 
 // v17.13 Phase 2.5: 썸트렌드 SNS 언급량 (Dispatch가 매일 1회 push)
@@ -4553,6 +4599,7 @@ function init(){
   loadBrandOverrides(); // admin 브랜드 분류 관리 (제외/카테고리)
   loadSnsBuzz();      // v17.13 Phase 2: Apify 인스타 화제성 (data/sns_buzz.json)
   loadSumtrendBuzz(); // v17.13 Phase 2.5: 썸트렌드 SNS 언급량 (data/sumtrend_buzz.json)
+  loadWholesalers();  // v17.11: 도매사 명부 361사 (admin 전용)
   setTimeout(function(){ try { renderCustomers(); } catch(e){} }, 100); // v14 거래처 (localStorage)
   if (ST.trend30 && ST.trend30.stores) {
     ST.trend30.stores = ST.trend30.stores.filter(function(s){ return !isExcluded(s); });
