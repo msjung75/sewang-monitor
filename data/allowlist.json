@@ -91,8 +91,16 @@
       "role": "staff",
       "memo": "세왕 이사",
       "approved_at": "2026-06-16T01:58:35.592Z"
+    },
+    {
+      "id": "4946806353",
+      "nickname": "박정언",
+      "profile": "http://img1.kakaocdn.net/thumb/R640x640.q70/?fname=http://t1.kakaocdn.net/account_images/default_profile.jpeg",
+      "role": "staff",
+      "memo": "세왕 전무",
+      "approved_at": "2026-06-16T02:44:19.061Z"
     }
   ],
   "blocked": [],
-  "updated_at": "2026-06-16T01:59:32.292Z"
+  "updated_at": "2026-06-16T02:44:19.061Z"
 }
