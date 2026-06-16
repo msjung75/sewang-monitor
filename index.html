@@ -543,6 +543,9 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
     </table>
   </div>
 
+  <!-- v17.8.1: 데이터 기준일 미니 stamp -->
+  <div id="data-freshness-stamp" style="margin-top:8px;font-size:10.5px;color:var(--txt3);text-align:center;padding:8px 10px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;gap:6px"><span>🕐</span><span id="data-freshness-text">데이터 갱신 시각 확인 중…</span></div>
+
   <!-- v17.6: SNS 트렌드 미니 카드 (TOP 성장 brand의 N 데이터랩 검색량) -->
   <div class="card" id="card-sns-trend" style="margin-top:14px">
     <div class="card-title">📱 SNS 화제성 TOP 5 <span style="color:var(--txt3);font-size:10px;font-weight:500;margin-left:auto">N 데이터랩 6개월</span></div>
@@ -2366,6 +2369,7 @@ async function loadYTDSummary(){
     // v15.15: 월별 창업 추이 카드
     try { renderMonthlyTrend(); } catch(e){}
     try { render30DayBreakdown(); } catch(e){}
+    try { updateDataFreshness(); } catch(e){}  // v17.8.1
     setTimeout(function(){ try { loadSnsTrend(); } catch(e){} }, 4000);  // v17.6 백그라운드 lazy
     // 「프랜차이즈」 상단 안내문 집계 표시
     var sumEl = document.getElementById('fr-ytd-summary');
@@ -3536,6 +3540,30 @@ function renderTrendSidoDist(cat){
 }
 
 // v15.15: 월별 창업 추이 (대시보드 카드)
+// v17.8.1: 데이터 기준일 stamp — 행안부 마지막 갱신 자동 감지
+function updateDataFreshness(){
+  var el = document.getElementById('data-freshness-text');
+  if (!el || !window.YTD || !window.YTD.by_brand) return;
+  var maxPd = '';
+  for (var b in window.YTD.by_brand) {
+    var v = window.YTD.by_brand[b];
+    for (var m in v.monthly) {
+      var stores = v.monthly[m].stores || [];
+      for (var i = 0; i < stores.length; i++) {
+        var pd = stores[i].permitDate || '';
+        if (pd > maxPd) maxPd = pd;
+      }
+    }
+  }
+  if (!maxPd || maxPd.length !== 8) { el.textContent = '데이터 갱신 시각 미상'; return; }
+  var d = maxPd.slice(0,4) + '-' + maxPd.slice(4,6) + '-' + maxPd.slice(6,8);
+  var today = new Date();
+  var pdDate = new Date(parseInt(maxPd.slice(0,4)), parseInt(maxPd.slice(4,6))-1, parseInt(maxPd.slice(6,8)));
+  var daysOld = Math.floor((today - pdDate) / (86400000));
+  var color = daysOld > 5 ? '#fbbf24' : daysOld > 3 ? '#7dd3fc' : '#34d399';
+  el.innerHTML = '🏛️ 행안부 마지막 인허가 데이터: <b style="color:' + color + '">' + d + '</b> (' + daysOld + '일 전)' + (daysOld > 3 ? '<br><span style="font-size:9.5px">※ 행안부 API 갱신 지연 가능 (영업일 + 2~5일)</span>' : '');
+}
+
 // v17.6: SNS 트렌드 — TOP 성장 brand의 N 데이터랩 검색량 (lazy fetch + 7일 캐시)
 async function loadSnsTrend(){
   var listEl = document.getElementById('sns-trend-list');
