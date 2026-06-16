@@ -3669,6 +3669,16 @@ function updateDataFreshness(){
 // v17.13: SNS 화제성 — 카테고리 가중 점수 + 「데이터 X」 fallback 명시
 // 사장님 정책: 주점·치킨·고기·한식·일식 우선, 「데이터 X」 brand는 명확히 표시
 var SNS_FOCUS_WEIGHT = { sool: 3.0, chicken: 2.5, meat: 2.5, korean: 1.5, japanese: 1.5, western: 1.2, seafood: 1.2, food: 1.0, asian: 1.0, chinese: 1.0, snack: 0.8, cafe: 0.5, other: 0.6 };
+window.SNS_BUZZ = null;  // v17.13 Phase 2: Apify 인스타 화제성 캐시
+async function loadSnsBuzz(){
+  try {
+    var r = await fetch('/data/sns_buzz.json?t=' + Math.floor(Date.now()/3600000), { cache: 'no-store' });
+    if (r.ok) {
+      window.SNS_BUZZ = await r.json();
+      console.log('[sns_buzz] loaded:', Object.keys(window.SNS_BUZZ.brands||{}).length, 'brands @', window.SNS_BUZZ.at);
+    }
+  } catch(e) { console.log('[sns_buzz] not yet available:', e.message); }
+}
 
 async function loadSnsTrend(){
   var listEl = document.getElementById('sns-trend-list');
@@ -3856,11 +3866,35 @@ function openSnsModal(brand){
           + '<div style="width:42px;text-align:right;font-weight:700;color:#34d399">' + n + '건</div>'
           + '</div>';
       }).join('');
-  // 인스타·YouTube placeholder (Phase 2)
-  document.getElementById('sns-modal-buzz').innerHTML = '<div style="background:rgba(167,139,250,0.06);border:1px dashed rgba(167,139,250,0.25);border-radius:8px;padding:10px;font-size:11px;color:var(--txt2)">'
-    + '<div style="font-weight:600;margin-bottom:4px">📸 인스타·YouTube 화제성</div>'
-    + '<div style="font-size:10px;color:var(--txt3)">⏳ Apify 인스타그램 해시태그 스크레이퍼 통합 예정 — 게시물·릴스·해시태그 언급량 (v17.13 Phase 2)</div>'
-    + '</div>';
+  // v17.13 Phase 2: Apify 인스타 화제성 (data/sns_buzz.json)
+  var buzzEl = document.getElementById('sns-modal-buzz');
+  var iz = (window.SNS_BUZZ && window.SNS_BUZZ.brands && window.SNS_BUZZ.brands[brand]) || null;
+  if (iz && iz.posts > 0) {
+    var hashHtml = (iz.topHashtags||[]).slice(0, 6).map(function(h){
+      return '<span style="font-size:10px;padding:2px 6px;background:rgba(167,139,250,0.1);color:#c4b5fd;border-radius:4px">#' + esc(h) + '</span>';
+    }).join(' ');
+    var sampleHtml = (iz.samplePosts||[]).slice(0, 3).map(function(p){
+      return '<a href="' + esc(p.url) + '" target="_blank" style="display:block;padding:5px 8px;background:rgba(255,255,255,0.02);border-radius:5px;margin-bottom:3px;font-size:10.5px;color:var(--txt2);text-decoration:none">'
+        + '<div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><b style="color:#c4b5fd">📸</b> ' + esc((p.caption||'').slice(0, 60)) + '...</div>'
+        + '<div style="font-size:9px;color:var(--txt3);margin-top:2px">❤️ ' + (p.likes||0).toLocaleString() + ' · 👁️ ' + (p.views||0).toLocaleString() + '</div>'
+        + '</a>';
+    }).join('');
+    buzzEl.innerHTML = '<div style="background:rgba(167,139,250,0.06);border:1px solid rgba(167,139,250,0.25);border-radius:8px;padding:10px;font-size:11px;color:var(--txt2)">'
+      + '<div style="font-weight:600;margin-bottom:6px">📸 인스타 릴스 화제성 <span style="color:var(--txt3);font-size:9px;float:right">Apify · 일 1회</span></div>'
+      + '<div style="display:flex;gap:6px;margin-bottom:8px;font-size:10.5px">'
+      +   '<div style="flex:1;text-align:center;padding:6px;background:rgba(255,255,255,0.03);border-radius:5px"><div style="color:var(--txt3);font-size:9px">릴스</div><div style="font-weight:800;color:#c4b5fd">' + iz.posts + '개</div></div>'
+      +   '<div style="flex:1;text-align:center;padding:6px;background:rgba(255,255,255,0.03);border-radius:5px"><div style="color:var(--txt3);font-size:9px">평균 좋아요</div><div style="font-weight:800;color:#34d399">' + (iz.avgLikes||0).toLocaleString() + '</div></div>'
+      +   '<div style="flex:1;text-align:center;padding:6px;background:rgba(255,255,255,0.03);border-radius:5px"><div style="color:var(--txt3);font-size:9px">평균 조회</div><div style="font-weight:800;color:#7dd3fc">' + (iz.avgViews||0).toLocaleString() + '</div></div>'
+      + '</div>'
+      + (hashHtml ? '<div style="margin-bottom:6px;line-height:1.7">' + hashHtml + '</div>' : '')
+      + (sampleHtml || '')
+      + '</div>';
+  } else {
+    buzzEl.innerHTML = '<div style="background:rgba(167,139,250,0.06);border:1px dashed rgba(167,139,250,0.25);border-radius:8px;padding:10px;font-size:11px;color:var(--txt2)">'
+      + '<div style="font-weight:600;margin-bottom:4px">📸 인스타 릴스 화제성</div>'
+      + '<div style="font-size:10px;color:var(--txt3)">⏳ Apify 해시태그 데이터 수집 대기 중 — 매일 새벽 자동 갱신 (사장님: APIFY_TOKEN GitHub secret 등록 필요)</div>'
+      + '</div>';
+  }
   // 매장 mini list
   var storesHtml = (b.sampleStores || []).slice(0, 5).map(function(s){
     var sido = (typeof regionOf === 'function') ? regionOf(s.addr) : '';
@@ -4329,6 +4363,7 @@ function init(){
   loadNaverNstatCache(); // v15.14: N등록 cron 결과 머지
   loadYTDSummary();   // YTD 6개월 summary (프랜차이즈 클릭 시 올해 출점/폐점 표시용)
   loadBrandOverrides(); // admin 브랜드 분류 관리 (제외/카테고리)
+  loadSnsBuzz();      // v17.13 Phase 2: Apify 인스타 화제성 (data/sns_buzz.json)
   setTimeout(function(){ try { renderCustomers(); } catch(e){} }, 100); // v14 거래처 (localStorage)
   if (ST.trend30 && ST.trend30.stores) {
     ST.trend30.stores = ST.trend30.stores.filter(function(s){ return !isExcluded(s); });
