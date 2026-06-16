@@ -536,7 +536,63 @@ export default async function handler(req, res) {
       res.setHeader('Cache-Control', 'public, s-maxage=600, stale-while-revalidate=60');
       return res.status(200).json({
         kakaoJsKey: process.env.KAKAO_JS_KEY || process.env.KAKAO_JS_APP_KEY || '',
+        vapidPublicKey: process.env.VAPID_PUBLIC_KEY || '',  // v17.12: PWA Push
       });
+    }
+
+    // v17.12: PWA Push 구독 등록 — GitHub Contents API로 data/push_subscriptions.json 저장
+    if (action === 'register_push' && req.method === 'POST') {
+      try {
+        const body = req.body || {};
+        const sub = body.subscription;
+        const types = body.types || ['new_store', 'closed', 'buzz', 'user'];
+        if (!sub || !sub.endpoint) return res.status(400).json({ error: 'subscription required' });
+        // 인증된 user 추출 (간단)
+        let userId = 'anon';
+        try {
+          const sess = (req.cookies && req.cookies.sewang_session) || '';
+          if (sess) { const tok = JSON.parse(Buffer.from(sess, 'base64').toString('utf8')); userId = tok.kakaoId || tok.email || userId; }
+        } catch(e){}
+        const pat = process.env.GITHUB_PAT || process.env.GH_PAT;
+        const repo = process.env.GH_REPO || 'msjung75/sewang-monitor';
+        if (!pat) return res.status(500).json({ error: 'GITHUB_PAT 미설정' });
+        const api = 'https://api.github.com/repos/' + repo + '/contents/data/push_subscriptions.json';
+        let current = { subscriptions: [] }; let sha = '';
+        try {
+          const g = await fetch(api, { headers: { 'Authorization': 'Bearer ' + pat, 'Accept': 'application/vnd.github+json', 'User-Agent': 'sewang-push' } });
+          if (g.ok) { const j = await g.json(); sha = j.sha; current = JSON.parse(Buffer.from(j.content, 'base64').toString('utf8')); }
+        } catch(e){}
+        // dedupe by endpoint
+        current.subscriptions = (current.subscriptions || []).filter(s => s.endpoint !== sub.endpoint);
+        current.subscriptions.push({ endpoint: sub.endpoint, keys: sub.keys, userId, types, at: new Date().toISOString() });
+        current.updated = new Date().toISOString();
+        const newContent = Buffer.from(JSON.stringify(current)).toString('base64');
+        const putBody = { message: 'push: register ' + userId, content: newContent };
+        if (sha) putBody.sha = sha;
+        const p = await fetch(api, { method: 'PUT', headers: { 'Authorization': 'Bearer ' + pat, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json', 'User-Agent': 'sewang-push' }, body: JSON.stringify(putBody) });
+        if (!p.ok) { const t = await p.text(); return res.status(500).json({ error: 'commit failed: ' + p.status, detail: t.slice(0,200) }); }
+        return res.status(200).json({ ok: true, total: current.subscriptions.length });
+      } catch(e) { return res.status(500).json({ error: e.message }); }
+    }
+    if (action === 'unregister_push' && req.method === 'POST') {
+      try {
+        const body = req.body || {};
+        const endpoint = body.endpoint;
+        if (!endpoint) return res.status(400).json({ error: 'endpoint required' });
+        const pat = process.env.GITHUB_PAT || process.env.GH_PAT;
+        const repo = process.env.GH_REPO || 'msjung75/sewang-monitor';
+        if (!pat) return res.status(500).json({ error: 'GITHUB_PAT 미설정' });
+        const api = 'https://api.github.com/repos/' + repo + '/contents/data/push_subscriptions.json';
+        const g = await fetch(api, { headers: { 'Authorization': 'Bearer ' + pat, 'Accept': 'application/vnd.github+json', 'User-Agent': 'sewang-push' } });
+        if (!g.ok) return res.status(200).json({ ok: true, total: 0 });
+        const j = await g.json();
+        const current = JSON.parse(Buffer.from(j.content, 'base64').toString('utf8'));
+        current.subscriptions = (current.subscriptions || []).filter(s => s.endpoint !== endpoint);
+        current.updated = new Date().toISOString();
+        const newContent = Buffer.from(JSON.stringify(current)).toString('base64');
+        const p = await fetch(api, { method: 'PUT', headers: { 'Authorization': 'Bearer ' + pat, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json', 'User-Agent': 'sewang-push' }, body: JSON.stringify({ message: 'push: unregister', content: newContent, sha: j.sha }) });
+        return res.status(200).json({ ok: p.ok, total: current.subscriptions.length });
+      } catch(e) { return res.status(500).json({ error: e.message }); }
     }
 
     // ===== 지오코딩 (주소 → 좌표) — 카카오 REST API 프록시 (키 보호) =====
