@@ -82,8 +82,16 @@
       "role": "owner",
       "memo": "세왕 이상",
       "approved_at": "2026-06-16T01:58:09.195Z"
+    },
+    {
+      "id": "4946765208",
+      "nickname": "홍철",
+      "profile": "",
+      "role": "staff",
+      "memo": "세왕 이사",
+      "approved_at": "2026-06-16T01:58:35.592Z"
     }
   ],
   "blocked": [],
-  "updated_at": "2026-06-16T01:58:09.195Z"
+  "updated_at": "2026-06-16T01:58:35.592Z"
 }
