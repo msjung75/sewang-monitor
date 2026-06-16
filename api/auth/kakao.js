@@ -574,6 +574,60 @@ export default async function handler(req, res) {
         return res.status(200).json({ ok: true, total: current.subscriptions.length });
       } catch(e) { return res.status(500).json({ error: e.message }); }
     }
+    // v17.12 Phase 2: 서버 → 전체 구독자에게 push 발송 (cron에서 호출)
+    if (action === 'send_push' && req.method === 'POST') {
+      try {
+        const cronSecret = process.env.CRON_SECRET || '';
+        const authHdr = req.headers['authorization'] || '';
+        if (!cronSecret || authHdr !== 'Bearer ' + cronSecret) {
+          return res.status(401).json({ error: 'unauthorized' });
+        }
+        const vapidPublic = process.env.VAPID_PUBLIC_KEY;
+        const vapidPrivate = process.env.VAPID_PRIVATE_KEY;
+        const vapidSubject = process.env.VAPID_SUBJECT || 'mailto:msjung75@gmail.com';
+        if (!vapidPublic || !vapidPrivate) return res.status(500).json({ error: 'VAPID 키 미설정' });
+        const webpush = require('web-push');
+        webpush.setVapidDetails(vapidSubject, vapidPublic, vapidPrivate);
+        const body = req.body || {};
+        const type = body.type || 'generic';
+        const payload = JSON.stringify({
+          title: body.title || '세왕 모니터',
+          body: body.body || '',
+          url: body.url || '/',
+          tag: body.tag || (type + '-' + Date.now()),
+          type
+        });
+        // 구독자 list 조회
+        const pat = process.env.GITHUB_PAT || process.env.GH_PAT;
+        const repo = process.env.GH_REPO || 'msjung75/sewang-monitor';
+        if (!pat) return res.status(500).json({ error: 'GITHUB_PAT 미설정' });
+        const api = 'https://api.github.com/repos/' + repo + '/contents/data/push_subscriptions.json';
+        const g = await fetch(api, { headers: { 'Authorization': 'Bearer ' + pat, 'Accept': 'application/vnd.github+json', 'User-Agent': 'sewang-push' } });
+        if (!g.ok) return res.status(200).json({ ok: true, sent: 0, total: 0, note: 'no subscriptions yet' });
+        const j = await g.json();
+        const data = JSON.parse(Buffer.from(j.content, 'base64').toString('utf8'));
+        const subs = (data.subscriptions || []).filter(s => !s.types || s.types.includes(type));
+        // 각 구독자에게 발송
+        let sent = 0, failed = 0, deadEndpoints = [];
+        for (const s of subs) {
+          try {
+            await webpush.sendNotification({ endpoint: s.endpoint, keys: s.keys }, payload);
+            sent++;
+          } catch(e) {
+            failed++;
+            if (e.statusCode === 410 || e.statusCode === 404) deadEndpoints.push(s.endpoint);
+          }
+        }
+        // dead endpoint 정리 (만료 구독)
+        if (deadEndpoints.length) {
+          data.subscriptions = data.subscriptions.filter(s => !deadEndpoints.includes(s.endpoint));
+          data.updated = new Date().toISOString();
+          const newContent = Buffer.from(JSON.stringify(data)).toString('base64');
+          await fetch(api, { method: 'PUT', headers: { 'Authorization': 'Bearer ' + pat, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json', 'User-Agent': 'sewang-push' }, body: JSON.stringify({ message: 'push: cleanup dead', content: newContent, sha: j.sha }) });
+        }
+        return res.status(200).json({ ok: true, sent, failed, total: subs.length, deadCleaned: deadEndpoints.length });
+      } catch(e) { return res.status(500).json({ error: e.message }); }
+    }
     if (action === 'unregister_push' && req.method === 'POST') {
       try {
         const body = req.body || {};
