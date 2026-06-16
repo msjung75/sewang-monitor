@@ -1,0 +1,83 @@
+name: nightly-apify-buzz
+# v17.13 Phase 2 — Apify Instagram Hashtag Scraper로 TOP brand 화제성 수집
+# 사장님 정책: 비용 최소화 — 매일 1회만, TOP 10 brand × 8 reels = 80 results × $0.0026 ≈ $0.21/day
+on:
+  schedule:
+    - cron: '0 18 * * *'    # 03:00 KST (YTD 이후)
+    - cron: '0 21 * * *'    # 06:00 KST (재시도)
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  fetch-buzz:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check today already done (idempotent)
+        id: check
+        run: |
+          if [ -f data/sns_buzz.json ]; then
+            TS=$(grep -o '"at":"[^"]*"' data/sns_buzz.json | head -1 | cut -d'"' -f4 | cut -c1-10)
+            TODAY=$(date -u +%Y-%m-%d)
+            if [ "$TS" = "$TODAY" ]; then
+              echo "already=true" >> $GITHUB_OUTPUT
+              echo "Today already done — skip"
+            else
+              echo "already=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "already=false" >> $GITHUB_OUTPUT
+          fi
+      - name: Fetch Apify buzz
+        if: steps.check.outputs.already != 'true'
+        env:
+          APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
+        run: python3 scripts/fetch-apify-buzz.py
+      - name: Commit via Contents API
+        if: steps.check.outputs.already != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          if [ ! -f data/sns_buzz.json ]; then
+            echo "No sns_buzz.json — skip commit"
+            exit 0
+          fi
+          python3 << 'PYEOF'
+          import base64, json, os, time, urllib.request, urllib.error
+          token = os.environ['GH_TOKEN']
+          repo = os.environ['REPO']
+          path = 'data/sns_buzz.json'
+          api = f'https://api.github.com/repos/{repo}/contents/{path}'
+          headers = {'Authorization': f'Bearer {token}', 'Accept': 'application/vnd.github+json', 'User-Agent': 'apify-buzz'}
+          with open(path, 'rb') as f:
+              content_b64 = base64.b64encode(f.read()).decode('ascii')
+          msg = f'[skip ci] Apify buzz nightly {time.strftime("%Y-%m-%dT%H:%MZ", time.localtime())}'
+          def get_sha():
+              try:
+                  req = urllib.request.Request(api, headers=headers)
+                  with urllib.request.urlopen(req) as r:
+                      return json.loads(r.read()).get('sha', '')
+              except Exception:
+                  return ''
+          sha = get_sha()
+          for attempt in range(3):
+              body = {'message': msg, 'content': content_b64}
+              if sha: body['sha'] = sha
+              data = json.dumps(body).encode()
+              req = urllib.request.Request(api, data=data, headers={**headers, 'Content-Type': 'application/json'}, method='PUT')
+              try:
+                  with urllib.request.urlopen(req) as r:
+                      print(f'✅ committed (attempt {attempt+1})')
+                      break
+              except urllib.error.HTTPError as e:
+                  print(f'  attempt {attempt+1}: {e.code}')
+                  if e.code == 409:
+                      time.sleep(3); sha = get_sha()
+                  else:
+                      time.sleep(3)
+          else:
+              raise SystemExit(1)
+          PYEOF
