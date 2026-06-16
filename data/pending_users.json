@@ -1,4 +1,11 @@
 {
-  "pending": [],
-  "updated_at": "2026-06-15T23:48:59.745Z"
+  "pending": [
+    {
+      "id": "4946755285",
+      "nickname": "손승일",
+      "profile": "http://k.kakaocdn.net/dn/de9NdK/btsQL88BTN2/xY3aj4tXY14kMDG8iSJ5P0/img_640x640.jpg",
+      "applied_at": "2026-06-16T01:42:12.355Z"
+    }
+  ],
+  "updated_at": "2026-06-16T01:42:12.355Z"
 }
