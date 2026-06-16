@@ -551,8 +551,8 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
     <div class="card-title">📱 SNS 화제성 TOP 5 <span style="color:var(--txt3);font-size:10px;font-weight:500;margin-left:auto">썸트렌드 + Apify</span></div>
     <div id="sns-trend-list"><div style="color:var(--txt3);font-size:11px;text-align:center;padding:14px">⏳ TOP 성장 brand 트렌드 분석 중…</div></div>
     <div style="font-size:10px;color:var(--txt3);text-align:center;margin-top:8px;line-height:1.5">
-      📊 <b>산출 기준:</b> 신규오픈(3M) × 카테고리가중 × (1 + 검색추세) × <b style="color:#7dd3fc">SNS 언급량 가중</b><br>
-      <span style="color:var(--txt3);opacity:0.7">※ 썸트렌드(인스타·블로그·유튜브) + Apify 인스타 릴스 + 행안부 인허가 · 클릭 → 근거</span>
+      📊 <b>산출 기준:</b> 신규오픈(3M) × 카테고리가중 × (1+검색추세) × SNS multiplier + growth bonus<br>
+      <span style="color:var(--txt3);opacity:0.7">※ <b style="color:#7dd3fc">썸트렌드 데이터 활용</b> — 인스타 0건 OR 3M 성장 ≤0% brand 자동 제외 (사장님 규칙)</span>
     </div>
   </div>
 
@@ -3705,6 +3705,26 @@ function sumtrendOf(brand){
   for (var k in brands) if (_normBrand(k) === n) return brands[k];
   return null;
 }
+// v17.13 Phase 2.6: 사장님 규칙 — instagram 합계 0 OR growth_3m_pct ≤ 0 → TOP 제외
+function sumtrendExclude(brand){
+  var st = sumtrendOf(brand);
+  if (!st) return false;  // 데이터 없는 brand는 제외 X (모르는 brand는 일단 통과)
+  var igTotal = (st.instagram||[]).reduce(function(a,x){ return a+(x.freq||0); }, 0);
+  if (igTotal === 0) return true;  // 케이찹사라다 케이스 — SNS 흔적 0
+  var g = (typeof st.growth_3m_pct === 'number') ? st.growth_3m_pct : null;
+  // growth ≤ 0이고 절대 언급량도 적으면 제외 (가마치통닭 케이스: 감소세 + 인스타 100건↓ 검토)
+  if (g !== null && g <= 0 && igTotal < 300) return true;
+  return false;
+}
+// 사장님 규칙: growth_3m_pct ≥ 100 → +50, ≥ 20 → +20 (additive bonus)
+function sumtrendGrowthBonus(brand){
+  var st = sumtrendOf(brand);
+  if (!st || typeof st.growth_3m_pct !== 'number') return 0;
+  var g = st.growth_3m_pct;
+  if (g >= 100) return 50;
+  if (g >= 20)  return 20;
+  return 0;
+}
 // 썸트렌드 신호 multiplier — 야화(폭증)는 큰 보너스, 케이찹사라다(0)는 강 페널티
 function sumtrendMultiplier(brand){
   var st = sumtrendOf(brand);
@@ -3792,9 +3812,12 @@ async function loadSnsTrend(){
     grouped[ac].mainCat = maxCat;
     grouped[ac].focusWeight = SNS_FOCUS_WEIGHT[maxCat] || 0.6;
   }
-  // 후보: 3개월 신규 ≥ 5건 + brand 길이 ≥ 2 + 카테고리 가중 ≥ 0.8 (cafe/snack 제외 효과)
+  // 후보: 3개월 신규 ≥ 5건 + brand 길이 ≥ 2
+  // v17.13 Phase 2.6: 사장님 규칙 — 썸트렌드 hard exclude (인스타 0 OR growth ≤ 0)
   var candidates = Object.values(grouped).filter(function(g){
-    return g.late >= 5 && g.brand.length >= 2;
+    if (g.late < 5 || g.brand.length < 2) return false;
+    if (typeof sumtrendExclude === 'function' && sumtrendExclude(g.brand)) return false;
+    return true;
   });
   if (!candidates.length) { listEl.innerHTML = '<div style="color:var(--txt3);font-size:11px;text-align:center;padding:14px">분석할 brand 없음</div>'; return; }
   // 1차 정렬: late × focusWeight (검색 fetch 전 후보 선정)
@@ -3816,19 +3839,22 @@ async function loadSnsTrend(){
         hasData = true;
       }
     } catch(e) {}
-    // v17.13 Phase 2.5: 썸트렌드 multiplier 통합 — 실제 SNS 언급량 가중
+    // v17.13 Phase 2.6: 사장님 규칙 — multiplier × + growth bonus +
     var stMult = (typeof sumtrendMultiplier === 'function') ? sumtrendMultiplier(g.brand) : 1.0;
+    var stBonus = (typeof sumtrendGrowthBonus === 'function') ? sumtrendGrowthBonus(g.brand) : 0;
     var baseScore = hasData
       ? g.late * g.focusWeight * (1 + Math.max(Math.min(growth, 300), -50) / 100)
       : g.late * g.focusWeight * 0.7;
-    var score = baseScore * stMult;
+    var score = baseScore * stMult + stBonus;
     var stData = (typeof sumtrendOf === 'function') ? sumtrendOf(g.brand) : null;
     results.push({
       brand: g.brand, openN: g.late, total1M: g.total1M, total3M: g.total3M, total6M: g.total6M,
       sparkline: arr, growth: growth, hasData: hasData,
       mainCat: g.mainCat, focusWeight: g.focusWeight,
       sampleStores: g.sampleStores, score: score,
-      sumtrendMult: stMult, hasSumtrend: !!stData
+      sumtrendMult: stMult, sumtrendBonus: stBonus, hasSumtrend: !!stData,
+      sumtrendGrowth: stData && typeof stData.growth_3m_pct === 'number' ? stData.growth_3m_pct : null,
+      sumtrendVerdict: stData ? (stData.verdict || '') : ''
     });
   }
   // v17.13 Phase 2.5: 점수순 TOP 5 — 썸트렌드 데이터 있는 brand 우선
@@ -3855,9 +3881,21 @@ function renderSnsTrendList(brands){
     var gc = b.growth > 20 ? '#34d399' : b.growth < -20 ? '#f87171' : 'var(--txt3)';
     var catInfo = (typeof DETAIL_CAT_INFO !== 'undefined' && DETAIL_CAT_INFO[b.mainCat]) || { label: '음식점', color: '#94a3b8' };
     var catBadge = '<span style="font-size:9px;padding:1px 5px;background:' + catInfo.color + '22;color:' + catInfo.color + ';border-radius:4px;font-weight:700;letter-spacing:-0.2px">' + catInfo.label + '</span>';
-    var growthHtml = b.hasData
-      ? '<div style="color:' + gc + ';font-weight:800;font-size:11px;width:48px;text-align:right">' + (b.growth>=0?'+':'') + b.growth + '%</div>'
-      : '<div style="color:var(--txt3);font-weight:700;font-size:10px;width:48px;text-align:right">신규 ' + b.openN + '</div>';
+    // v17.13 Phase 2.6: sumtrend growth_3m_pct 우선 표시
+    var growthHtml;
+    if (typeof b.sumtrendGrowth === 'number') {
+      var sg = b.sumtrendGrowth;
+      var sgColor = sg >= 100 ? '#f87171' : sg >= 20 ? '#34d399' : sg <= 0 ? '#94a3b8' : '#7dd3fc';
+      var sgLabel = (sg >= 0 ? '+' : '') + sg + '%';
+      growthHtml = '<div style="text-align:right;width:55px">'
+        + '<div style="color:' + sgColor + ';font-weight:800;font-size:12px">' + sgLabel + '</div>'
+        + '<div style="font-size:8.5px;color:var(--txt3);letter-spacing:-0.2px">SNS 3M</div>'
+        + '</div>';
+    } else if (b.hasData) {
+      growthHtml = '<div style="color:' + gc + ';font-weight:800;font-size:11px;width:48px;text-align:right">' + (b.growth>=0?'+':'') + b.growth + '%</div>';
+    } else {
+      growthHtml = '<div style="color:var(--txt3);font-weight:700;font-size:10px;width:48px;text-align:right">신규 ' + b.openN + '</div>';
+    }
     return '<div onclick="openSnsModal(\'' + esc(b.brand).replace(/\'/g,"\\'") + '\')" style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(125,211,252,0.04);border:1px solid rgba(125,211,252,0.15);border-radius:8px;margin-bottom:5px;cursor:pointer;font-size:11.5px">'
       + '<div style="width:20px;font-weight:800;color:var(--txt3);text-align:center">' + (i+1) + '</div>'
       + '<div style="flex:1;display:flex;flex-direction:column;gap:3px;min-width:0">'
@@ -3967,8 +4005,20 @@ function openSnsModal(brand){
           }).join('')
         + '</div>';
     }
+    // v17.13 Phase 2.6: growth_3m_pct 큰 글씨 + verdict 한 줄
+    var gp = (typeof stData.growth_3m_pct === 'number') ? stData.growth_3m_pct : null;
+    var gpColor = gp === null ? 'var(--txt3)' : gp >= 100 ? '#f87171' : gp >= 20 ? '#34d399' : gp <= 0 ? '#94a3b8' : '#7dd3fc';
+    var gpLabel = gp === null ? '데이터 X' : (gp >= 0 ? '+' : '') + gp + '%';
+    var growthHeader = (gp !== null) ?
+      '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:rgba(0,0,0,0.15);border-radius:7px;margin-bottom:10px">'
+      + '<div style="font-size:11px;color:var(--txt2)">📊 3개월 성장률</div>'
+      + '<div style="font-size:22px;font-weight:800;color:' + gpColor + ';letter-spacing:-1px">' + gpLabel + '</div>'
+      + '</div>' : '';
+    var verdictHtml = stData.verdict ? '<div style="font-size:11.5px;color:var(--txt);background:rgba(255,255,255,0.04);padding:8px 10px;border-radius:7px;margin-bottom:10px;line-height:1.5">' + esc(stData.verdict) + '</div>' : '';
     stEl.innerHTML = '<div style="background:rgba(125,211,252,0.06);border:1px solid rgba(125,211,252,0.25);border-radius:9px;padding:12px;font-size:11px;color:var(--txt2)">'
-      + '<div style="font-weight:700;color:var(--txt);margin-bottom:8px;font-size:12px">💬 썸트렌드 SNS 6개월 언급량 <span style="color:var(--txt3);font-size:9px;font-weight:500;float:right">Dispatch · 일 1회</span></div>'
+      + '<div style="font-weight:700;color:var(--txt);margin-bottom:8px;font-size:12px">💬 SNS 화제성 (썸트렌드) <span style="color:var(--txt3);font-size:9px;font-weight:500;float:right">Dispatch · 일 1회</span></div>'
+      + growthHeader
+      + verdictHtml
       + sparkRow
       + sentHtml
       + assocHtml
