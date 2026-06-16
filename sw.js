@@ -1,5 +1,5 @@
-// PWA Service Worker v16.9 — 옛 SW 사용자 강제 reload
-const CACHE = 'sewang-pwa-v16_9-force-update';
+// PWA Service Worker v17.12 — Push 알림 (iOS 16.4+ web push)
+const CACHE = 'sewang-pwa-v17_12-push';
 const SHELL = ['/manifest.json', '/icon.svg'];  // index.html 제거 — 항상 network-first
 
 self.addEventListener('install', e => {
@@ -26,6 +26,41 @@ self.addEventListener('activate', e => {
 self.addEventListener('message', e => {
   // 클라이언트가 SKIP_WAITING 요청 시 즉시 활성화
   if (e.data && e.data.type === 'SKIP_WAITING') self.skipWaiting();
+});
+
+// v17.12: Push 알림 수신 (서버 → 사용자 device)
+self.addEventListener('push', e => {
+  let data = {};
+  try { data = e.data ? e.data.json() : {}; } catch(err) {
+    data = { title: '세왕 모니터', body: e.data ? e.data.text() : '새 알림' };
+  }
+  const title = data.title || '세왕 모니터';
+  const opts = {
+    body: data.body || '',
+    icon: data.icon || '/icon.svg',
+    badge: '/icon.svg',
+    tag: data.tag || 'sewang-' + Date.now(),
+    requireInteraction: false,
+    data: { url: data.url || '/', type: data.type || 'generic' }
+  };
+  e.waitUntil(self.registration.showNotification(title, opts));
+});
+
+// v17.12: 알림 클릭 — 앱 열거나 포커스
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  const url = (e.notification.data && e.notification.data.url) || '/';
+  e.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clients => {
+      for (const c of clients) {
+        if (c.url.includes(self.location.origin) && 'focus' in c) {
+          c.navigate(url);
+          return c.focus();
+        }
+      }
+      if (self.clients.openWindow) return self.clients.openWindow(url);
+    })
+  );
 });
 
 self.addEventListener('fetch', e => {
