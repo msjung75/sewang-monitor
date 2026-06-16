@@ -1,0 +1,27 @@
+name: nightly-push-sender
+# v17.12 Phase 2 — 매일 새벽 4종 push 알림 발송
+# 신규 매장 · 폐점 · 화제성 · 가입자
+on:
+  schedule:
+    - cron: '0 22 * * *'    # 07:00 KST (YTD/Apify/Sumtrend 이후)
+    - cron: '0 0 * * *'     # 09:00 KST (재시도)
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Send push notifications
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          VERCEL_URL: https://sewang-monitor.vercel.app
+        run: |
+          if [ -z "$CRON_SECRET" ]; then
+            echo "⚠️ CRON_SECRET 미설정 — secret 등록 후 활성화"
+            exit 0
+          fi
+          python3 scripts/send-push-notifications.py
