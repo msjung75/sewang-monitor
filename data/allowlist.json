@@ -74,8 +74,16 @@
       "memo": "세왕 부장",
       "approved_at": "2026-06-15T23:48:59.823Z",
       "updated_at": "2026-06-15T23:56:07.705Z"
+    },
+    {
+      "id": "4946755285",
+      "nickname": "손승일",
+      "profile": "http://k.kakaocdn.net/dn/de9NdK/btsQL88BTN2/xY3aj4tXY14kMDG8iSJ5P0/img_640x640.jpg",
+      "role": "owner",
+      "memo": "세왕 이상",
+      "approved_at": "2026-06-16T01:58:09.195Z"
     }
   ],
   "blocked": [],
-  "updated_at": "2026-06-15T23:56:07.705Z"
+  "updated_at": "2026-06-16T01:58:09.195Z"
 }
