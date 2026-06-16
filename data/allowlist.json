@@ -107,8 +107,16 @@
       "role": "owner",
       "memo": "토리키조쿠",
       "approved_at": "2026-06-16T02:58:35.734Z"
+    },
+    {
+      "id": "4947168634",
+      "nickname": "은성",
+      "profile": "http://k.kakaocdn.net/dn/dMQ3Zs/dJMcafZWczD/nf1keepFDd4Fc88EC7odfK/img_640x640.jpg",
+      "role": "staff",
+      "memo": "교수",
+      "approved_at": "2026-06-16T06:29:24.354Z"
     }
   ],
   "blocked": [],
-  "updated_at": "2026-06-16T02:58:35.734Z"
+  "updated_at": "2026-06-16T06:29:24.354Z"
 }
