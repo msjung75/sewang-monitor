@@ -1660,6 +1660,7 @@ function storeCard(s, opts){
   +   '<span class="tag t-reg">' + esc(regionOf(s.addr)) + ' ' + esc(guOf(s.addr)) + '</span>'
   +   (brand ? '<span class="tag t-fr">🏪 ' + esc(brand) + '</span>' : '')
   +   nvBadge
+  +   ((typeof storeWsChipHtml === 'function') ? storeWsChipHtml(s.id) : '')
   + '</div>'
   + '<div class="sc-desc">📍 ' + esc(s.addr || '주소 정보 없음')
   +   (s.tel ? '<br>📞 <a href="tel:' + esc(s.tel) + '" style="color:var(--c1);text-decoration:none" onclick="event.stopPropagation()">' + esc(s.tel) + '</a>' : '')
@@ -1670,6 +1671,7 @@ function storeCard(s, opts){
   +     '<button class="sc-track-btn" data-act="naver">N 보기</button>'
   +     '<button class="sc-track-btn" data-act="map">지도</button>'
   +     '<button class="sc-track-btn" data-act="insta">📷 인스타</button>'
+  +     ((ST.me && ['admin','staff','owner'].includes(ST.me.role)) ? '<button class="sc-track-btn" data-act="ws" style="color:#fbbf24;border-color:rgba(251,191,36,.25)">🏷️ 도매사</button>' : '')
   +     '<button class="sc-track-btn ' + (tr ? 'tracked' : '') + '" data-act="track">' + (tr ? '📌 추적중' : '＋ 추적') + '</button>'
   +   '</span>'
   + '</div>'
@@ -1695,6 +1697,7 @@ function bindCards(el, list){
         if (act === 'naver') window.open(naverSearchUrl(s), '_blank');
         else if (act === 'map') window.open(mapUrl(s), '_blank');
         else if (act === 'insta') loadInsta(s);
+        else if (act === 'ws') { if (typeof openStoreWsModal === 'function') openStoreWsModal(s.id, s.name, s.addr); }
         else if (act === 'track') { toggleTrack(s); }
       });
     });
@@ -2997,6 +3000,7 @@ function renderTracked(){
       +   '<span class="tag t-reg">' + esc(regionOf(s.addr) + ' ' + guOf(s.addr)) + '</span>'
       +   '<span class="st-badge ' + (stCls[s.status] || 'st-new') + '">' + (stMap[s.status] || '연락필요') + '</span>'
       +   (trend ? '<span class="tag t-gray">📊 ' + esc(trend) + '</span>' : '')
+      +   ((typeof storeWsChipHtml === 'function') ? storeWsChipHtml(s.id) : '')
       + '</div>'
       + '<div class="sc-desc">📍 ' + esc(s.addr)
       +   (s.tel ? '<br>📞 <a href="tel:' + esc(s.tel) + '" style="color:var(--c1);text-decoration:none">' + esc(s.tel) + '</a>' : '')
@@ -3683,6 +3687,102 @@ async function loadSnsBuzz(){
       console.log('[sns_buzz] loaded:', Object.keys(window.SNS_BUZZ.brands||{}).length, 'brands @', window.SNS_BUZZ.at);
     }
   } catch(e) { console.log('[sns_buzz] not yet available:', e.message); }
+}
+
+// v17.11 Phase 2: 매장 ↔ 도매사 매핑 (localStorage 전용 — 서버·repo 노출 0)
+function getStoreWsMap(){
+  try { return JSON.parse(localStorage.getItem('sewang_store_wholesaler_v1') || '{}'); } catch(e){ return {}; }
+}
+function setStoreWs(storeId, wsId){
+  var m = getStoreWsMap();
+  if (wsId) m[storeId] = wsId;
+  else delete m[storeId];
+  localStorage.setItem('sewang_store_wholesaler_v1', JSON.stringify(m));
+}
+function wsById(id){
+  if (!window.WS_DATA) return null;
+  return (window.WS_DATA.wholesalers || []).find(function(w){ return w.id === id; });
+}
+function wsNearAddr(storeAddr){
+  // 시·도 + 시·군·구 기반 후보 추출
+  if (!window.WS_DATA || !storeAddr) return [];
+  var sido = (typeof regionOf === 'function') ? regionOf(storeAddr) : '';
+  var gu = (typeof guOf === 'function') ? guOf(storeAddr) : '';
+  var list = window.WS_DATA.wholesalers.slice();
+  if (sido) list = list.filter(function(w){ return w.sido === sido; });
+  // gu 매칭이 있는 거 우선 → 알파 정렬
+  return list.sort(function(a, b){
+    var ag = (a.gu === gu) ? 0 : 1;
+    var bg = (b.gu === gu) ? 0 : 1;
+    if (ag !== bg) return ag - bg;
+    return (a.name || '').localeCompare(b.name || '');
+  });
+}
+// 매장 카드에 도매사 chip 렌더용 helper
+function storeWsChipHtml(storeId){
+  var map = getStoreWsMap();
+  var wsId = map[storeId];
+  if (!wsId) return '';
+  var w = wsById(wsId);
+  if (!w) return '';
+  return '<span style="font-size:9.5px;padding:2px 6px;background:rgba(251,191,36,0.12);color:#fbbf24;border-radius:4px;font-weight:700">🏷️ ' + esc(w.name) + '</span>';
+}
+// admin only — 매장의 도매사 매핑 모달
+window._wsMapStore = null;
+function openStoreWsModal(storeId, storeName, storeAddr){
+  if (!ST.me || !['admin','staff','owner'].includes(ST.me.role)) return;
+  window._wsMapStore = { id: storeId, name: storeName, addr: storeAddr };
+  var modal = document.getElementById('store-ws-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'store-ws-modal';
+    modal.style.cssText = 'display:flex;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:14px;box-sizing:border-box';
+    modal.onclick = function(e){ if (e.target === modal) closeStoreWsModal(); };
+    document.body.appendChild(modal);
+  }
+  var current = getStoreWsMap()[storeId];
+  var currentW = current ? wsById(current) : null;
+  var candidates = wsNearAddr(storeAddr);
+  modal.innerHTML = '<div style="max-width:520px;width:100%;max-height:85vh;overflow-y:auto;background:var(--surface);border:1px solid var(--border-hi);border-radius:14px;padding:16px">'
+    + '<div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:12px">'
+    +   '<div><div style="font-size:11px;color:var(--txt3)">매장 도매사 매핑 <span style="color:#fbbf24;font-size:9px;margin-left:4px">localStorage 전용</span></div>'
+    +   '<div style="font-size:14px;font-weight:800;margin-top:3px">' + esc(storeName) + '</div></div>'
+    +   '<button onclick="closeStoreWsModal()" style="background:rgba(255,255,255,0.06);border:0;color:var(--txt2);width:28px;height:28px;border-radius:50%;font-size:14px;cursor:pointer">×</button>'
+    + '</div>'
+    + (currentW ? '<div style="background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.25);border-radius:8px;padding:8px 11px;margin-bottom:10px;font-size:11px;display:flex;justify-content:space-between;align-items:center">'
+        + '<span>🏷️ 현재: <b>' + esc(currentW.name) + '</b></span>'
+        + '<button onclick="setStoreWs(window._wsMapStore.id,null);openStoreWsModal(window._wsMapStore.id,window._wsMapStore.name,window._wsMapStore.addr);" style="background:transparent;border:0;color:#f87171;font-size:11px;cursor:pointer">해제</button>'
+        + '</div>' : '')
+    + '<input id="store-ws-search" type="text" placeholder="🔍 도매사·대표·구 검색" oninput="renderStoreWsCandidates()" style="width:100%;padding:9px 11px;border:1px solid var(--border2);background:var(--surface);border-radius:8px;color:var(--txt);font-size:12.5px;margin-bottom:8px;box-sizing:border-box">'
+    + '<div style="font-size:10.5px;color:var(--txt3);margin-bottom:6px">📍 ' + esc(storeAddr || '주소 정보 없음') + ' — 동일 시·도 ' + candidates.length + '사 후보</div>'
+    + '<div id="store-ws-candidates" style="max-height:420px;overflow-y:auto"></div>'
+    + '</div>';
+  renderStoreWsCandidates();
+}
+function renderStoreWsCandidates(){
+  var info = window._wsMapStore;
+  if (!info) return;
+  var qEl = document.getElementById('store-ws-search');
+  var q = (qEl ? qEl.value : '').trim().toLowerCase();
+  var list = wsNearAddr(info.addr);
+  if (q) list = list.filter(function(w){
+    var hay = ((w.name||'') + ' ' + (w.ceo||'') + ' ' + (w.gu||'') + ' ' + (w.addr||'')).toLowerCase();
+    return hay.indexOf(q) >= 0;
+  });
+  var el = document.getElementById('store-ws-candidates');
+  if (!el) return;
+  if (!list.length) { el.innerHTML = '<div style="color:var(--txt3);font-size:11px;text-align:center;padding:12px">후보 없음</div>'; return; }
+  el.innerHTML = list.slice(0, 50).map(function(w){
+    return '<div onclick="setStoreWs(window._wsMapStore.id,\'' + esc(w.id) + '\');closeStoreWsModal();if(typeof renderNew===\'function\')renderNew();if(typeof renderTracked===\'function\')renderTracked();" style="padding:8px 10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:6px;margin-bottom:4px;cursor:pointer;font-size:11.5px">'
+      + '<div style="display:flex;justify-content:space-between;align-items:center"><b>' + esc(w.name) + '</b><span style="font-size:9.5px;color:var(--txt3)">' + esc(w.sido) + ' ' + esc(w.gu||'') + '</span></div>'
+      + '<div style="font-size:10px;color:var(--txt3);margin-top:2px">' + esc(w.ceo || '') + (w.tel ? ' · 📞 ' + esc(w.tel) : '') + '</div>'
+      + '</div>';
+  }).join('') + (list.length > 50 ? '<div style="color:var(--txt3);font-size:10px;text-align:center;padding:6px">↑ 50사 표시 · 검색해서 좁히세요</div>' : '');
+}
+function closeStoreWsModal(){
+  var m = document.getElementById('store-ws-modal');
+  if (m) m.style.display = 'none';
+  window._wsMapStore = null;
 }
 
 // v17.11: 도매사 명부 (서울·경기·인천 361사 — admin 전용)
