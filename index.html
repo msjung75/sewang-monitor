@@ -4144,12 +4144,16 @@ function openSnsModal(brand){
         +   '<span style="color:#f87171">부 ' + n.toFixed(0) + '%</span>'
         + '</div>';
     }
-    // 연관어 TOP 5
+    // 연관어 TOP 8 — 문자열 또는 {label, freq} 객체 둘 다 지원
     var assocHtml = '';
     if (stData.topAssoc && stData.topAssoc.length) {
       assocHtml = '<div style="display:flex;gap:4px;flex-wrap:wrap">'
         + stData.topAssoc.slice(0, 8).map(function(w){
-            return '<span style="font-size:10px;padding:2px 7px;background:rgba(125,211,252,0.1);color:#7dd3fc;border-radius:4px;font-weight:600">#' + esc(w) + '</span>';
+            var label = (typeof w === 'string') ? w : (w.label || '');
+            var freq = (typeof w === 'object' && w.freq) ? w.freq : null;
+            if (!label) return '';
+            var pre = (label.charAt(0) === '#') ? '' : '#';
+            return '<span style="font-size:10px;padding:2px 7px;background:rgba(125,211,252,0.1);color:#7dd3fc;border-radius:4px;font-weight:600">' + pre + esc(label) + (freq ? ' <span style="opacity:0.6;font-weight:400">' + freq + '</span>' : '') + '</span>';
           }).join('')
         + '</div>';
     }
