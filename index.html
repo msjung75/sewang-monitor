@@ -546,13 +546,13 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
   <!-- v17.8.1: 데이터 기준일 미니 stamp -->
   <div id="data-freshness-stamp" style="margin-top:8px;font-size:10.5px;color:var(--txt3);text-align:center;padding:8px 10px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;gap:6px"><span>🕐</span><span id="data-freshness-text">데이터 갱신 시각 확인 중…</span></div>
 
-  <!-- v17.13: SNS 화제성 카드 (카테고리 라벨 + 화제성 근거 모달) -->
+  <!-- v17.13: SNS 화제성 카드 (썸트렌드 + Apify + 카테고리 가중) -->
   <div class="card" id="card-sns-trend" style="margin-top:14px">
-    <div class="card-title">📱 SNS 화제성 TOP 5 <span style="color:var(--txt3);font-size:10px;font-weight:500;margin-left:auto">주점·치킨·고기 가중</span></div>
+    <div class="card-title">📱 SNS 화제성 TOP 5 <span style="color:var(--txt3);font-size:10px;font-weight:500;margin-left:auto">썸트렌드 + Apify</span></div>
     <div id="sns-trend-list"><div style="color:var(--txt3);font-size:11px;text-align:center;padding:14px">⏳ TOP 성장 brand 트렌드 분석 중…</div></div>
     <div style="font-size:10px;color:var(--txt3);text-align:center;margin-top:8px;line-height:1.5">
-      📊 <b>산출 기준:</b> 최근 3개월 신규 오픈 ≥ 5건 + 카테고리 가중 + 검색량 추세<br>
-      <span style="color:var(--txt3);opacity:0.7">※ 주점·치킨·고기·한식·일식 brand 우선 · 클릭 → 화제성 근거</span>
+      📊 <b>산출 기준:</b> 신규오픈(3M) × 카테고리가중 × (1 + 검색추세) × <b style="color:#7dd3fc">SNS 언급량 가중</b><br>
+      <span style="color:var(--txt3);opacity:0.7">※ 썸트렌드(인스타·블로그·유튜브) + Apify 인스타 릴스 + 행안부 인허가 · 클릭 → 근거</span>
     </div>
   </div>
 
@@ -724,6 +724,8 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
     </div>
     <!-- 종합 평가 1줄 -->
     <div id="sns-modal-verdict" style="background:linear-gradient(135deg,rgba(125,211,252,0.08),rgba(167,139,250,0.05));border:1px solid rgba(125,211,252,0.2);border-radius:9px;padding:10px 12px;font-size:12px;line-height:1.5;color:var(--txt);margin-bottom:14px"></div>
+    <!-- v17.13 Phase 2.5: 썸트렌드 SNS 언급량 (인스타·블로그·유튜브 6개월 + 감성 + 연관어) -->
+    <div id="sns-modal-sumtrend" style="margin-bottom:14px"></div>
     <!-- 네이버 검색량 sparkline -->
     <div id="sns-modal-trend" style="margin-bottom:14px"></div>
     <!-- 신규 오픈 3구간 -->
@@ -3680,12 +3682,67 @@ async function loadSnsBuzz(){
   } catch(e) { console.log('[sns_buzz] not yet available:', e.message); }
 }
 
+// v17.13 Phase 2.5: 썸트렌드 SNS 언급량 (Dispatch가 매일 1회 push)
+window.SUMTREND_BUZZ = null;
+async function loadSumtrendBuzz(){
+  try {
+    var r = await fetch('/data/sumtrend_buzz.json?t=' + Math.floor(Date.now()/3600000), { cache: 'no-store' });
+    if (r.ok) {
+      window.SUMTREND_BUZZ = await r.json();
+      console.log('[sumtrend_buzz] loaded:', Object.keys(window.SUMTREND_BUZZ.brands||{}).length, 'brands @', window.SUMTREND_BUZZ.updated);
+    }
+  } catch(e) { console.log('[sumtrend_buzz] not yet available:', e.message); }
+}
+
+// brand normalize (공백 제거 + lowercase) — sumtrend JSON 키와 매칭
+function _normBrand(b){ return (b || '').replace(/\s+/g, '').toLowerCase(); }
+// 썸트렌드 brand 데이터 조회 — 다양한 표기 시도
+function sumtrendOf(brand){
+  if (!window.SUMTREND_BUZZ || !window.SUMTREND_BUZZ.brands) return null;
+  var brands = window.SUMTREND_BUZZ.brands;
+  if (brands[brand]) return brands[brand];
+  var n = _normBrand(brand);
+  for (var k in brands) if (_normBrand(k) === n) return brands[k];
+  return null;
+}
+// 썸트렌드 신호 multiplier — 야화(폭증)는 큰 보너스, 케이찹사라다(0)는 강 페널티
+function sumtrendMultiplier(brand){
+  var st = sumtrendOf(brand);
+  if (!st) return 1.0;  // 데이터 없음 — neutral
+  function sum(arr){ if (!arr||!arr.length) return 0; var s=0; for (var i=0;i<arr.length;i++) s+=(arr[i].freq||0); return s; }
+  function lastN(arr, n){ if (!arr||!arr.length) return 0; var s=0; var st=Math.max(0,arr.length-n); for (var i=st;i<arr.length;i++) s+=(arr[i].freq||0); return s; }
+  function firstN(arr, n){ if (!arr||!arr.length) return 0; var s=0; var en=Math.min(arr.length,n); for (var i=0;i<en;i++) s+=(arr[i].freq||0); return s; }
+  // 6개 소스 중 인스타+블로그+유튜브 합산 (3+3 구간)
+  var last3 = lastN(st.instagram, 3) + lastN(st.blog, 3) + lastN(st.youtube, 3);
+  var first3 = firstN(st.instagram, 3) + firstN(st.blog, 3) + firstN(st.youtube, 3);
+  // 절대값 가중
+  var absMult;
+  if (last3 === 0)       absMult = 0.2;   // 케이찹사라다 케이스 — 강 페널티
+  else if (last3 < 30)   absMult = 0.7;
+  else if (last3 < 100)  absMult = 1.0;
+  else if (last3 < 300)  absMult = 1.5;
+  else if (last3 < 800)  absMult = 2.0;
+  else                   absMult = 2.5;   // 야화 케이스 — 큰 보너스
+  // 성장 가중 (last3 / first3)
+  var growthMult = 1.0;
+  if (first3 > 0) {
+    var r = last3 / first3;
+    if (r > 3.0)      growthMult = 1.4;
+    else if (r > 2.0) growthMult = 1.25;
+    else if (r > 1.3) growthMult = 1.1;
+    else if (r < 0.5) growthMult = 0.7;  // 감소세
+  } else if (last3 > 0) {
+    growthMult = 1.5;  // 0 → 출현 = 신생 buzz
+  }
+  return Math.max(0.15, Math.min(4.0, absMult * growthMult));
+}
+
 async function loadSnsTrend(){
   var listEl = document.getElementById('sns-trend-list');
   if (!listEl || !window.YTD || !window.YTD.by_brand) return;
   // 캐시 (1일 — buzz 데이터 빠르게 갱신)
   try {
-    var cached = localStorage.getItem('sewang_sns_trend_v17_13');
+    var cached = localStorage.getItem('sewang_sns_trend_v17_14');
     if (cached) {
       var c = JSON.parse(cached);
       if (Date.now() - (c.ts||0) < 86400 * 1000 && c.brands) {
@@ -3759,24 +3816,29 @@ async function loadSnsTrend(){
         hasData = true;
       }
     } catch(e) {}
-    // 점수: 데이터 있으면 검색 추세 반영, 없으면 fallback (가중 × 신규 오픈)
-    var score = hasData
+    // v17.13 Phase 2.5: 썸트렌드 multiplier 통합 — 실제 SNS 언급량 가중
+    var stMult = (typeof sumtrendMultiplier === 'function') ? sumtrendMultiplier(g.brand) : 1.0;
+    var baseScore = hasData
       ? g.late * g.focusWeight * (1 + Math.max(Math.min(growth, 300), -50) / 100)
-      : g.late * g.focusWeight * 0.7;  // 페널티 30%
+      : g.late * g.focusWeight * 0.7;
+    var score = baseScore * stMult;
+    var stData = (typeof sumtrendOf === 'function') ? sumtrendOf(g.brand) : null;
     results.push({
       brand: g.brand, openN: g.late, total1M: g.total1M, total3M: g.total3M, total6M: g.total6M,
       sparkline: arr, growth: growth, hasData: hasData,
       mainCat: g.mainCat, focusWeight: g.focusWeight,
-      sampleStores: g.sampleStores, score: score
+      sampleStores: g.sampleStores, score: score,
+      sumtrendMult: stMult, hasSumtrend: !!stData
     });
   }
-  // 점수순 TOP 5 (데이터 있는 brand 우선 효과)
+  // v17.13 Phase 2.5: 점수순 TOP 5 — 썸트렌드 데이터 있는 brand 우선
   results.sort(function(a,b){
-    if (a.hasData !== b.hasData) return a.hasData ? -1 : 1;  // 데이터 있는 게 우선
+    if (a.hasSumtrend !== b.hasSumtrend) return a.hasSumtrend ? -1 : 1;  // 썸트렌드 우선
+    if (a.hasData !== b.hasData) return a.hasData ? -1 : 1;
     return b.score - a.score;
   });
   var top5 = results.slice(0, 5);
-  try { localStorage.setItem('sewang_sns_trend_v17_13', JSON.stringify({ ts: Date.now(), brands: top5 })); } catch(e){}
+  try { localStorage.setItem('sewang_sns_trend_v17_14', JSON.stringify({ ts: Date.now(), brands: top5 })); } catch(e){}
   renderSnsTrendList(top5);
 }
 
@@ -3811,7 +3873,7 @@ function renderSnsTrendList(brands){
 // v17.13: 화제성 근거 모달
 window._snsModalBrand = null;
 function openSnsModal(brand){
-  var cacheStr = localStorage.getItem('sewang_sns_trend_v17_13');
+  var cacheStr = localStorage.getItem('sewang_sns_trend_v17_14');
   if (!cacheStr) return;
   var c; try { c = JSON.parse(cacheStr); } catch(e){ return; }
   var b = (c.brands || []).find(function(x){ return x.brand === brand; });
@@ -3827,17 +3889,93 @@ function openSnsModal(brand){
   badgeEl.style.color = catInfo.color;
   document.getElementById('sns-modal-title').innerHTML = '🔥 ' + esc(b.brand);
   document.getElementById('sns-modal-sub').innerHTML = '최근 3개월 신규 <b style="color:#34d399">' + b.total3M + '</b>건 · 6개월 누적 <b>' + b.total6M + '</b>건';
-  // 종합 평가
-  var verdict = '';
+  // 종합 평가 — v17.13 Phase 2.5: 썸트렌드 신호 우선 노출
+  var stData = sumtrendOf(brand);
   var reasons = [];
-  if (b.total1M >= 3) reasons.push('🚀 최근 1개월 <b>' + b.total1M + '</b>건 급증');
-  else if (b.total3M >= 10) reasons.push('📈 3개월간 꾸준한 출점 <b>' + b.total3M + '</b>건');
-  if (b.hasData && b.growth >= 20) reasons.push('🔍 네이버 검색량 <b style="color:#34d399">+' + b.growth + '%</b>');
-  else if (b.hasData && b.growth >= 0) reasons.push('🔍 검색량 ' + (b.growth>=0?'+':'') + b.growth + '%');
-  else if (!b.hasData) reasons.push('⚠️ <span style="color:#f87171">검색 데이터 없음</span> (Apify 보강 예정)');
-  if (b.focusWeight >= 2) reasons.push('🥃 ' + catInfo.label + ' (도매 핵심 카테고리)');
-  verdict = reasons.join(' · ');
-  document.getElementById('sns-modal-verdict').innerHTML = '💡 <b>왜 화제성 TOP?</b><br>' + verdict;
+  if (stData) {
+    // 인스타 last3 vs first3
+    var ig = stData.instagram || [];
+    var igLast3 = ig.slice(-3).reduce(function(a,x){ return a+(x.freq||0); }, 0);
+    var igFirst3 = ig.slice(0,3).reduce(function(a,x){ return a+(x.freq||0); }, 0);
+    if (igLast3 >= 300) {
+      var mult = igFirst3 ? (igLast3 / igFirst3).toFixed(1) : 'N';
+      reasons.push('🔥 <b style="color:#f87171">인스타 ' + igLast3 + '건 폭증</b> (' + mult + 'x)');
+    } else if (igLast3 >= 50) {
+      reasons.push('📸 인스타 <b>' + igLast3 + '건</b>');
+    } else if (igLast3 === 0) {
+      reasons.push('⚠️ <span style="color:#f87171">인스타 언급 0건</span> (SNS 화제성 없음)');
+    }
+    // 감성
+    if (stData.sentiment) {
+      var sp = stData.sentiment.positive || 0;
+      if (sp >= 0.5) reasons.push('😊 긍정 <b style="color:#34d399">' + Math.round(sp*100) + '%</b>');
+    }
+  }
+  if (b.total1M >= 3) reasons.push('🚀 1개월 <b>' + b.total1M + '</b>건 신규');
+  else if (b.total3M >= 10) reasons.push('📈 3개월 <b>' + b.total3M + '</b>건');
+  if (b.hasData && b.growth >= 20) reasons.push('🔍 검색량 <b style="color:#34d399">+' + b.growth + '%</b>');
+  if (b.focusWeight >= 2) reasons.push('🥃 ' + catInfo.label);
+  if (!reasons.length) reasons.push('📊 신규 ' + b.openN + '건 · 카테고리 ' + catInfo.label);
+  document.getElementById('sns-modal-verdict').innerHTML = '💡 <b>왜 화제성 TOP?</b><br>' + reasons.join(' · ');
+
+  // v17.13 Phase 2.5: 썸트렌드 SNS 언급량 (인스타·블로그·유튜브 sparkline 3개 + 감성 + 연관어)
+  var stEl = document.getElementById('sns-modal-sumtrend');
+  if (stData) {
+    function spark(arr, color, label){
+      if (!arr || !arr.length) return '<div style="flex:1;text-align:center;padding:6px;font-size:9.5px;color:var(--txt3)">' + label + ' 데이터 없음</div>';
+      var maxV = Math.max.apply(null, arr.map(function(x){return x.freq||0;}).concat([1]));
+      var total = arr.reduce(function(a,x){ return a+(x.freq||0); }, 0);
+      var pts = arr.map(function(x,idx){ return (idx/(arr.length-1)*108+4) + ',' + (32 - (x.freq||0)/maxV*28); }).join(' ');
+      var last = arr[arr.length-1].freq || 0;
+      return '<div style="flex:1;padding:6px 4px;background:rgba(255,255,255,0.02);border-radius:6px;text-align:center">'
+        + '<div style="font-size:9px;color:var(--txt3);margin-bottom:2px">' + label + '</div>'
+        + '<svg width="100%" height="36" viewBox="0 0 116 36" preserveAspectRatio="none">'
+        +   '<polyline fill="none" stroke="' + color + '" stroke-width="1.8" points="' + pts + '"/>'
+        +   '<polyline fill="' + color + '22" stroke="none" points="4,32 ' + pts + ' 112,32"/>'
+        + '</svg>'
+        + '<div style="font-size:10.5px;color:' + color + ';font-weight:800">' + total.toLocaleString() + ' <span style="font-size:9px;color:var(--txt3);font-weight:500">(최근 ' + last + ')</span></div>'
+        + '</div>';
+    }
+    var sparkRow = '<div style="display:flex;gap:6px;margin-bottom:8px">'
+      + spark(stData.instagram, '#f472b6', '📸 인스타')
+      + spark(stData.blog,      '#34d399', '📝 블로그')
+      + spark(stData.youtube,   '#f87171', '🎬 유튜브')
+      + '</div>';
+    // 감성 막대
+    var sentHtml = '';
+    if (stData.sentiment) {
+      var p = (stData.sentiment.positive||0) * 100;
+      var n = (stData.sentiment.negative||0) * 100;
+      var nu = (stData.sentiment.neutral||0) * 100;
+      sentHtml = '<div style="display:flex;height:10px;border-radius:5px;overflow:hidden;margin-bottom:6px;background:rgba(255,255,255,0.04)">'
+        + '<div style="width:' + p.toFixed(1) + '%;background:#34d399" title="긍정 ' + p.toFixed(0) + '%"></div>'
+        + '<div style="width:' + nu.toFixed(1) + '%;background:#7dd3fc" title="중립 ' + nu.toFixed(0) + '%"></div>'
+        + '<div style="width:' + n.toFixed(1) + '%;background:#f87171" title="부정 ' + n.toFixed(0) + '%"></div>'
+        + '</div>'
+        + '<div style="display:flex;font-size:9.5px;color:var(--txt3);justify-content:space-between;margin-bottom:8px">'
+        +   '<span style="color:#34d399">긍 ' + p.toFixed(0) + '%</span>'
+        +   '<span style="color:#7dd3fc">중 ' + nu.toFixed(0) + '%</span>'
+        +   '<span style="color:#f87171">부 ' + n.toFixed(0) + '%</span>'
+        + '</div>';
+    }
+    // 연관어 TOP 5
+    var assocHtml = '';
+    if (stData.topAssoc && stData.topAssoc.length) {
+      assocHtml = '<div style="display:flex;gap:4px;flex-wrap:wrap">'
+        + stData.topAssoc.slice(0, 8).map(function(w){
+            return '<span style="font-size:10px;padding:2px 7px;background:rgba(125,211,252,0.1);color:#7dd3fc;border-radius:4px;font-weight:600">#' + esc(w) + '</span>';
+          }).join('')
+        + '</div>';
+    }
+    stEl.innerHTML = '<div style="background:rgba(125,211,252,0.06);border:1px solid rgba(125,211,252,0.25);border-radius:9px;padding:12px;font-size:11px;color:var(--txt2)">'
+      + '<div style="font-weight:700;color:var(--txt);margin-bottom:8px;font-size:12px">💬 썸트렌드 SNS 6개월 언급량 <span style="color:var(--txt3);font-size:9px;font-weight:500;float:right">Dispatch · 일 1회</span></div>'
+      + sparkRow
+      + sentHtml
+      + assocHtml
+      + '</div>';
+  } else {
+    stEl.innerHTML = '<div style="background:rgba(125,211,252,0.04);border:1px dashed rgba(125,211,252,0.2);border-radius:9px;padding:10px;font-size:10.5px;color:var(--txt3);text-align:center">⏳ 썸트렌드 SNS 언급량 데이터 수집 대기 (Dispatch가 일 1회 푸시)</div>';
+  }
   // 검색 추세 큰 sparkline
   var trendEl = document.getElementById('sns-modal-trend');
   if (b.hasData && b.sparkline && b.sparkline.length) {
@@ -4364,6 +4502,7 @@ function init(){
   loadYTDSummary();   // YTD 6개월 summary (프랜차이즈 클릭 시 올해 출점/폐점 표시용)
   loadBrandOverrides(); // admin 브랜드 분류 관리 (제외/카테고리)
   loadSnsBuzz();      // v17.13 Phase 2: Apify 인스타 화제성 (data/sns_buzz.json)
+  loadSumtrendBuzz(); // v17.13 Phase 2.5: 썸트렌드 SNS 언급량 (data/sumtrend_buzz.json)
   setTimeout(function(){ try { renderCustomers(); } catch(e){} }, 100); // v14 거래처 (localStorage)
   if (ST.trend30 && ST.trend30.stores) {
     ST.trend30.stores = ST.trend30.stores.filter(function(s){ return !isExcluded(s); });
