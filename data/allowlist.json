@@ -99,8 +99,16 @@
       "role": "staff",
       "memo": "세왕 전무",
       "approved_at": "2026-06-16T02:44:19.061Z"
+    },
+    {
+      "id": "4946867933",
+      "nickname": "Progetto Jian 김아형",
+      "profile": "http://k.kakaocdn.net/dn/dqAXAu/dJMcagSUxFV/SwzjSYdT7GhMHM93kiRDqk/img_640x640.jpg",
+      "role": "owner",
+      "memo": "토리키조쿠",
+      "approved_at": "2026-06-16T02:58:35.734Z"
     }
   ],
   "blocked": [],
-  "updated_at": "2026-06-16T02:44:19.061Z"
+  "updated_at": "2026-06-16T02:58:35.734Z"
 }
