@@ -1,4 +1,11 @@
 {
-  "pending": [],
-  "updated_at": "2026-06-16T01:58:35.501Z"
+  "pending": [
+    {
+      "id": "4946806353",
+      "nickname": "박정언",
+      "profile": "http://img1.kakaocdn.net/thumb/R640x640.q70/?fname=http://t1.kakaocdn.net/account_images/default_profile.jpeg",
+      "applied_at": "2026-06-16T02:15:33.944Z"
+    }
+  ],
+  "updated_at": "2026-06-16T02:15:33.944Z"
 }
