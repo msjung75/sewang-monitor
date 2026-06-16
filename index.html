@@ -885,6 +885,21 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
     <div class="card-title">🏷️ 카테고리 override</div>
     <div id="admin-category-overrides"></div>
   </div>
+  <!-- v17.11: 도매사 명부 placeholder (admin 전용) -->
+  <div class="card" style="margin-bottom:12px;border-left:3px solid #fbbf24">
+    <div class="card-title">📚 도매사 명부 <span style="font-size:9px;color:#fbbf24;background:rgba(251,191,36,.12);padding:2px 6px;border-radius:6px;margin-left:6px;font-weight:700">곧 출시</span></div>
+    <div style="font-size:11.5px;color:var(--txt2);line-height:1.6;padding:10px 12px;background:rgba(251,191,36,.04);border:1px solid rgba(251,191,36,.18);border-radius:8px">
+      📋 「서울·경기·인천 도매사 명부 2025」 통합 예정:<br>
+      • 전국 주류 도매사 리스트 (사명·주소·전화)<br>
+      • 매장 ↔ 도매사 매핑 (admin 수동 등록)<br>
+      • 매장 카드에 「🏷️ 도매사 표시」 자동 라벨<br>
+      • 거래처 명단과 교차 검증<br>
+      <span style="font-size:10px;color:var(--txt3);margin-top:6px;display:block">※ 사장님 도매사 엑셀 파일 업로드 후 활성화. 외부 노출 금지 — admin/staff+ 전용.</span>
+    </div>
+    <div style="margin-top:10px">
+      <button onclick="alert('도매사 엑셀 파일 업로드는 다음 commit에서 활성화됩니다.\\n현재는 placeholder UI만 표시 중.')" style="width:100%;padding:10px;background:rgba(251,191,36,0.12);border:1px solid rgba(251,191,36,0.3);color:#fbbf24;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">📤 도매사 명부 업로드 (준비 중)</button>
+    </div>
+  </div>
   <!-- v14: 거래처 매칭 (사장님 브라우저 전용, 서버·repo 노출 0) -->
   <div class="card" style="margin-bottom:12px;border-left:3px solid #34d399">
     <div class="card-title">💼 거래처 매칭 <span style="font-size:9px;color:#34d399;background:rgba(52,211,153,.12);padding:2px 6px;border-radius:6px;margin-left:6px;font-weight:700">이 브라우저만 · 비공개</span></div>
