@@ -836,6 +836,7 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
         <div class="chip" data-v="all">전체</div>
       </div>
       <div id="trend-fr-closure-caption" style="font-size:10px;color:var(--txt3);margin-bottom:8px;line-height:1.5">정규 = 백화점·아울렛·축제·박람회 <b>제외</b> · 회전율 = 정규폐점 / (신규+정규폐점) · <span style="color:#f87171">≥50% 위험</span> · <span style="color:#fbbf24">30~50% 주의</span></div>
+      <div style="font-size:9.5px;color:#fbbf24;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);border-radius:6px;padding:6px 9px;margin-bottom:8px;line-height:1.5">🏛️ <b>공정위 가맹사업 정보공개서 등록 brand만</b> 표시 · ⚠️ 2025년 이전 등록 매장은 폐업 정보가 일부만 표시될 수 있습니다 (행안부 데이터 갱신 정책)</div>
       <div id="trend-fr-closures"></div>
     </div>
     <!-- v17.14: 단기 운영 폐업 (≤90일) -->
@@ -3503,11 +3504,13 @@ function renderTrendCloseAnalysis(){
       if (bs.closed < 3) continue;
       var tot = bs.open + bs.closed;
       if (tot < 5) continue;
+      // v17.14.3: 공정위 등록 brand만
+      if (typeof isFranchiseRegistered === 'function' && !isFranchiseRegistered(bs.brand)) continue;
       bs.churn = Math.round(bs.closed/tot*100);
       bArr.push(bs);
     }
     bArr.sort(function(a,b){ if (b.churn !== a.churn) return b.churn - a.churn; return b.closed - a.closed; });
-    if (!bArr.length) churnEl.innerHTML = '<div style="color:var(--txt3);font-size:11px;text-align:center;padding:10px">폐업 3건 이상 brand 없음</div>';
+    if (!bArr.length) churnEl.innerHTML = '<div style="color:var(--txt3);font-size:11px;text-align:center;padding:10px">공정위 등록 폐업 brand 없음</div>';
     else {
       churnEl.innerHTML = bArr.slice(0,10).map(function(g,i){
         var c = g.churn > 60 ? '#f87171' : g.churn > 35 ? '#fbbf24' : '#34d399';
@@ -3565,8 +3568,12 @@ function renderFranchiseClosures(){
     bArr.sort(function(a,b){ return (b.total_closed - a.total_closed) || (b.churn_rate - a.churn_rate); });
     topList = bArr.slice(0, 10);
   }
+  // v17.14.3: 공정위 마스터 매칭 — 등록 brand만
+  if (typeof isFranchiseRegistered === 'function') {
+    topList = topList.filter(function(g){ return isFranchiseRegistered(g.brand); });
+  }
   var emptyLbl = useEvent ? '🎪 행사' : usePopup ? '🏬 팝업' : '정규';
-  if (!topList.length) { el.innerHTML = '<div style="color:var(--txt3);font-size:11px;text-align:center;padding:10px">' + emptyLbl + ' 폐점 3건 이상 brand 없음</div>'; return; }
+  if (!topList.length) { el.innerHTML = '<div style="color:var(--txt3);font-size:11px;text-align:center;padding:10px">공정위 등록 ' + emptyLbl + ' 폐점 brand 없음</div>'; return; }
   el.innerHTML = topList.slice(0, 10).map(function(g, i){
     var closedShown = useRegular ? (g.total_closed_regular||g.total_closed||0)
                      : usePopup ? (g.total_closed_popup||0)
@@ -3597,6 +3604,11 @@ function renderFranchiseClosures(){
       crisis += '<span style="font-size:9px;padding:1px 5px;background:rgba(167,139,250,0.18);color:#a78bfa;border-radius:4px;font-weight:700;margin-left:4px">🏬 ' + Math.round(g.popup_ratio) + '%</span>';
     } else if (useRegular && g.event_ratio >= 30) {
       crisis += '<span style="font-size:9px;padding:1px 5px;background:rgba(251,191,36,0.18);color:#fbbf24;border-radius:4px;font-weight:700;margin-left:4px">🎪 ' + Math.round(g.event_ratio) + '%</span>';
+    }
+    // v17.14.3: 🏛️ 공정위 매장수 chip
+    var frStores = (typeof franchiseStoreCount === 'function') ? franchiseStoreCount(g.brand) : 0;
+    if (frStores > 0) {
+      crisis += '<span style="font-size:9px;padding:1px 5px;background:rgba(125,211,252,0.12);color:#7dd3fc;border-radius:4px;font-weight:700;margin-left:4px">🏛️ 가맹 ' + frStores.toLocaleString() + '점</span>';
     }
     return '<div onclick="if(typeof openFrBrandModal===\'function\')openFrBrandModal(\'' + esc(g.brand).replace(/\'/g,"\\'") + '\')" style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(248,113,113,0.05);border:1px solid rgba(248,113,113,0.15);border-radius:8px;margin-bottom:5px;font-size:11.5px;cursor:pointer">'
       + '<div style="width:22px;font-weight:800;color:var(--txt3);text-align:center">' + (i+1) + '</div>'
@@ -3920,6 +3932,45 @@ function closeStoreWsModal(){
   window._wsMapStore = null;
 }
 
+// v17.14.3: 공정위 가맹사업 마스터 (11,579 brand)
+window.FRANCHISE_MASTER = null;
+window._franchiseSet = null;
+async function loadFranchiseMaster(){
+  try {
+    var r = await fetch('/data/franchise_master.json?t=' + Math.floor(Date.now()/3600000), { cache:'no-store' });
+    if (!r.ok) return;
+    window.FRANCHISE_MASTER = await r.json();
+    // compact key Set (빠른 매칭)
+    var s = {};
+    (window.FRANCHISE_MASTER.compact_lookup || []).forEach(function(k){ s[k] = 1; });
+    // 매장수 lookup (모달용)
+    var sl = {};
+    (window.FRANCHISE_MASTER.brands || []).forEach(function(b){
+      sl[b.name.replace(/\s+/g,'').toLowerCase()] = b.stores || 0;
+    });
+    window._franchiseSet = s;
+    window._franchiseStores = sl;
+    console.log('[franchise_master] loaded:', window.FRANCHISE_MASTER.total, 'brand');
+  } catch(e){ console.log('[franchise_master] load fail:', e.message); }
+}
+// brand가 공정위 등록인지
+function isFranchiseRegistered(brand){
+  if (!window._franchiseSet || !brand) return false;
+  var key = brand.replace(/\s+/g,'').toLowerCase();
+  if (window._franchiseSet[key]) return true;
+  // 부분 매칭 (BRAND_ALIASES와 비슷)
+  // 끝 4자 이상 일치하면 매칭 (역전할머니맥주 = 역전할머니맥주의정부점)
+  for (var k in window._franchiseSet) {
+    if (k.length >= 4 && (key.indexOf(k) === 0 || k.indexOf(key) === 0)) return true;
+  }
+  return false;
+}
+function franchiseStoreCount(brand){
+  if (!window._franchiseStores || !brand) return 0;
+  var key = brand.replace(/\s+/g,'').toLowerCase();
+  return window._franchiseStores[key] || 0;
+}
+
 // v17.11: 도매사 명부 (서울·경기·인천 361사 — admin 전용)
 window.WS_DATA = null;
 async function loadWholesalers(){
@@ -4045,7 +4096,7 @@ async function loadSnsTrend(){
   if (!listEl || !window.YTD || !window.YTD.by_brand) return;
   // 캐시 (1일 — buzz 데이터 빠르게 갱신)
   try {
-    var cached = localStorage.getItem('sewang_sns_trend_v17_14');
+    var cached = localStorage.getItem('sewang_sns_trend_v17_15');  // v17.13.2: cache bump (옛 401 fallback 폐기)
     if (cached) {
       var c = JSON.parse(cached);
       if (Date.now() - (c.ts||0) < 86400 * 1000 && c.brands) {
@@ -4152,7 +4203,7 @@ async function loadSnsTrend(){
     return b.score - a.score;
   });
   var top5 = results.slice(0, 5);
-  try { localStorage.setItem('sewang_sns_trend_v17_14', JSON.stringify({ ts: Date.now(), brands: top5 })); } catch(e){}
+  try { localStorage.setItem('sewang_sns_trend_v17_15', JSON.stringify({ ts: Date.now(), brands: top5 })); } catch(e){}
   renderSnsTrendList(top5);
 }
 
@@ -4199,7 +4250,7 @@ function renderSnsTrendList(brands){
 // v17.13: 화제성 근거 모달
 window._snsModalBrand = null;
 function openSnsModal(brand){
-  var cacheStr = localStorage.getItem('sewang_sns_trend_v17_14');
+  var cacheStr = localStorage.getItem('sewang_sns_trend_v17_15');
   if (!cacheStr) return;
   var c; try { c = JSON.parse(cacheStr); } catch(e){ return; }
   var b = (c.brands || []).find(function(x){ return x.brand === brand; });
@@ -4962,6 +5013,7 @@ function init(){
   loadSnsBuzz();      // v17.13 Phase 2: Apify 인스타 화제성 (data/sns_buzz.json)
   loadSumtrendBuzz(); // v17.13 Phase 2.5: 썸트렌드 SNS 언급량 (data/sumtrend_buzz.json)
   loadWholesalers();  // v17.11: 도매사 명부 361사 (admin 전용)
+  loadFranchiseMaster();  // v17.14.3: 공정위 가맹사업 마스터 11,579 brand
   setTimeout(function(){ try { renderCustomers(); } catch(e){} }, 100); // v14 거래처 (localStorage)
   if (ST.trend30 && ST.trend30.stores) {
     ST.trend30.stores = ST.trend30.stores.filter(function(s){ return !isExcluded(s); });
