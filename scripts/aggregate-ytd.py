@@ -29,6 +29,15 @@ def is_excluded(name, upte, addr=''):
         a = addr.lower()
         if any(k.lower() in a for k in EXCLUDE_ADDR_KEYWORDS): return True
     return False
+
+# v17.14.1: 백화점·복합몰 = 「팝업 폐업」 분류 (제외 X, 분류만)
+POPUP_ADDR_KEYWORDS = [k.lower() for k in EXCLUDE_ADDR_KEYWORDS] + [
+    '면세점','면세', 'duty free',
+]
+def is_popup_addr(addr):
+    if not addr: return False
+    a = addr.lower()
+    return any(k in a for k in POPUP_ADDR_KEYWORDS)
 def is_closed(status):
     return any(k in (status or '') for k in ['폐업','취소','말소','중지','휴업'])
 def brand_of(name):
@@ -138,11 +147,13 @@ for month, stores in months.items():
     }
 
 # brand별 월별 신규/폐업 — v17.14: 폐업도 brand 그룹화하기 위해 all_stores 대상
+# v17.14.1: 폐업을 「정규」 vs 「팝업」 분리 (주소 기반)
 brand_data = defaultdict(lambda: {
-    'total_open': 0, 'total_closed': 0, 'total_short_closed': 0,
-    'operating_days_list': [],  # 운영기간 통계
-    'closed_by_sido': Counter(),
-    'monthly': defaultdict(lambda: {'open': 0, 'closed': 0, 'stores': []})
+    'total_open': 0, 'total_closed': 0, 'total_closed_regular': 0, 'total_closed_popup': 0,
+    'total_short_closed': 0,
+    'operating_days_list': [],
+    'closed_by_sido': Counter(), 'closed_regular_by_sido': Counter(),
+    'monthly': defaultdict(lambda: {'open': 0, 'closed': 0, 'closed_regular': 0, 'closed_popup': 0, 'stores': []})
 })
 for s in all_stores:
     b = brand_of(s.get('name',''))
@@ -151,38 +162,38 @@ for s in all_stores:
     if not pd: continue
     closed = is_closed(s.get('status',''))
     excluded = is_excluded(s.get('name',''), s.get('upte',''), s.get('addr',''))
+    popup = is_popup_addr(s.get('addr',''))
     bd = brand_data[b]
     if closed:
-        # 폐업은 EXCLUDE 적용 안함 — 모든 폐업 카운트
         bd['total_closed'] += 1
         bd['monthly'][pd]['closed'] += 1
         bd['closed_by_sido'][sido_short(s.get('addr',''))] += 1
+        if popup:
+            bd['total_closed_popup'] += 1
+            bd['monthly'][pd]['closed_popup'] += 1
+        else:
+            bd['total_closed_regular'] += 1
+            bd['monthly'][pd]['closed_regular'] += 1
+            bd['closed_regular_by_sido'][sido_short(s.get('addr',''))] += 1
         d = operating_days(s)
         if d is not None:
             bd['operating_days_list'].append(d)
             if d <= 90: bd['total_short_closed'] += 1
     else:
-        # 신규는 EXCLUDE 적용
         if excluded: continue
         bd['total_open'] += 1
         bd['monthly'][pd]['open'] += 1
-    # 매장 list — 최대 30개 (폐업 포함)
     if len(bd['monthly'][pd]['stores']) < 30:
         bd['monthly'][pd]['stores'].append({
-            'id': s.get('id'),
-            'name': s.get('name'),
-            'addr': s.get('addr',''),
-            'permitDate': s.get('permitDate'),
-            'closedDate': s.get('closedDate',''),
-            'status': s.get('status',''),
-            'closed': closed,
+            'id': s.get('id'), 'name': s.get('name'), 'addr': s.get('addr',''),
+            'permitDate': s.get('permitDate'), 'closedDate': s.get('closedDate',''),
+            'status': s.get('status',''), 'closed': closed, 'popup': popup,
             'opDays': operating_days(s) if closed else None,
-            'type': s.get('type',''),
-            'typeLabel': s.get('typeLabel',''),
+            'type': s.get('type',''), 'typeLabel': s.get('typeLabel',''),
             'upte': s.get('upte',''),
         })
 
-# brand 데이터 정리 + 회전율 계산
+# brand 데이터 정리 + 회전율 계산 (정규 기준)
 for brand, data in brand_data.items():
     if data['total_open'] + data['total_closed'] < 1: continue
     monthly = {}
@@ -190,36 +201,60 @@ for brand, data in brand_data.items():
         v['stores'].sort(key=lambda x: x.get('permitDate',''), reverse=True)
         monthly[m] = v
     total = data['total_open'] + data['total_closed']
+    total_reg = data['total_open'] + data['total_closed_regular']
     op_days = data['operating_days_list']
     summary['by_brand'][brand] = {
         'total_open': data['total_open'],
         'total_closed': data['total_closed'],
+        'total_closed_regular': data['total_closed_regular'],  # v17.14.1
+        'total_closed_popup': data['total_closed_popup'],      # v17.14.1
         'total_short_closed': data['total_short_closed'],
-        'churn_rate': round(data['total_closed'] / total * 100, 1) if total else 0,  # v17.14
+        # v17.14.1: 회전율은 「정규」 기준 (사장님 의도 — brand 위기 신호)
+        'churn_rate': round(data['total_closed'] / total * 100, 1) if total else 0,
+        'churn_rate_regular': round(data['total_closed_regular'] / total_reg * 100, 1) if total_reg else 0,
+        'popup_ratio': round(data['total_closed_popup'] / data['total_closed'] * 100, 1) if data['total_closed'] else 0,
         'avg_op_days': round(sum(op_days)/len(op_days)) if op_days else None,
         'median_op_days': sorted(op_days)[len(op_days)//2] if op_days else None,
         'closed_by_sido': dict(data['closed_by_sido'].most_common(8)),
+        'closed_regular_by_sido': dict(data['closed_regular_by_sido'].most_common(8)),
         'monthly': monthly,
     }
 
-# v17.14: 프랜차이즈 폐점 TOP — 폐점 ≥ 3건 OR 회전율 ≥ 30% 인 brand
+# v17.14.1: 프랜차이즈 폐점 TOP — 정규/팝업 분리 + 두 가지 list 제공
 franchise_closures = []
 for b, v in summary['by_brand'].items():
     if len(b) < 2 or len(b) > 30: continue
-    if re.search(r'\d{4,}', b): continue  # 연도 노이즈
+    if re.search(r'\d{4,}', b): continue
     closed = v.get('total_closed', 0)
-    if closed < 3: continue  # 최소 3건
+    if closed < 3: continue
     franchise_closures.append({
         'brand': b,
         'total_open': v.get('total_open', 0),
         'total_closed': closed,
+        'total_closed_regular': v.get('total_closed_regular', 0),
+        'total_closed_popup': v.get('total_closed_popup', 0),
         'churn_rate': v.get('churn_rate', 0),
+        'churn_rate_regular': v.get('churn_rate_regular', 0),
+        'popup_ratio': v.get('popup_ratio', 0),
         'total_short_closed': v.get('total_short_closed', 0),
         'avg_op_days': v.get('avg_op_days'),
         'top_sido': list(v.get('closed_by_sido', {}).items())[:3],
+        'top_sido_regular': list(v.get('closed_regular_by_sido', {}).items())[:3],
     })
-franchise_closures.sort(key=lambda x: (-x['total_closed'], -x['churn_rate']))
-summary['closure_analysis']['top_franchise_closures'] = franchise_closures[:30]
+# v17.14.1: 「정규 기준」 = 사장님 핵심 의도 (brand 위기 신호)
+top_regular = [c for c in franchise_closures if c['total_closed_regular'] >= 3]
+top_regular.sort(key=lambda x: (-x['total_closed_regular'], -x['churn_rate_regular']))
+summary['closure_analysis']['top_franchise_closures'] = top_regular[:30]  # 정규 기준 (default)
+# 「전체 폐점」 별도 list
+top_all = sorted(franchise_closures, key=lambda x: (-x['total_closed'], -x['churn_rate']))
+summary['closure_analysis']['top_franchise_closures_all'] = top_all[:30]
+# 「팝업 폐점」 별도 list (백화점 한시 운영)
+top_popup = [c for c in franchise_closures if c['total_closed_popup'] >= 3]
+top_popup.sort(key=lambda x: -x['total_closed_popup'])
+summary['closure_analysis']['top_franchise_closures_popup'] = top_popup[:30]
+# 요약 통계
+summary['closure_analysis']['total_closed_regular'] = sum(v.get('total_closed_regular', 0) for v in summary['by_brand'].values())
+summary['closure_analysis']['total_closed_popup'] = sum(v.get('total_closed_popup', 0) for v in summary['by_brand'].values())
 
 # v17.14: 단기 폐업 (≤90일) 통계
 short_term_closures = []
