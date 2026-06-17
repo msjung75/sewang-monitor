@@ -1,11 +1,14 @@
 name: Nightly YTD Incremental
 # v16.8: 다중 schedule (GitHub Actions silent skip 방어)
+# v17.14.4: 18:00/19:00 KST 추가 — 행안부 평일 publish (16~19시) 즉시 fetch
 on:
   schedule:
     - cron: '15 19 * * *'   # 04:15 KST (메인)
     - cron: '0 21 * * *'    # 06:00 KST (1차 재시도)
     - cron: '0 23 * * *'    # 08:00 KST (2차 재시도)
     - cron: '0 1 * * *'     # 10:00 KST (3차 재시도)
+    - cron: '0 9 * * *'     # 18:00 KST — 행안부 publish 직후 즉시 fetch
+    - cron: '0 10 * * *'    # 19:00 KST — publish 재시도 (watchdog)
   workflow_dispatch:
 
 permissions:
