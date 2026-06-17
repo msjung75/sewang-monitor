@@ -1,0 +1,86 @@
+name: monthly-franchise-master
+# v17.14.3 — 공정위 가맹사업 정보공개서 마스터 갱신 (매월 1일 04:00 KST)
+on:
+  schedule:
+    - cron: '0 19 1 * *'   # 매월 1일 04:00 KST
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  fetch-master:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch franchise master via Vercel proxy (12 pages)
+        run: |
+          python3 << 'PYEOF'
+          import json, urllib.request, time, re, os
+          all_brands = []
+          all_compact = {}
+          for page in range(1, 13):
+              url = f'https://sewang-monitor.vercel.app/api/auth/kakao?action=franchise_stats&page={page}&rows=1000'
+              try:
+                  r = urllib.request.urlopen(url, timeout=30)
+                  d = json.loads(r.read())
+                  for it in d.get('items', []):
+                      name = (it.get('n') or '').strip()
+                      stores = it.get('f', 0) or 0
+                      if not name: continue
+                      name_clean = re.sub(r'\s*\d{4}\s*$', '', name).strip()
+                      compact = re.sub(r'\s+', '', name_clean).lower()
+                      if compact not in all_compact:
+                          all_compact[compact] = True
+                          all_brands.append({'name': name_clean, 'stores': stores})
+                  print(f'page {page}: total unique {len(all_brands)}')
+                  time.sleep(0.3)
+              except Exception as e:
+                  print(f'page {page} err: {e}'); break
+          import datetime
+          out = {
+              'updated': datetime.datetime.utcnow().isoformat() + 'Z',
+              'source': '공정거래위원회 가맹사업 정보공개서',
+              'total': len(all_brands),
+              'compact_lookup': list(all_compact.keys()),
+              'brands': all_brands,
+          }
+          os.makedirs('data', exist_ok=True)
+          with open('data/franchise_master.json', 'w', encoding='utf-8') as f:
+              json.dump(out, f, ensure_ascii=False, separators=(',',':'))
+          print(f'✅ {len(all_brands)} brands saved')
+          PYEOF
+      - name: Commit via Contents API
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          python3 << 'PYEOF'
+          import base64, json, os, time, urllib.request, urllib.error
+          token = os.environ['GH_TOKEN']
+          repo = os.environ['REPO']
+          path = 'data/franchise_master.json'
+          api = f'https://api.github.com/repos/{repo}/contents/{path}'
+          headers = {'Authorization': f'Bearer {token}', 'Accept': 'application/vnd.github+json', 'User-Agent': 'fr-master'}
+          with open(path, 'rb') as f:
+              content_b64 = base64.b64encode(f.read()).decode('ascii')
+          def get_sha():
+              try:
+                  req = urllib.request.Request(api, headers=headers)
+                  with urllib.request.urlopen(req) as r: return json.loads(r.read()).get('sha','')
+              except: return ''
+          sha = get_sha()
+          for attempt in range(3):
+              body = {'message': f'[skip ci] 공정위 가맹 마스터 monthly update', 'content': content_b64}
+              if sha: body['sha'] = sha
+              data = json.dumps(body).encode()
+              req = urllib.request.Request(api, data=data, headers={**headers,'Content-Type':'application/json'}, method='PUT')
+              try:
+                  with urllib.request.urlopen(req) as r:
+                      print(f'✅ committed attempt {attempt+1}'); break
+              except urllib.error.HTTPError as e:
+                  print(f'attempt {attempt+1}: {e.code}')
+                  if e.code == 409: time.sleep(3); sha = get_sha()
+                  else: time.sleep(3)
+          else: raise SystemExit(1)
+          PYEOF
