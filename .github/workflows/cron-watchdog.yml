@@ -1,9 +1,11 @@
 name: Cron Watchdog (자가 치유)
 # v16.8: 매일 11:00 KST에 「오늘 데이터 있나?」 점검 + 누락 시 자동 트리거
+# v17.14.4: 19:30 KST 추가 — 행안부 publish (16~19시 KST) 직후 점검
 on:
   schedule:
     - cron: '0 2 * * *'    # 매일 11:00 KST
     - cron: '0 5 * * *'    # 매일 14:00 KST (재확인)
+    - cron: '30 10 * * *'  # 매일 19:30 KST — 행안부 publish 직후 점검
   workflow_dispatch:
 
 permissions:
