@@ -2,9 +2,12 @@ name: nightly-trend30
 on:
   schedule:
     # v16.8: 다중 schedule (silent skip 방어)
+    # v17.14.4: 18:00/19:00 KST 추가 — 행안부 평일 publish (16~19시) 즉시 fetch
     - cron: '0 19 * * *'    # 04:00 KST (메인)
     - cron: '30 21 * * *'   # 06:30 KST (재시도)
     - cron: '30 23 * * *'   # 08:30 KST (재시도)
+    - cron: '0 9 * * *'     # 18:00 KST — 행안부 publish 직후
+    - cron: '0 10 * * *'    # 19:00 KST — publish 재시도
   workflow_dispatch: {}
 
 jobs:
