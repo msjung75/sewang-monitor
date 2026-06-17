@@ -830,11 +830,12 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
     <div style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(248,113,113,0.15)">
       <div style="font-size:11.5px;color:var(--txt2);margin-bottom:8px;font-weight:700">⚠️ 프랜차이즈 폐점 TOP 10 <span style="color:var(--txt3);font-size:9.5px;font-weight:500;margin-left:6px">brand 클릭 → 상세</span></div>
       <div class="chips" id="chip-fr-closure-mode" style="margin-bottom:8px">
-        <div class="chip on" data-v="regular">정규 폐점 <span style="opacity:0.6;font-size:9px">(brand 위기)</span></div>
-        <div class="chip" data-v="popup">팝업 폐점 <span style="opacity:0.6;font-size:9px">(백화점·한시)</span></div>
+        <div class="chip on" data-v="regular">✅ 정규 <span style="opacity:0.6;font-size:9px">(brand 위기)</span></div>
+        <div class="chip" data-v="popup">🏬 팝업 <span style="opacity:0.6;font-size:9px">(백화점)</span></div>
+        <div class="chip" data-v="event">🎪 행사 <span style="opacity:0.6;font-size:9px">(축제·박람회)</span></div>
         <div class="chip" data-v="all">전체</div>
       </div>
-      <div id="trend-fr-closure-caption" style="font-size:10px;color:var(--txt3);margin-bottom:8px;line-height:1.5">정규 폐점 = 백화점·아울렛·면세점 제외 폐업 · 회전율 = 정규폐점 / (신규+정규폐점) · <span style="color:#f87171">≥50% 위험</span> · <span style="color:#fbbf24">30~50% 주의</span></div>
+      <div id="trend-fr-closure-caption" style="font-size:10px;color:var(--txt3);margin-bottom:8px;line-height:1.5">정규 = 백화점·아울렛·축제·박람회 <b>제외</b> · 회전율 = 정규폐점 / (신규+정규폐점) · <span style="color:#f87171">≥50% 위험</span> · <span style="color:#fbbf24">30~50% 주의</span></div>
       <div id="trend-fr-closures"></div>
     </div>
     <!-- v17.14: 단기 운영 폐업 (≤90일) -->
@@ -3444,10 +3445,11 @@ function renderTrendCloseAnalysis(){
     var caSum = window.YTD && window.YTD.closure_analysis;
     var reg = caSum ? (caSum.total_closed_regular||0) : 0;
     var pop = caSum ? (caSum.total_closed_popup||0) : 0;
-    var splitHtml = (reg || pop)
-      ? ' · <span style="color:#34d399">정규 ' + reg.toLocaleString() + '</span> + <span style="color:#a78bfa">🏬 팝업 ' + pop.toLocaleString() + '</span>'
+    var evt = caSum ? (caSum.total_closed_event||0) : 0;
+    var splitHtml = (reg || pop || evt)
+      ? '<br><span style="color:#34d399">✅ 정규 ' + reg.toLocaleString() + '</span> + <span style="color:#a78bfa">🏬 팝업 ' + pop.toLocaleString() + '</span> + <span style="color:#fbbf24">🎪 행사 ' + evt.toLocaleString() + '</span>'
       : '';
-    sumEl.innerHTML = '올해 누적 <b style="color:#f87171">' + totalClose.toLocaleString() + '</b>건 폐업' + splitHtml + ' (월평균 ' + Math.round(totalClose/6).toLocaleString() + ')';
+    sumEl.innerHTML = '올해 누적 <b style="color:#f87171">' + totalClose.toLocaleString() + '</b>건 폐업 (월평균 ' + Math.round(totalClose/6).toLocaleString() + ')' + splitHtml;
   }
   // 월별 폐업 stack
   var monthEl = document.getElementById('trend-close-month');
@@ -3529,18 +3531,22 @@ function renderFranchiseClosures(){
   var capEl = document.getElementById('trend-fr-closure-caption');
   if (!el) return;
   // 모드별 list + 카운트 컬럼 결정
-  var topList = null, useRegular = false, usePopup = false;
+  var topList = null, useRegular = false, usePopup = false, useEvent = false;
   if (mode === 'popup') {
     topList = ca && ca.top_franchise_closures_popup;
     usePopup = true;
-    if (capEl) capEl.innerHTML = '팝업 폐점 = 백화점·아울렛·면세점 주소 매장 · 한시적 운영 패턴 (진짜 brand 위기 X)';
+    if (capEl) capEl.innerHTML = '🏬 팝업 폐점 = 백화점·아울렛·면세점·하나로마트 주소 매장 (한시 운영 패턴, brand 위기 X)';
+  } else if (mode === 'event') {
+    topList = ca && ca.top_franchise_closures_event;
+    useEvent = true;
+    if (capEl) capEl.innerHTML = '🎪 행사 폐점 = 축제·박람회·박물관·전시장·체육관·체험관·임시 주소/매장명 매장 (지방 행사 한시 매장)';
   } else if (mode === 'all') {
     topList = ca && ca.top_franchise_closures_all;
-    if (capEl) capEl.innerHTML = '전체 폐점 = 정규 + 팝업 합산 · 회전율 = 전체폐점 / (신규+전체폐점)';
+    if (capEl) capEl.innerHTML = '전체 폐점 = 정규 + 팝업 + 행사 합산 · 회전율 = 전체폐점 / (신규+전체폐점)';
   } else {
     topList = ca && ca.top_franchise_closures;
     useRegular = true;
-    if (capEl) capEl.innerHTML = '정규 폐점 = 백화점·아울렛·면세점 <b>제외</b> 폐업 (사장님 의도) · 회전율 = 정규폐점 / (신규+정규폐점) · <span style="color:#f87171">≥50% 위험</span> · <span style="color:#fbbf24">30~50% 주의</span>';
+    if (capEl) capEl.innerHTML = '✅ 정규 폐점 = 백화점·아울렛·축제·박람회 <b>제외</b> (사장님 의도) · 회전율 = 정규폐점 / (신규+정규폐점) · <span style="color:#f87171">≥50% 위험</span> · <span style="color:#fbbf24">30~50% 주의</span>';
   }
   if (!topList || !topList.length) {
     // Fallback (v17.5 schema)
@@ -3559,17 +3565,22 @@ function renderFranchiseClosures(){
     bArr.sort(function(a,b){ return (b.total_closed - a.total_closed) || (b.churn_rate - a.churn_rate); });
     topList = bArr.slice(0, 10);
   }
-  if (!topList.length) { el.innerHTML = '<div style="color:var(--txt3);font-size:11px;text-align:center;padding:10px">' + (usePopup ? '팝업' : '정규') + ' 폐점 3건 이상 brand 없음</div>'; return; }
+  var emptyLbl = useEvent ? '🎪 행사' : usePopup ? '🏬 팝업' : '정규';
+  if (!topList.length) { el.innerHTML = '<div style="color:var(--txt3);font-size:11px;text-align:center;padding:10px">' + emptyLbl + ' 폐점 3건 이상 brand 없음</div>'; return; }
   el.innerHTML = topList.slice(0, 10).map(function(g, i){
     var closedShown = useRegular ? (g.total_closed_regular||g.total_closed||0)
                      : usePopup ? (g.total_closed_popup||0)
+                     : useEvent ? (g.total_closed_event||0)
                      : (g.total_closed||0);
     var churn = useRegular ? (g.churn_rate_regular||0) : (g.churn_rate||0);
     var c = churn >= 50 ? '#f87171' : churn >= 30 ? '#fbbf24' : '#34d399';
-    // 팝업 비중 경고 — 정규 mode에서 팝업 폐점도 ≥3건 있으면 분리 표시
+    // 정규 mode에서 팝업/행사 별도 표시
     var split = '';
-    if (useRegular && g.total_closed_popup && g.total_closed_popup >= 3) {
-      split = '<div style="font-size:8.5px;color:#a78bfa;margin-top:2px">+ 팝업 ' + g.total_closed_popup + '건</div>';
+    if (useRegular) {
+      var parts = [];
+      if (g.total_closed_popup >= 3) parts.push('🏬' + g.total_closed_popup);
+      if (g.total_closed_event >= 3) parts.push('🎪' + g.total_closed_event);
+      if (parts.length) split = '<div style="font-size:8.5px;color:#a78bfa;margin-top:2px">+ ' + parts.join(' / ') + '</div>';
     }
     // SNS 위기 신호
     var stData = (typeof sumtrendOf === 'function') ? sumtrendOf(g.brand) : null;
@@ -3579,9 +3590,13 @@ function renderFranchiseClosures(){
     } else if (stData && typeof stData.growth_3m_pct === 'number' && stData.growth_3m_pct >= 50) {
       crisis = '<span style="font-size:9px;padding:1px 5px;background:rgba(52,211,153,0.18);color:#34d399;border-radius:4px;font-weight:700;margin-left:4px">🔥 SNS↑</span>';
     }
-    // 팝업 비중 경고 chip (정규 mode에서 팝업비중 ≥50%이면)
-    if (useRegular && g.popup_ratio >= 50) {
-      crisis += '<span style="font-size:9px;padding:1px 5px;background:rgba(167,139,250,0.18);color:#a78bfa;border-radius:4px;font-weight:700;margin-left:4px">🏬 팝업 ' + Math.round(g.popup_ratio) + '%</span>';
+    // v17.14.2: 한시 매장 통합 chip (팝업+행사 ≥50%면 신뢰도 경고)
+    if (useRegular && g.transient_ratio >= 50) {
+      crisis += '<span style="font-size:9px;padding:1px 5px;background:rgba(248,113,113,0.18);color:#f87171;border-radius:4px;font-weight:700;margin-left:4px">⚠️ 한시 ' + Math.round(g.transient_ratio) + '%</span>';
+    } else if (useRegular && g.popup_ratio >= 50) {
+      crisis += '<span style="font-size:9px;padding:1px 5px;background:rgba(167,139,250,0.18);color:#a78bfa;border-radius:4px;font-weight:700;margin-left:4px">🏬 ' + Math.round(g.popup_ratio) + '%</span>';
+    } else if (useRegular && g.event_ratio >= 30) {
+      crisis += '<span style="font-size:9px;padding:1px 5px;background:rgba(251,191,36,0.18);color:#fbbf24;border-radius:4px;font-weight:700;margin-left:4px">🎪 ' + Math.round(g.event_ratio) + '%</span>';
     }
     return '<div onclick="if(typeof openFrBrandModal===\'function\')openFrBrandModal(\'' + esc(g.brand).replace(/\'/g,"\\'") + '\')" style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(248,113,113,0.05);border:1px solid rgba(248,113,113,0.15);border-radius:8px;margin-bottom:5px;font-size:11.5px;cursor:pointer">'
       + '<div style="width:22px;font-weight:800;color:var(--txt3);text-align:center">' + (i+1) + '</div>'
