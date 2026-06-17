@@ -826,10 +826,15 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
     <div id="trend-close-sido" style="margin-bottom:14px"></div>
     <div style="font-size:11px;color:var(--txt3);margin-bottom:6px;font-weight:700">🔄 회전율 TOP brand (폐/(신+폐))</div>
     <div id="trend-close-churn"></div>
-    <!-- v17.14: 프랜차이즈 폐점 TOP 10 (사장님 핵심 요청) -->
+    <!-- v17.14.1: 프랜차이즈 폐점 TOP 10 (정규/팝업/전체 토글) -->
     <div style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(248,113,113,0.15)">
       <div style="font-size:11.5px;color:var(--txt2);margin-bottom:8px;font-weight:700">⚠️ 프랜차이즈 폐점 TOP 10 <span style="color:var(--txt3);font-size:9.5px;font-weight:500;margin-left:6px">brand 클릭 → 상세</span></div>
-      <div style="font-size:10px;color:var(--txt3);margin-bottom:8px;line-height:1.5">회전율 = 폐점 / (신규+폐점) · <span style="color:#f87171">≥50% 위험</span> · <span style="color:#fbbf24">30~50% 주의</span></div>
+      <div class="chips" id="chip-fr-closure-mode" style="margin-bottom:8px">
+        <div class="chip on" data-v="regular">정규 폐점 <span style="opacity:0.6;font-size:9px">(brand 위기)</span></div>
+        <div class="chip" data-v="popup">팝업 폐점 <span style="opacity:0.6;font-size:9px">(백화점·한시)</span></div>
+        <div class="chip" data-v="all">전체</div>
+      </div>
+      <div id="trend-fr-closure-caption" style="font-size:10px;color:var(--txt3);margin-bottom:8px;line-height:1.5">정규 폐점 = 백화점·아울렛·면세점 제외 폐업 · 회전율 = 정규폐점 / (신규+정규폐점) · <span style="color:#f87171">≥50% 위험</span> · <span style="color:#fbbf24">30~50% 주의</span></div>
       <div id="trend-fr-closures"></div>
     </div>
     <!-- v17.14: 단기 운영 폐업 (≤90일) -->
@@ -3140,7 +3145,7 @@ document.querySelectorAll('.bnav-btn').forEach(function(btn){
   btn.addEventListener('click', function(){ switchPage(btn.dataset.pg); });
 });
 
-['chip-days','chip-region','chip-type','chip-nstat','chip-gold-sort','chip-track','chip-track-sort','chip-fr-kind','chip-fr-source','chip-map-mode','chip-map-cat','chip-trend-cat','chip-ws-sido'].forEach(function(id){
+['chip-days','chip-region','chip-type','chip-nstat','chip-gold-sort','chip-track','chip-track-sort','chip-fr-kind','chip-fr-source','chip-map-mode','chip-map-cat','chip-trend-cat','chip-ws-sido','chip-fr-closure-mode'].forEach(function(id){
   document.querySelectorAll('#' + id + ' .chip').forEach(function(c){
     c.addEventListener('click', function(){
       document.querySelectorAll('#' + id + ' .chip').forEach(function(x){ x.classList.remove('on'); });
@@ -3149,6 +3154,7 @@ document.querySelectorAll('.bnav-btn').forEach(function(btn){
       else if (id === 'chip-gold-sort') renderGold();
       else if (id === 'chip-track' || id === 'chip-track-sort') renderTracked();
       else if (id === 'chip-ws-sido') renderWholesalers();
+      else if (id === 'chip-fr-closure-mode') { try { renderFranchiseClosures(); } catch(e){} }
       else if (id === 'chip-fr-kind' || id === 'chip-fr-source') { FR_SELECTED = null; renderFr(); }
       else if (id === 'chip-trend-cat') renderTrendTab();
       else if (id === 'chip-map-cat' || id === 'chip-map-mode') renderMapSidoStats();
@@ -3432,9 +3438,17 @@ function renderTrendCloseAnalysis(){
       }
     }
   }
-  // 요약
+  // 요약 — v17.14.1: 정규/팝업 분리 stamp
   var sumEl = document.getElementById('trend-close-summary');
-  if (sumEl) sumEl.innerHTML = '올해 누적 <b style="color:#f87171">' + totalClose.toLocaleString() + '</b>건 폐업 (월평균 ' + Math.round(totalClose/6).toLocaleString() + ')';
+  if (sumEl) {
+    var caSum = window.YTD && window.YTD.closure_analysis;
+    var reg = caSum ? (caSum.total_closed_regular||0) : 0;
+    var pop = caSum ? (caSum.total_closed_popup||0) : 0;
+    var splitHtml = (reg || pop)
+      ? ' · <span style="color:#34d399">정규 ' + reg.toLocaleString() + '</span> + <span style="color:#a78bfa">🏬 팝업 ' + pop.toLocaleString() + '</span>'
+      : '';
+    sumEl.innerHTML = '올해 누적 <b style="color:#f87171">' + totalClose.toLocaleString() + '</b>건 폐업' + splitHtml + ' (월평균 ' + Math.round(totalClose/6).toLocaleString() + ')';
+  }
   // 월별 폐업 stack
   var monthEl = document.getElementById('trend-close-month');
   if (monthEl) {
@@ -3507,15 +3521,29 @@ function renderTrendCloseAnalysis(){
   try { renderFranchiseClosures(); } catch(e){ console.log('[v17.14] fr closures err', e); }
 }
 
-// v17.14: 프랜차이즈 폐점 TOP 10 (사장님 핵심 요청 — 회전율·SNS 위기 신호)
+// v17.14.1: 프랜차이즈 폐점 TOP 10 (정규/팝업/전체 모드)
 function renderFranchiseClosures(){
   var ca = window.YTD && (window.YTD.closure_analysis || window.YTD.closureAnalysis);
-  // server-side aggregate가 아직 옛 schema (v17.5)일 수 있어, 클라이언트에서도 fallback 계산
-  var topList = ca && ca.top_franchise_closures;
+  var mode = (typeof activeChip === 'function') ? (activeChip('chip-fr-closure-mode') || 'regular') : 'regular';
   var el = document.getElementById('trend-fr-closures');
+  var capEl = document.getElementById('trend-fr-closure-caption');
   if (!el) return;
+  // 모드별 list + 카운트 컬럼 결정
+  var topList = null, useRegular = false, usePopup = false;
+  if (mode === 'popup') {
+    topList = ca && ca.top_franchise_closures_popup;
+    usePopup = true;
+    if (capEl) capEl.innerHTML = '팝업 폐점 = 백화점·아울렛·면세점 주소 매장 · 한시적 운영 패턴 (진짜 brand 위기 X)';
+  } else if (mode === 'all') {
+    topList = ca && ca.top_franchise_closures_all;
+    if (capEl) capEl.innerHTML = '전체 폐점 = 정규 + 팝업 합산 · 회전율 = 전체폐점 / (신규+전체폐점)';
+  } else {
+    topList = ca && ca.top_franchise_closures;
+    useRegular = true;
+    if (capEl) capEl.innerHTML = '정규 폐점 = 백화점·아울렛·면세점 <b>제외</b> 폐업 (사장님 의도) · 회전율 = 정규폐점 / (신규+정규폐점) · <span style="color:#f87171">≥50% 위험</span> · <span style="color:#fbbf24">30~50% 주의</span>';
+  }
   if (!topList || !topList.length) {
-    // Fallback — 기존 brandStats를 사용 (회전율 기반)
+    // Fallback (v17.5 schema)
     if (!window.YTD || !window.YTD.by_brand) { el.innerHTML = '<div style="color:var(--txt3);font-size:11px;text-align:center;padding:10px">데이터 없음</div>'; return; }
     var bArr = [];
     for (var b in window.YTD.by_brand) {
@@ -3526,30 +3554,43 @@ function renderFranchiseClosures(){
       if (/\d{4,}/.test(alias)) continue;
       var open = v.total_open || 0, closed = v.total_closed || 0;
       if (closed < 3) continue;
-      var total = open + closed;
-      bArr.push({ brand: alias, open: open, closed: closed, churn: Math.round(closed/total*100) });
+      bArr.push({ brand: alias, total_open: open, total_closed: closed, churn_rate: Math.round(closed/(open+closed)*100) });
     }
-    bArr.sort(function(a,b){ return (b.closed - a.closed) || (b.churn - a.churn); });
-    topList = bArr.slice(0, 10).map(function(g){
-      return { brand: g.brand, total_open: g.open, total_closed: g.closed, churn_rate: g.churn };
-    });
+    bArr.sort(function(a,b){ return (b.total_closed - a.total_closed) || (b.churn_rate - a.churn_rate); });
+    topList = bArr.slice(0, 10);
   }
-  if (!topList.length) { el.innerHTML = '<div style="color:var(--txt3);font-size:11px;text-align:center;padding:10px">폐점 3건 이상 brand 없음</div>'; return; }
+  if (!topList.length) { el.innerHTML = '<div style="color:var(--txt3);font-size:11px;text-align:center;padding:10px">' + (usePopup ? '팝업' : '정규') + ' 폐점 3건 이상 brand 없음</div>'; return; }
   el.innerHTML = topList.slice(0, 10).map(function(g, i){
-    var c = g.churn_rate >= 50 ? '#f87171' : g.churn_rate >= 30 ? '#fbbf24' : '#34d399';
-    // SNS 위기 신호 — 썸트렌드 growth ≤ 0 이고 폐점 ≥ 5건이면 ⚠️
+    var closedShown = useRegular ? (g.total_closed_regular||g.total_closed||0)
+                     : usePopup ? (g.total_closed_popup||0)
+                     : (g.total_closed||0);
+    var churn = useRegular ? (g.churn_rate_regular||0) : (g.churn_rate||0);
+    var c = churn >= 50 ? '#f87171' : churn >= 30 ? '#fbbf24' : '#34d399';
+    // 팝업 비중 경고 — 정규 mode에서 팝업 폐점도 ≥3건 있으면 분리 표시
+    var split = '';
+    if (useRegular && g.total_closed_popup && g.total_closed_popup >= 3) {
+      split = '<div style="font-size:8.5px;color:#a78bfa;margin-top:2px">+ 팝업 ' + g.total_closed_popup + '건</div>';
+    }
+    // SNS 위기 신호
     var stData = (typeof sumtrendOf === 'function') ? sumtrendOf(g.brand) : null;
     var crisis = '';
-    if (stData && typeof stData.growth_3m_pct === 'number' && stData.growth_3m_pct <= 0 && g.total_closed >= 5) {
+    if (stData && typeof stData.growth_3m_pct === 'number' && stData.growth_3m_pct <= 0 && closedShown >= 5) {
       crisis = '<span style="font-size:9px;padding:1px 5px;background:rgba(248,113,113,0.18);color:#f87171;border-radius:4px;font-weight:700;margin-left:4px">⚠️ SNS↓</span>';
     } else if (stData && typeof stData.growth_3m_pct === 'number' && stData.growth_3m_pct >= 50) {
       crisis = '<span style="font-size:9px;padding:1px 5px;background:rgba(52,211,153,0.18);color:#34d399;border-radius:4px;font-weight:700;margin-left:4px">🔥 SNS↑</span>';
     }
+    // 팝업 비중 경고 chip (정규 mode에서 팝업비중 ≥50%이면)
+    if (useRegular && g.popup_ratio >= 50) {
+      crisis += '<span style="font-size:9px;padding:1px 5px;background:rgba(167,139,250,0.18);color:#a78bfa;border-radius:4px;font-weight:700;margin-left:4px">🏬 팝업 ' + Math.round(g.popup_ratio) + '%</span>';
+    }
     return '<div onclick="if(typeof openFrBrandModal===\'function\')openFrBrandModal(\'' + esc(g.brand).replace(/\'/g,"\\'") + '\')" style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(248,113,113,0.05);border:1px solid rgba(248,113,113,0.15);border-radius:8px;margin-bottom:5px;font-size:11.5px;cursor:pointer">'
       + '<div style="width:22px;font-weight:800;color:var(--txt3);text-align:center">' + (i+1) + '</div>'
-      + '<div style="flex:1;font-weight:700;display:flex;align-items:center;gap:2px;min-width:0"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(g.brand) + '</span>' + crisis + '</div>'
-      + '<div style="color:var(--txt3);font-size:10.5px;text-align:right;width:64px">+' + (g.total_open||0) + '<br>-<span style="color:#f87171;font-weight:700">' + g.total_closed + '</span></div>'
-      + '<div style="text-align:right;width:48px"><div style="color:' + c + ';font-weight:800;font-size:14px">' + g.churn_rate + '%</div><div style="font-size:8.5px;color:var(--txt3)">회전</div></div>'
+      + '<div style="flex:1;font-weight:700;display:flex;flex-direction:column;min-width:0">'
+      +   '<div style="display:flex;align-items:center;gap:2px"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(g.brand) + '</span>' + crisis + '</div>'
+      +   split
+      + '</div>'
+      + '<div style="color:var(--txt3);font-size:10.5px;text-align:right;width:64px">+' + (g.total_open||0) + '<br>-<span style="color:#f87171;font-weight:700">' + closedShown + '</span></div>'
+      + '<div style="text-align:right;width:48px"><div style="color:' + c + ';font-weight:800;font-size:14px">' + churn + '%</div><div style="font-size:8.5px;color:var(--txt3)">회전</div></div>'
       + '</div>';
   }).join('');
   // 단기 운영 폐업 (≤90일)
