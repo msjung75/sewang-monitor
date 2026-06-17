@@ -1,5 +1,5 @@
-// PWA Service Worker v17.12 — Push 알림 (iOS 16.4+ web push)
-const CACHE = 'sewang-pwa-v17_12-push';
+// PWA Service Worker v17.14.3 — Push + 화제성 cache bump + 공정위 마스터
+const CACHE = 'sewang-pwa-v17_14_3-franchise';
 const SHELL = ['/manifest.json', '/icon.svg'];  // index.html 제거 — 항상 network-first
 
 self.addEventListener('install', e => {
