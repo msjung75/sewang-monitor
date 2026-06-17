@@ -3940,35 +3940,55 @@ async function loadFranchiseMaster(){
     var r = await fetch('/data/franchise_master.json?t=' + Math.floor(Date.now()/3600000), { cache:'no-store' });
     if (!r.ok) return;
     window.FRANCHISE_MASTER = await r.json();
-    // compact key Set (빠른 매칭)
+    // v17.14.3.1: compact key + 영문 alias 추출 (「비에이치씨(BHC)」 → 「비에이치씨」 + 「bhc」)
     var s = {};
-    (window.FRANCHISE_MASTER.compact_lookup || []).forEach(function(k){ s[k] = 1; });
-    // 매장수 lookup (모달용)
     var sl = {};
     (window.FRANCHISE_MASTER.brands || []).forEach(function(b){
-      sl[b.name.replace(/\s+/g,'').toLowerCase()] = b.stores || 0;
+      var n = b.name || '';
+      var nl = n.replace(/\s+/g,'').toLowerCase();
+      s[nl] = 1;
+      sl[nl] = b.stores || 0;
+      // 괄호 안 영문 추출 (「비에이치씨(BHC)」 → 「bhc」)
+      var m = n.match(/[\(（](\w+)[\)）]/);
+      if (m && m[1].length >= 2) {
+        var alias = m[1].toLowerCase();
+        s[alias] = 1;
+        if (!sl[alias]) sl[alias] = b.stores || 0;
+      }
+      // 괄호 제거한 본명 (「비에이치씨(BHC)」 → 「비에이치씨」)
+      var base = n.replace(/[\(（][^\)）]*[\)）]/g, '').replace(/\s+/g,'').toLowerCase();
+      if (base && base !== nl) {
+        s[base] = 1;
+        if (!sl[base]) sl[base] = b.stores || 0;
+      }
     });
     window._franchiseSet = s;
     window._franchiseStores = sl;
-    console.log('[franchise_master] loaded:', window.FRANCHISE_MASTER.total, 'brand');
+    console.log('[franchise_master] loaded:', window.FRANCHISE_MASTER.total, 'brand,', Object.keys(s).length, 'keys');
   } catch(e){ console.log('[franchise_master] load fail:', e.message); }
 }
-// brand가 공정위 등록인지
+// brand가 공정위 등록인지 — 정확 매칭 + prefix/suffix 매칭
 function isFranchiseRegistered(brand){
   if (!window._franchiseSet || !brand) return false;
   var key = brand.replace(/\s+/g,'').toLowerCase();
   if (window._franchiseSet[key]) return true;
-  // 부분 매칭 (BRAND_ALIASES와 비슷)
-  // 끝 4자 이상 일치하면 매칭 (역전할머니맥주 = 역전할머니맥주의정부점)
+  // brand 끝 4자 이상이 마스터 키에 prefix/suffix 매칭 (역전할머니맥주의정부점 = 역전할머니맥주)
   for (var k in window._franchiseSet) {
-    if (k.length >= 4 && (key.indexOf(k) === 0 || k.indexOf(key) === 0)) return true;
+    if (k.length < 3) continue;
+    if (key.indexOf(k) === 0 || k.indexOf(key) === 0) return true;
   }
   return false;
 }
 function franchiseStoreCount(brand){
   if (!window._franchiseStores || !brand) return 0;
   var key = brand.replace(/\s+/g,'').toLowerCase();
-  return window._franchiseStores[key] || 0;
+  if (window._franchiseStores[key]) return window._franchiseStores[key];
+  // 매칭된 마스터 키 찾기
+  for (var k in window._franchiseStores) {
+    if (k.length < 3) continue;
+    if (key.indexOf(k) === 0 || k.indexOf(key) === 0) return window._franchiseStores[k];
+  }
+  return 0;
 }
 
 // v17.11: 도매사 명부 (서울·경기·인천 361사 — admin 전용)
