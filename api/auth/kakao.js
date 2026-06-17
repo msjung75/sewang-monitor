@@ -469,11 +469,20 @@ export default async function handler(req, res) {
       if (!cid || !csec) return res.status(500).json({ error: 'NAVER 키 미설정' });
       const keyword = (req.query.q || '').trim();
       if (!keyword) return res.status(400).json({ error: 'q 필요' });
-      // 최근 6개월
+      // v17.13.1: 6개월 (지난달 말까지 — 데이터랩은 당월 데이터 미지원)
       const end = new Date();
-      const start = new Date(end.getTime() - 180 * 86400 * 1000);
+      end.setDate(0); // 지난달 말일
+      const start = new Date(end);
+      start.setMonth(start.getMonth() - 5);
+      start.setDate(1);
       const fmt = d => d.toISOString().slice(0,10);
       try {
+        const payload = {
+          startDate: fmt(start),
+          endDate: fmt(end),
+          timeUnit: 'month',
+          keywordGroups: [{ groupName: keyword, keywords: [keyword] }],
+        };
         const r = await fetch('https://openapi.naver.com/v1/datalab/search', {
           method: 'POST',
           headers: {
@@ -481,17 +490,23 @@ export default async function handler(req, res) {
             'X-Naver-Client-Secret': csec,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            startDate: fmt(start),
-            endDate: fmt(end),
-            timeUnit: 'month',
-            keywordGroups: [{ groupName: keyword, keywords: [keyword] }],
-          }),
+          body: JSON.stringify(payload),
         });
-        const d = await r.json();
+        const text = await r.text();
+        let d = null;
+        try { d = JSON.parse(text); } catch(e) {}
+        // v17.13.1: 디버그 정보 노출
+        if (!r.ok || !d) {
+          res.setHeader('Cache-Control', 'no-store');
+          return res.status(200).json({
+            keyword, data: [], _ok: false, _status: r.status,
+            _payload: payload, _raw: text.slice(0, 400),
+            _hasCid: !!cid, _cidLen: cid ? cid.length : 0,
+          });
+        }
         const data = (d.results && d.results[0] && d.results[0].data) || [];
         res.setHeader('Cache-Control', 'public, s-maxage=86400, stale-while-revalidate=3600');
-        return res.status(200).json({ keyword, data });
+        return res.status(200).json({ keyword, data, _ok: true, _status: r.status, _payload: payload });
       } catch (e) {
         return res.status(500).json({ error: e.message });
       }
