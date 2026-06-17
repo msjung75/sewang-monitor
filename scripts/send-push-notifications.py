@@ -30,7 +30,11 @@ def post_push(payload):
         print(f"  ❌ {payload['type']}: {e}"); return None
 
 EXCLUDE_KEYWORDS = ['커피','카페','coffee','cafe','스타벅스','이디야','투썸','커피빈','메가커피','컴포즈','폴바셋','빵','베이커리','파리바게뜨','뚜레쥬르','롯데리아','맥도날드','버거킹','KFC','맘스터치','CU','GS25','세븐일레븐','이마트24','미니스톱','주바른','팝업','popup']
-EXCLUDE_ADDR = ['백화점','아울렛','outlet','프리미엄아울렛','복합쇼핑','스타필드','롯데몰','현대몰','신세계백화점','롯데백화점','현대백화점','갤러리아','AK플라자','NC백화점','더현대','코엑스몰','타임스퀘어','IFC몰','애비뉴엘','지하상가']
+EXCLUDE_ADDR = ['백화점','아울렛','outlet','프리미엄아울렛','복합쇼핑','스타필드','롯데몰','현대몰','신세계백화점','롯데백화점','현대백화점','갤러리아','AK플라자','NC백화점','더현대','코엑스몰','타임스퀘어','IFC몰','애비뉴엘','지하상가','면세점','면세']
+# v17.14.1: 팝업 판별 (폐업 알림 노이즈 제거)
+def is_popup_addr(addr):
+    a = (addr or '').lower()
+    return any(k.lower() in a for k in EXCLUDE_ADDR)
 def is_excluded(s):
     n = (s.get('name') or '').lower(); u = (s.get('upte') or '').lower(); a = (s.get('addr') or '').lower()
     if any(k.lower() in n for k in EXCLUDE_KEYWORDS): return True
@@ -51,9 +55,13 @@ else:
     stores = d.get('stores', [])
     filtered = [s for s in stores if not is_excluded(s)]
     new_stores = [s for s in filtered if not is_closed(s)]
-    closed_stores = [s for s in filtered if is_closed(s)]
+    # v17.14.1: 폐업은 EXCLUDE 미적용 + 팝업 분리, 정규 폐업만 알림 트리거
+    all_closed_stores = [s for s in stores if is_closed(s)]
+    closed_stores = [s for s in all_closed_stores if not is_popup_addr(s.get('addr',''))]
+    closed_popup_stores = [s for s in all_closed_stores if is_popup_addr(s.get('addr',''))]
     new_count = len(new_stores)
-    closed_count = len(closed_stores)
+    closed_count = len(closed_stores)  # 정규 폐업만
+    closed_popup_count = len(closed_popup_stores)
     # 신규 매장 TOP 시·도
     from collections import Counter
     sido_cnt = Counter()
@@ -74,12 +82,12 @@ if new_count >= 10:
         'url': '/?tab=new'
     })
 
-# 2. 폐점 알림 (≥ 5건)
+# 2. 폐점 알림 (정규 ≥ 5건 — 팝업은 노이즈로 제외)
 if closed_count >= 5:
     post_push({
         'type': 'closed',
-        'title': f'⚠️ 폐점 {closed_count}건',
-        'body': f'{yesterday[:4]}.{yesterday[4:6]}.{yesterday[6:8]} 폐업·말소 매장 다수',
+        'title': f'⚠️ 정규 폐점 {closed_count}건',
+        'body': f'{yesterday[:4]}.{yesterday[4:6]}.{yesterday[6:8]} 폐업 (팝업 {closed_popup_count}건 제외)',
         'url': '/?tab=trend'
     })
 
