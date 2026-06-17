@@ -4110,7 +4110,7 @@ async function loadSnsTrend(){
   var results = [];
   for (var i = 0; i < topCandidates.length; i++) {
     var g = topCandidates[i];
-    var arr = [], growth = 0, hasData = false;
+    var arr = [], growth = 0, hasData = false, naverFallback = null, naverReason = '';
     try {
       var r = await fetch('/api/auth/kakao?action=naver_trend&q=' + encodeURIComponent(g.brand), { credentials:'same-origin' });
       var d = await r.json();
@@ -4120,6 +4120,10 @@ async function loadSnsTrend(){
         var firstN = arr.slice(0,3).reduce(function(a,b){ return a+b; }, 0);
         growth = firstN ? Math.round((lastN-firstN)/firstN*100) : 0;
         hasData = true;
+      } else {
+        // v17.13.1: 데이터랩 실패 시 search_local fallback
+        naverFallback = d.fallback || null;
+        naverReason = d._reason || '';
       }
     } catch(e) {}
     // v17.13 Phase 2.6: 사장님 규칙 — multiplier × + growth bonus +
@@ -4133,6 +4137,7 @@ async function loadSnsTrend(){
     results.push({
       brand: g.brand, openN: g.late, total1M: g.total1M, total3M: g.total3M, total6M: g.total6M,
       sparkline: arr, growth: growth, hasData: hasData,
+      naverFallback: naverFallback, naverReason: naverReason,  // v17.13.1
       mainCat: g.mainCat, focusWeight: g.focusWeight,
       sampleStores: g.sampleStores, score: score,
       sumtrendMult: stMult, sumtrendBonus: stBonus, hasSumtrend: !!stData,
@@ -4326,7 +4331,30 @@ function openSnsModal(brand){
       + '<polyline fill="' + gc + '22" stroke="none" points="10,90 ' + pts + ' 470,90"/>'
       + '</svg>';
   } else {
-    trendEl.innerHTML = '<div style="background:rgba(248,113,113,0.06);border:1px dashed rgba(248,113,113,0.25);border-radius:8px;padding:10px;font-size:11px;color:var(--txt2);text-align:center">⚠️ 네이버 데이터랩 검색 데이터 없음<br><span style="font-size:10px;color:var(--txt3)">신규 오픈 수 기준으로 화제성 평가 · Apify Instagram 통합 예정</span></div>';
+    // v17.13.1: 데이터랩 실패 원인 + search_local fallback 표시
+    var reason = b.naverReason || '';
+    var fb = b.naverFallback || null;
+    var msg = '';
+    if (reason === 'scope_disabled') {
+      msg = '<div style="background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.25);border-radius:8px;padding:10px;font-size:11px;color:var(--txt2);line-height:1.5">'
+        + '<div style="font-weight:700;color:#fbbf24;margin-bottom:4px">⚠️ 네이버 「데이터랩 (검색어 트렌드)」 API scope 미활성화</div>'
+        + '<div style="font-size:10px;color:var(--txt3)">사장님 액션: <a href="https://developers.naver.com/apps/" target="_blank" style="color:#7dd3fc">developers.naver.com</a> → 애플리케이션 → <b>API 설정 탭</b>에서 「데이터랩 (검색어 트렌드)」 체크 후 저장</div>'
+        + '</div>';
+    } else if (reason === 'rate_limit') {
+      msg = '<div style="background:rgba(248,113,113,0.06);border:1px solid rgba(248,113,113,0.25);border-radius:8px;padding:10px;font-size:11px;color:var(--txt2)">⚠️ 네이버 데이터랩 일일 한도 초과 (25,000건)</div>';
+    } else {
+      msg = '<div style="background:rgba(255,255,255,0.04);border:1px dashed rgba(255,255,255,0.15);border-radius:8px;padding:10px;font-size:11px;color:var(--txt3);text-align:center">네이버 데이터랩 검색 데이터 없음 (대신 썸트렌드 · Apify 활용)</div>';
+    }
+    // search_local fallback — brand 매장수
+    if (fb && fb.total > 0) {
+      msg += '<div style="margin-top:8px;background:rgba(125,211,252,0.05);border:1px solid rgba(125,211,252,0.2);border-radius:8px;padding:9px 11px;font-size:11px">'
+        + '<div style="font-weight:700;color:#7dd3fc;margin-bottom:4px">🔍 네이버 검색 매장 <span style="float:right">' + fb.total.toLocaleString() + '건</span></div>'
+        + (fb.sample||[]).map(function(s){
+            return '<div style="font-size:10.5px;color:var(--txt3);margin-top:2px">📍 ' + esc(s.title) + ' <span style="opacity:0.7">· ' + esc((s.address||'').slice(0,30)) + '</span></div>';
+          }).join('')
+        + '</div>';
+    }
+    trendEl.innerHTML = msg;
   }
   // 신규 오픈 3구간
   var openMax = Math.max(b.total1M, b.total3M, b.total6M, 1);
