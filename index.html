@@ -824,22 +824,8 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
     <div id="trend-close-month" style="margin-bottom:14px"></div>
     <div style="font-size:11px;color:var(--txt3);margin-bottom:6px;font-weight:700">📍 시·도별 폐업 TOP</div>
     <div id="trend-close-sido" style="margin-bottom:14px"></div>
-    <div style="font-size:11px;color:var(--txt3);margin-bottom:6px;font-weight:700">🔄 회전율 TOP brand (폐/(신+폐))</div>
-    <div id="trend-close-churn"></div>
-    <!-- v17.14.1: 프랜차이즈 폐점 TOP 10 (정규/팝업/전체 토글) -->
-    <div style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(248,113,113,0.15)">
-      <div style="font-size:11.5px;color:var(--txt2);margin-bottom:8px;font-weight:700">⚠️ 프랜차이즈 폐점 TOP 10 <span style="color:var(--txt3);font-size:9.5px;font-weight:500;margin-left:6px">brand 클릭 → 상세</span></div>
-      <div class="chips" id="chip-fr-closure-mode" style="margin-bottom:8px">
-        <div class="chip on" data-v="regular">✅ 정규 <span style="opacity:0.6;font-size:9px">(brand 위기)</span></div>
-        <div class="chip" data-v="popup">🏬 팝업 <span style="opacity:0.6;font-size:9px">(백화점)</span></div>
-        <div class="chip" data-v="event">🎪 행사 <span style="opacity:0.6;font-size:9px">(축제·박람회)</span></div>
-        <div class="chip" data-v="all">전체</div>
-      </div>
-      <div id="trend-fr-closure-caption" style="font-size:10px;color:var(--txt3);margin-bottom:8px;line-height:1.5">정규 = 백화점·아울렛·축제·박람회 <b>제외</b> · 회전율 = 정규폐점 / (신규+정규폐점) · <span style="color:#f87171">≥50% 위험</span> · <span style="color:#fbbf24">30~50% 주의</span></div>
-      <div style="font-size:9.5px;color:#fbbf24;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);border-radius:6px;padding:6px 9px;margin-bottom:8px;line-height:1.5">🏛️ <b>공정위 가맹사업 정보공개서 등록 brand만</b> 표시 · ⚠️ 2025년 이전 등록 매장은 폐업 정보가 일부만 표시될 수 있습니다 (행안부 데이터 갱신 정책)</div>
-      <div id="trend-fr-closures"></div>
-    </div>
-    <!-- v17.14: 단기 운영 폐업 (≤90일) -->
+    <!-- v17.14.5: 회전율 TOP / 프랜차이즈 폐점 TOP 카드 제거 (사장님 「의미 없음」) -->
+    <!-- v17.14: 단기 운영 폐업 (≤90일) — 유지 -->
     <div id="trend-short-term-section" style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(248,113,113,0.15)">
       <div style="font-size:11.5px;color:var(--txt2);margin-bottom:8px;font-weight:700">⚠️ 단기 운영 폐업 (≤90일)</div>
       <div id="trend-short-term"></div>
@@ -3147,7 +3133,7 @@ document.querySelectorAll('.bnav-btn').forEach(function(btn){
   btn.addEventListener('click', function(){ switchPage(btn.dataset.pg); });
 });
 
-['chip-days','chip-region','chip-type','chip-nstat','chip-gold-sort','chip-track','chip-track-sort','chip-fr-kind','chip-fr-source','chip-map-mode','chip-map-cat','chip-trend-cat','chip-ws-sido','chip-fr-closure-mode'].forEach(function(id){
+['chip-days','chip-region','chip-type','chip-nstat','chip-gold-sort','chip-track','chip-track-sort','chip-fr-kind','chip-fr-source','chip-map-mode','chip-map-cat','chip-trend-cat','chip-ws-sido'].forEach(function(id){
   document.querySelectorAll('#' + id + ' .chip').forEach(function(c){
     c.addEventListener('click', function(){
       document.querySelectorAll('#' + id + ' .chip').forEach(function(x){ x.classList.remove('on'); });
@@ -3156,7 +3142,6 @@ document.querySelectorAll('.bnav-btn').forEach(function(btn){
       else if (id === 'chip-gold-sort') renderGold();
       else if (id === 'chip-track' || id === 'chip-track-sort') renderTracked();
       else if (id === 'chip-ws-sido') renderWholesalers();
-      else if (id === 'chip-fr-closure-mode') { try { renderFranchiseClosures(); } catch(e){} }
       else if (id === 'chip-fr-kind' || id === 'chip-fr-source') { FR_SELECTED = null; renderFr(); }
       else if (id === 'chip-trend-cat') renderTrendTab();
       else if (id === 'chip-map-cat' || id === 'chip-map-mode') renderMapSidoStats();
@@ -3495,132 +3480,15 @@ function renderTrendCloseAnalysis(){
       }).join('');
     }
   }
-  // 회전율 TOP brand (폐업 3건 이상만)
-  var churnEl = document.getElementById('trend-close-churn');
-  if (churnEl) {
-    var bArr = [];
-    for (var k in brandStats) {
-      var bs = brandStats[k];
-      if (bs.closed < 3) continue;
-      var tot = bs.open + bs.closed;
-      if (tot < 5) continue;
-      // v17.14.3: 공정위 등록 brand만
-      if (typeof isFranchiseRegistered === 'function' && !isFranchiseRegistered(bs.brand)) continue;
-      bs.churn = Math.round(bs.closed/tot*100);
-      bArr.push(bs);
-    }
-    bArr.sort(function(a,b){ if (b.churn !== a.churn) return b.churn - a.churn; return b.closed - a.closed; });
-    if (!bArr.length) churnEl.innerHTML = '<div style="color:var(--txt3);font-size:11px;text-align:center;padding:10px">공정위 등록 폐업 brand 없음</div>';
-    else {
-      churnEl.innerHTML = bArr.slice(0,10).map(function(g,i){
-        var c = g.churn > 60 ? '#f87171' : g.churn > 35 ? '#fbbf24' : '#34d399';
-        return '<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(248,113,113,0.05);border:1px solid rgba(248,113,113,0.15);border-radius:8px;margin-bottom:5px;font-size:11.5px;cursor:pointer" onclick="if(typeof openFrBrandModal===\'function\')openFrBrandModal(\'' + esc(g.brand).replace(/\'/g,"\\'") + '\')">'
-          + '<div style="width:22px;font-weight:800;color:var(--txt3)">' + (i+1) + '</div>'
-          + '<div style="flex:1;font-weight:700">' + esc(g.brand) + '</div>'
-          + '<div style="color:var(--txt3);font-size:10.5px">+' + g.open + ' / -' + g.closed + '</div>'
-          + '<div style="color:' + c + ';font-weight:800;font-size:13px;width:42px;text-align:right">' + g.churn + '%</div></div>';
-      }).join('');
-    }
-  }
-  // v17.14: 프랜차이즈 폐점 TOP 10 + 단기 운영 폐업
-  try { renderFranchiseClosures(); } catch(e){ console.log('[v17.14] fr closures err', e); }
+  // v17.14.5: 회전율 TOP / 프랜차이즈 폐점 TOP 카드 제거 (사장님 「의미 없음」)
+  // 단기 운영 폐업만 유지
+  try { renderShortTermClosures(); } catch(e){ console.log('[v17.14.5] short-term err', e); }
 }
 
 // v17.14.1: 프랜차이즈 폐점 TOP 10 (정규/팝업/전체 모드)
-function renderFranchiseClosures(){
+// v17.14.5: 단기 운영 폐업 (≤90일) — 회전율/프랜차이즈 폐점 TOP는 제거됨
+function renderShortTermClosures(){
   var ca = window.YTD && (window.YTD.closure_analysis || window.YTD.closureAnalysis);
-  var mode = (typeof activeChip === 'function') ? (activeChip('chip-fr-closure-mode') || 'regular') : 'regular';
-  var el = document.getElementById('trend-fr-closures');
-  var capEl = document.getElementById('trend-fr-closure-caption');
-  if (!el) return;
-  // 모드별 list + 카운트 컬럼 결정
-  var topList = null, useRegular = false, usePopup = false, useEvent = false;
-  if (mode === 'popup') {
-    topList = ca && ca.top_franchise_closures_popup;
-    usePopup = true;
-    if (capEl) capEl.innerHTML = '🏬 팝업 폐점 = 백화점·아울렛·면세점·하나로마트 주소 매장 (한시 운영 패턴, brand 위기 X)';
-  } else if (mode === 'event') {
-    topList = ca && ca.top_franchise_closures_event;
-    useEvent = true;
-    if (capEl) capEl.innerHTML = '🎪 행사 폐점 = 축제·박람회·박물관·전시장·체육관·체험관·임시 주소/매장명 매장 (지방 행사 한시 매장)';
-  } else if (mode === 'all') {
-    topList = ca && ca.top_franchise_closures_all;
-    if (capEl) capEl.innerHTML = '전체 폐점 = 정규 + 팝업 + 행사 합산 · 회전율 = 전체폐점 / (신규+전체폐점)';
-  } else {
-    topList = ca && ca.top_franchise_closures;
-    useRegular = true;
-    if (capEl) capEl.innerHTML = '✅ 정규 폐점 = 백화점·아울렛·축제·박람회 <b>제외</b> (사장님 의도) · 회전율 = 정규폐점 / (신규+정규폐점) · <span style="color:#f87171">≥50% 위험</span> · <span style="color:#fbbf24">30~50% 주의</span>';
-  }
-  if (!topList || !topList.length) {
-    // Fallback (v17.5 schema)
-    if (!window.YTD || !window.YTD.by_brand) { el.innerHTML = '<div style="color:var(--txt3);font-size:11px;text-align:center;padding:10px">데이터 없음</div>'; return; }
-    var bArr = [];
-    for (var b in window.YTD.by_brand) {
-      var v = window.YTD.by_brand[b];
-      var bc = b.replace(/\s/g,'').toLowerCase();
-      var alias = (typeof BRAND_ALIASES !== 'undefined' && BRAND_ALIASES[bc]) || b;
-      if (alias.length < 2 || alias.length > 30) continue;
-      if (/\d{4,}/.test(alias)) continue;
-      var open = v.total_open || 0, closed = v.total_closed || 0;
-      if (closed < 3) continue;
-      bArr.push({ brand: alias, total_open: open, total_closed: closed, churn_rate: Math.round(closed/(open+closed)*100) });
-    }
-    bArr.sort(function(a,b){ return (b.total_closed - a.total_closed) || (b.churn_rate - a.churn_rate); });
-    topList = bArr.slice(0, 10);
-  }
-  // v17.14.3: 공정위 마스터 매칭 — 등록 brand만
-  if (typeof isFranchiseRegistered === 'function') {
-    topList = topList.filter(function(g){ return isFranchiseRegistered(g.brand); });
-  }
-  var emptyLbl = useEvent ? '🎪 행사' : usePopup ? '🏬 팝업' : '정규';
-  if (!topList.length) { el.innerHTML = '<div style="color:var(--txt3);font-size:11px;text-align:center;padding:10px">공정위 등록 ' + emptyLbl + ' 폐점 brand 없음</div>'; return; }
-  el.innerHTML = topList.slice(0, 10).map(function(g, i){
-    var closedShown = useRegular ? (g.total_closed_regular||g.total_closed||0)
-                     : usePopup ? (g.total_closed_popup||0)
-                     : useEvent ? (g.total_closed_event||0)
-                     : (g.total_closed||0);
-    var churn = useRegular ? (g.churn_rate_regular||0) : (g.churn_rate||0);
-    var c = churn >= 50 ? '#f87171' : churn >= 30 ? '#fbbf24' : '#34d399';
-    // 정규 mode에서 팝업/행사 별도 표시
-    var split = '';
-    if (useRegular) {
-      var parts = [];
-      if (g.total_closed_popup >= 3) parts.push('🏬' + g.total_closed_popup);
-      if (g.total_closed_event >= 3) parts.push('🎪' + g.total_closed_event);
-      if (parts.length) split = '<div style="font-size:8.5px;color:#a78bfa;margin-top:2px">+ ' + parts.join(' / ') + '</div>';
-    }
-    // SNS 위기 신호
-    var stData = (typeof sumtrendOf === 'function') ? sumtrendOf(g.brand) : null;
-    var crisis = '';
-    if (stData && typeof stData.growth_3m_pct === 'number' && stData.growth_3m_pct <= 0 && closedShown >= 5) {
-      crisis = '<span style="font-size:9px;padding:1px 5px;background:rgba(248,113,113,0.18);color:#f87171;border-radius:4px;font-weight:700;margin-left:4px">⚠️ SNS↓</span>';
-    } else if (stData && typeof stData.growth_3m_pct === 'number' && stData.growth_3m_pct >= 50) {
-      crisis = '<span style="font-size:9px;padding:1px 5px;background:rgba(52,211,153,0.18);color:#34d399;border-radius:4px;font-weight:700;margin-left:4px">🔥 SNS↑</span>';
-    }
-    // v17.14.2: 한시 매장 통합 chip (팝업+행사 ≥50%면 신뢰도 경고)
-    if (useRegular && g.transient_ratio >= 50) {
-      crisis += '<span style="font-size:9px;padding:1px 5px;background:rgba(248,113,113,0.18);color:#f87171;border-radius:4px;font-weight:700;margin-left:4px">⚠️ 한시 ' + Math.round(g.transient_ratio) + '%</span>';
-    } else if (useRegular && g.popup_ratio >= 50) {
-      crisis += '<span style="font-size:9px;padding:1px 5px;background:rgba(167,139,250,0.18);color:#a78bfa;border-radius:4px;font-weight:700;margin-left:4px">🏬 ' + Math.round(g.popup_ratio) + '%</span>';
-    } else if (useRegular && g.event_ratio >= 30) {
-      crisis += '<span style="font-size:9px;padding:1px 5px;background:rgba(251,191,36,0.18);color:#fbbf24;border-radius:4px;font-weight:700;margin-left:4px">🎪 ' + Math.round(g.event_ratio) + '%</span>';
-    }
-    // v17.14.3: 🏛️ 공정위 매장수 chip
-    var frStores = (typeof franchiseStoreCount === 'function') ? franchiseStoreCount(g.brand) : 0;
-    if (frStores > 0) {
-      crisis += '<span style="font-size:9px;padding:1px 5px;background:rgba(125,211,252,0.12);color:#7dd3fc;border-radius:4px;font-weight:700;margin-left:4px">🏛️ 가맹 ' + frStores.toLocaleString() + '점</span>';
-    }
-    return '<div onclick="if(typeof openFrBrandModal===\'function\')openFrBrandModal(\'' + esc(g.brand).replace(/\'/g,"\\'") + '\')" style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(248,113,113,0.05);border:1px solid rgba(248,113,113,0.15);border-radius:8px;margin-bottom:5px;font-size:11.5px;cursor:pointer">'
-      + '<div style="width:22px;font-weight:800;color:var(--txt3);text-align:center">' + (i+1) + '</div>'
-      + '<div style="flex:1;font-weight:700;display:flex;flex-direction:column;min-width:0">'
-      +   '<div style="display:flex;align-items:center;gap:2px"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(g.brand) + '</span>' + crisis + '</div>'
-      +   split
-      + '</div>'
-      + '<div style="color:var(--txt3);font-size:10.5px;text-align:right;width:64px">+' + (g.total_open||0) + '<br>-<span style="color:#f87171;font-weight:700">' + closedShown + '</span></div>'
-      + '<div style="text-align:right;width:48px"><div style="color:' + c + ';font-weight:800;font-size:14px">' + churn + '%</div><div style="font-size:8.5px;color:var(--txt3)">회전</div></div>'
-      + '</div>';
-  }).join('');
-  // 단기 운영 폐업 (≤90일)
   var stEl = document.getElementById('trend-short-term');
   var sec = document.getElementById('trend-short-term-section');
   if (!stEl) return;
@@ -3636,7 +3504,6 @@ function renderFranchiseClosures(){
     }
     stEl.innerHTML = '<div style="background:rgba(248,113,113,0.06);border:1px solid rgba(248,113,113,0.2);border-radius:8px;padding:10px;margin-bottom:8px;font-size:11.5px"><div style="display:flex;justify-content:space-between"><b>단기 폐업</b><span style="color:#f87171;font-weight:800;font-size:13px">' + ca.short_term_total + '건</span></div><div style="font-size:10px;color:var(--txt3);margin-top:3px">개업 후 90일 이내 폐업 — 한시적 운영(팝업·행사) 신호</div></div>' + brandTopHtml;
   } else {
-    // closedDate 없으면 안내
     if (sec) sec.style.display = 'none';
   }
 }
