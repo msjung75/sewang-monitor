@@ -2871,7 +2871,7 @@ function renderCharts(){
 
 function renderBuzz(){
   var tbl = document.getElementById('tbl-buzz');
-  var list = ST.permits.filter(function(s){ return nv(s) && nv(s).found && (nv(s).blogTotal || 0) > 0; })
+  var list = ST.permits.filter(function(s){ var c = (typeof detailCategory === 'function') ? detailCategory(s) : 'other'; return nv(s) && nv(s).found && (nv(s).blogTotal || 0) > 0 && (c === 'sool' || c === 'chicken'); })
     .sort(function(a,b){ return buzzScore(nv(b)) - buzzScore(nv(a)); }).slice(0, 5);
   if (!list.length) {
     tbl.innerHTML = '<tr><td style="color:var(--txt3);text-align:center;padding:20px;font-size:11px">' +
@@ -4415,7 +4415,7 @@ function detailCategory(s){
   // 카페·빵 (편의점·디저트 포함)
   if (/카페|커피|cafe|coffee|빵|베이커리|제과|디저트|도넛|꽈배기|와플|아이스크림|빙수|마카롱|크로플|크로아상|티라미수|파이/i.test(t)) return 'cafe';
   // 치킨 (한국 치킨 brand 키워드 강화)
-  if (/치킨|chicken|닭볶|닭갈비|찜닭|닭한마리|닭발|닭강정|영양닭|통닭|비비큐|bbq|bhc|노랑통닭|네네치킨|굽네|페리카나|또래오래|호식이|땅땅|훌리|가마치|호치킨|크리스피|크리스피로|육회바른|핫후라이/i.test(t)) return 'chicken';
+  if (/치킨|chicken|닭볶|닭갈비|찜닭|닭한마리|닭발|닭강정|영양닭|통닭|비비큐|bbq|bhc|노랑통닭|네네치킨|굽네|페리카나|또래오래|호식이|땅땅|훌리|가마치|호치킨|크리스피치킨|육회바른|핫후라이/i.test(t)) return 'chicken';
   // 고기·구이
   if (/고기|삼겹|갈비|곱창|막창|불고기|구이|돼지|소고기|한우|등심|안심|차돌|업진살|항정살|특수부위|숯불|연탄/i.test(t)) return 'meat';
   // 일식 (라멘·소바·돈가스 포함)
@@ -4618,7 +4618,7 @@ async function loadNaverNstatCache(){
       var notFound = (s.nstat === 'unregistered') || (s.found === false) || (s.registered === false);
       var isLocked = (s.nstat === 'locked');
       if (found || notFound || isLocked) {
-        ST.naver[id] = { found: found, checked_at: s.checked_at, name: s.name, nstat: s.nstat };
+        ST.naver[id] = { found: found, checked_at: s.checked_at, name: s.name, nstat: s.nstat, blogTotal: s.blogTotal || 0 };
         checked++;
         if (found) reg++;
         else if (notFound) unreg++;
