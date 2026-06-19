@@ -70,6 +70,21 @@ def search_naver_local(name, addr):
     except Exception:
         return 'error'
 
+def search_naver_blog_count(name):
+    """블로그 언급 수 (v17.15 - 화제성 TOP 5용)"""
+    url = f'https://openapi.naver.com/v1/search/blog.json?query={quote(name)}&display=1&start=1'
+    req = urllib.request.Request(url, headers={
+        'X-Naver-Client-Id': NAVER_CLIENT_ID,
+        'X-Naver-Client-Secret': NAVER_CLIENT_SECRET,
+    })
+    try:
+        with urllib.request.urlopen(req, timeout=10) as r:
+            d = json.loads(r.read())
+        return d.get('total', 0)
+    except Exception:
+        return 0
+
+
 # 캐시 로드
 cache = {}
 if os.path.exists(CACHE_PATH):
@@ -167,7 +182,12 @@ for iid in queue:
     if result == 'error':
         errors += 1
         time.sleep(REQUEST_INTERVAL_SEC); continue
-    cache[iid] = {'nstat': result, 'checked_at': now_iso(), 'name': name[:30]}
+    entry = {'nstat': result, 'checked_at': now_iso(), 'name': name[:30]}
+    if result == 'registered':
+        # v17.15: 등록된 매장은 블로그 언급 수도 수집
+        entry['blogTotal'] = search_naver_blog_count(name)
+        time.sleep(REQUEST_INTERVAL_SEC)
+    cache[iid] = entry
     if result == 'registered': new_registered += 1
     else: new_unregistered += 1
     processed += 1
