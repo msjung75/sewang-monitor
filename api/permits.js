@@ -1,7 +1,13 @@
-// 행안부 지방행정 인허가 데이터(data.go.kr) 신규 업장 조회 프록시
-// 일반음식점 / 휴게음식점 / 단란주점 / 유흥주점 신규 인허가 조회
+// 행안부 지방행정 인허가 데이터(data.go.kr) 신규/폐업/변경 조회 프록시
+// 일반음식점 / 휴게음식점 / 단란주점 / 유흥주점 인허가 조회
 // 데이터는 매일 갱신, 2일 전 기준 현행화
-// 파라미터: days(기본7) 또는 from/to(YYYYMMDD, to는 미만조건), region, type, maxPages
+// 파라미터:
+//   - days(기본7) 또는 from/to(YYYYMMDD, to는 미만조건)
+//   - region: seoul / gyeonggi / metro / all 등
+//   - type: ilban / hyuge / danran / yuheung / all
+//   - dateField: permit(default, 인허가일) | closed(폐업일) | modified(데이터 갱신일 - 상호변경 등)
+//   - maxPages: 페이지 수 (default 5, max 50)
+//   - status: open(default) | closed | all
 
 const SERVICES = {
   ilban:   { base: 'general_restaurants', label: '일반음식점' },
@@ -29,7 +35,6 @@ const REGION_PREFIX = {
   gyeongnam:['경상남도'],
   jeju:     ['제주특별자치도'],
   metro:    ['서울특별시', '경기도', '인천광역시'],
-  // backwards-compat: region=all도 17개 분할 (단일 호출은 Vercel 10s timeout 위험 → client는 시·도별 호출 권장)
   all: [
     '서울특별시','경기도','부산광역시','대구광역시','인천광역시','광주광역시',
     '대전광역시','울산광역시','세종특별자치시','강원특별자치도','충청북도',
@@ -37,23 +42,31 @@ const REGION_PREFIX = {
   ],
 };
 
+// v17.16: dateField=modified 시 사용할 컬럼명 (행안부 데이터 갱신일자)
+const DATE_COLS = {
+  permit:   'LCPMT_YMD',
+  closed:   'CLSBIZ_YMD',
+  modified: 'LASTMODTS',
+};
+
 export default async function handler(req, res) {
   const key = process.env.DATA_GO_KR_KEY;
   if (!key) return res.status(500).json({ error: 'DATA_GO_KR_KEY 미설정' });
 
   const { days = '7', region = 'metro', type = 'all', from = '', to = '', status: statusFilter = 'open', dateField = 'permit' } = req.query;
-  const maxPages = Math.min(parseInt(req.query.maxPages || '5', 10), 10);
-  // status: open(영업 only, default) | closed(폐업·취소·말소·중지·휴업) | all(전부)
-  // dateField: permit(인허가일 LCPMT_YMD, default) | closed(폐업일자 CLSBIZ_YMD)
+  const maxPages = Math.min(parseInt(req.query.maxPages || '5', 10), 50);
 
-  // 조회 시작일: from(YYYYMMDD) 우선, 없으면 KST 기준 N일 전
+  if (!DATE_COLS[dateField]) {
+    return res.status(400).json({ error: `dateField 파라미터 오류 (permit|closed|modified)` });
+  }
+
   let since, until = '';
   if (/^\d{8}$/.test(from)) {
     since = from;
     if (/^\d{8}$/.test(to)) until = to;
   } else {
     const d = new Date(Date.now() + 9 * 3600 * 1000);
-    d.setUTCDate(d.getUTCDate() - Math.min(parseInt(days, 10) || 7, 90));
+    d.setUTCDate(d.getUTCDate() - Math.min(parseInt(days, 10) || 7, 365));
     since = d.toISOString().slice(0, 10).replace(/-/g, '');
   }
 
@@ -82,11 +95,15 @@ export default async function handler(req, res) {
         const isClosed = /폐업|취소|말소|중지|휴업/.test(st);
         if (statusFilter === 'all') return true;
         if (statusFilter === 'closed') return isClosed;
-        return !isClosed; // open(default)
-      })
-      .sort((a, b) => (b.permitDate || '').localeCompare(a.permitDate || ''));
+        return !isClosed;
+      });
+
+    // v17.16: dateField에 따라 다른 컬럼으로 정렬
+    const sortKey = dateField === 'modified' ? 'modifiedDate' : (dateField === 'closed' ? 'closedDate' : 'permitDate');
+    items.sort((a, b) => (b[sortKey] || '').localeCompare(a[sortKey] || ''));
+
     res.setHeader('Cache-Control', 's-maxage=1800, stale-while-revalidate=300');
-    return res.status(200).json({ since, until, count: items.length, capped, items });
+    return res.status(200).json({ since, until, dateField, count: items.length, capped, items });
   } catch (e) {
     return res.status(500).json({ error: e.message });
   }
@@ -96,8 +113,8 @@ async function fetchService(typeKey, addrPrefix, since, until, key, maxPages, da
   const svc = SERVICES[typeKey];
   const all = [];
   let capped = false;
-  // dateField=closed → CLSBIZ_YMD(폐업일자) 기준, default permit → LCPMT_YMD(인허가일)
-  const dateCol = dateField === 'closed' ? 'CLSBIZ_YMD' : 'LCPMT_YMD';
+  const dateCol = DATE_COLS[dateField];
+
   for (let page = 1; page <= maxPages; page++) {
     const qs = new URLSearchParams({
       serviceKey: key,
@@ -125,6 +142,8 @@ async function fetchService(typeKey, addrPrefix, since, until, key, maxPages, da
     for (const it of arr) {
       const pd = String(it.LCPMT_YMD || '').replace(/[^0-9]/g, '').slice(0, 8);
       const cd = String(it.CLSBIZ_YMD || '').replace(/[^0-9]/g, '').slice(0, 8);
+      // v17.16: LASTMODTS는 보통 YYYYMMDDHHMMSS 또는 YYYY-MM-DD 형태
+      const md = String(it.LASTMODTS || it.LCMODY_DT || '').replace(/[^0-9]/g, '').slice(0, 8);
       all.push({
         id: it.MNG_NO || ((it.BPLC_NM || '') + pd),
         name: it.BPLC_NM || '',
@@ -133,6 +152,7 @@ async function fetchService(typeKey, addrPrefix, since, until, key, maxPages, da
         upte: it.SNTTN_BZSTAT_NM || '',
         permitDate: pd,
         closedDate: cd,
+        modifiedDate: md, // v17.16: 데이터 갱신일자
         status: it.DTL_SALS_STTS_NM || it.SALS_STTS_NM || '',
         addr: it.ROAD_NM_ADDR || it.LOTNO_ADDR || '',
         tel: it.TELNO || '',
