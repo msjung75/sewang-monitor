@@ -1,4 +1,165 @@
 {
+  "updated": "2026-06-22T04:04:44+09:00",
+  "source": "Sometrend MCP (Vibecompany)",
+  "period": "202601 ~ 20260622",
+  "brands": {
+    "야화 혼술바": {
+      "keywords": ["야화혼술바", "야화"],
+      "instagram": [
+        {"date": "202601", "freq": 36},
+        {"date": "202602", "freq": 68},
+        {"date": "202603", "freq": 199},
+        {"date": "202604", "freq": 284},
+        {"date": "202605", "freq": 256},
+        {"date": "202606", "freq": 243}
+      ],
+      "blog": [
+        {"date": "202601", "freq": 488},
+        {"date": "202602", "freq": 424},
+        {"date": "202603", "freq": 550},
+        {"date": "202604", "freq": 757},
+        {"date": "202605", "freq": 1164},
+        {"date": "202606", "freq": 879}
+      ],
+      "topAssoc": [
+        {"label": "혼술바", "freq": 92},
+        {"label": "#야화혼술바", "freq": 70},
+        {"label": "#야화", "freq": 55},
+        {"label": "야화혼술바", "freq": 43},
+        {"label": "칵테일", "freq": 41},
+        {"label": "분위기", "freq": 36},
+        {"label": "술집", "freq": 35},
+        {"label": "자기야화", "freq": 31},
+        {"label": "자기", "freq": 31},
+        {"label": "혼술", "freq": 27}
+      ],
+      "growth_3m_pct": 158,
+      "verdict": "🔥 실제 화제성 폭증 — 인스타 36→243 (+158%) · 릴스 전략 효과"
+    },
+    "가마치통닭": {
+      "keywords": ["가마치통닭"],
+      "instagram": [
+        {"date": "202601", "freq": 57},
+        {"date": "202602", "freq": 57},
+        {"date": "202603", "freq": 102},
+        {"date": "202604", "freq": 70},
+        {"date": "202605", "freq": 69},
+        {"date": "202606", "freq": 43}
+      ],
+      "blog": [
+        {"date": "202601", "freq": 1298},
+        {"date": "202602", "freq": 693},
+        {"date": "202603", "freq": 549},
+        {"date": "202604", "freq": 500},
+        {"date": "202605", "freq": 575},
+        {"date": "202606", "freq": 362}
+      ],
+      "topAssoc": [
+        {"label": "통닭", "freq": 116},
+        {"label": "치킨", "freq": 19},
+        {"label": "먹다", "freq": 15},
+        {"label": "#가마치통닭", "freq": 13},
+        {"label": "전", "freq": 10},
+        {"label": "노력", "freq": 10},
+        {"label": "포장하다", "freq": 9},
+        {"label": "비소", "freq": 9},
+        {"label": "1년", "freq": 9}
+      ],
+      "growth_3m_pct": -16,
+      "verdict": "🟡 안정 frequency — 감소세"
+    },
+    "토핑몬스터피자": {
+      "keywords": ["토핑몬스터피자"],
+      "instagram": [
+        {"date": "202601", "freq": 3},
+        {"date": "202602", "freq": 4},
+        {"date": "202603", "freq": 1},
+        {"date": "202604", "freq": 5},
+        {"date": "202605", "freq": 8},
+        {"date": "202606", "freq": 8}
+      ],
+      "blog": [
+        {"date": "202601", "freq": 15},
+        {"date": "202602", "freq": 17},
+        {"date": "202603", "freq": 27},
+        {"date": "202604", "freq": 28},
+        {"date": "202605", "freq": 39},
+        {"date": "202606", "freq": 31}
+      ],
+      "topAssoc": [
+        {"label": "시키다", "freq": 2},
+        {"label": "몬스터", "freq": 2},
+        {"label": "#토핑몬스터피자", "freq": 2},
+        {"label": "피자", "freq": 2},
+        {"label": "고구마피자 먹다", "freq": 1},
+        {"label": "단호박고구마피자 먹다", "freq": 1}
+      ],
+      "growth_3m_pct": 163,
+      "verdict": "💤 미미함 — 절대량 월 10건 미만(노이즈 수준), 성장률은 참고용"
+    },
+    "처갓집양념치킨": {
+      "keywords": ["처갓집양념치킨", "처갓집"],
+      "instagram": [
+        {"date": "202601", "freq": 308},
+        {"date": "202602", "freq": 469},
+        {"date": "202603", "freq": 367},
+        {"date": "202604", "freq": 386},
+        {"date": "202605", "freq": 401},
+        {"date": "202606", "freq": 239}
+      ],
+      "blog": [
+        {"date": "202601", "freq": 2084},
+        {"date": "202602", "freq": 2172},
+        {"date": "202603", "freq": 2282},
+        {"date": "202604", "freq": 1792},
+        {"date": "202605", "freq": 1902},
+        {"date": "202606", "freq": 1505}
+      ],
+      "topAssoc": [
+        {"label": "치킨", "freq": 265},
+        {"label": "양념치킨", "freq": 229},
+        {"label": "#처갓집양념치킨", "freq": 82},
+        {"label": "#처갓집", "freq": 79},
+        {"label": "슈프림", "freq": 77},
+        {"label": "쿠폰", "freq": 54},
+        {"label": "할인", "freq": 51},
+        {"label": "후라이드", "freq": 50},
+        {"label": "양념", "freq": 46},
+        {"label": "미트칠리", "freq": 33}
+      ],
+      "growth_3m_pct": -10,
+      "verdict": "🔥 높은 화제성 유지 — 인스타 월평균 342건 고볼륨 (전분기比 -10%)"
+    },
+    "케이찹사라다": {
+      "keywords": ["케이찹사라다"],
+      "instagram": [
+        {"date": "202601", "freq": 0},
+        {"date": "202602", "freq": 0},
+        {"date": "202603", "freq": 0},
+        {"date": "202604", "freq": 0},
+        {"date": "202605", "freq": 0},
+        {"date": "202606", "freq": 0}
+      ],
+      "blog": [
+        {"date": "202601", "freq": 0},
+        {"date": "202602", "freq": 0},
+        {"date": "202603", "freq": 0},
+        {"date": "202604", "freq": 0},
+        {"date": "202605", "freq": 0},
+        {"date": "202606", "freq": 0}
+      ],
+      "topAssoc": [],
+      "growth_3m_pct": 0,
+      "verdict": "❌ SNS 흔적 0건 — 화제성 평가 불가"
+    }
+  },
+  "_methodology": {
+    "data_source": "Sometrend (Vibecompany) — 다음소프트 SNS analytics",
+    "growth_3m_pct_formula": "(최근 3개월 평균 / 직전 3개월 평균 - 1) * 100, instagram 기준",
+    "note": "토핑몬스터피자는 성장률 +163%이나 절대량이 월 10건 미만 노이즈 수준이라 verdict를 💤로 하향 조정함 (자율 판단)"
+  }
+}
+{
   "updated": "2026-06-20T04:05:02+09:00",
   "source": "Sometrend MCP (Vibecompany)",
   "period": "202601 ~ 20260620",
