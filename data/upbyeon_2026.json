@@ -1,5 +1,5 @@
 {
-  "updated": "2026-06-22T01:31:54+09:00",
+  "updated": "2026-06-22T20:04:56+09:00",
   "baseline_date": "20260101",
   "current_date": "20260622",
   "brands": {
@@ -11,6 +11,8 @@
       "candidate_count": 30,
       "verified_count": 30,
       "upbyeon_count": 4,
+      "upbyeon_count_real": 4,
+      "total_growth": 6,
       "upbyeon_ratio": 0.667,
       "is_upbyeon_specialist": true,
       "upbyeon": [
@@ -22,7 +24,7 @@
           "lcpmt": "2022-06-08",
           "dat_updt": "2026-05-16 03:03:03",
           "region_code": "5350000",
-          "region_name": "5350000",
+          "region_name": "기타 지역",
           "trivial": false
         },
         {
@@ -55,12 +57,10 @@
           "lcpmt": "1992-03-31",
           "dat_updt": "2026-05-13 22:47:50",
           "region_code": "4880000",
-          "region_name": "4880000",
+          "region_name": "기타 도",
           "trivial": false
         }
-      ],
-      "upbyeon_count_real": 4,
-      "total_growth": 6
+      ]
     },
     "빅대디": {
       "service": "ilban",
@@ -70,11 +70,11 @@
       "candidate_count": 50,
       "verified_count": 50,
       "upbyeon_count": 0,
+      "upbyeon_count_real": 0,
+      "total_growth": 1,
       "upbyeon_ratio": 0.0,
       "is_upbyeon_specialist": false,
-      "upbyeon": [],
-      "upbyeon_count_real": 0,
-      "total_growth": 1
+      "upbyeon": []
     },
     "한신포차": {
       "service": "ilban",
@@ -84,6 +84,8 @@
       "candidate_count": 119,
       "verified_count": 80,
       "upbyeon_count": 3,
+      "upbyeon_count_real": 3,
+      "total_growth": 4,
       "upbyeon_ratio": 0.75,
       "is_upbyeon_specialist": true,
       "upbyeon": [
@@ -95,7 +97,7 @@
           "lcpmt": "2024-08-13",
           "dat_updt": "2026-05-03 22:53:36",
           "region_code": "3530000",
-          "region_name": "3530000",
+          "region_name": "기타 시도",
           "trivial": false
         },
         {
@@ -120,9 +122,7 @@
           "region_name": "경기 성남시",
           "trivial": false
         }
-      ],
-      "upbyeon_count_real": 3,
-      "total_growth": 4
+      ]
     },
     "포차중문": {
       "service": "ilban",
@@ -132,8 +132,10 @@
       "candidate_count": 9,
       "verified_count": 9,
       "upbyeon_count": 5,
+      "upbyeon_count_real": 5,
+      "total_growth": 6,
       "upbyeon_ratio": 0.833,
-      "is_upbyeon_specialist": true,
+      "is_upbyeon_specialist": false,
       "upbyeon": [
         {
           "mng_no": "3350000-101-2014-00130",
@@ -165,7 +167,7 @@
           "lcpmt": "2001-12-13",
           "dat_updt": "2026-05-21 03:03:03",
           "region_code": "6510000",
-          "region_name": "제주특별자치도",
+          "region_name": "6510000",
           "trivial": false
         },
         {
@@ -190,9 +192,7 @@
           "region_name": "부산 금정구",
           "trivial": false
         }
-      ],
-      "upbyeon_count_real": 5,
-      "total_growth": 6
+      ]
     },
     "생마차": {
       "service": "ilban",
@@ -202,6 +202,8 @@
       "candidate_count": 97,
       "verified_count": 80,
       "upbyeon_count": 1,
+      "upbyeon_count_real": 0,
+      "total_growth": 1,
       "upbyeon_ratio": 0.0,
       "is_upbyeon_specialist": false,
       "upbyeon": [
@@ -213,12 +215,10 @@
           "lcpmt": "2024-02-19",
           "dat_updt": "2026-05-07 22:37:21",
           "region_code": "3630000",
-          "region_name": "3630000",
+          "region_name": "기타 시도",
           "trivial": true
         }
-      ],
-      "upbyeon_count_real": 0,
-      "total_growth": 1
+      ]
     },
     "1988포차": {
       "service": "ilban",
@@ -228,6 +228,8 @@
       "candidate_count": 3,
       "verified_count": 3,
       "upbyeon_count": 1,
+      "upbyeon_count_real": 1,
+      "total_growth": 2,
       "upbyeon_ratio": 0.5,
       "is_upbyeon_specialist": false,
       "upbyeon": [
@@ -242,9 +244,7 @@
           "region_name": "경기 남양주시",
           "trivial": false
         }
-      ],
-      "upbyeon_count_real": 1,
-      "total_growth": 2
+      ]
     },
     "BHC": {
       "service": "ilban",
@@ -254,6 +254,8 @@
       "candidate_count": 851,
       "verified_count": 80,
       "upbyeon_count": 5,
+      "upbyeon_count_real": 3,
+      "total_growth": 33,
       "upbyeon_ratio": 0.091,
       "is_upbyeon_specialist": false,
       "upbyeon": [
@@ -265,7 +267,7 @@
           "lcpmt": "2025-12-17",
           "dat_updt": "2026-01-07 22:17:50",
           "region_code": "3290000",
-          "region_name": "3290000",
+          "region_name": "기타 시도",
           "trivial": true
         },
         {
@@ -276,7 +278,7 @@
           "lcpmt": "2025-09-24",
           "dat_updt": "2026-05-12 22:47:50",
           "region_code": "4930000",
-          "region_name": "4930000",
+          "region_name": "기타 도",
           "trivial": false
         },
         {
@@ -298,7 +300,7 @@
           "lcpmt": "2025-05-02",
           "dat_updt": "2026-05-11 22:50:00",
           "region_code": "5000000",
-          "region_name": "5000000",
+          "region_name": "기타 지역",
           "trivial": true
         },
         {
@@ -309,12 +311,10 @@
           "lcpmt": "2024-05-21",
           "dat_updt": "2026-04-11 03:03:03",
           "region_code": "5480000",
-          "region_name": "5480000",
+          "region_name": "기타 지역",
           "trivial": false
         }
-      ],
-      "upbyeon_count_real": 3,
-      "total_growth": 33
+      ]
     },
     "BBQ": {
       "service": "ilban",
@@ -324,6 +324,8 @@
       "candidate_count": 829,
       "verified_count": 80,
       "upbyeon_count": 6,
+      "upbyeon_count_real": 6,
+      "total_growth": 39,
       "upbyeon_ratio": 0.154,
       "is_upbyeon_specialist": false,
       "upbyeon": [
@@ -335,7 +337,7 @@
           "lcpmt": "2025-10-27",
           "dat_updt": "2026-03-17 23:02:38",
           "region_code": "4810000",
-          "region_name": "4810000",
+          "region_name": "기타 도",
           "trivial": false
         },
         {
@@ -346,7 +348,7 @@
           "lcpmt": "2025-06-26",
           "dat_updt": "2026-03-11 01:40:33",
           "region_code": "3450000",
-          "region_name": "3450000",
+          "region_name": "기타 시도",
           "trivial": false
         },
         {
@@ -357,7 +359,7 @@
           "lcpmt": "2025-05-20",
           "dat_updt": "2026-05-23 03:03:03",
           "region_code": "5370000",
-          "region_name": "5370000",
+          "region_name": "기타 지역",
           "trivial": false
         },
         {
@@ -368,7 +370,7 @@
           "lcpmt": "2024-05-08",
           "dat_updt": "2026-05-23 03:03:03",
           "region_code": "4950000",
-          "region_name": "4950000",
+          "region_name": "기타 도",
           "trivial": false
         },
         {
@@ -379,7 +381,7 @@
           "lcpmt": "2024-04-30",
           "dat_updt": "2026-02-21 21:47:51",
           "region_code": "5700000",
-          "region_name": "5700000",
+          "region_name": "기타 지역",
           "trivial": false
         },
         {
@@ -390,12 +392,10 @@
           "lcpmt": "2024-03-15",
           "dat_updt": "2026-05-13 21:54:50",
           "region_code": "5590000",
-          "region_name": "5590000",
+          "region_name": "기타 지역",
           "trivial": false
         }
-      ],
-      "upbyeon_count_real": 6,
-      "total_growth": 39
+      ]
     },
     "교촌치킨": {
       "service": "ilban",
@@ -405,11 +405,11 @@
       "candidate_count": 806,
       "verified_count": 80,
       "upbyeon_count": 0,
+      "upbyeon_count_real": 0,
+      "total_growth": 17,
       "upbyeon_ratio": 0.0,
       "is_upbyeon_specialist": false,
-      "upbyeon": [],
-      "upbyeon_count_real": 0,
-      "total_growth": 17
+      "upbyeon": []
     },
     "굽네치킨": {
       "service": "ilban",
@@ -419,6 +419,8 @@
       "candidate_count": 821,
       "verified_count": 80,
       "upbyeon_count": 1,
+      "upbyeon_count_real": 1,
+      "total_growth": 11,
       "upbyeon_ratio": 0.091,
       "is_upbyeon_specialist": false,
       "upbyeon": [
@@ -430,12 +432,10 @@
           "lcpmt": "2025-08-28",
           "dat_updt": "2026-01-28 21:18:50",
           "region_code": "5690000",
-          "region_name": "5690000",
+          "region_name": "기타 지역",
           "trivial": false
         }
-      ],
-      "upbyeon_count_real": 1,
-      "total_growth": 11
+      ]
     },
     "깐부치킨": {
       "service": "ilban",
@@ -445,6 +445,8 @@
       "candidate_count": 160,
       "verified_count": 80,
       "upbyeon_count": 1,
+      "upbyeon_count_real": 1,
+      "total_growth": 12,
       "upbyeon_ratio": 0.083,
       "is_upbyeon_specialist": false,
       "upbyeon": [
@@ -459,9 +461,7 @@
           "region_name": "경기 파주시",
           "trivial": false
         }
-      ],
-      "upbyeon_count_real": 1,
-      "total_growth": 12
+      ]
     },
     "처갓집양념치킨": {
       "service": "ilban",
@@ -471,6 +471,8 @@
       "candidate_count": 799,
       "verified_count": 80,
       "upbyeon_count": 2,
+      "upbyeon_count_real": 2,
+      "total_growth": 36,
       "upbyeon_ratio": 0.056,
       "is_upbyeon_specialist": false,
       "upbyeon": [
@@ -482,7 +484,7 @@
           "lcpmt": "2024-08-09",
           "dat_updt": "2026-05-11 22:52:47",
           "region_code": "3330000",
-          "region_name": "3330000",
+          "region_name": "기타 시도",
           "trivial": false
         },
         {
@@ -493,12 +495,10 @@
           "lcpmt": "2023-08-16",
           "dat_updt": "2026-02-04 22:47:50",
           "region_code": "6510000",
-          "region_name": "제주특별자치도",
+          "region_name": "6510000",
           "trivial": false
         }
-      ],
-      "upbyeon_count_real": 2,
-      "total_growth": 36
+      ]
     },
     "노랑통닭": {
       "service": "ilban",
@@ -508,6 +508,8 @@
       "candidate_count": 646,
       "verified_count": 80,
       "upbyeon_count": 6,
+      "upbyeon_count_real": 6,
+      "total_growth": 42,
       "upbyeon_ratio": 0.143,
       "is_upbyeon_specialist": false,
       "upbyeon": [
@@ -519,7 +521,7 @@
           "lcpmt": "2025-08-14",
           "dat_updt": "2026-05-05 22:34:17",
           "region_code": "3370000",
-          "region_name": "3370000",
+          "region_name": "기타 시도",
           "trivial": false
         },
         {
@@ -530,7 +532,7 @@
           "lcpmt": "2025-05-26",
           "dat_updt": "2026-06-19 03:03:03",
           "region_code": "3310000",
-          "region_name": "3310000",
+          "region_name": "기타 시도",
           "trivial": false
         },
         {
@@ -541,7 +543,7 @@
           "lcpmt": "2025-05-15",
           "dat_updt": "2026-06-03 03:03:03",
           "region_code": "4620000",
-          "region_name": "4620000",
+          "region_name": "기타 도",
           "trivial": false
         },
         {
@@ -552,7 +554,7 @@
           "lcpmt": "2025-04-30",
           "dat_updt": "2026-05-01 03:03:03",
           "region_code": "4781000",
-          "region_name": "4781000",
+          "region_name": "기타 도",
           "trivial": false
         },
         {
@@ -563,7 +565,7 @@
           "lcpmt": "2024-11-01",
           "dat_updt": "2026-05-01 22:51:09",
           "region_code": "3520000",
-          "region_name": "3520000",
+          "region_name": "기타 시도",
           "trivial": false
         },
         {
@@ -574,12 +576,10 @@
           "lcpmt": "2024-10-08",
           "dat_updt": "2026-05-14 03:03:03",
           "region_code": "4181000",
-          "region_name": "4181000",
+          "region_name": "기타 도",
           "trivial": false
         }
-      ],
-      "upbyeon_count_real": 6,
-      "total_growth": 42
+      ]
     },
     "페리카나": {
       "service": "ilban",
@@ -589,6 +589,8 @@
       "candidate_count": 766,
       "verified_count": 80,
       "upbyeon_count": 1,
+      "upbyeon_count_real": 1,
+      "total_growth": 17,
       "upbyeon_ratio": 0.059,
       "is_upbyeon_specialist": false,
       "upbyeon": [
@@ -600,12 +602,10 @@
           "lcpmt": "2025-10-31",
           "dat_updt": "2026-05-20 03:03:03",
           "region_code": "5680000",
-          "region_name": "5680000",
+          "region_name": "기타 지역",
           "trivial": false
         }
-      ],
-      "upbyeon_count_real": 1,
-      "total_growth": 17
+      ]
     },
     "네네치킨": {
       "service": "ilban",
@@ -615,6 +615,8 @@
       "candidate_count": 793,
       "verified_count": 80,
       "upbyeon_count": 1,
+      "upbyeon_count_real": 1,
+      "total_growth": 7,
       "upbyeon_ratio": 0.143,
       "is_upbyeon_specialist": false,
       "upbyeon": [
@@ -626,12 +628,10 @@
           "lcpmt": "2019-10-30",
           "dat_updt": "2026-06-05 03:03:03",
           "region_code": "5430000",
-          "region_name": "5430000",
+          "region_name": "기타 지역",
           "trivial": false
         }
-      ],
-      "upbyeon_count_real": 1,
-      "total_growth": 7
+      ]
     },
     "호식이두마리치킨": {
       "service": "ilban",
@@ -641,6 +641,8 @@
       "candidate_count": 729,
       "verified_count": 80,
       "upbyeon_count": 1,
+      "upbyeon_count_real": 1,
+      "total_growth": 13,
       "upbyeon_ratio": 0.077,
       "is_upbyeon_specialist": false,
       "upbyeon": [
@@ -652,12 +654,10 @@
           "lcpmt": "2024-08-23",
           "dat_updt": "2026-01-13 22:47:50",
           "region_code": "3540000",
-          "region_name": "3540000",
+          "region_name": "기타 시도",
           "trivial": false
         }
-      ],
-      "upbyeon_count_real": 1,
-      "total_growth": 13
+      ]
     },
     "보드람치킨": {
       "service": "ilban",
@@ -667,6 +667,8 @@
       "candidate_count": 182,
       "verified_count": 80,
       "upbyeon_count": 3,
+      "upbyeon_count_real": 3,
+      "total_growth": 20,
       "upbyeon_ratio": 0.15,
       "is_upbyeon_specialist": false,
       "upbyeon": [
@@ -678,7 +680,7 @@
           "lcpmt": "2025-08-25",
           "dat_updt": "2026-05-13 21:54:54",
           "region_code": "5590000",
-          "region_name": "5590000",
+          "region_name": "기타 지역",
           "trivial": false
         },
         {
@@ -689,7 +691,7 @@
           "lcpmt": "2023-09-05",
           "dat_updt": "2026-05-05 22:02:47",
           "region_code": "5130000",
-          "region_name": "5130000",
+          "region_name": "기타 지역",
           "trivial": false
         },
         {
@@ -700,12 +702,10 @@
           "lcpmt": "2017-10-31",
           "dat_updt": "2026-02-20 21:17:51",
           "region_code": "5540000",
-          "region_name": "5540000",
+          "region_name": "기타 지역",
           "trivial": false
         }
-      ],
-      "upbyeon_count_real": 3,
-      "total_growth": 20
+      ]
     },
     "자담치킨": {
       "service": "ilban",
@@ -715,6 +715,8 @@
       "candidate_count": 608,
       "verified_count": 80,
       "upbyeon_count": 7,
+      "upbyeon_count_real": 7,
+      "total_growth": 41,
       "upbyeon_ratio": 0.171,
       "is_upbyeon_specialist": false,
       "upbyeon": [
@@ -726,7 +728,7 @@
           "lcpmt": "2025-12-24",
           "dat_updt": "2026-05-10 22:59:39",
           "region_code": "4390000",
-          "region_name": "충북 충주시",
+          "region_name": "기타 도",
           "trivial": false
         },
         {
@@ -737,7 +739,7 @@
           "lcpmt": "2025-09-11",
           "dat_updt": "2026-05-07 03:03:03",
           "region_code": "5250000",
-          "region_name": "5250000",
+          "region_name": "기타 지역",
           "trivial": false
         },
         {
@@ -759,7 +761,7 @@
           "lcpmt": "2024-09-30",
           "dat_updt": "2026-01-27 22:17:50",
           "region_code": "3460000",
-          "region_name": "3460000",
+          "region_name": "기타 시도",
           "trivial": false
         },
         {
@@ -781,7 +783,7 @@
           "lcpmt": "2024-09-10",
           "dat_updt": "2026-04-29 23:18:03",
           "region_code": "4671000",
-          "region_name": "4671000",
+          "region_name": "기타 도",
           "trivial": false
         },
         {
@@ -792,12 +794,10 @@
           "lcpmt": "2023-11-07",
           "dat_updt": "2026-03-19 22:47:56",
           "region_code": "4510000",
-          "region_name": "4510000",
+          "region_name": "기타 도",
           "trivial": false
         }
-      ],
-      "upbyeon_count_real": 7,
-      "total_growth": 41
+      ]
     },
     "멕시카나": {
       "service": "ilban",
@@ -807,6 +807,8 @@
       "candidate_count": 848,
       "verified_count": 80,
       "upbyeon_count": 14,
+      "upbyeon_count_real": 14,
+      "total_growth": 35,
       "upbyeon_ratio": 0.4,
       "is_upbyeon_specialist": false,
       "upbyeon": [
@@ -829,7 +831,7 @@
           "lcpmt": "2025-09-08",
           "dat_updt": "2026-04-21 03:03:03",
           "region_code": "5400000",
-          "region_name": "5400000",
+          "region_name": "기타 지역",
           "trivial": false
         },
         {
@@ -840,7 +842,7 @@
           "lcpmt": "2025-07-31",
           "dat_updt": "2026-05-22 03:03:03",
           "region_code": "5690000",
-          "region_name": "5690000",
+          "region_name": "기타 지역",
           "trivial": false
         },
         {
@@ -851,7 +853,7 @@
           "lcpmt": "2025-05-13",
           "dat_updt": "2026-05-07 22:37:26",
           "region_code": "3630000",
-          "region_name": "3630000",
+          "region_name": "기타 시도",
           "trivial": false
         },
         {
@@ -862,7 +864,7 @@
           "lcpmt": "2025-04-29",
           "dat_updt": "2026-05-05 22:54:01",
           "region_code": "4800000",
-          "region_name": "4800000",
+          "region_name": "기타 도",
           "trivial": false
         },
         {
@@ -873,7 +875,7 @@
           "lcpmt": "2025-01-10",
           "dat_updt": "2026-05-10 22:56:08",
           "region_code": "4530000",
-          "region_name": "4530000",
+          "region_name": "기타 도",
           "trivial": false
         },
         {
@@ -884,7 +886,7 @@
           "lcpmt": "2024-12-26",
           "dat_updt": "2026-04-11 03:03:03",
           "region_code": "5380000",
-          "region_name": "5380000",
+          "region_name": "기타 지역",
           "trivial": false
         },
         {
@@ -895,7 +897,7 @@
           "lcpmt": "2024-03-21",
           "dat_updt": "2026-03-11 01:43:51",
           "region_code": "3460000",
-          "region_name": "3460000",
+          "region_name": "기타 시도",
           "trivial": false
         },
         {
@@ -928,7 +930,7 @@
           "lcpmt": "2024-01-05",
           "dat_updt": "2026-05-05 22:53:57",
           "region_code": "4800000",
-          "region_name": "4800000",
+          "region_name": "기타 도",
           "trivial": false
         },
         {
@@ -939,7 +941,7 @@
           "lcpmt": "2023-07-10",
           "dat_updt": "2026-03-20 22:47:56",
           "region_code": "3510500",
-          "region_name": "3510500",
+          "region_name": "기타 시도",
           "trivial": false
         },
         {
@@ -961,12 +963,10 @@
           "lcpmt": "2022-06-08",
           "dat_updt": "2026-06-10 03:03:03",
           "region_code": "6510000",
-          "region_name": "제주특별자치도",
+          "region_name": "6510000",
           "trivial": false
         }
-      ],
-      "upbyeon_count_real": 14,
-      "total_growth": 35
+      ]
     },
     "투다리": {
       "service": "ilban",
@@ -976,6 +976,8 @@
       "candidate_count": 833,
       "verified_count": 80,
       "upbyeon_count": 2,
+      "upbyeon_count_real": 2,
+      "total_growth": 14,
       "upbyeon_ratio": 0.143,
       "is_upbyeon_specialist": false,
       "upbyeon": [
@@ -998,12 +1000,10 @@
           "lcpmt": "2024-07-22",
           "dat_updt": "2026-03-05 22:17:51",
           "region_code": "3670000",
-          "region_name": "3670000",
+          "region_name": "기타 시도",
           "trivial": false
         }
-      ],
-      "upbyeon_count_real": 2,
-      "total_growth": 14
+      ]
     },
     "봉구비어": {
       "service": "ilban",
@@ -1013,11 +1013,11 @@
       "candidate_count": 256,
       "verified_count": 80,
       "upbyeon_count": 0,
+      "upbyeon_count_real": 0,
+      "total_growth": 0,
       "upbyeon_ratio": 0,
       "is_upbyeon_specialist": false,
-      "upbyeon": [],
-      "upbyeon_count_real": 0,
-      "total_growth": 0
+      "upbyeon": []
     },
     "79대포": {
       "service": "ilban",
@@ -1027,6 +1027,8 @@
       "candidate_count": 99,
       "verified_count": 80,
       "upbyeon_count": 2,
+      "upbyeon_count_real": 2,
+      "total_growth": 8,
       "upbyeon_ratio": 0.25,
       "is_upbyeon_specialist": false,
       "upbyeon": [
@@ -1038,7 +1040,7 @@
           "lcpmt": "2023-05-24",
           "dat_updt": "2026-03-04 22:50:05",
           "region_code": "4810000",
-          "region_name": "4810000",
+          "region_name": "기타 도",
           "trivial": false
         },
         {
@@ -1049,12 +1051,10 @@
           "lcpmt": "2023-01-02",
           "dat_updt": "2026-03-07 21:18:54",
           "region_code": "4201000",
-          "region_name": "4201000",
+          "region_name": "기타 도",
           "trivial": false
         }
-      ],
-      "upbyeon_count_real": 2,
-      "total_growth": 8
+      ]
     },
     "청담이상": {
       "service": "ilban",
@@ -1064,11 +1064,11 @@
       "candidate_count": 42,
       "verified_count": 42,
       "upbyeon_count": 0,
+      "upbyeon_count_real": 0,
+      "total_growth": 0,
       "upbyeon_ratio": 0,
       "is_upbyeon_specialist": false,
-      "upbyeon": [],
-      "upbyeon_count_real": 0,
-      "total_growth": 0
+      "upbyeon": []
     },
     "야화혼술바": {
       "service": "ilban",
@@ -1078,11 +1078,11 @@
       "candidate_count": 0,
       "verified_count": 0,
       "upbyeon_count": 0,
+      "upbyeon_count_real": 0,
+      "total_growth": 12,
       "upbyeon_ratio": 0.0,
       "is_upbyeon_specialist": false,
-      "upbyeon": [],
-      "upbyeon_count_real": 0,
-      "total_growth": 12
+      "upbyeon": []
     },
     "우이락": {
       "service": "ilban",
@@ -1092,6 +1092,8 @@
       "candidate_count": 50,
       "verified_count": 50,
       "upbyeon_count": 5,
+      "upbyeon_count_real": 5,
+      "total_growth": 14,
       "upbyeon_ratio": 0.357,
       "is_upbyeon_specialist": false,
       "upbyeon": [
@@ -1114,7 +1116,7 @@
           "lcpmt": "2023-06-27",
           "dat_updt": "2026-06-12 03:03:03",
           "region_code": "4810000",
-          "region_name": "4810000",
+          "region_name": "기타 도",
           "trivial": false
         },
         {
@@ -1125,7 +1127,7 @@
           "lcpmt": "2010-08-02",
           "dat_updt": "2026-04-24 21:17:50",
           "region_code": "4271000",
-          "region_name": "4271000",
+          "region_name": "기타 도",
           "trivial": false
         },
         {
@@ -1136,7 +1138,7 @@
           "lcpmt": "2005-10-05",
           "dat_updt": "2026-05-11 22:48:05",
           "region_code": "3330000",
-          "region_name": "3330000",
+          "region_name": "기타 시도",
           "trivial": false
         },
         {
@@ -1147,12 +1149,10 @@
           "lcpmt": "2003-07-28",
           "dat_updt": "2026-05-21 03:03:03",
           "region_code": "4231000",
-          "region_name": "4231000",
+          "region_name": "기타 도",
           "trivial": false
         }
-      ],
-      "upbyeon_count_real": 5,
-      "total_growth": 14
+      ]
     },
     "새마을식당": {
       "service": "ilban",
@@ -1162,6 +1162,8 @@
       "candidate_count": 151,
       "verified_count": 80,
       "upbyeon_count": 1,
+      "upbyeon_count_real": 1,
+      "total_growth": 7,
       "upbyeon_ratio": 0.143,
       "is_upbyeon_specialist": false,
       "upbyeon": [
@@ -1173,12 +1175,10 @@
           "lcpmt": "2021-09-02",
           "dat_updt": "2026-05-11 22:52:23",
           "region_code": "3330000",
-          "region_name": "3330000",
+          "region_name": "기타 시도",
           "trivial": false
         }
-      ],
-      "upbyeon_count_real": 1,
-      "total_growth": 7
+      ]
     },
     "홍콩반점": {
       "service": "ilban",
@@ -1188,11 +1188,11 @@
       "candidate_count": 375,
       "verified_count": 80,
       "upbyeon_count": 0,
+      "upbyeon_count_real": 0,
+      "total_growth": 1,
       "upbyeon_ratio": 0.0,
       "is_upbyeon_specialist": false,
-      "upbyeon": [],
-      "upbyeon_count_real": 0,
-      "total_growth": 1
+      "upbyeon": []
     },
     "신선설농탕": {
       "service": "ilban",
@@ -1202,11 +1202,11 @@
       "candidate_count": 48,
       "verified_count": 48,
       "upbyeon_count": 0,
+      "upbyeon_count_real": 0,
+      "total_growth": 0,
       "upbyeon_ratio": 0,
       "is_upbyeon_specialist": false,
-      "upbyeon": [],
-      "upbyeon_count_real": 0,
-      "total_growth": 0
+      "upbyeon": []
     },
     "명륜진사갈비": {
       "service": "ilban",
@@ -1216,6 +1216,8 @@
       "candidate_count": 341,
       "verified_count": 80,
       "upbyeon_count": 2,
+      "upbyeon_count_real": 1,
+      "total_growth": 5,
       "upbyeon_ratio": 0.2,
       "is_upbyeon_specialist": false,
       "upbyeon": [
@@ -1241,9 +1243,7 @@
           "region_name": "경기 광주시",
           "trivial": false
         }
-      ],
-      "upbyeon_count_real": 1,
-      "total_growth": 5
+      ]
     }
   }
 }
