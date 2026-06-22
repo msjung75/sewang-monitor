@@ -1,0 +1,1249 @@
+{
+  "updated": "2026-06-22T01:31:54+09:00",
+  "baseline_date": "20260101",
+  "current_date": "20260622",
+  "brands": {
+    "88포차": {
+      "service": "ilban",
+      "current_count": 42,
+      "current_count_reported": 42,
+      "new_permits_count": 2,
+      "candidate_count": 30,
+      "verified_count": 30,
+      "upbyeon_count": 4,
+      "upbyeon_ratio": 0.667,
+      "is_upbyeon_specialist": true,
+      "upbyeon": [
+        {
+          "mng_no": "5350000-101-2022-00238",
+          "old_name": "88연탄구이집",
+          "new_name": "88포차",
+          "addr": "경상남도 김해시 가락로30번길 13, 101호 (부원동)",
+          "lcpmt": "2022-06-08",
+          "dat_updt": "2026-05-16 03:03:03",
+          "region_code": "5350000",
+          "region_name": "5350000",
+          "trivial": false
+        },
+        {
+          "mng_no": "3060000-101-2021-00304",
+          "old_name": "상봉포차",
+          "new_name": "88포차",
+          "addr": "서울특별시 중랑구 봉우재로43길 30, 1층 (상봉동)",
+          "lcpmt": "2021-11-09",
+          "dat_updt": "2026-05-10 23:02:30",
+          "region_code": "3060000",
+          "region_name": "서울 동대문구",
+          "trivial": false
+        },
+        {
+          "mng_no": "3990000-101-2017-00520",
+          "old_name": "풍천장어촌&흑돼지",
+          "new_name": "1988포차",
+          "addr": "경기도 남양주시 오남읍 양지로 284, 1층",
+          "lcpmt": "2017-11-06",
+          "dat_updt": "2026-03-24 21:17:49",
+          "region_code": "3990000",
+          "region_name": "경기 남양주시",
+          "trivial": false
+        },
+        {
+          "mng_no": "4880000-101-1992-00008",
+          "old_name": "청년순대국 고흥녹동점",
+          "new_name": "88포차",
+          "addr": "전라남도 고흥군 도양읍 비봉로 167, 103호",
+          "lcpmt": "1992-03-31",
+          "dat_updt": "2026-05-13 22:47:50",
+          "region_code": "4880000",
+          "region_name": "4880000",
+          "trivial": false
+        }
+      ],
+      "upbyeon_count_real": 4,
+      "total_growth": 6
+    },
+    "빅대디": {
+      "service": "ilban",
+      "current_count": 65,
+      "current_count_reported": 65,
+      "new_permits_count": 1,
+      "candidate_count": 50,
+      "verified_count": 50,
+      "upbyeon_count": 0,
+      "upbyeon_ratio": 0.0,
+      "is_upbyeon_specialist": false,
+      "upbyeon": [],
+      "upbyeon_count_real": 0,
+      "total_growth": 1
+    },
+    "한신포차": {
+      "service": "ilban",
+      "current_count": 206,
+      "current_count_reported": 206,
+      "new_permits_count": 1,
+      "candidate_count": 119,
+      "verified_count": 80,
+      "upbyeon_count": 3,
+      "upbyeon_ratio": 0.75,
+      "is_upbyeon_specialist": true,
+      "upbyeon": [
+        {
+          "mng_no": "3530000-101-2024-00321",
+          "old_name": "쌩라면 소래점",
+          "new_name": "한신포차 소래포구역점",
+          "addr": "인천광역시 남동구 소래역로 28, 조은프라자 1층 101호 (논현동)",
+          "lcpmt": "2024-08-13",
+          "dat_updt": "2026-05-03 22:53:36",
+          "region_code": "3530000",
+          "region_name": "3530000",
+          "trivial": false
+        },
+        {
+          "mng_no": "3050000-101-2022-00053",
+          "old_name": "초장집 장안점",
+          "new_name": "한신포차 장안점",
+          "addr": "서울특별시 동대문구 장한로 106, 장안동 상가 1층 (장안동)",
+          "lcpmt": "2022-02-24",
+          "dat_updt": "2026-02-03 22:17:50",
+          "region_code": "3050000",
+          "region_name": "서울 광진구",
+          "trivial": false
+        },
+        {
+          "mng_no": "3820000-101-2021-00261",
+          "old_name": "사랑관 의정부",
+          "new_name": "한신포차 의정부역점",
+          "addr": "경기도 의정부시 시민로132번길 9, 지상 1층 (의정부동)",
+          "lcpmt": "2021-06-30",
+          "dat_updt": "2026-06-05 03:03:03",
+          "region_code": "3820000",
+          "region_name": "경기 성남시",
+          "trivial": false
+        }
+      ],
+      "upbyeon_count_real": 3,
+      "total_growth": 4
+    },
+    "포차중문": {
+      "service": "ilban",
+      "current_count": 19,
+      "current_count_reported": 19,
+      "new_permits_count": 1,
+      "candidate_count": 9,
+      "verified_count": 9,
+      "upbyeon_count": 5,
+      "upbyeon_ratio": 0.833,
+      "is_upbyeon_specialist": true,
+      "upbyeon": [
+        {
+          "mng_no": "3350000-101-2014-00130",
+          "old_name": "빨간닭",
+          "new_name": "포차중문 부산대점",
+          "addr": "부산광역시 금정구 부산대학로50번길 17 (장전동)",
+          "lcpmt": "2014-08-06",
+          "dat_updt": "2026-03-11 01:35:11",
+          "region_code": "3350000",
+          "region_name": "부산 금정구",
+          "trivial": false
+        },
+        {
+          "mng_no": "3990000-101-2014-00060",
+          "old_name": "생마차 진접점",
+          "new_name": "포차중문 남양주진접점",
+          "addr": "경기도 남양주시 진접읍 해밀예당1로 50-47 (101호,102호)",
+          "lcpmt": "2014-02-17",
+          "dat_updt": "2026-05-12 21:17:49",
+          "region_code": "3990000",
+          "region_name": "경기 남양주시",
+          "trivial": false
+        },
+        {
+          "mng_no": "6510000-101-2001-00637",
+          "old_name": "천하육회시청점",
+          "new_name": "포차중문",
+          "addr": "제주특별자치도 제주시 광양8길 9 (이도이동)",
+          "lcpmt": "2001-12-13",
+          "dat_updt": "2026-05-21 03:03:03",
+          "region_code": "6510000",
+          "region_name": "제주특별자치도",
+          "trivial": false
+        },
+        {
+          "mng_no": "3600000-101-2001-00656",
+          "old_name": "전포여관 광주상무점",
+          "new_name": "포차중문",
+          "addr": "광주광역시 서구 시청로56번길 18 (치평동)",
+          "lcpmt": "2001-11-23",
+          "dat_updt": "2026-06-20 03:03:03",
+          "region_code": "3600000",
+          "region_name": "광주광역시",
+          "trivial": false
+        },
+        {
+          "mng_no": "3350000-101-1993-02101",
+          "old_name": "빨간닭",
+          "new_name": "포차중문 부산대점",
+          "addr": "부산광역시 금정구 부산대학로50번길 17 (장전동)",
+          "lcpmt": "1993-11-03",
+          "dat_updt": "2026-03-11 01:33:14",
+          "region_code": "3350000",
+          "region_name": "부산 금정구",
+          "trivial": false
+        }
+      ],
+      "upbyeon_count_real": 5,
+      "total_growth": 6
+    },
+    "생마차": {
+      "service": "ilban",
+      "current_count": 148,
+      "current_count_reported": 148,
+      "new_permits_count": 1,
+      "candidate_count": 97,
+      "verified_count": 80,
+      "upbyeon_count": 1,
+      "upbyeon_ratio": 0.0,
+      "is_upbyeon_specialist": false,
+      "upbyeon": [
+        {
+          "mng_no": "3630000-101-2024-00063",
+          "old_name": "생마차광주첨단점",
+          "new_name": "생마차 광주첨단점",
+          "addr": "광주광역시 광산구 임방울대로826번길 47, 1층 111,112호 (쌍암동)",
+          "lcpmt": "2024-02-19",
+          "dat_updt": "2026-05-07 22:37:21",
+          "region_code": "3630000",
+          "region_name": "3630000",
+          "trivial": true
+        }
+      ],
+      "upbyeon_count_real": 0,
+      "total_growth": 1
+    },
+    "1988포차": {
+      "service": "ilban",
+      "current_count": 5,
+      "current_count_reported": 5,
+      "new_permits_count": 1,
+      "candidate_count": 3,
+      "verified_count": 3,
+      "upbyeon_count": 1,
+      "upbyeon_ratio": 0.5,
+      "is_upbyeon_specialist": false,
+      "upbyeon": [
+        {
+          "mng_no": "3990000-101-2017-00520",
+          "old_name": "풍천장어촌&흑돼지",
+          "new_name": "1988포차",
+          "addr": "경기도 남양주시 오남읍 양지로 284, 1층",
+          "lcpmt": "2017-11-06",
+          "dat_updt": "2026-03-24 21:17:49",
+          "region_code": "3990000",
+          "region_name": "경기 남양주시",
+          "trivial": false
+        }
+      ],
+      "upbyeon_count_real": 1,
+      "total_growth": 2
+    },
+    "BHC": {
+      "service": "ilban",
+      "current_count": 1500,
+      "current_count_reported": 2080,
+      "new_permits_count": 30,
+      "candidate_count": 851,
+      "verified_count": 80,
+      "upbyeon_count": 5,
+      "upbyeon_ratio": 0.091,
+      "is_upbyeon_specialist": false,
+      "upbyeon": [
+        {
+          "mng_no": "3290000-101-2025-00413",
+          "old_name": "BHC",
+          "new_name": "비에이치씨(BHC)",
+          "addr": "부산광역시 부산진구 범일로 161-1, 1층 102호 (범천동, 범천 SJ FABER)",
+          "lcpmt": "2025-12-17",
+          "dat_updt": "2026-01-07 22:17:50",
+          "region_code": "3290000",
+          "region_name": "3290000",
+          "trivial": true
+        },
+        {
+          "mng_no": "4930000-101-2025-00065",
+          "old_name": "또그랑",
+          "new_name": "비에이치씨(BHC) 해남화원점",
+          "addr": "전라남도 해남군 화원면 금평길 14-6, 1층",
+          "lcpmt": "2025-09-24",
+          "dat_updt": "2026-05-12 22:47:50",
+          "region_code": "4930000",
+          "region_name": "4930000",
+          "trivial": false
+        },
+        {
+          "mng_no": "3180000-101-2025-00616",
+          "old_name": "브뤼셀프라이 여의도점",
+          "new_name": "BHC 서울크루즈점",
+          "addr": "서울특별시 영등포구 여의도한강공원길 231, 1-5호 (여의도동)",
+          "lcpmt": "2025-09-15",
+          "dat_updt": "2026-05-08 03:03:03",
+          "region_code": "3180000",
+          "region_name": "서울 금천구",
+          "trivial": false
+        },
+        {
+          "mng_no": "5000000-101-2025-00029",
+          "old_name": "트레비",
+          "new_name": "트레비&BHC 진도의신점",
+          "addr": "전라남도 진도군 의신면 진도대로 2420, 1층",
+          "lcpmt": "2025-05-02",
+          "dat_updt": "2026-05-11 22:50:00",
+          "region_code": "5000000",
+          "region_name": "5000000",
+          "trivial": true
+        },
+        {
+          "mng_no": "5480000-101-2024-00015",
+          "old_name": "꼬꼬와 꿀꿀",
+          "new_name": "비에이치씨(BHC)합천청덕점",
+          "addr": "경상남도 합천군 청덕면 동부로 1757",
+          "lcpmt": "2024-05-21",
+          "dat_updt": "2026-04-11 03:03:03",
+          "region_code": "5480000",
+          "region_name": "5480000",
+          "trivial": false
+        }
+      ],
+      "upbyeon_count_real": 3,
+      "total_growth": 33
+    },
+    "BBQ": {
+      "service": "ilban",
+      "current_count": 1500,
+      "current_count_reported": 1913,
+      "new_permits_count": 33,
+      "candidate_count": 829,
+      "verified_count": 80,
+      "upbyeon_count": 6,
+      "upbyeon_ratio": 0.154,
+      "is_upbyeon_specialist": false,
+      "upbyeon": [
+        {
+          "mng_no": "4810000-101-2025-00311",
+          "old_name": "청홍바다마루 BBQ",
+          "new_name": "여수바다마루BBQ",
+          "addr": "전라남도 여수시 돌산읍 백초길 53-12, 1층",
+          "lcpmt": "2025-10-27",
+          "dat_updt": "2026-03-17 23:02:38",
+          "region_code": "4810000",
+          "region_name": "4810000",
+          "trivial": false
+        },
+        {
+          "mng_no": "3450000-101-2025-00170",
+          "old_name": "피자플렉스 칠곡점",
+          "new_name": "비비큐(BBQ) 대구읍내점",
+          "addr": "대구광역시 북구 구암로17길 2, 1층 (읍내동)",
+          "lcpmt": "2025-06-26",
+          "dat_updt": "2026-03-11 01:40:33",
+          "region_code": "3450000",
+          "region_name": "3450000",
+          "trivial": false
+        },
+        {
+          "mng_no": "5370000-101-2025-00077",
+          "old_name": "뽀글이분식",
+          "new_name": "비비큐(BBQ)연초점",
+          "addr": "경상남도 거제시 연초면 죽토로 31, 1층",
+          "lcpmt": "2025-05-20",
+          "dat_updt": "2026-05-23 03:03:03",
+          "region_code": "5370000",
+          "region_name": "5370000",
+          "trivial": false
+        },
+        {
+          "mng_no": "4950000-101-2024-00048",
+          "old_name": "호식이두마리치킨 전남무안점",
+          "new_name": "BBQ 무안군청점",
+          "addr": "전라남도 무안군 무안읍 뻘낙지길 5",
+          "lcpmt": "2024-05-08",
+          "dat_updt": "2026-05-23 03:03:03",
+          "region_code": "4950000",
+          "region_name": "4950000",
+          "trivial": false
+        },
+        {
+          "mng_no": "5700000-101-2024-00042",
+          "old_name": "커피와 호두과자",
+          "new_name": "BBQ 문장주유소점",
+          "addr": "경기도 여주시 흥천면 이여로 924",
+          "lcpmt": "2024-04-30",
+          "dat_updt": "2026-02-21 21:47:51",
+          "region_code": "5700000",
+          "region_name": "5700000",
+          "trivial": false
+        },
+        {
+          "mng_no": "5590000-101-2024-00073",
+          "old_name": "생마차 양주옥정점",
+          "new_name": "BBQ 양주옥정중앙점",
+          "addr": "경기도 양주시 옥정동로7다길 74, 115,116호 (옥정동)",
+          "lcpmt": "2024-03-15",
+          "dat_updt": "2026-05-13 21:54:50",
+          "region_code": "5590000",
+          "region_name": "5590000",
+          "trivial": false
+        }
+      ],
+      "upbyeon_count_real": 6,
+      "total_growth": 39
+    },
+    "교촌치킨": {
+      "service": "ilban",
+      "current_count": 1500,
+      "current_count_reported": 2023,
+      "new_permits_count": 17,
+      "candidate_count": 806,
+      "verified_count": 80,
+      "upbyeon_count": 0,
+      "upbyeon_ratio": 0.0,
+      "is_upbyeon_specialist": false,
+      "upbyeon": [],
+      "upbyeon_count_real": 0,
+      "total_growth": 17
+    },
+    "굽네치킨": {
+      "service": "ilban",
+      "current_count": 1500,
+      "current_count_reported": 1712,
+      "new_permits_count": 10,
+      "candidate_count": 821,
+      "verified_count": 80,
+      "upbyeon_count": 1,
+      "upbyeon_ratio": 0.091,
+      "is_upbyeon_specialist": false,
+      "upbyeon": [
+        {
+          "mng_no": "5690000-101-2025-00299",
+          "old_name": "크레센트 디저트 카페",
+          "new_name": "굽네치킨 조치원점",
+          "addr": "세종특별자치시 조치원읍 죽림로 37, 1층",
+          "lcpmt": "2025-08-28",
+          "dat_updt": "2026-01-28 21:18:50",
+          "region_code": "5690000",
+          "region_name": "5690000",
+          "trivial": false
+        }
+      ],
+      "upbyeon_count_real": 1,
+      "total_growth": 11
+    },
+    "깐부치킨": {
+      "service": "ilban",
+      "current_count": 319,
+      "current_count_reported": 319,
+      "new_permits_count": 11,
+      "candidate_count": 160,
+      "verified_count": 80,
+      "upbyeon_count": 1,
+      "upbyeon_ratio": 0.083,
+      "is_upbyeon_specialist": false,
+      "upbyeon": [
+        {
+          "mng_no": "3980000-101-2018-00041",
+          "old_name": "깐부치킨 구리 장자못점",
+          "new_name": "주식회사 가온인터벤션 깐부치킨 구리장자못점",
+          "addr": "경기도 구리시 장자대로86번길 14-15, 1층 (수택동)",
+          "lcpmt": "2018-03-08",
+          "dat_updt": "2026-02-04 21:17:50",
+          "region_code": "3980000",
+          "region_name": "경기 파주시",
+          "trivial": false
+        }
+      ],
+      "upbyeon_count_real": 1,
+      "total_growth": 12
+    },
+    "처갓집양념치킨": {
+      "service": "ilban",
+      "current_count": 1500,
+      "current_count_reported": 1529,
+      "new_permits_count": 34,
+      "candidate_count": 799,
+      "verified_count": 80,
+      "upbyeon_count": 2,
+      "upbyeon_ratio": 0.056,
+      "is_upbyeon_specialist": false,
+      "upbyeon": [
+        {
+          "mng_no": "3330000-101-2024-00334",
+          "old_name": "에그182",
+          "new_name": "처갓집양념치킨 재송점",
+          "addr": "부산광역시 해운대구 재송1로32번길 7, 1층 일부호 (재송동)",
+          "lcpmt": "2024-08-09",
+          "dat_updt": "2026-05-11 22:52:47",
+          "region_code": "3330000",
+          "region_name": "3330000",
+          "trivial": false
+        },
+        {
+          "mng_no": "6510000-101-2023-00600",
+          "old_name": "평민닭발연동점",
+          "new_name": "처갓집양념치킨신제주점",
+          "addr": "제주특별자치도 제주시 성신로1길 21, 1층 (연동)",
+          "lcpmt": "2023-08-16",
+          "dat_updt": "2026-02-04 22:47:50",
+          "region_code": "6510000",
+          "region_name": "제주특별자치도",
+          "trivial": false
+        }
+      ],
+      "upbyeon_count_real": 2,
+      "total_growth": 36
+    },
+    "노랑통닭": {
+      "service": "ilban",
+      "current_count": 1114,
+      "current_count_reported": 1114,
+      "new_permits_count": 36,
+      "candidate_count": 646,
+      "verified_count": 80,
+      "upbyeon_count": 6,
+      "upbyeon_ratio": 0.143,
+      "is_upbyeon_specialist": false,
+      "upbyeon": [
+        {
+          "mng_no": "3370000-101-2025-00091",
+          "old_name": "노랑통닭 연산9동점",
+          "new_name": "노랑통닭 토곡점",
+          "addr": "부산광역시 연제구 연안로 8, 1층 일부호 (연산동)",
+          "lcpmt": "2025-08-14",
+          "dat_updt": "2026-05-05 22:34:17",
+          "region_code": "3370000",
+          "region_name": "3370000",
+          "trivial": false
+        },
+        {
+          "mng_no": "3310000-101-2025-00055",
+          "old_name": "배통치킨",
+          "new_name": "노랑통닭 용호데시앙점",
+          "addr": "부산광역시 남구 용호로 254, 1층 일부 (용호동)",
+          "lcpmt": "2025-05-26",
+          "dat_updt": "2026-06-19 03:03:03",
+          "region_code": "3310000",
+          "region_name": "3310000",
+          "trivial": false
+        },
+        {
+          "mng_no": "4620000-101-2025-00032",
+          "old_name": "신두리맛집어촌집회수산(직판장내)",
+          "new_name": "노랑통닭 신두리해수욕장점",
+          "addr": "충청남도 태안군 원북면 신두로 727, 2동 1층",
+          "lcpmt": "2025-05-15",
+          "dat_updt": "2026-06-03 03:03:03",
+          "region_code": "4620000",
+          "region_name": "4620000",
+          "trivial": false
+        },
+        {
+          "mng_no": "4781000-101-2025-00021",
+          "old_name": "올리브",
+          "new_name": "노랑통닭 고창대산점",
+          "addr": "전북특별자치도 고창군 대산면 대성로 287",
+          "lcpmt": "2025-04-30",
+          "dat_updt": "2026-05-01 03:03:03",
+          "region_code": "4781000",
+          "region_name": "4781000",
+          "trivial": false
+        },
+        {
+          "mng_no": "3520000-101-2024-00546",
+          "old_name": "다퍼주는 다찌",
+          "new_name": "노랑통닭 인천대입구역점",
+          "addr": "인천광역시 연수구 테크노파크로111번길 11, 시카고타워 1층 101호 (송도동)",
+          "lcpmt": "2024-11-01",
+          "dat_updt": "2026-05-01 22:51:09",
+          "region_code": "3520000",
+          "region_name": "3520000",
+          "trivial": false
+        },
+        {
+          "mng_no": "4181000-101-2024-00347",
+          "old_name": "덤브치킨춘천우두점",
+          "new_name": "노랑통닭우두점",
+          "addr": "강원특별자치도 춘천시 우두1길 140, 210동 110호 (우두동, 춘천우두 EG the1 2차)",
+          "lcpmt": "2024-10-08",
+          "dat_updt": "2026-05-14 03:03:03",
+          "region_code": "4181000",
+          "region_name": "4181000",
+          "trivial": false
+        }
+      ],
+      "upbyeon_count_real": 6,
+      "total_growth": 42
+    },
+    "페리카나": {
+      "service": "ilban",
+      "current_count": 1500,
+      "current_count_reported": 2585,
+      "new_permits_count": 16,
+      "candidate_count": 766,
+      "verified_count": 80,
+      "upbyeon_count": 1,
+      "upbyeon_ratio": 0.059,
+      "is_upbyeon_specialist": false,
+      "upbyeon": [
+        {
+          "mng_no": "5680000-101-2025-00189",
+          "old_name": "신념치킨",
+          "new_name": "페리카나(합덕점)",
+          "addr": "충청남도 당진시 합덕읍 버그내2길 45-10, 1동",
+          "lcpmt": "2025-10-31",
+          "dat_updt": "2026-05-20 03:03:03",
+          "region_code": "5680000",
+          "region_name": "5680000",
+          "trivial": false
+        }
+      ],
+      "upbyeon_count_real": 1,
+      "total_growth": 17
+    },
+    "네네치킨": {
+      "service": "ilban",
+      "current_count": 1453,
+      "current_count_reported": 1453,
+      "new_permits_count": 6,
+      "candidate_count": 793,
+      "verified_count": 80,
+      "upbyeon_count": 1,
+      "upbyeon_ratio": 0.143,
+      "is_upbyeon_specialist": false,
+      "upbyeon": [
+        {
+          "mng_no": "5430000-101-2019-00051",
+          "old_name": "비에이치씨(BHC)남해남면점",
+          "new_name": "네네치킨 남해남면점",
+          "addr": "경상남도 남해군 남면 남서대로 798 (102호)",
+          "lcpmt": "2019-10-30",
+          "dat_updt": "2026-06-05 03:03:03",
+          "region_code": "5430000",
+          "region_name": "5430000",
+          "trivial": false
+        }
+      ],
+      "upbyeon_count_real": 1,
+      "total_growth": 7
+    },
+    "호식이두마리치킨": {
+      "service": "ilban",
+      "current_count": 1268,
+      "current_count_reported": 1268,
+      "new_permits_count": 12,
+      "candidate_count": 729,
+      "verified_count": 80,
+      "upbyeon_count": 1,
+      "upbyeon_ratio": 0.077,
+      "is_upbyeon_specialist": false,
+      "upbyeon": [
+        {
+          "mng_no": "3540000-101-2024-00279",
+          "old_name": "바른치킨 부평점",
+          "new_name": "호식이두마리치킨 부평중앙점",
+          "addr": "인천광역시 부평구 경인로1012번길 12-6, 1층 (부평동)",
+          "lcpmt": "2024-08-23",
+          "dat_updt": "2026-01-13 22:47:50",
+          "region_code": "3540000",
+          "region_name": "3540000",
+          "trivial": false
+        }
+      ],
+      "upbyeon_count_real": 1,
+      "total_growth": 13
+    },
+    "보드람치킨": {
+      "service": "ilban",
+      "current_count": 348,
+      "current_count_reported": 348,
+      "new_permits_count": 17,
+      "candidate_count": 182,
+      "verified_count": 80,
+      "upbyeon_count": 3,
+      "upbyeon_ratio": 0.15,
+      "is_upbyeon_specialist": false,
+      "upbyeon": [
+        {
+          "mng_no": "5590000-101-2025-00221",
+          "old_name": "뒷돈",
+          "new_name": "보드람치킨 양주옥정신도시점",
+          "addr": "경기도 양주시 옥정동로7나길 15, 폴리프라자1 101,102호 (옥정동)",
+          "lcpmt": "2025-08-25",
+          "dat_updt": "2026-05-13 21:54:54",
+          "region_code": "5590000",
+          "region_name": "5590000",
+          "trivial": false
+        },
+        {
+          "mng_no": "5130000-101-2023-00248",
+          "old_name": "용공장",
+          "new_name": "보드람치킨(경산사동점)",
+          "addr": "경상북도 경산시 박물관로 23, 1층 (사동)",
+          "lcpmt": "2023-09-05",
+          "dat_updt": "2026-05-05 22:02:47",
+          "region_code": "5130000",
+          "region_name": "5130000",
+          "trivial": false
+        },
+        {
+          "mng_no": "5540000-101-2017-00242",
+          "old_name": "고래고래",
+          "new_name": "보드람치킨 곤지암삼리점",
+          "addr": "경기도 광주시 곤지암읍 평촌길 39, 1층",
+          "lcpmt": "2017-10-31",
+          "dat_updt": "2026-02-20 21:17:51",
+          "region_code": "5540000",
+          "region_name": "5540000",
+          "trivial": false
+        }
+      ],
+      "upbyeon_count_real": 3,
+      "total_growth": 20
+    },
+    "자담치킨": {
+      "service": "ilban",
+      "current_count": 1151,
+      "current_count_reported": 1151,
+      "new_permits_count": 34,
+      "candidate_count": 608,
+      "verified_count": 80,
+      "upbyeon_count": 7,
+      "upbyeon_ratio": 0.171,
+      "is_upbyeon_specialist": false,
+      "upbyeon": [
+        {
+          "mng_no": "4390000-101-2025-00366",
+          "old_name": "헬로팬닭갈비",
+          "new_name": "자담치킨서충주신도시점",
+          "addr": "충청북도 충주시 대소원면 첨단쉼터6길 39-9, 1층",
+          "lcpmt": "2025-12-24",
+          "dat_updt": "2026-05-10 22:59:39",
+          "region_code": "4390000",
+          "region_name": "충북 충주시",
+          "trivial": false
+        },
+        {
+          "mng_no": "5250000-101-2025-00061",
+          "old_name": "둘둘치킨 망양점",
+          "new_name": "자담치킨 망양점",
+          "addr": "경상북도 울진군 기성면 망양로 111, 삼성모텔",
+          "lcpmt": "2025-09-11",
+          "dat_updt": "2026-05-07 03:03:03",
+          "region_code": "5250000",
+          "region_name": "5250000",
+          "trivial": false
+        },
+        {
+          "mng_no": "3130000-101-2025-00634",
+          "old_name": "짜글이를 부탁해",
+          "new_name": "자담치킨 서강대점",
+          "addr": "서울특별시 마포구 광성로 28, 상가동 지2층 102호 (신수동, 마포벽산 이-솔렌스힐아파트)",
+          "lcpmt": "2025-08-29",
+          "dat_updt": "2026-05-08 22:51:46",
+          "region_code": "3130000",
+          "region_name": "서울 서대문구",
+          "trivial": false
+        },
+        {
+          "mng_no": "3460000-101-2024-00383",
+          "old_name": "씨네마맥주대구수성트럼프월드점",
+          "new_name": "자담치킨두산점",
+          "addr": "대구광역시 수성구 동대구로 59, 1층 B-8호 (두산동, 대우트럼프월드수성아파트)",
+          "lcpmt": "2024-09-30",
+          "dat_updt": "2026-01-27 22:17:50",
+          "region_code": "3460000",
+          "region_name": "3460000",
+          "trivial": false
+        },
+        {
+          "mng_no": "3260000-101-2024-00045",
+          "old_name": "텐카츠야 송도점",
+          "new_name": "자담치킨 송도해수욕장점",
+          "addr": "부산광역시 서구 충무대로34번길 47, 1층 (암남동, 송도비치텔)",
+          "lcpmt": "2024-09-24",
+          "dat_updt": "2026-05-09 22:39:20",
+          "region_code": "3260000",
+          "region_name": "부산광역시",
+          "trivial": false
+        },
+        {
+          "mng_no": "4671000-101-2024-00240",
+          "old_name": "밥을 훔친찬",
+          "new_name": "자담치킨군산지곡점",
+          "addr": "전북특별자치도 군산시 의료원로 57-15 (지곡동)",
+          "lcpmt": "2024-09-10",
+          "dat_updt": "2026-04-29 23:18:03",
+          "region_code": "4671000",
+          "region_name": "4671000",
+          "trivial": false
+        },
+        {
+          "mng_no": "4510000-101-2023-00122",
+          "old_name": "무창포 먹거리식당＆파닭",
+          "new_name": "무창포 먹거리식당&자담치킨",
+          "addr": "충청남도 보령시 웅천읍 열린바다로 388-9, 1,2층",
+          "lcpmt": "2023-11-07",
+          "dat_updt": "2026-03-19 22:47:56",
+          "region_code": "4510000",
+          "region_name": "4510000",
+          "trivial": false
+        }
+      ],
+      "upbyeon_count_real": 7,
+      "total_growth": 41
+    },
+    "멕시카나": {
+      "service": "ilban",
+      "current_count": 1500,
+      "current_count_reported": 2064,
+      "new_permits_count": 21,
+      "candidate_count": 848,
+      "verified_count": 80,
+      "upbyeon_count": 14,
+      "upbyeon_ratio": 0.4,
+      "is_upbyeon_specialist": false,
+      "upbyeon": [
+        {
+          "mng_no": "3240000-101-2025-00483",
+          "old_name": "황금맥주",
+          "new_name": "멕시카나치킨 천호초교점",
+          "addr": "서울특별시 강동구 구천면로 334, 1층 (천호동)",
+          "lcpmt": "2025-12-29",
+          "dat_updt": "2026-06-05 03:03:03",
+          "region_code": "3240000",
+          "region_name": "서울 송파구",
+          "trivial": false
+        },
+        {
+          "mng_no": "5400000-101-2025-00040",
+          "old_name": "든든한 한상",
+          "new_name": "멕시카나 치킨 호암점",
+          "addr": "경상남도 함안군 칠원읍 오곡로 94, 칠원그랜드쇼핑 2층 201호",
+          "lcpmt": "2025-09-08",
+          "dat_updt": "2026-04-21 03:03:03",
+          "region_code": "5400000",
+          "region_name": "5400000",
+          "trivial": false
+        },
+        {
+          "mng_no": "5690000-101-2025-00266",
+          "old_name": "칠오일(751)",
+          "new_name": "멕시카나 세종나성점",
+          "addr": "세종특별자치시 한누리대로 223, 리베라아이누리 1층 105호 (나성동)",
+          "lcpmt": "2025-07-31",
+          "dat_updt": "2026-05-22 03:03:03",
+          "region_code": "5690000",
+          "region_name": "5690000",
+          "trivial": false
+        },
+        {
+          "mng_no": "3630000-101-2025-00107",
+          "old_name": "팔곡보쌈",
+          "new_name": "멕시카나 신창제일점",
+          "addr": "광주광역시 광산구 신창로35번길 7, 1층 (신가동)",
+          "lcpmt": "2025-05-13",
+          "dat_updt": "2026-05-07 22:37:26",
+          "region_code": "3630000",
+          "region_name": "3630000",
+          "trivial": false
+        },
+        {
+          "mng_no": "4800000-101-2025-00088",
+          "old_name": "포차처럼양아치킨목포옥암점",
+          "new_name": "멕시카나치킨평화광장점",
+          "addr": "전라남도 목포시 원형서로 46-1, 112호 (상동, 양우비치팰리스)",
+          "lcpmt": "2025-04-29",
+          "dat_updt": "2026-05-05 22:54:01",
+          "region_code": "4800000",
+          "region_name": "4800000",
+          "trivial": false
+        },
+        {
+          "mng_no": "4530000-101-2025-00003",
+          "old_name": "주락실",
+          "new_name": "멕시카나 서산호수공원점",
+          "addr": "충청남도 서산시 대지제1길 11, 1층 102호 (읍내동)",
+          "lcpmt": "2025-01-10",
+          "dat_updt": "2026-05-10 22:56:08",
+          "region_code": "4530000",
+          "region_name": "4530000",
+          "trivial": false
+        },
+        {
+          "mng_no": "5380000-101-2024-00474",
+          "old_name": "맥시칸치킨 양산사송점",
+          "new_name": "멕시카나 양산사송점",
+          "addr": "경상남도 양산시 동면 내송큰들로 73, 상가동 408호 (사송더샵데시앙 4단지)",
+          "lcpmt": "2024-12-26",
+          "dat_updt": "2026-04-11 03:03:03",
+          "region_code": "5380000",
+          "region_name": "5380000",
+          "trivial": false
+        },
+        {
+          "mng_no": "3460000-101-2024-00089",
+          "old_name": "바사쿠치킨범어",
+          "new_name": "멕시카나치킨범어점",
+          "addr": "대구광역시 수성구 청솔로14길 39, 1층 (범어동)",
+          "lcpmt": "2024-03-21",
+          "dat_updt": "2026-03-11 01:43:51",
+          "region_code": "3460000",
+          "region_name": "3460000",
+          "trivial": false
+        },
+        {
+          "mng_no": "3910000-101-2024-00073",
+          "old_name": "멕시카나 평택1호점",
+          "new_name": "멕시카나 평택점",
+          "addr": "경기도 평택시 원평로52번길 49-3, 1층 (평택동)",
+          "lcpmt": "2024-03-13",
+          "dat_updt": "2026-02-21 21:51:15",
+          "region_code": "3910000",
+          "region_name": "경기 과천시",
+          "trivial": false
+        },
+        {
+          "mng_no": "3380000-101-2024-00040",
+          "old_name": "역 민락점",
+          "new_name": "멕시카나 민락역점",
+          "addr": "부산광역시 수영구 광안해변로326번길 32, 114호 (민락동, e편한세상 오션테라스 3단지)",
+          "lcpmt": "2024-03-06",
+          "dat_updt": "2026-05-11 22:45:50",
+          "region_code": "3380000",
+          "region_name": "부산 수영구",
+          "trivial": false
+        },
+        {
+          "mng_no": "4800000-101-2024-00006",
+          "old_name": "호식이두마리치킨목포산정점",
+          "new_name": "멕시카나산정점",
+          "addr": "전라남도 목포시 양을로53번길 16, 1층 (산정동)",
+          "lcpmt": "2024-01-05",
+          "dat_updt": "2026-05-05 22:53:57",
+          "region_code": "4800000",
+          "region_name": "4800000",
+          "trivial": false
+        },
+        {
+          "mng_no": "3510500-101-2023-00264",
+          "old_name": "설맥 인천학익점",
+          "new_name": "멕시카나 학익신기점",
+          "addr": "인천광역시 미추홀구 한나루로 349, 1층 101호 (학익동)",
+          "lcpmt": "2023-07-10",
+          "dat_updt": "2026-03-20 22:47:56",
+          "region_code": "3510500",
+          "region_name": "3510500",
+          "trivial": false
+        },
+        {
+          "mng_no": "3050000-101-2023-00207",
+          "old_name": "호치킨 신설동점",
+          "new_name": "멕시카나치킨 신설동점",
+          "addr": "서울특별시 동대문구 한빛로1길 3, 1층 (신설동)",
+          "lcpmt": "2023-06-07",
+          "dat_updt": "2026-03-17 22:17:53",
+          "region_code": "3050000",
+          "region_name": "서울 광진구",
+          "trivial": false
+        },
+        {
+          "mng_no": "6510000-101-2022-00371",
+          "old_name": "멕시카나치킨더홈노형점",
+          "new_name": "멕시카나노형점",
+          "addr": "제주특별자치도 제주시 연북로 41, 메르헨하우스3 오피스텔 지1층 비07호,비08호 (노형동)",
+          "lcpmt": "2022-06-08",
+          "dat_updt": "2026-06-10 03:03:03",
+          "region_code": "6510000",
+          "region_name": "제주특별자치도",
+          "trivial": false
+        }
+      ],
+      "upbyeon_count_real": 14,
+      "total_growth": 35
+    },
+    "투다리": {
+      "service": "ilban",
+      "current_count": 1500,
+      "current_count_reported": 3138,
+      "new_permits_count": 12,
+      "candidate_count": 833,
+      "verified_count": 80,
+      "upbyeon_count": 2,
+      "upbyeon_ratio": 0.143,
+      "is_upbyeon_specialist": false,
+      "upbyeon": [
+        {
+          "mng_no": "4010000-101-2025-00068",
+          "old_name": "선주가시흥은계점",
+          "new_name": "투다리시흥은계점",
+          "addr": "경기도 시흥시 은계남로 12, 178, 179호 (은행동, 시흥은계 호반 써밋플레이스)",
+          "lcpmt": "2025-02-26",
+          "dat_updt": "2026-05-02 22:06:53",
+          "region_code": "4010000",
+          "region_name": "경기 안성시",
+          "trivial": false
+        },
+        {
+          "mng_no": "3670000-101-2024-00343",
+          "old_name": "덕희 하이볼클럽",
+          "new_name": "투다리 대전봉명점",
+          "addr": "대전광역시 유성구 문화원로 86, 채운2 지상1층 105호 (봉명동)",
+          "lcpmt": "2024-07-22",
+          "dat_updt": "2026-03-05 22:17:51",
+          "region_code": "3670000",
+          "region_name": "3670000",
+          "trivial": false
+        }
+      ],
+      "upbyeon_count_real": 2,
+      "total_growth": 14
+    },
+    "봉구비어": {
+      "service": "ilban",
+      "current_count": 468,
+      "current_count_reported": 468,
+      "new_permits_count": 0,
+      "candidate_count": 256,
+      "verified_count": 80,
+      "upbyeon_count": 0,
+      "upbyeon_ratio": 0,
+      "is_upbyeon_specialist": false,
+      "upbyeon": [],
+      "upbyeon_count_real": 0,
+      "total_growth": 0
+    },
+    "79대포": {
+      "service": "ilban",
+      "current_count": 175,
+      "current_count_reported": 175,
+      "new_permits_count": 6,
+      "candidate_count": 99,
+      "verified_count": 80,
+      "upbyeon_count": 2,
+      "upbyeon_ratio": 0.25,
+      "is_upbyeon_specialist": false,
+      "upbyeon": [
+        {
+          "mng_no": "4810000-101-2023-00215",
+          "old_name": "하누바다",
+          "new_name": "79대포 미평점",
+          "addr": "전라남도 여수시 대학로 6, 1층 (미평동)",
+          "lcpmt": "2023-05-24",
+          "dat_updt": "2026-03-04 22:50:05",
+          "region_code": "4810000",
+          "region_name": "4810000",
+          "trivial": false
+        },
+        {
+          "mng_no": "4201000-101-2023-00001",
+          "old_name": "안주가강릉교동점",
+          "new_name": "79대포강릉교동점",
+          "addr": "강원특별자치도 강릉시 하슬라로206번길 20-5, 1층 (교동)",
+          "lcpmt": "2023-01-02",
+          "dat_updt": "2026-03-07 21:18:54",
+          "region_code": "4201000",
+          "region_name": "4201000",
+          "trivial": false
+        }
+      ],
+      "upbyeon_count_real": 2,
+      "total_growth": 8
+    },
+    "청담이상": {
+      "service": "ilban",
+      "current_count": 86,
+      "current_count_reported": 86,
+      "new_permits_count": 0,
+      "candidate_count": 42,
+      "verified_count": 42,
+      "upbyeon_count": 0,
+      "upbyeon_ratio": 0,
+      "is_upbyeon_specialist": false,
+      "upbyeon": [],
+      "upbyeon_count_real": 0,
+      "total_growth": 0
+    },
+    "야화혼술바": {
+      "service": "ilban",
+      "current_count": 12,
+      "current_count_reported": 12,
+      "new_permits_count": 12,
+      "candidate_count": 0,
+      "verified_count": 0,
+      "upbyeon_count": 0,
+      "upbyeon_ratio": 0.0,
+      "is_upbyeon_specialist": false,
+      "upbyeon": [],
+      "upbyeon_count_real": 0,
+      "total_growth": 12
+    },
+    "우이락": {
+      "service": "ilban",
+      "current_count": 94,
+      "current_count_reported": 94,
+      "new_permits_count": 9,
+      "candidate_count": 50,
+      "verified_count": 50,
+      "upbyeon_count": 5,
+      "upbyeon_ratio": 0.357,
+      "is_upbyeon_specialist": false,
+      "upbyeon": [
+        {
+          "mng_no": "3130000-101-2023-01026",
+          "old_name": "우이락 연남점",
+          "new_name": "우이락 서강대점",
+          "addr": "서울특별시 마포구 광성로 36, 원인터빌딩 지하1층 (신수동)",
+          "lcpmt": "2023-10-30",
+          "dat_updt": "2026-06-19 03:03:03",
+          "region_code": "3130000",
+          "region_name": "서울 서대문구",
+          "trivial": false
+        },
+        {
+          "mng_no": "4810000-101-2023-00268",
+          "old_name": "리버스영",
+          "new_name": "우이락 여수디오션점",
+          "addr": "전라남도 여수시 소호로 295, 디오션리조트 B층 202호 (소호동)",
+          "lcpmt": "2023-06-27",
+          "dat_updt": "2026-06-12 03:03:03",
+          "region_code": "4810000",
+          "region_name": "4810000",
+          "trivial": false
+        },
+        {
+          "mng_no": "4271000-101-2010-00017",
+          "old_name": "두꺼비 로멘스",
+          "new_name": "우이락 영월점",
+          "addr": "강원특별자치도 영월군 영월읍 중앙로 60",
+          "lcpmt": "2010-08-02",
+          "dat_updt": "2026-04-24 21:17:50",
+          "region_code": "4271000",
+          "region_name": "4271000",
+          "trivial": false
+        },
+        {
+          "mng_no": "3330000-101-2005-00281",
+          "old_name": "만복집(해운대장산점)",
+          "new_name": "우이락(해운대장산점)",
+          "addr": "부산광역시 해운대구 양운로42번길 14 (좌동, 지오프라자2  104,105호)",
+          "lcpmt": "2005-10-05",
+          "dat_updt": "2026-05-11 22:48:05",
+          "region_code": "3330000",
+          "region_name": "3330000",
+          "trivial": false
+        },
+        {
+          "mng_no": "4231000-101-2003-00221",
+          "old_name": "쉬림프셰프설악워터피아점",
+          "new_name": "우이락설악워터피아점",
+          "addr": "강원특별자치도 속초시 미시령로2983번길 88 (장사동)",
+          "lcpmt": "2003-07-28",
+          "dat_updt": "2026-05-21 03:03:03",
+          "region_code": "4231000",
+          "region_name": "4231000",
+          "trivial": false
+        }
+      ],
+      "upbyeon_count_real": 5,
+      "total_growth": 14
+    },
+    "새마을식당": {
+      "service": "ilban",
+      "current_count": 265,
+      "current_count_reported": 265,
+      "new_permits_count": 6,
+      "candidate_count": 151,
+      "verified_count": 80,
+      "upbyeon_count": 1,
+      "upbyeon_ratio": 0.143,
+      "is_upbyeon_specialist": false,
+      "upbyeon": [
+        {
+          "mng_no": "3330000-101-2021-00360",
+          "old_name": "7곡제면소 NC해운대점",
+          "new_name": "새마을식당 NC해운대점",
+          "addr": "부산광역시 해운대구 해운대로 813, 지팝건축물 7층 일부호 (좌동)",
+          "lcpmt": "2021-09-02",
+          "dat_updt": "2026-05-11 22:52:23",
+          "region_code": "3330000",
+          "region_name": "3330000",
+          "trivial": false
+        }
+      ],
+      "upbyeon_count_real": 1,
+      "total_growth": 7
+    },
+    "홍콩반점": {
+      "service": "ilban",
+      "current_count": 648,
+      "current_count_reported": 648,
+      "new_permits_count": 1,
+      "candidate_count": 375,
+      "verified_count": 80,
+      "upbyeon_count": 0,
+      "upbyeon_ratio": 0.0,
+      "is_upbyeon_specialist": false,
+      "upbyeon": [],
+      "upbyeon_count_real": 0,
+      "total_growth": 1
+    },
+    "신선설농탕": {
+      "service": "ilban",
+      "current_count": 74,
+      "current_count_reported": 74,
+      "new_permits_count": 0,
+      "candidate_count": 48,
+      "verified_count": 48,
+      "upbyeon_count": 0,
+      "upbyeon_ratio": 0,
+      "is_upbyeon_specialist": false,
+      "upbyeon": [],
+      "upbyeon_count_real": 0,
+      "total_growth": 0
+    },
+    "명륜진사갈비": {
+      "service": "ilban",
+      "current_count": 617,
+      "current_count_reported": 617,
+      "new_permits_count": 4,
+      "candidate_count": 341,
+      "verified_count": 80,
+      "upbyeon_count": 2,
+      "upbyeon_ratio": 0.2,
+      "is_upbyeon_specialist": false,
+      "upbyeon": [
+        {
+          "mng_no": "3150000-101-2023-00731",
+          "old_name": "주식회사 명륜진사갈비 우장산점",
+          "new_name": "명륜진사갈비 우장산점",
+          "addr": "서울특별시 강서구 강서로 219, 1층 (화곡동)",
+          "lcpmt": "2023-11-10",
+          "dat_updt": "2026-05-01 22:45:22",
+          "region_code": "3150000",
+          "region_name": "서울 양천구",
+          "trivial": true
+        },
+        {
+          "mng_no": "4040000-101-2023-00536",
+          "old_name": "명륜진사갈비(풍산역점)",
+          "new_name": "명륜진사갈비(하남풍산역점)",
+          "addr": "경기도 하남시 덕풍로 83, 1층 (덕풍동)",
+          "lcpmt": "2023-10-13",
+          "dat_updt": "2026-03-11 01:20:42",
+          "region_code": "4040000",
+          "region_name": "경기 광주시",
+          "trivial": false
+        }
+      ],
+      "upbyeon_count_real": 1,
+      "total_growth": 5
+    }
+  }
+}
