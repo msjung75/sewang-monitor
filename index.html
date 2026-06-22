@@ -545,6 +545,16 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
     </table>
   </div>
 
+  <!-- v17.17: 업변 acquisition 카드 (data/upbyeon_2026.json) -->
+  <div class="card" id="card-upbyeon" style="margin-top:14px">
+    <div class="card-title">🔄 업변 acquisition TOP <span style="color:var(--txt3);font-size:10px;font-weight:500;margin-left:auto">상반기 전국</span></div>
+    <table class="rtbl" id="tbl-upbyeon">
+      <tr><td style="color:var(--txt3);text-align:center;padding:20px;font-size:11px">⏳ 업변 데이터 로딩 중…</td></tr>
+    </table>
+    <div style="font-size:10px;color:var(--txt3);text-align:center;margin-top:8px;line-height:1.5;padding:0 6px">
+      💡 <b>업변</b> = 기존 다른 브랜드 매장이 간판 갈아끼우고 들어온 케이스 (신규 인허가 외 확장)
+    </div>
+
   <!-- v17.8.1: 데이터 기준일 미니 stamp -->
   <div id="data-freshness-stamp" style="margin-top:8px;font-size:10.5px;color:var(--txt3);text-align:center;padding:8px 10px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;gap:6px"><span>🕐</span><span id="data-freshness-text">데이터 갱신 시각 확인 중…</span></div>
 
@@ -2867,6 +2877,44 @@ function renderCharts(){
   } else {
     mini.innerHTML = '<tr><td style="color:var(--txt3);text-align:center;padding:20px;font-size:11px">기간 내 반복 출점 브랜드 없음</td></tr>';
   }
+}
+
+
+// v17.17: 업변 acquisition 데이터 로드
+async function loadUpbyeon(){
+  var tbl = document.getElementById('tbl-upbyeon');
+  if (!tbl) return;
+  try {
+    var r = await fetch('/api/upbyeon?view=upbyeon', { credentials: 'same-origin' });
+    if (!r.ok) throw new Error('fetch failed: ' + r.status);
+    var j = await r.json();
+    var items = (j.items || []).filter(function(x){ return (x.upbyeon || 0) > 0; }).slice(0, 8);
+    if (!items.length) {
+      tbl.innerHTML = '<tr><td style="color:var(--txt3);text-align:center;padding:20px;font-size:11px">업변 데이터 없음</td></tr>';
+      return;
+    }
+    var html = '<tr><th>#</th><th>브랜드</th><th style="text-align:right">신규</th><th style="text-align:right">업변</th><th style="text-align:right">비중</th></tr>';
+    items.forEach(function(x, i){
+      var tag = x.is_specialist ? '<span class="tag" style="background:rgba(251,146,60,.18);color:#fbbf24;font-size:9px;margin-left:4px;padding:1px 5px;border-radius:3px">전문</span>' : '';
+      var ratioPct = Math.round((x.upbyeon_ratio || 0) * 100);
+      var ratioColor = ratioPct >= 50 ? '#fbbf24' : (ratioPct >= 25 ? '#7dd3fc' : 'var(--txt3)');
+      html += '<tr>'
+        + '<td class="rn">' + (i+1) + '</td>'
+        + '<td style="font-size:12px;font-weight:600">' + (window.esc ? esc(x.name) : x.name) + tag + '</td>'
+        + '<td style="font-size:11px;color:var(--txt3);text-align:right">' + (x.new_permits || 0) + '</td>'
+        + '<td style="font-size:12px;font-weight:600;text-align:right">' + (x.upbyeon || 0) + '</td>'
+        + '<td style="font-size:11px;text-align:right;color:' + ratioColor + '">' + ratioPct + '%</td>'
+        + '</tr>';
+    });
+    tbl.innerHTML = html;
+  } catch(e){
+    tbl.innerHTML = '<tr><td style="color:var(--txt3);text-align:center;padding:20px;font-size:11px">업변 데이터 로드 실패 — 새로고침 재시도</td></tr>';
+  }
+}
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', loadUpbyeon);
+} else {
+  setTimeout(loadUpbyeon, 100);
 }
 
 function renderBuzz(){
