@@ -1,0 +1,77 @@
+name: nightly-upbyeon
+on:
+  schedule:
+    # 04:30 KST (메인) — 행안부 publish 직후
+    - cron: '30 19 * * *'
+    # 09:30 KST 재시도
+    - cron: '30 0 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install aiohttp
+        run: pip install aiohttp
+      - name: Run upbyeon detection (29 brands nationwide)
+        env:
+          DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+          UPBYEON_BASELINE: '20260101'
+          OUTPUT: 'data/upbyeon_2026.json'
+        run: python3 scripts/fetch-upbyeon.py
+      - name: Commit via GitHub Contents API
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          if [ ! -f data/upbyeon_2026.json ]; then
+            echo "No upbyeon file generated"
+            exit 0
+          fi
+          python3 << 'PYEOF'
+          import base64, json, os, time, urllib.request, urllib.error
+          token = os.environ['GH_TOKEN']
+          repo = os.environ['REPO']
+          path = 'data/upbyeon_2026.json'
+          api = f'https://api.github.com/repos/{repo}/contents/{path}'
+          headers = {'Authorization': f'Bearer {token}', 'Accept': 'application/vnd.github+json', 'User-Agent': 'upbyeon'}
+          with open(path, 'rb') as f:
+              content_b64 = base64.b64encode(f.read()).decode('ascii')
+          msg = f'[skip ci] nightly upbyeon update {time.strftime("%Y-%m-%dT%H:%MZ", time.localtime())}'
+          def get_sha():
+              try:
+                  req = urllib.request.Request(api, headers=headers)
+                  with urllib.request.urlopen(req) as r:
+                      return json.loads(r.read()).get('sha', '')
+              except Exception:
+                  return ''
+          sha = get_sha()
+          for attempt in range(3):
+              body = {'message': msg, 'content': content_b64}
+              if sha: body['sha'] = sha
+              data = json.dumps(body).encode()
+              req = urllib.request.Request(api, data=data, headers={**headers, 'Content-Type': 'application/json'}, method='PUT')
+              try:
+                  with urllib.request.urlopen(req) as r:
+                      print(f'✅ Committed via API (attempt {attempt+1}, status {r.status})')
+                      break
+              except urllib.error.HTTPError as e:
+                  print(f'Attempt {attempt+1} failed: {e.code} {e.reason}')
+                  print(e.read().decode()[:300])
+                  if e.code == 409:
+                      time.sleep(3)
+                      sha = get_sha()
+                  else:
+                      time.sleep(3)
+          else:
+              print('All 3 attempts failed')
+              import sys; sys.exit(1)
+          PYEOF
