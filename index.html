@@ -6105,5 +6105,48 @@ function startPendingPolling(){
   });
 }
 </script>
+<script>
+// v17.17.4: 사용자 활동 로깅 — 페이지 진입 시 1회 (api/log endpoint, GITHUB_TOKEN 설정 시 활성화)
+(function(){
+  var sent = false;
+  function sendLog(eventType, tab){
+    try {
+      var me = window.ME || window._ME || {};
+      var payload = JSON.stringify({
+        event: eventType || 'visit',
+        user_id: (me.kakao_id || me.id || 'unknown').toString(),
+        role: me.role || 'unknown',
+        ts: Date.now(),
+        tab: tab || (location.hash || '').replace('#','') || 'home'
+      });
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon('/api/log', new Blob([payload], {type:'application/json'}));
+      } else {
+        fetch('/api/log', { method:'POST', body: payload, headers:{'Content-Type':'application/json'}, keepalive: true }).catch(function(){});
+      }
+    } catch(e){}
+  }
+  var checks = 0;
+  var iv = setInterval(function(){
+    checks++;
+    if (window.ME && window.ME.kakao_id) {
+      clearInterval(iv);
+      if (!sent) { sent = true; sendLog('visit'); }
+    } else if (checks > 30) {
+      clearInterval(iv);
+      if (!sent) { sent = true; sendLog('visit'); }
+    }
+  }, 1000);
+  var lastHash = '';
+  window.addEventListener('hashchange', function(){
+    var h = (location.hash || '').replace('#','');
+    if (h && h !== lastHash) {
+      lastHash = h;
+      var me = window.ME || {};
+      if (me.kakao_id) sendLog('tab', h);
+    }
+  });
+})();
+</script>
 </body>
 </html>
