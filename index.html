@@ -2897,6 +2897,8 @@ function renderCharts(){
 async function loadRecommend(){
   var tbl = document.getElementById('tbl-recommend');
   if (!tbl) return;
+  // v17.17.5: owner role 차단 — 영업 추천은 세왕 직원 전용
+  if (window.ME && window.ME.role === 'owner') return;
   try {
     var r = await fetch('/api/recommend?limit=15&minScore=2.5', { credentials: 'same-origin' });
     if (!r.ok) throw new Error('fetch failed: ' + r.status);
@@ -5217,12 +5219,15 @@ function showBlockedScreen(){
     setTimeout(function(){ try { loadAdminPanel(); } catch(e){} }, 500);
     setTimeout(function(){ try { startPendingPolling(); } catch(e){} }, 2000);
   }
-  // 업주(owner)는 「선점기회」 + 「추적매장」 숨김 — 사장님/직원 전용 기능
+  // 업주(owner)는 「선점기회」 + 「추적매장」 + 「영업 추천 TOP」 카드 숨김 — 사장님/직원 전용
   if (role === 'owner') {
     var goldBtn = document.getElementById('bnav-gold');
     var trackBtn = document.getElementById('bnav-track');
     if (goldBtn) goldBtn.style.display = 'none';
     if (trackBtn) trackBtn.style.display = 'none';
+    // v17.17.5: 영업 추천 카드 숨김 (대시보드 내)
+    var recCard = document.getElementById('card-recommend');
+    if (recCard) recCard.style.display = 'none';
     // 직접 hash 진입도 차단 — 홈으로 리다이렉트
     window.addEventListener('hashchange', function(){
       var h = (location.hash || '').replace('#','');
