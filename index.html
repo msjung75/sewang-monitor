@@ -556,6 +556,17 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
     </div>
   </div>
 
+  <!-- v17.17.3: 영업 추천 카드 (data/recommend_metro.json) -->
+  <div class="card" id="card-recommend" style="margin-top:14px">
+    <div class="card-title">🎯 영업 추천 TOP <span style="color:var(--txt3);font-size:10px;font-weight:500;margin-left:auto">수도권 14일 · 점수 기준</span></div>
+    <table class="rtbl" id="tbl-recommend">
+      <tr><td style="color:var(--txt3);text-align:center;padding:20px;font-size:11px">⏳ 영업 추천 데이터 로딩 중…</td></tr>
+    </table>
+    <div style="font-size:10px;color:var(--txt3);text-align:center;margin-top:8px;line-height:1.5;padding:0 6px">
+      🎯 <b>추천 점수</b> = 위치(수도권) + 업태 + 위생업태 + 상호 키워드 (세왕 거래처 패턴 학습)
+    </div>
+  </div>
+
   <!-- v17.8.1: 데이터 기준일 미니 stamp -->
   <div id="data-freshness-stamp" style="margin-top:8px;font-size:10.5px;color:var(--txt3);text-align:center;padding:8px 10px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;gap:6px"><span>🕐</span><span id="data-freshness-text">데이터 갱신 시각 확인 중…</span></div>
 
@@ -2880,6 +2891,78 @@ function renderCharts(){
   }
 }
 
+
+
+// v17.17.3: 영업 추천 데이터 로드
+async function loadRecommend(){
+  var tbl = document.getElementById('tbl-recommend');
+  if (!tbl) return;
+  try {
+    var r = await fetch('/api/recommend?limit=15&minScore=2.5', { credentials: 'same-origin' });
+    if (!r.ok) throw new Error('fetch failed: ' + r.status);
+    var j = await r.json();
+    var items = j.items || [];
+    if (!items.length) {
+      tbl.innerHTML = '<tr><td style="color:var(--txt3);text-align:center;padding:20px;font-size:11px">추천 매장 없음 (다음 갱신 후 확인)</td></tr>';
+      return;
+    }
+    var html = '<tr><th>#</th><th>매장명</th><th>위생업태</th><th style="text-align:right">점수</th></tr>';
+    items.forEach(function(x, i){
+      var name = (typeof esc === 'function') ? esc(x.name) : x.name;
+      var bzstat = (typeof esc === 'function') ? esc(x.bzstat || '') : (x.bzstat || '');
+      var sc = (x.score || 0).toFixed(1);
+      var scColor = x.score >= 5.5 ? '#fbbf24' : (x.score >= 4.0 ? '#7dd3fc' : 'var(--txt2)');
+      var addrShort = (x.addr || '').substring(0, 26);
+      addrShort = (typeof esc === 'function') ? esc(addrShort) : addrShort;
+      html += '<tr style="cursor:pointer" onclick="openRecommendDetail(' + i + ')">'
+        + '<td class="rn">' + (i+1) + '</td>'
+        + '<td><div style="font-size:12px;font-weight:600">' + name + '</div>'
+        + '<div style="font-size:9.5px;color:var(--txt3)">' + addrShort + '</div></td>'
+        + '<td style="font-size:11px;color:var(--txt2)">' + bzstat + '</td>'
+        + '<td style="font-size:13px;font-weight:700;text-align:right;color:' + scColor + '">' + sc + '</td>'
+        + '</tr>';
+    });
+    tbl.innerHTML = html;
+    window._recommendItems = items;
+  } catch(e){
+    tbl.innerHTML = '<tr><td style="color:var(--txt3);text-align:center;padding:20px;font-size:11px">추천 데이터 로드 실패</td></tr>';
+  }
+}
+
+function openRecommendDetail(idx){
+  var x = (window._recommendItems || [])[idx];
+  if (!x) return;
+  var name = (typeof esc === 'function') ? esc(x.name) : x.name;
+  var addr = (typeof esc === 'function') ? esc(x.addr || '') : (x.addr || '');
+  var reasons = (x.reasons || []).map(function(r){ return '<span style="background:rgba(56,189,248,.15);color:#7dd3fc;font-size:10px;padding:2px 7px;border-radius:4px;margin-right:4px;display:inline-block;margin-bottom:3px">'+ r + '</span>'; }).join('');
+  var html = '<div style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.85);z-index:9999;overflow-y:auto;padding:20px" onclick="if(event.target===this)this.remove()">'
+    + '<div style="max-width:680px;margin:20px auto;background:#0f1828;border:1px solid var(--border);border-radius:12px;padding:18px">'
+    + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'
+    + '<div style="font-size:15px;font-weight:700">🎯 ' + name + '</div>'
+    + '<button style="background:transparent;border:none;color:#fff;font-size:20px;cursor:pointer" onclick="this.closest(\'div[style*=fixed]\').remove()">×</button>'
+    + '</div>'
+    + '<div style="font-size:12px;color:var(--txt2);line-height:1.7;margin-bottom:8px">'
+    + '<div>📍 <b>주소</b>: ' + addr + '</div>'
+    + '<div>🏷️ <b>업태</b>: ' + (x.type || '') + ' / <b>위생업태</b>: ' + (x.bzstat || '') + '</div>'
+    + '<div>📅 <b>인허가일</b>: ' + (x.permitDate || '') + '</div>'
+    + (x.tel ? '<div>☎️ <b>전화</b>: ' + (x.tel || '') + '</div>' : '')
+    + '<div>🎯 <b>추천 점수</b>: <span style="color:#fbbf24;font-weight:700">' + (x.score || 0).toFixed(1) + '</span></div>'
+    + '</div>'
+    + '<div style="margin-top:10px"><b style="font-size:11px">매칭 신호</b><br>' + reasons + '</div>'
+    + '<div style="margin-top:12px;font-size:10px;color:var(--txt3);text-align:center;padding:8px;background:rgba(56,189,248,.05);border-radius:6px">'
+    + '💡 영업 우선 검토 매장 — 네이버 검색 / 거래 가능성 확인'
+    + '</div>'
+    + '</div></div>';
+  var div = document.createElement('div');
+  div.innerHTML = html;
+  document.body.appendChild(div.firstChild);
+}
+window.openRecommendDetail = openRecommendDetail;
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', loadRecommend);
+} else {
+  setTimeout(loadRecommend, 150);
+}
 
 // v17.17.2: 업변 acquisition 데이터 로드
 async function loadUpbyeon(){
