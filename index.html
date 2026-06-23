@@ -1022,21 +1022,6 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 </div><!-- /main -->
 
 <!-- ===== BOTTOM NAV ===== -->
-
-<!-- ======= PAGE: 수입사 분석 (admin/staff only) v17.17.6 ======= -->
-<div class="page" id="pg-imp">
-  <div class="alert-banner" style="border-color:rgba(56,189,248,.3)">
-    <span class="aico">📊</span>
-    <div>
-      <strong style="color:var(--c1)">수입사별 점유율 분석</strong><br>
-      <span style="font-size:12px">와인 · 위스키 · 일본주 · 6개월 누적 (2026-01~06) · 점유율 기준</span>
-    </div>
-  </div>
-  <div id="imp-content">
-    <div style="color:var(--txt3);text-align:center;padding:30px;font-size:11px">⏳ 데이터 로딩 중…</div>
-  </div>
-</div>
-
 <nav class="bnav">
   <button class="bnav-btn on" data-pg="home">
     <span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>대시보드
@@ -1060,10 +1045,7 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
   <button class="bnav-btn" data-pg="map">
     <span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></span>지도
   </button>
-  <button class="bnav-btn" id="bnav-imp" data-pg="imp">
-    <span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="14" width="3" height="5"/><rect x="12" y="9" width="3" height="10"/><rect x="17" y="4" width="3" height="15"/></svg></span>수입사
-  </button>
-    <button class="bnav-btn" id="bnav-track" data-pg="track">
+  <button class="bnav-btn" id="bnav-track" data-pg="track">
     <span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></span>추적매장
   </button>
 </nav>
@@ -5237,19 +5219,19 @@ function showBlockedScreen(){
     setTimeout(function(){ try { loadAdminPanel(); } catch(e){} }, 500);
     setTimeout(function(){ try { startPendingPolling(); } catch(e){} }, 2000);
   }
-  // 업주(owner)는 「선점기회」+「추적매장」+「영업 추천」+「수입사 분석」 숨김 — 사장님/직원 전용
+  // 업주(owner)는 「선점기회」 + 「추적매장」 + 「영업 추천 TOP」 카드 숨김 — 사장님/직원 전용
   if (role === 'owner') {
     var goldBtn = document.getElementById('bnav-gold');
     var trackBtn = document.getElementById('bnav-track');
-    var impBtn = document.getElementById('bnav-imp');
     if (goldBtn) goldBtn.style.display = 'none';
     if (trackBtn) trackBtn.style.display = 'none';
-    if (impBtn) impBtn.style.display = 'none';
+    // v17.17.5: 영업 추천 카드 숨김 (대시보드 내)
     var recCard = document.getElementById('card-recommend');
     if (recCard) recCard.style.display = 'none';
+    // 직접 hash 진입도 차단 — 홈으로 리다이렉트
     window.addEventListener('hashchange', function(){
       var h = (location.hash || '').replace('#','');
-      if (h === 'gold' || h === 'track' || h === 'imp') { location.hash = ''; }
+      if (h === 'gold' || h === 'track') { location.hash = ''; }
     });
   }
   init();
@@ -6170,75 +6152,6 @@ function startPendingPolling(){
     }
   });
 })();
-
-// v17.17.6: 수입사 분석 페이지 데이터
-window.IMP_DATA = {"categories": {"wine": {"name": "와인", "total_importers": 96, "top_15": [{"importer": "엠에이치샴페인즈앤드와인즈코리아", "share_pct": 20.2}, {"importer": "하이스코트(주)", "share_pct": 16.1}, {"importer": "(주)아영에프비씨", "share_pct": 9.8}, {"importer": "인터리커(주)", "share_pct": 6.3}, {"importer": "(주)신세계엘앤비", "share_pct": 4.48}, {"importer": "케이엔제이와인엔스피리츠", "share_pct": 4.44}, {"importer": "(주)롯데주류비지", "share_pct": 4.4}, {"importer": "(주)와이넬", "share_pct": 4.24}, {"importer": "나라셀라(주)", "share_pct": 3.46}, {"importer": "씨에스알와인(주)", "share_pct": 3.29}, {"importer": "(주)동원와인플러스", "share_pct": 2.31}, {"importer": "에노테카코리아(주)", "share_pct": 1.87}, {"importer": "(주)비이엑스스피리츠코리아", "share_pct": 1.71}, {"importer": "한독와인(주)", "share_pct": 1.65}, {"importer": "(주)비케이트레이딩", "share_pct": 1.41}], "monthly_top5": {"01": {"엠에이치샴페인즈앤드와인즈코리아": 13.12, "하이스코트(주)": 14.35, "(주)아영에프비씨": 9.09, "인터리커(주)": 5.2, "(주)신세계엘앤비": 5.49}, "02": {"엠에이치샴페인즈앤드와인즈코리아": 12.84, "하이스코트(주)": 19.77, "(주)아영에프비씨": 11.22, "인터리커(주)": 7.47, "(주)신세계엘앤비": 6.74}, "03": {"엠에이치샴페인즈앤드와인즈코리아": 28.69, "하이스코트(주)": 12.73, "(주)아영에프비씨": 10.34, "인터리커(주)": 5.67, "(주)신세계엘앤비": 2.41}, "04": {"엠에이치샴페인즈앤드와인즈코리아": 21.85, "하이스코트(주)": 23.11, "(주)아영에프비씨": 9.55, "인터리커(주)": 5.3, "(주)신세계엘앤비": 2.33}, "05": {"엠에이치샴페인즈앤드와인즈코리아": 17.34, "하이스코트(주)": 13.86, "(주)아영에프비씨": 12.28, "인터리커(주)": 7.58, "(주)신세계엘앤비": 9.07}, "06": {"엠에이치샴페인즈앤드와인즈코리아": 24.14, "하이스코트(주)": 11.47, "(주)아영에프비씨": 6.5, "인터리커(주)": 7.39, "(주)신세계엘앤비": 2.53}}}, "whisky": {"name": "위스키", "total_importers": 45, "top_15": [{"importer": "빔산토리코리아(유)", "share_pct": 20.75}, {"importer": "주식회사 골든블루", "share_pct": 13.34}, {"importer": "윈저글로벌", "share_pct": 13.19}, {"importer": "윌리엄그랜트앤선즈코리아(주)", "share_pct": 9.06}, {"importer": "디아지오코리아 주식회사", "share_pct": 8.81}, {"importer": "(주)페르노리카코리아", "share_pct": 6.94}, {"importer": "한국브라운포맨", "share_pct": 6.27}, {"importer": "엠에이치샴페인즈앤드와인즈코리아", "share_pct": 6.19}, {"importer": "(주)비이엑스스피리츠코리아", "share_pct": 2.25}, {"importer": "(주)아영에프비씨", "share_pct": 2.07}, {"importer": "(주)디앤피스피리츠", "share_pct": 1.82}, {"importer": "(주)제이트레이딩컴퍼니", "share_pct": 1.67}, {"importer": "하이스코트(주)", "share_pct": 1.53}, {"importer": "골든블루인터내셔널", "share_pct": 1.1}, {"importer": "(주)에프제이코리아", "share_pct": 0.78}], "monthly_top5": {"01": {"빔산토리코리아(유)": 21.65, "주식회사 골든블루": 8.81, "윈저글로벌": 12.3, "윌리엄그랜트앤선즈코리아(주)": 10.03, "디아지오코리아 주식회사": 12.4}, "02": {"빔산토리코리아(유)": 23.35, "주식회사 골든블루": 14.56, "윈저글로벌": 10.89, "윌리엄그랜트앤선즈코리아(주)": 7.17, "디아지오코리아 주식회사": 9.02}, "03": {"빔산토리코리아(유)": 18.06, "주식회사 골든블루": 15.18, "윈저글로벌": 18.27, "윌리엄그랜트앤선즈코리아(주)": 10.4, "디아지오코리아 주식회사": 8.02}, "04": {"빔산토리코리아(유)": 20.02, "주식회사 골든블루": 12.99, "윈저글로벌": 16.54, "윌리엄그랜트앤선즈코리아(주)": 7.2, "디아지오코리아 주식회사": 6.41}, "05": {"빔산토리코리아(유)": 20.63, "주식회사 골든블루": 17.68, "윈저글로벌": 15.85, "윌리엄그랜트앤선즈코리아(주)": 6.93, "디아지오코리아 주식회사": 8.58}, "06": {"빔산토리코리아(유)": 21.66, "주식회사 골든블루": 9.7, "윈저글로벌": 2.03, "윌리엄그랜트앤선즈코리아(주)": 13.58, "디아지오코리아 주식회사": 9.15}}}, "sake": {"name": "일본주", "total_importers": 34, "top_15": [{"importer": "(주)니혼슈코리아", "share_pct": 28.47}, {"importer": "(주)젠니혼주류", "share_pct": 16.63}, {"importer": "하이스코트(주)", "share_pct": 15.89}, {"importer": "주식회사 일로플러스(ILO PLUS Co.,ltd)", "share_pct": 5.76}, {"importer": "(주)롯데아사히주류", "share_pct": 4.97}, {"importer": "(주)태산주류", "share_pct": 4.6}, {"importer": "주식회사 리스코아이엔씨", "share_pct": 4.19}, {"importer": "빅보이리커", "share_pct": 3.91}, {"importer": "(주)씨알트레이딩", "share_pct": 2.76}, {"importer": "(주)가주유통", "share_pct": 2.17}, {"importer": "쿠마가이주류(주)", "share_pct": 2.05}, {"importer": "(주)언피셜서울지점", "share_pct": 1.59}, {"importer": "주식회사 모노드림", "share_pct": 0.98}, {"importer": "지자케씨와이코리아(주)", "share_pct": 0.85}, {"importer": "(주)일로", "share_pct": 0.8}], "monthly_top5": {"01": {"(주)니혼슈코리아": 27.54, "(주)젠니혼주류": 15.28, "하이스코트(주)": 18.55, "주식회사 일로플러스(ILO PLUS Co.,ltd)": 4.72, "(주)롯데아사히주류": 5.59}, "02": {"(주)니혼슈코리아": 27.93, "(주)젠니혼주류": 17.11, "하이스코트(주)": 18.24, "주식회사 일로플러스(ILO PLUS Co.,ltd)": 5.32, "(주)롯데아사히주류": 5.74}, "03": {"(주)니혼슈코리아": 28.25, "(주)젠니혼주류": 17.54, "하이스코트(주)": 17.44, "주식회사 일로플러스(ILO PLUS Co.,ltd)": 5.35, "(주)롯데아사히주류": 4.21}, "04": {"(주)니혼슈코리아": 28.34, "(주)젠니혼주류": 17.42, "하이스코트(주)": 13.71, "주식회사 일로플러스(ILO PLUS Co.,ltd)": 5.57, "(주)롯데아사히주류": 5.09}, "05": {"(주)니혼슈코리아": 27.76, "(주)젠니혼주류": 15.86, "하이스코트(주)": 13.97, "주식회사 일로플러스(ILO PLUS Co.,ltd)": 7.32, "(주)롯데아사히주류": 4.84}, "06": {"(주)니혼슈코리아": 31.85, "(주)젠니혼주류": 16.45, "하이스코트(주)": 11.95, "주식회사 일로플러스(ILO PLUS Co.,ltd)": 6.82, "(주)롯데아사히주류": 4.16}}}}};
-
-async function loadImporter(){
-  if (window.ME && window.ME.role === 'owner') return;  // owner block
-  var root = document.getElementById('imp-content');
-  if (!root || root.dataset.loaded) return;
-  root.dataset.loaded = '1';
-  if (!window.Chart) {
-    root.innerHTML = '<div style="color:var(--txt3);text-align:center;padding:30px">Chart.js 로딩 대기…</div>';
-    return;
-  }
-  
-  var LABELS = {wine:'🍷 와인', whisky:'🥃 위스키', sake:'🍶 일본주'};
-  var COLORS = ['#60a5fa','#fbbf24','#f87171','#34d399','#a78bfa','#fb923c','#22d3ee','#f472b6','#84cc16','#facc15','#fcd34d','#c084fc','#67e8f9','#fda4af','#a3e635'];
-  
-  root.innerHTML = '';
-  Object.entries(window.IMP_DATA.categories).forEach(function(entry){
-    var catKey = entry[0], catData = entry[1];
-    var card = document.createElement('div');
-    card.className = 'card';
-    card.style.marginBottom = '12px';
-    card.innerHTML = '<div class="card-title">'+(LABELS[catKey]||catData.name)
-      + '<span style="font-weight:400;color:var(--txt3);font-size:10px;margin-left:auto">'+catData.total_importers+'개 수입사</span></div>'
-      + '<div style="position:relative;height:260px;margin-bottom:14px"><canvas id="imp-donut-'+catKey+'"></canvas></div>'
-      + '<div style="font-size:11px;color:var(--txt3);margin-bottom:6px;padding-left:6px">TOP 5 월별 추이</div>'
-      + '<div style="position:relative;height:200px;margin-bottom:14px"><canvas id="imp-trend-'+catKey+'"></canvas></div>'
-      + '<table class="rtbl">'
-      + '<tr><th>#</th><th>수입사</th><th style="text-align:right">점유율</th></tr>'
-      + catData.top_15.map(function(r,i){
-          return '<tr><td class="rn">'+(i+1)+'</td><td style="font-size:11.5px">'+r.importer+'</td>'
-            + '<td style="text-align:right;color:#fbbf24;font-weight:700">'+r.share_pct.toFixed(1)+'%</td></tr>';
-        }).join('')
-      + '</table>';
-    root.appendChild(card);
-    
-    var top10 = catData.top_15.slice(0,10);
-    new Chart(document.getElementById('imp-donut-'+catKey).getContext('2d'), {
-      type:'doughnut',
-      data:{labels:top10.map(function(r){return r.importer.length>13?r.importer.substring(0,12)+'…':r.importer;}),
-            datasets:[{data:top10.map(function(r){return r.share_pct;}),backgroundColor:COLORS,borderWidth:0}]},
-      options:{responsive:true,maintainAspectRatio:false,
-        plugins:{legend:{position:'right',labels:{color:'#94a3b8',font:{size:9},boxWidth:8,padding:4}},
-                 tooltip:{callbacks:{label:function(ctx){return ctx.label+': '+ctx.parsed.toFixed(1)+'%';}}}}}
-    });
-    var months = Object.keys(catData.monthly_top5).sort();
-    var top5 = catData.top_15.slice(0,5);
-    new Chart(document.getElementById('imp-trend-'+catKey).getContext('2d'),{
-      type:'line',
-      data:{labels:months.map(function(m){return m+'월';}),
-            datasets:top5.map(function(r,i){return {label:(r.importer.length>13?r.importer.substring(0,12)+'…':r.importer),
-              data:months.map(function(m){return catData.monthly_top5[m][r.importer]||0;}),
-              borderColor:COLORS[i],backgroundColor:COLORS[i]+'30',tension:0.3,borderWidth:2,pointRadius:2};})},
-      options:{responsive:true,maintainAspectRatio:false,
-        plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:9},boxWidth:8,padding:3}},
-                 tooltip:{callbacks:{label:function(ctx){return ctx.dataset.label+': '+ctx.parsed.y.toFixed(1)+'%';}}}},
-        scales:{x:{ticks:{color:'#94a3b8',font:{size:9}},grid:{color:'#1e2d45'}},
-                y:{ticks:{color:'#94a3b8',font:{size:9},callback:function(v){return v+'%';}},grid:{color:'#1e2d45'},beginAtZero:true}}}
-    });
-  });
-}
-
-// Hook into bnav button click for "imp" page
-document.addEventListener('click', function(e){
-  var btn = e.target.closest('[data-pg="imp"]');
-  if (btn) setTimeout(loadImporter, 100);
-});
-
 </script>
 </body>
 </html>
