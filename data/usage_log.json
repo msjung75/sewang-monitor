@@ -1,0 +1,19 @@
+{
+  "updated": "2026-06-23T01:58:09.063Z",
+  "days": {
+    "2026-06-23": {
+      "users": {
+        "4946069634": {
+          "role": "staff",
+          "visits": 1,
+          "last_event": "visit",
+          "last_ts": 1782179889063,
+          "tabs": {
+            "home": 1
+          }
+        }
+      },
+      "total": 1
+    }
+  }
+}
