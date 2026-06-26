@@ -115,8 +115,16 @@
       "role": "staff",
       "memo": "교수",
       "approved_at": "2026-06-16T06:29:24.354Z"
+    },
+    {
+      "id": "4963472791",
+      "nickname": "김진영",
+      "profile": "http://img1.kakaocdn.net/thumb/R640x640.q70/?fname=http%3A%2F%2Ft1.kakaocdn.net%2Faccount_images%2Fdefault_profile.jpeg",
+      "role": "owner",
+      "memo": "도시맥주 강남",
+      "approved_at": "2026-06-26T16:18:30.745Z"
     }
   ],
   "blocked": [],
-  "updated_at": "2026-06-16T06:29:24.354Z"
+  "updated_at": "2026-06-26T16:18:30.745Z"
 }
