@@ -1,5 +1,5 @@
 {
-  "updated": "2026-06-26T05:04:10+09:00",
+  "updated": "2026-06-26T21:21:07+09:00",
   "baseline_date": "20260101",
   "current_date": "20260626",
   "brands": {
@@ -81,7 +81,7 @@
       "current_count": 207,
       "current_count_reported": 207,
       "new_permits_count": 1,
-      "candidate_count": 121,
+      "candidate_count": 122,
       "verified_count": 80,
       "upbyeon_count": 3,
       "upbyeon_count_real": 3,
@@ -249,14 +249,14 @@
     "BHC": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 2083,
-      "new_permits_count": 32,
+      "current_count_reported": 2084,
+      "new_permits_count": 33,
       "candidate_count": 850,
       "verified_count": 80,
       "upbyeon_count": 5,
       "upbyeon_count_real": 3,
-      "total_growth": 35,
-      "upbyeon_ratio": 0.086,
+      "total_growth": 36,
+      "upbyeon_ratio": 0.083,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -400,13 +400,13 @@
     "교촌치킨": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 2023,
-      "new_permits_count": 18,
+      "current_count_reported": 2024,
+      "new_permits_count": 19,
       "candidate_count": 805,
       "verified_count": 80,
       "upbyeon_count": 0,
       "upbyeon_count_real": 0,
-      "total_growth": 18,
+      "total_growth": 19,
       "upbyeon_ratio": 0.0,
       "is_upbyeon_specialist": false,
       "upbyeon": []
@@ -502,10 +502,10 @@
     },
     "노랑통닭": {
       "service": "ilban",
-      "current_count": 1117,
-      "current_count_reported": 1117,
+      "current_count": 1119,
+      "current_count_reported": 1119,
       "new_permits_count": 38,
-      "candidate_count": 647,
+      "candidate_count": 651,
       "verified_count": 80,
       "upbyeon_count": 6,
       "upbyeon_count_real": 6,
@@ -609,15 +609,15 @@
     },
     "네네치킨": {
       "service": "ilban",
-      "current_count": 1453,
-      "current_count_reported": 1453,
-      "new_permits_count": 6,
-      "candidate_count": 794,
+      "current_count": 1454,
+      "current_count_reported": 1454,
+      "new_permits_count": 7,
+      "candidate_count": 795,
       "verified_count": 80,
       "upbyeon_count": 1,
       "upbyeon_count_real": 1,
-      "total_growth": 7,
-      "upbyeon_ratio": 0.143,
+      "total_growth": 8,
+      "upbyeon_ratio": 0.125,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -720,15 +720,15 @@
     },
     "자담치킨": {
       "service": "ilban",
-      "current_count": 1154,
-      "current_count_reported": 1154,
-      "new_permits_count": 35,
-      "candidate_count": 611,
+      "current_count": 1155,
+      "current_count_reported": 1155,
+      "new_permits_count": 36,
+      "candidate_count": 612,
       "verified_count": 80,
       "upbyeon_count": 8,
       "upbyeon_count_real": 8,
-      "total_growth": 43,
-      "upbyeon_ratio": 0.186,
+      "total_growth": 44,
+      "upbyeon_ratio": 0.182,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -993,14 +993,14 @@
     "투다리": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 3138,
-      "new_permits_count": 12,
+      "current_count_reported": 3139,
+      "new_permits_count": 13,
       "candidate_count": 833,
       "verified_count": 80,
       "upbyeon_count": 2,
       "upbyeon_count_real": 2,
-      "total_growth": 14,
-      "upbyeon_ratio": 0.143,
+      "total_growth": 15,
+      "upbyeon_ratio": 0.133,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
