@@ -123,8 +123,16 @@
       "role": "owner",
       "memo": "도시맥주 강남",
       "approved_at": "2026-06-26T16:18:30.745Z"
+    },
+    {
+      "id": "4963533063",
+      "nickname": "지원",
+      "profile": "http://k.kakaocdn.net/dn/cho87v/dJMcaf7YOFn/MIqjEO4kkbEmglGEzSSk31/img_640x640.jpg",
+      "role": "owner",
+      "memo": "도시맥주 강남 매니져",
+      "approved_at": "2026-06-26T19:33:19.664Z"
     }
   ],
   "blocked": [],
-  "updated_at": "2026-06-26T16:18:30.745Z"
+  "updated_at": "2026-06-26T19:33:19.664Z"
 }
