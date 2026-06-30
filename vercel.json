@@ -9,7 +9,31 @@
             ]
         },
         {
-            "source": "/data/(.*).json",
+            "source": "/data/brand_overrides.json",
+            "headers": [
+                { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+            ]
+        },
+        {
+            "source": "/data/ytd_2026_summary.json",
+            "headers": [
+                { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate, no-cache" }
+            ]
+        },
+        {
+            "source": "/data/franchise_master.json",
+            "headers": [
+                { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate, no-cache" }
+            ]
+        },
+        {
+            "source": "/data/trend30_all.json",
+            "headers": [
+                { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate, no-cache" }
+            ]
+        },
+        {
+            "source": "/data/recommend_metro.json",
             "headers": [
                 { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate, no-cache" }
             ]
