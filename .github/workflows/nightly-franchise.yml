@@ -1,0 +1,74 @@
+name: nightly-franchise-detect
+
+on:
+  schedule:
+    # 06:00 KST (after nightly-recommend at 05:00 KST)
+    - cron: '0 21 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  detect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run franchise auto-detect + trend30 update
+        env:
+          BASE_URL: 'https://sewang-monitor.vercel.app'
+          MASTER_PATH: 'data/franchise_master.json'
+          TREND_PATH: 'data/trend30_all.json'
+          DAYS: '14'
+        run: python3 scripts/detect_franchise.py | tee /tmp/franchise_result.json
+      - name: Commit changes via GitHub Contents API
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          python3 << 'PYEOF'
+          import base64, json, os, time, urllib.request, urllib.error
+          token = os.environ['GH_TOKEN']
+          repo = os.environ['REPO']
+          headers = {'Authorization': f'Bearer {token}', 'Accept': 'application/vnd.github+json', 'User-Agent': 'franchise-detect'}
+          
+          for path in ['data/franchise_master.json', 'data/trend30_all.json']:
+              if not os.path.exists(path):
+                  print(f'skip: {path} not found')
+                  continue
+              api = f'https://api.github.com/repos/{repo}/contents/{path}'
+              with open(path, 'rb') as f:
+                  content_b64 = base64.b64encode(f.read()).decode('ascii')
+              # Get current sha
+              try:
+                  req = urllib.request.Request(api, headers=headers)
+                  with urllib.request.urlopen(req) as r:
+                      sha = json.loads(r.read()).get('sha', '')
+              except Exception:
+                  sha = ''
+              msg = f'[skip ci] nightly franchise+trend update {time.strftime("%Y-%m-%dT%H:%MZ", time.localtime())} - {path}'
+              for attempt in range(3):
+                  body = {'message': msg, 'content': content_b64}
+                  if sha: body['sha'] = sha
+                  data = json.dumps(body).encode()
+                  req = urllib.request.Request(api, data=data, headers={**headers, 'Content-Type': 'application/json'}, method='PUT')
+                  try:
+                      with urllib.request.urlopen(req) as r:
+                          print(f'✅ committed {path} (attempt {attempt+1})')
+                          break
+                  except urllib.error.HTTPError as e:
+                      print(f'attempt {attempt+1} failed: {e.code} {e.reason}')
+                      if e.code == 409:
+                          time.sleep(3)
+                          req2 = urllib.request.Request(api, headers=headers)
+                          try:
+                              with urllib.request.urlopen(req2) as r:
+                                  sha = json.loads(r.read()).get('sha', '')
+                          except: pass
+                      else: time.sleep(3)
+          PYEOF
