@@ -1,12 +1,12 @@
-// PWA Service Worker v17.15.0 — Cache invalidation + force-reload + localStorage clear signal
-const CACHE = 'sewang-pwa-v17_15_0-franchise';
-const SHELL = ['/manifest.json', '/icon.svg'];  // index.html 제거 — 항상 network-first
+// PWA Service Worker v17.15.1 — HOTFIX: restore /api/ original behavior (cookies)
+const CACHE = 'sewang-pwa-v17_15_1-franchise';
+const SHELL = ['/manifest.json', '/icon.svg'];
 
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(CACHE)
       .then(c => c.addAll(SHELL))
-      .then(() => self.skipWaiting())  // 새 sw 즉시 활성화
+      .then(() => self.skipWaiting())
   );
 });
 
@@ -14,15 +14,14 @@ self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys()
       .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
-      .then(() => self.clients.claim())  // 즉시 모든 탭 제어
+      .then(() => self.clients.claim())
       .then(() => self.clients.matchAll({type: 'window', includeUncontrolled: true}))
       .then(clients => {
-        // 모든 열린 탭에 강제 RELOAD + localStorage 정리 신호
         clients.forEach(c => {
           c.postMessage({
             type: 'SW_UPDATED_RELOAD',
             forceClear: true,
-            version: 'v17_15_0',
+            version: 'v17_15_1',
             clearKeys: [
               'sewang_franchise_master',
               'sewang_franchise_stats',
@@ -37,11 +36,9 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('message', e => {
-  // 클라이언트가 SKIP_WAITING 요청 시 즉시 활성화
   if (e.data && e.data.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
-// Push 알림 수신
 self.addEventListener('push', e => {
   let data = {};
   try { data = e.data ? e.data.json() : {}; } catch(err) {
@@ -77,21 +74,14 @@ self.addEventListener('notificationclick', e => {
 
 self.addEventListener('fetch', e => {
   const u = new URL(e.request.url);
-  // API·데이터: 항상 network + cache-busting timestamp
-  if (u.pathname.startsWith('/api/') || u.pathname.startsWith('/data/')) {
-    // Add cache-busting query param if not present
-    const url = new URL(e.request.url);
-    if (!url.searchParams.has('_t')) {
-      url.searchParams.set('_t', Date.now().toString());
-    }
-    e.respondWith(
-      fetch(url.toString(), {
-        method: e.request.method,
-        headers: e.request.headers,
-        cache: 'no-store',
-        credentials: 'omit'
-      })
-    );
+  // API: 항상 원래 request 그대로 (쿠키·세션 보존 필수, 카카오 OAuth 등)
+  if (u.pathname.startsWith('/api/')) {
+    e.respondWith(fetch(e.request, { cache: 'no-store' }));
+    return;
+  }
+  // 데이터 파일: cache-busting + 원래 request 그대로 (no credentials 변경)
+  if (u.pathname.startsWith('/data/')) {
+    e.respondWith(fetch(e.request, { cache: 'no-store' }));
     return;
   }
   // index.html / 루트 / .html: network-first
