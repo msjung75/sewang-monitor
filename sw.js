@@ -1,5 +1,5 @@
-// PWA Service Worker v17.14.3 — Push + 화제성 cache bump + 공정위 마스터
-const CACHE = 'sewang-pwa-v17_14_3-franchise';
+// PWA Service Worker v17.15.0 — Cache invalidation + force-reload + localStorage clear signal
+const CACHE = 'sewang-pwa-v17_15_0-franchise';
 const SHELL = ['/manifest.json', '/icon.svg'];  // index.html 제거 — 항상 network-first
 
 self.addEventListener('install', e => {
@@ -15,10 +15,23 @@ self.addEventListener('activate', e => {
     caches.keys()
       .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
       .then(() => self.clients.claim())  // 즉시 모든 탭 제어
-      .then(() => self.clients.matchAll({type: 'window'}))
+      .then(() => self.clients.matchAll({type: 'window', includeUncontrolled: true}))
       .then(clients => {
-        // 모든 열린 탭에 RELOAD 메시지 → index.html 자동 새로고침
-        clients.forEach(c => c.postMessage({ type: 'SW_UPDATED_RELOAD' }));
+        // 모든 열린 탭에 강제 RELOAD + localStorage 정리 신호
+        clients.forEach(c => {
+          c.postMessage({
+            type: 'SW_UPDATED_RELOAD',
+            forceClear: true,
+            version: 'v17_15_0',
+            clearKeys: [
+              'sewang_franchise_master',
+              'sewang_franchise_stats',
+              'sewang_sns_trend',
+              'sewang_sns_trend_v17_15',
+              'sewang-v12'
+            ]
+          });
+        });
       })
   );
 });
@@ -28,7 +41,7 @@ self.addEventListener('message', e => {
   if (e.data && e.data.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
-// v17.12: Push 알림 수신 (서버 → 사용자 device)
+// Push 알림 수신
 self.addEventListener('push', e => {
   let data = {};
   try { data = e.data ? e.data.json() : {}; } catch(err) {
@@ -46,7 +59,6 @@ self.addEventListener('push', e => {
   e.waitUntil(self.registration.showNotification(title, opts));
 });
 
-// v17.12: 알림 클릭 — 앱 열거나 포커스
 self.addEventListener('notificationclick', e => {
   e.notification.close();
   const url = (e.notification.data && e.notification.data.url) || '/';
@@ -65,12 +77,24 @@ self.addEventListener('notificationclick', e => {
 
 self.addEventListener('fetch', e => {
   const u = new URL(e.request.url);
-  // API·데이터: 항상 network (no-store)
+  // API·데이터: 항상 network + cache-busting timestamp
   if (u.pathname.startsWith('/api/') || u.pathname.startsWith('/data/')) {
-    e.respondWith(fetch(e.request, { cache: 'no-store' }));
+    // Add cache-busting query param if not present
+    const url = new URL(e.request.url);
+    if (!url.searchParams.has('_t')) {
+      url.searchParams.set('_t', Date.now().toString());
+    }
+    e.respondWith(
+      fetch(url.toString(), {
+        method: e.request.method,
+        headers: e.request.headers,
+        cache: 'no-store',
+        credentials: 'omit'
+      })
+    );
     return;
   }
-  // index.html / 루트 / .html: network-first (캐시는 offline fallback만)
+  // index.html / 루트 / .html: network-first
   if (u.pathname === '/' || u.pathname.endsWith('.html') || u.pathname.endsWith('/index')) {
     e.respondWith(
       fetch(e.request, { cache: 'no-store' })
@@ -81,11 +105,11 @@ self.addEventListener('fetch', e => {
           }
           return resp;
         })
-        .catch(() => caches.match(e.request))  // 네트워크 실패 시 캐시 fallback
+        .catch(() => caches.match(e.request))
     );
     return;
   }
-  // 정적 자원 (icon, manifest 등): cache-first
+  // 정적 자원: cache-first
   e.respondWith(caches.match(e.request).then(r => r || fetch(e.request).then(resp => {
     if (resp.ok && e.request.method === 'GET') {
       const clone = resp.clone();
