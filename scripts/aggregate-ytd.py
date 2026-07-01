@@ -68,27 +68,143 @@ def closure_category(name, addr):
     return 'regular'
 def is_closed(status):
     return any(k in (status or '') for k in ['폐업','취소','말소','중지','휴업'])
+# ─── v17.16: franchise_master.json compact_lookup 활용 정규화 ───
+_MASTER_LOOKUP = None
+def _load_master_lookup():
+    global _MASTER_LOOKUP
+    if _MASTER_LOOKUP is not None: return _MASTER_LOOKUP
+    _MASTER_LOOKUP = {}
+    try:
+        import os as _os
+        for path in ('data/franchise_master.json', './data/franchise_master.json', '../data/franchise_master.json'):
+            if _os.path.exists(path):
+                with open(path,'r',encoding='utf-8') as f:
+                    fm = json.load(f)
+                cl = fm.get('compact_lookup') or {}
+                _MASTER_LOOKUP.update(cl)
+                # also add brand.name as self-lookup
+                for b in (fm.get('brands') or []):
+                    nm = b.get('name','') if isinstance(b, dict) else b
+                    if nm:
+                        _MASTER_LOOKUP[nm.replace(' ','')] = nm
+                break
+    except Exception as e:
+        sys.stderr.write(f'[master_lookup] load failed: {e}\n')
+    return _MASTER_LOOKUP
+
+# 강제 override: 이름 정규화가 잘 안 되는 유명 브랜드
+_BRAND_OVERRIDES = [
+    ('야화혼술바', '야화 혼술바'),  # 야화혼술바천안신부점 등
+    ('야화 혼술바', '야화 혼술바'),
+    ('메가엠지씨커피', '메가엠지씨커피'),
+    ('컴포즈커피', '컴포즈커피'),
+    ('이디야커피', '이디야커피'),
+    ('텐퍼센트커피', '텐퍼센트커피'),
+    ('텐퍼센트', '텐퍼센트커피'),
+    ('우지커피', '우지커피'),
+    ('빽다방', '빽다방'),
+    ('더벤티', '더벤티'),
+    ('백억커피', '백억커피'),
+    ('매머드커피', '매머드커피'),
+    ('바나프레소', '바나프레소'),
+    ('스타벅스', '스타벅스'),
+    ('투썸플레이스', '투썸플레이스'),
+    ('공차', '공차'),
+    ('이마트24', '이마트24'),
+    ('세븐일레븐', '세븐일레븐'),
+    ('지에스25', 'GS25'),
+    ('GS25', 'GS25'),
+    ('씨유', 'CU'),
+    ('CU', 'CU'),
+    ('파리바게뜨', '파리바게뜨'),
+    ('뚜레쥬르', '뚜레쥬르'),
+    ('노랑통닭', '노랑통닭'),
+    ('가마치통닭', '가마치통닭'),
+    ('처갓집양념치킨', '처갓집양념치킨'),
+    ('BHC', 'BHC'),
+    ('bhc', 'BHC'),
+    ('BBQ', 'BBQ'),
+    ('교촌치킨', '교촌치킨'),
+    ('굽네치킨', '굽네치킨'),
+    ('부어치킨', '부어치킨'),
+    ('농가의식탁', '농가의 식탁'),
+    ('농가의 식탁', '농가의 식탁'),
+    ('삼대갈비', '삼대갈비'),
+    ('소복소복', '소복소복'),
+    ('명류당티에프', '명류당티에프'),
+    ('명류당', '명류당티에프'),
+    ('써브웨이', '써브웨이'),
+    ('노브랜드버거', '노브랜드버거'),
+    ('토핑몬스터피자', '토핑몬스터피자'),
+    ('케이찹사라다', '케이찹사라다'),
+    ('슈퍼크리스피', '슈퍼크리스피'),
+    ('큰손닭강정', '큰손닭강정'),
+    ('BBQ치킨', 'BBQ'),
+    ('마루미베이글', '마루미베이글'),
+    ('런던베이글뮤지엄', '런던베이글뮤지엄'),
+    ('노티드', '노티드'),
+    ('올드페리도넛', '올드페리도넛'),
+]
+
 def brand_of(name):
-    """v15.7 강화 — 띄어쓰기·붙여쓰기·괄호 suffix 다중 패턴 통합"""
+    """v17.16 강화 — franchise_master.json lookup + override + 기존 regex 순차 시도"""
     if not name: return None
     n = re.sub(r'\s+', ' ', name).strip()
-    # 1) "(지역명)점" 또는 "(주소) 점" 괄호 suffix 제거
+    # 0) 괄호 suffix 제거
     n = re.sub(r'\s*\([^)]+\)\s*점?\s*$', '', n).strip()
-    # 2) 띄어쓰기 있는 "OO점" 형식 — 마지막 토큰이 ~점으로 끝나면 떼기
+    n_nospace = n.replace(' ','')
+
+    # ★ Override — startswith match (야화혼술바천안신부점 → 야화 혼술바)
+    for prefix, canonical in _BRAND_OVERRIDES:
+        p_nospace = prefix.replace(' ','')
+        if n_nospace.startswith(p_nospace):
+            return canonical
+
+    # ★ Master lookup — exact match
+    lookup = _load_master_lookup()
+    if n in lookup: return lookup[n]
+    if n_nospace in lookup: return lookup[n_nospace]
+
+    # ★ Master lookup — prefix match (매장명 앞부분이 master brand)
+    # 매장명의 각 prefix에 대해 lookup 확인 (긴 것부터)
+    if len(n_nospace) >= 3:
+        for i in range(min(len(n_nospace), 12), 2, -1):
+            prefix_ns = n_nospace[:i]
+            if prefix_ns in lookup:
+                return lookup[prefix_ns]
+
+    # 2) 띄어쓰기 있는 "OO점" — 마지막 토큰이 ~점이면 떼기
     parts = re.split(r'\s+', n)
     if len(parts) >= 2:
         last = parts[-1]
-        if re.search(r'점$', last) and len(last) <= 12:  # OO점, OO직영점, OO본점 등
+        if re.search(r'점$', last) and len(last) <= 12:
             base = ' '.join(parts[:-1]).strip()
-            if len(base) >= 3: return base
-    # 3) 붙여쓴 "OO점" 형식 (예: 역전할머니맥주충북진천광혜원점)
-    #    base가 4자 이상 한글이고 끝이 한글 1~8자 + 점인 경우
+            if len(base) >= 3:
+                # base가 lookup에 있으면 정규화
+                base_ns = base.replace(' ','')
+                if base_ns in lookup: return lookup[base_ns]
+                return base
+    # 3) 붙여쓴 "OO점" — 마지막 「점」 앞 지역명 절단
+    #    "야화혼술바천안신부점" → "야화혼술바" (첫 4-5자만 base)
     m = re.match(r'^([가-힣a-zA-Z0-9·\-]{4,})([가-힣a-zA-Z0-9]{1,10}점)\s*$', n)
-    if m: return m.group(1)
-    # 4) "OO 직영점/가맹점/본점/지점" suffix 변형
+    if m:
+        base = m.group(1)
+        # base가 lookup에 있으면 정규화
+        base_ns = base.replace(' ','')
+        if base_ns in lookup: return lookup[base_ns]
+        # base의 짧은 prefix로 추가 시도
+        for i in range(min(len(base_ns), 12), 2, -1):
+            prefix_ns = base_ns[:i]
+            if prefix_ns in lookup:
+                return lookup[prefix_ns]
+        return base
+    # 4) suffix 변형
     m2 = re.match(r'^(.+?)(직영점|가맹점|본점|지점|매장)\s*$', n)
     if m2 and len(m2.group(1)) >= 3:
-        return m2.group(1).strip()
+        base = m2.group(1).strip()
+        base_ns = base.replace(' ','')
+        if base_ns in lookup: return lookup[base_ns]
+        return base
     return n
 def sido_short(addr):
     if not addr: return '기타'
