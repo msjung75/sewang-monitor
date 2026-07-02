@@ -6276,3 +6276,108 @@ function startPendingPolling(){
   else injectUI();
 })();
 </script>
+
+<script>
+/* ─── v17.19: 거래처 매칭 공용화 (사장님 승인 2026-07-02) ───
+   data/customers_hash.json(FNV 해시 12hex + 지역)을 전 사용자가 자동 로드 → 💼 뱃지.
+   매장명 원문은 서버·repo 어디에도 없음(해시만). 등록은 관리탭 「전 직원 공유」 버튼(admin). */
+(function(){
+  var HIDX = null;
+  function fnv(s, seed){
+    var b = unescape(encodeURIComponent(String(s).normalize ? String(s).normalize('NFC') : String(s)));
+    var h = seed >>> 0;
+    for (var i = 0; i < b.length; i++){ h ^= b.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+    return ('0000000' + h.toString(16)).slice(-8);
+  }
+  function hkey(name){
+    var c = String(name||'').replace(/[\s\u00A0]/g,'').toLowerCase();
+    if (c.length < 2) return null;
+    return (fnv(c, 2166136261) + fnv(c, 424242421)).slice(0, 12);
+  }
+  window._custHkey = hkey;
+  fetch('/data/customers_hash.json?v=' + Date.now(), { cache: 'no-store' })
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(d){
+      if (!d || !Array.isArray(d.e) || !d.e.length) return;
+      HIDX = {};
+      d.e.forEach(function(x){
+        var i = x.indexOf('|');
+        var k = i < 0 ? x : x.slice(0, i);
+        var r = i < 0 ? '' : x.slice(i + 1);
+        (HIDX[k] = HIDX[k] || []).push(r);
+      });
+      window._CUST_SHARED_N = d.n || d.e.length;
+      var box = document.getElementById('cust-store-box');
+      if (box && !document.getElementById('cust-shared-line')) {
+        var ln = document.createElement('div');
+        ln.id = 'cust-shared-line';
+        ln.style.cssText = 'font-size:10.5px;color:#34d399;margin-top:6px';
+        ln.textContent = '🌐 공유 명단 적용 중: ' + (d.n || d.e.length).toLocaleString() + '곳' + (d.u ? ' · 기준 ' + d.u : '') + ' — 전 사용자 자동 표시';
+        box.appendChild(ln);
+      }
+      try { if (typeof renderNew === 'function') renderNew(); } catch(e){}
+      try { if (typeof renderGold === 'function') renderGold(); } catch(e){}
+    }).catch(function(){});
+  var _prevICS = window.isCustomerStore;
+  window.isCustomerStore = function(name, addr){
+    if (HIDX) {
+      var keys = [hkey(name), hkey(String(name||'').replace(/\([^)]*\)/g,''))];
+      for (var i = 0; i < keys.length; i++){
+        var cands = keys[i] && HIDX[keys[i]];
+        if (!cands || !cands.length) continue;
+        if (!addr) return true;
+        var a = String(addr);
+        for (var j = 0; j < cands.length; j++){
+          var r = cands[j];
+          if (!r) return true;
+          var toks = r.split(/\s+/);
+          for (var t = 0; t < toks.length; t++){ if (toks[t] && a.indexOf(toks[t]) >= 0) return true; }
+        }
+      }
+    }
+    return _prevICS ? _prevICS(name, addr) : false;
+  };
+  function buildShareEntries(){
+    var d = null;
+    try { d = JSON.parse(localStorage.getItem('sewang_customer_stores')||'null'); } catch(e){}
+    if (!d || !Array.isArray(d.stores) || !d.stores.length) return null;
+    var seen = {}, out = [];
+    d.stores.forEach(function(s){
+      if (!s || !s.n) return;
+      [s.n, String(s.n).replace(/\([^)]*\)/g,'')].forEach(function(v){
+        var k = hkey(v);
+        if (!k) return;
+        var r = String(s.r||'').slice(0,20);
+        var ent = k + (r ? '|' + r : '');
+        if (seen[ent]) return;
+        seen[ent] = 1;
+        out.push(ent);
+      });
+    });
+    return { u: String(d.updated||'').slice(0,10), n: d.stores.length, e: out };
+  }
+  function addShareBtn(){
+    var box = document.getElementById('cust-store-box');
+    if (!box || document.getElementById('cust-share-btn')) return;
+    var b = document.createElement('button');
+    b.id = 'cust-share-btn';
+    b.textContent = '🌐 전 직원 공유 등록 (해시)';
+    b.style.cssText = 'width:100%;margin-top:8px;padding:9px;background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.3);color:#38bdf8;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer';
+    b.onclick = function(){
+      var p = buildShareEntries();
+      if (!p || !p.e.length) { alert('먼저 「📂 명단 파일 가져오기」로 이 기기에 명단을 등록하세요.'); return; }
+      if (!confirm('거래처 ' + p.n.toLocaleString() + '곳(해시 ' + p.e.length.toLocaleString() + '건)을 전 직원 공유로 등록할까요?\n\n매장명 원문이 아닌 해시(지문)만 서버에 저장됩니다.')) return;
+      b.disabled = true; b.textContent = '등록 중...';
+      adminPost('set_customer_hashes', p).then(function(r){
+        b.disabled = false; b.textContent = '🌐 전 직원 공유 등록 (해시)';
+        if (r.ok) {
+          if (typeof showToast === 'function') showToast('🌐', '공유 등록 완료', r.data.count.toLocaleString() + '건 — 1~2분 후 전 직원 적용');
+        } else alert('실패: ' + (r.data && r.data.error));
+      }).catch(function(e){ b.disabled = false; b.textContent = '🌐 전 직원 공유 등록 (해시)'; alert('오류: ' + e.message); });
+    };
+    box.appendChild(b);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', addShareBtn);
+  else addShareBtn();
+})();
+</script>
