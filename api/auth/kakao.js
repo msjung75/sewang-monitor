@@ -860,6 +860,24 @@ export default async function handler(req, res) {
       catch (e) { return res.status(400).json({ ok: false, error: e.message }); }
     }
 
+    // ===== v17.19: 거래처 해시 명단 공유 등록 (admin) =====
+    // 매장명 원문이 아닌 FNV 해시(12hex)+지역만 저장. 사장님 기기에서 생성해 전 직원 공유.
+    if (action === 'set_customer_hashes') {
+      const body = await readBody(req);
+      const entries = Array.isArray(body.e) ? body.e : null;
+      if (!entries || !entries.length) return res.status(400).json({ ok: false, error: 'e(배열) 필요' });
+      if (entries.length > 50000) return res.status(400).json({ ok: false, error: '항목 과다 (max 50000)' });
+      const fmtOk = entries.every(x => typeof x === 'string' && /^[0-9a-f]{12}(\|.{0,20})?$/.test(x));
+      if (!fmtOk) return res.status(400).json({ ok: false, error: '형식 오류 (12hex 또는 12hex|지역)' });
+      if (!GITHUB_TOKEN) return res.status(400).json({ ok: false, error: 'GITHUB_TOKEN 미설정' });
+      try {
+        const f = await ghGetFile('data/customers_hash.json');
+        const c = { u: String(body.u || '').slice(0, 10), n: Number(body.n) || 0, e: entries, updated_at: new Date().toISOString(), by: payload.n || '' };
+        await ghPutFile('data/customers_hash.json', c, f.sha, 'set_customer_hashes: ' + entries.length + ' entries');
+        return res.status(200).json({ ok: true, count: entries.length });
+      } catch (e) { return res.status(400).json({ ok: false, error: e.message }); }
+    }
+
     return res.status(400).json({ error: 'unknown_action', hint: 'action=login|me|logout|list_users|pending_count|add_user|approve|reject|update_role|update_user|remove' });
   } catch (err) {
     console.error('[auth_handler_failed]', err);
