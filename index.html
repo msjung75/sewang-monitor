@@ -6155,3 +6155,124 @@ function startPendingPolling(){
 </script>
 </body>
 </html>
+
+<script>
+/* ─── v17.18: 매장 단위 거래처 매칭 (localStorage 전용 · 서버 노출 0) ───
+   v14 brand 매칭에 이어, 세왕 거래처(정상) 매장명 명단을 이 브라우저에만 저장하고
+   신규업장·선점기회 카드에 💼 거래 뱃지를 표시. 서버·repo·타 기기 노출 없음. */
+(function(){
+  var KEY = 'sewang_customer_stores';
+  var IDX = null;
+  function compact(s){ return String(s||'').replace(/[\s\u00A0]/g,'').toLowerCase(); }
+  function noParen(s){ return String(s||'').replace(/\([^)]*\)/g,''); }
+  function loadStores(){
+    try { var d = JSON.parse(localStorage.getItem(KEY)||'null'); return (d && Array.isArray(d.stores)) ? d : null; } catch(e){ return null; }
+  }
+  function buildIdx(){
+    IDX = {};
+    var d = loadStores();
+    if (!d) return;
+    d.stores.forEach(function(e){
+      if (!e || !e.n) return;
+      var k1 = compact(e.n), k2 = compact(noParen(e.n));
+      [k1, k2].forEach(function(k){
+        if (k.length < 2) return;
+        if (!IDX[k]) IDX[k] = [];
+        IDX[k].push(e.r || '');
+      });
+    });
+  }
+  window.isCustomerStore = function(name, addr){
+    if (IDX === null) buildIdx();
+    if (!name) return false;
+    var cands = IDX[compact(name)] || IDX[compact(noParen(name))];
+    if (!cands || !cands.length) return false;
+    if (!addr) return true;
+    var a = String(addr);
+    for (var i = 0; i < cands.length; i++){
+      var r = cands[i];
+      if (!r) return true;
+      var toks = r.split(/\s+/);
+      for (var j = 0; j < toks.length; j++){
+        if (toks[j] && a.indexOf(toks[j]) >= 0) return true;
+      }
+    }
+    return false; /* 동명 매장 · 지역 불일치 → 뱃지 없음 */
+  };
+  if (typeof storeCard === 'function') {
+    var _sc = storeCard;
+    window.storeCard = function(s, opts){
+      var html = _sc(s, opts);
+      try {
+        if (s && window.isCustomerStore(s.name, s.addr)) {
+          html = html.replace('<div class="sc-tags">',
+            '<div class="sc-tags"><span class="tag" style="background:rgba(52,211,153,.16);color:#34d399;font-weight:800;border:1px solid rgba(52,211,153,.35)">💼 거래</span>');
+        }
+      } catch(e){}
+      return html;
+    };
+  }
+  function applyImport(txt){
+    var arr = null, updated = '', src = '';
+    try {
+      var d = JSON.parse(txt);
+      if (Array.isArray(d)) arr = d.map(function(x){ return (typeof x === 'string') ? { n: x } : { n: x.n || x.name || '', r: x.r || '' }; });
+      else if (d && Array.isArray(d.stores)) { arr = d.stores; updated = d.updated || ''; src = d.src || ''; }
+    } catch(e){
+      arr = String(txt).split(/\r?\n/).map(function(l){ return l.trim(); }).filter(Boolean).map(function(n){ return { n: n }; });
+    }
+    arr = (arr || []).filter(function(e){ return e && e.n; });
+    if (!arr.length) { alert('명단을 읽지 못했습니다 (JSON 또는 줄바꿈 텍스트)'); return; }
+    try {
+      localStorage.setItem(KEY, JSON.stringify({ v: 1, updated: updated || new Date().toISOString().slice(0,10), src: src, stores: arr }));
+    } catch(e){ alert('저장 실패: ' + e.message); return; }
+    IDX = null;
+    renderCount();
+    if (typeof showToast === 'function') showToast('💼', '거래처 매장 명단 등록', arr.length.toLocaleString() + '곳 (이 브라우저만)');
+    try { if (typeof renderNew === 'function') renderNew(); } catch(e){}
+    try { if (typeof renderGold === 'function') renderGold(); } catch(e){}
+  }
+  window._custStorePaste = applyImport;
+  window._custStoreClear = function(){
+    if (!confirm('매장 명단을 이 브라우저에서 삭제할까요?')) return;
+    localStorage.removeItem(KEY);
+    IDX = null;
+    renderCount();
+    try { if (typeof renderNew === 'function') renderNew(); } catch(e){}
+  };
+  function renderCount(){
+    var el = document.getElementById('cust-store-status');
+    if (!el) return;
+    var d = loadStores();
+    el.innerHTML = d
+      ? '등록: <b style="color:#34d399">' + d.stores.length.toLocaleString() + '곳</b>' + (d.updated ? ' · 기준 ' + d.updated : '') + ' <a href="javascript:window._custStoreClear()" style="color:#f87171;font-size:10px;margin-left:6px">삭제</a>'
+      : '아직 매장 명단이 없습니다 — 명단 파일(JSON/TXT)을 가져오세요';
+  }
+  function injectUI(){
+    var list = document.getElementById('customer-list');
+    if (!list || document.getElementById('cust-store-box')) return;
+    var box = document.createElement('div');
+    box.id = 'cust-store-box';
+    box.innerHTML = '<div style="margin-top:12px;padding-top:11px;border-top:1px dashed var(--border2)">'
+      + '<div style="font-size:11.5px;font-weight:700;margin-bottom:6px">🏪 매장 단위 명단 <span style="font-size:9px;color:#34d399;background:rgba(52,211,153,.12);padding:2px 6px;border-radius:6px;font-weight:700">신규업장 💼 뱃지</span></div>'
+      + '<div id="cust-store-status" style="font-size:11px;color:var(--txt3);margin-bottom:8px"></div>'
+      + '<div style="display:flex;gap:6px">'
+      + '<input id="cust-store-file" type="file" accept=".json,.txt,application/json,text/plain" style="display:none">'
+      + '<button onclick="document.getElementById(&quot;cust-store-file&quot;).click()" style="flex:1;padding:9px;background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.3);color:#34d399;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer">📂 명단 파일 가져오기</button>'
+      + '<button onclick="var t=prompt(&quot;매장명을 줄바꿈으로 붙여넣기&quot;);if(t)window._custStorePaste(t)" style="padding:9px 12px;background:var(--surface2);border:1px solid var(--border2);color:var(--txt2);border-radius:8px;font-size:11.5px;cursor:pointer">붙여넣기</button>'
+      + '</div></div>';
+    list.parentNode.appendChild(box);
+    document.getElementById('cust-store-file').addEventListener('change', function(ev){
+      var f = ev.target.files && ev.target.files[0];
+      if (!f) return;
+      var rd = new FileReader();
+      rd.onload = function(){ applyImport(rd.result); };
+      rd.readAsText(f, 'utf-8');
+      ev.target.value = '';
+    });
+    renderCount();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', injectUI);
+  else injectUI();
+})();
+</script>
