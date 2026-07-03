@@ -6381,3 +6381,76 @@ function startPendingPolling(){
   else addShareBtn();
 })();
 </script>
+
+<script>
+/* ─── v17.20: 📍 거래처자리 — 주소(도로명+번호) 해시 매칭 ───
+   거래처 주소지에 다른 이름의 신규 인허가 = 사장 교체/같은 건물 신규 입점 영업 신호.
+   같은 주소키에 인허가 3건 이상이면 백화점·푸드코트로 보고 표시하지 않음. */
+(function(){
+  var AIDX = null;
+  var ROAD = /([가-힣A-Za-z0-9·.]+(?:로|길))\s*(\d+(?:-\d+)?)/;
+  function addrKey(addr){
+    var m = ROAD.exec(String(addr||''));
+    return m ? (m[1] + m[2]).replace(/\s/g,'').toLowerCase() : null;
+  }
+  fetch('/data/customers_hash.json?v=' + Date.now(), { cache: 'no-store' })
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(d){
+      if (!d || !Array.isArray(d.ea) || !d.ea.length || typeof window._custHkey !== 'function') return;
+      AIDX = {};
+      d.ea.forEach(function(x){
+        var i = x.indexOf('|');
+        var k = i < 0 ? x : x.slice(0, i);
+        var r = i < 0 ? '' : x.slice(i + 1);
+        (AIDX[k] = AIDX[k] || []).push(r);
+      });
+      try { if (typeof renderNew === 'function') renderNew(); } catch(e){}
+      try { if (typeof renderGold === 'function') renderGold(); } catch(e){}
+    }).catch(function(){});
+  var CNT = null, CNT_LEN = -1;
+  function hitCounts(){
+    var list = (window.ST && ST.permits) ? ST.permits : [];
+    if (CNT && CNT_LEN === list.length) return CNT;
+    CNT = {}; CNT_LEN = list.length;
+    for (var i = 0; i < list.length; i++){
+      var ak = addrKey(list[i].addr);
+      if (!ak) continue;
+      var h = window._custHkey(ak);
+      if (h && AIDX[h]) CNT[h] = (CNT[h] || 0) + 1;
+    }
+    return CNT;
+  }
+  window.isCustomerAddr = function(addr){
+    if (!AIDX) return false;
+    var ak = addrKey(addr);
+    if (!ak) return false;
+    var h = window._custHkey(ak);
+    var cands = h && AIDX[h];
+    if (!cands || !cands.length) return false;
+    var a = String(addr);
+    var regionOk = false;
+    for (var j = 0; j < cands.length; j++){
+      var r = cands[j];
+      if (!r) { regionOk = true; break; }
+      var toks = r.split(/\s+/);
+      for (var t = 0; t < toks.length; t++){ if (toks[t] && a.indexOf(toks[t]) >= 0) { regionOk = true; break; } }
+      if (regionOk) break;
+    }
+    if (!regionOk) return false;
+    return (hitCounts()[h] || 0) <= 2;  /* 백화점·몰 노이즈 차단 */
+  };
+  if (typeof storeCard === 'function') {
+    var _sc = window.storeCard;
+    window.storeCard = function(s, opts){
+      var html = _sc(s, opts);
+      try {
+        if (s && html.indexOf('💼 거래') < 0 && window.isCustomerAddr(s.addr)) {
+          html = html.replace('<div class="sc-tags">',
+            '<div class="sc-tags"><span class="tag" style="background:rgba(251,191,36,.14);color:#fbbf24;font-weight:800;border:1px solid rgba(251,191,36,.35)" title="이 주소에 세왕 거래처가 등록돼 있습니다 — 사장 교체 또는 같은 건물 신규 입점 가능성">📍 거래처자리</span>');
+        }
+      } catch(e){}
+      return html;
+    };
+  }
+})();
+</script>
