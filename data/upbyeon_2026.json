@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-04T04:28:21+09:00",
+  "updated": "2026-07-04T20:55:01+09:00",
   "baseline_date": "20260101",
   "current_date": "20260704",
   "brands": {
@@ -249,7 +249,7 @@
     "BHC": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 2280,
+      "current_count_reported": 2279,
       "new_permits_count": 39,
       "candidate_count": 912,
       "verified_count": 80,
@@ -480,15 +480,15 @@
     },
     "노랑통닭": {
       "service": "ilban",
-      "current_count": 1243,
-      "current_count_reported": 1243,
-      "new_permits_count": 42,
+      "current_count": 1245,
+      "current_count_reported": 1245,
+      "new_permits_count": 44,
       "candidate_count": 773,
       "verified_count": 80,
       "upbyeon_count": 6,
       "upbyeon_count_real": 6,
-      "total_growth": 48,
-      "upbyeon_ratio": 0.125,
+      "total_growth": 50,
+      "upbyeon_ratio": 0.12,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -562,14 +562,14 @@
     "페리카나": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 2749,
+      "current_count_reported": 2750,
       "new_permits_count": 17,
-      "candidate_count": 831,
+      "candidate_count": 832,
       "verified_count": 80,
-      "upbyeon_count": 1,
-      "upbyeon_count_real": 1,
-      "total_growth": 18,
-      "upbyeon_ratio": 0.056,
+      "upbyeon_count": 2,
+      "upbyeon_count_real": 2,
+      "total_growth": 19,
+      "upbyeon_ratio": 0.105,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -582,6 +582,17 @@
           "region_code": "5680000",
           "region_name": "기타 지역",
           "trivial": false
+        },
+        {
+          "mng_no": "6510000-101-2022-00866",
+          "old_name": "흑진주",
+          "new_name": "페리카나치킨삼양도련점",
+          "addr": "제주특별자치도 제주시 서흘길 20, 1층 (삼양일동)",
+          "lcpmt": "2022-06-23",
+          "dat_updt": "2026-07-03 22:47:48",
+          "region_code": "6510000",
+          "region_name": "6510000",
+          "trivial": false
         }
       ]
     },
@@ -590,7 +601,7 @@
       "current_count": 1500,
       "current_count_reported": 1560,
       "new_permits_count": 7,
-      "candidate_count": 867,
+      "candidate_count": 868,
       "verified_count": 80,
       "upbyeon_count": 1,
       "upbyeon_count_real": 1,
@@ -689,13 +700,13 @@
       "service": "ilban",
       "current_count": 1258,
       "current_count_reported": 1258,
-      "new_permits_count": 37,
-      "candidate_count": 714,
+      "new_permits_count": 38,
+      "candidate_count": 715,
       "verified_count": 80,
       "upbyeon_count": 7,
       "upbyeon_count_real": 7,
-      "total_growth": 44,
-      "upbyeon_ratio": 0.159,
+      "total_growth": 45,
+      "upbyeon_ratio": 0.156,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -780,14 +791,14 @@
     "멕시카나": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 2276,
-      "new_permits_count": 22,
+      "current_count_reported": 2277,
+      "new_permits_count": 23,
       "candidate_count": 912,
       "verified_count": 80,
       "upbyeon_count": 13,
       "upbyeon_count_real": 13,
-      "total_growth": 35,
-      "upbyeon_ratio": 0.371,
+      "total_growth": 36,
+      "upbyeon_ratio": 0.361,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -938,9 +949,9 @@
     "투다리": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 3445,
+      "current_count_reported": 3446,
       "new_permits_count": 13,
-      "candidate_count": 892,
+      "candidate_count": 893,
       "verified_count": 80,
       "upbyeon_count": 2,
       "upbyeon_count_real": 2,
