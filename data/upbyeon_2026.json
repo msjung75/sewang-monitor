@@ -1,19 +1,19 @@
 {
-  "updated": "2026-07-06T05:28:05+09:00",
+  "updated": "2026-07-06T21:30:55+09:00",
   "baseline_date": "20260101",
   "current_date": "20260706",
   "brands": {
     "88포차": {
       "service": "ilban",
-      "current_count": 44,
-      "current_count_reported": 44,
+      "current_count": 42,
+      "current_count_reported": 42,
       "new_permits_count": 3,
-      "candidate_count": 31,
-      "verified_count": 31,
-      "upbyeon_count": 4,
-      "upbyeon_count_real": 4,
-      "total_growth": 7,
-      "upbyeon_ratio": 0.571,
+      "candidate_count": 29,
+      "verified_count": 29,
+      "upbyeon_count": 3,
+      "upbyeon_count_real": 3,
+      "total_growth": 6,
+      "upbyeon_ratio": 0.5,
       "is_upbyeon_specialist": true,
       "upbyeon": [
         {
@@ -48,17 +48,6 @@
           "region_code": "3990000",
           "region_name": "경기 남양주시",
           "trivial": false
-        },
-        {
-          "mng_no": "4880000-101-1992-00008",
-          "old_name": "청년순대국 고흥녹동점",
-          "new_name": "88포차",
-          "addr": "전라남도 고흥군 도양읍 비봉로 167, 103호",
-          "lcpmt": "1992-03-31",
-          "dat_updt": "2026-05-13 22:47:50",
-          "region_code": "4880000",
-          "region_name": "기타 도",
-          "trivial": false
         }
       ]
     },
@@ -78,10 +67,10 @@
     },
     "한신포차": {
       "service": "ilban",
-      "current_count": 224,
-      "current_count_reported": 224,
+      "current_count": 207,
+      "current_count_reported": 207,
       "new_permits_count": 1,
-      "candidate_count": 139,
+      "candidate_count": 127,
       "verified_count": 80,
       "upbyeon_count": 3,
       "upbyeon_count_real": 3,
@@ -126,15 +115,15 @@
     },
     "포차중문": {
       "service": "ilban",
-      "current_count": 21,
-      "current_count_reported": 21,
+      "current_count": 20,
+      "current_count_reported": 20,
       "new_permits_count": 1,
-      "candidate_count": 11,
-      "verified_count": 11,
-      "upbyeon_count": 5,
-      "upbyeon_count_real": 5,
-      "total_growth": 6,
-      "upbyeon_ratio": 0.833,
+      "candidate_count": 10,
+      "verified_count": 10,
+      "upbyeon_count": 4,
+      "upbyeon_count_real": 4,
+      "total_growth": 5,
+      "upbyeon_ratio": 0.8,
       "is_upbyeon_specialist": true,
       "upbyeon": [
         {
@@ -171,17 +160,6 @@
           "trivial": false
         },
         {
-          "mng_no": "3600000-101-2001-00656",
-          "old_name": "전포여관 광주상무점",
-          "new_name": "포차중문",
-          "addr": "광주광역시 서구 시청로56번길 18 (치평동)",
-          "lcpmt": "2001-11-23",
-          "dat_updt": "2026-06-23 03:03:03",
-          "region_code": "3600000",
-          "region_name": "광주광역시",
-          "trivial": false
-        },
-        {
           "mng_no": "3350000-101-1993-02101",
           "old_name": "빨간닭",
           "new_name": "포차중문 부산대점",
@@ -196,29 +174,17 @@
     },
     "생마차": {
       "service": "ilban",
-      "current_count": 170,
-      "current_count_reported": 170,
+      "current_count": 149,
+      "current_count_reported": 149,
       "new_permits_count": 2,
-      "candidate_count": 119,
+      "candidate_count": 102,
       "verified_count": 80,
-      "upbyeon_count": 1,
+      "upbyeon_count": 0,
       "upbyeon_count_real": 0,
       "total_growth": 2,
       "upbyeon_ratio": 0.0,
       "is_upbyeon_specialist": false,
-      "upbyeon": [
-        {
-          "mng_no": "3630000-101-2024-00063",
-          "old_name": "생마차광주첨단점",
-          "new_name": "생마차 광주첨단점",
-          "addr": "광주광역시 광산구 임방울대로826번길 47, 1층 111,112호 (쌍암동)",
-          "lcpmt": "2024-02-19",
-          "dat_updt": "2026-05-07 22:37:21",
-          "region_code": "3630000",
-          "region_name": "기타 시도",
-          "trivial": true
-        }
-      ]
+      "upbyeon": []
     },
     "1988포차": {
       "service": "ilban",
@@ -249,14 +215,14 @@
     "BHC": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 2279,
-      "new_permits_count": 39,
-      "candidate_count": 914,
+      "current_count_reported": 2086,
+      "new_permits_count": 34,
+      "candidate_count": 897,
       "verified_count": 80,
-      "upbyeon_count": 5,
-      "upbyeon_count_real": 3,
-      "total_growth": 42,
-      "upbyeon_ratio": 0.071,
+      "upbyeon_count": 3,
+      "upbyeon_count_real": 2,
+      "total_growth": 36,
+      "upbyeon_ratio": 0.056,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -271,17 +237,6 @@
           "trivial": true
         },
         {
-          "mng_no": "4930000-101-2025-00065",
-          "old_name": "또그랑",
-          "new_name": "비에이치씨(BHC) 해남화원점",
-          "addr": "전라남도 해남군 화원면 금평길 14-6, 1층",
-          "lcpmt": "2025-09-24",
-          "dat_updt": "2026-05-12 22:47:50",
-          "region_code": "4930000",
-          "region_name": "기타 도",
-          "trivial": false
-        },
-        {
           "mng_no": "3180000-101-2025-00616",
           "old_name": "브뤼셀프라이 여의도점",
           "new_name": "BHC 서울크루즈점",
@@ -291,17 +246,6 @@
           "region_code": "3180000",
           "region_name": "서울 금천구",
           "trivial": false
-        },
-        {
-          "mng_no": "5000000-101-2025-00029",
-          "old_name": "트레비",
-          "new_name": "트레비&BHC 진도의신점",
-          "addr": "전라남도 진도군 의신면 진도대로 2420, 1층",
-          "lcpmt": "2025-05-02",
-          "dat_updt": "2026-05-11 22:50:00",
-          "region_code": "5000000",
-          "region_name": "기타 지역",
-          "trivial": true
         },
         {
           "mng_no": "5480000-101-2024-00015",
@@ -319,27 +263,16 @@
     "BBQ": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 2088,
-      "new_permits_count": 39,
-      "candidate_count": 881,
+      "current_count_reported": 1916,
+      "new_permits_count": 35,
+      "candidate_count": 890,
       "verified_count": 80,
-      "upbyeon_count": 5,
-      "upbyeon_count_real": 5,
-      "total_growth": 44,
-      "upbyeon_ratio": 0.114,
+      "upbyeon_count": 3,
+      "upbyeon_count_real": 3,
+      "total_growth": 38,
+      "upbyeon_ratio": 0.079,
       "is_upbyeon_specialist": false,
       "upbyeon": [
-        {
-          "mng_no": "4810000-101-2025-00311",
-          "old_name": "청홍바다마루 BBQ",
-          "new_name": "여수바다마루BBQ",
-          "addr": "전라남도 여수시 돌산읍 백초길 53-12, 1층",
-          "lcpmt": "2025-10-27",
-          "dat_updt": "2026-03-17 23:02:38",
-          "region_code": "4810000",
-          "region_name": "기타 도",
-          "trivial": false
-        },
         {
           "mng_no": "3450000-101-2025-00170",
           "old_name": "피자플렉스 칠곡점",
@@ -363,17 +296,6 @@
           "trivial": false
         },
         {
-          "mng_no": "4950000-101-2024-00048",
-          "old_name": "호식이두마리치킨 전남무안점",
-          "new_name": "BBQ 무안군청점",
-          "addr": "전라남도 무안군 무안읍 뻘낙지길 5",
-          "lcpmt": "2024-05-08",
-          "dat_updt": "2026-05-23 03:03:03",
-          "region_code": "4950000",
-          "region_name": "기타 도",
-          "trivial": false
-        },
-        {
           "mng_no": "5700000-101-2024-00042",
           "old_name": "커피와 호두과자",
           "new_name": "BBQ 문장주유소점",
@@ -389,13 +311,13 @@
     "교촌치킨": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 2156,
-      "new_permits_count": 21,
-      "candidate_count": 863,
+      "current_count_reported": 2024,
+      "new_permits_count": 19,
+      "candidate_count": 846,
       "verified_count": 80,
       "upbyeon_count": 0,
       "upbyeon_count_real": 0,
-      "total_growth": 21,
+      "total_growth": 19,
       "upbyeon_ratio": 0.0,
       "is_upbyeon_specialist": false,
       "upbyeon": []
@@ -403,9 +325,9 @@
     "굽네치킨": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 1868,
+      "current_count_reported": 1714,
       "new_permits_count": 11,
-      "candidate_count": 881,
+      "candidate_count": 872,
       "verified_count": 80,
       "upbyeon_count": 1,
       "upbyeon_count_real": 1,
@@ -428,10 +350,10 @@
     },
     "깐부치킨": {
       "service": "ilban",
-      "current_count": 323,
-      "current_count_reported": 323,
+      "current_count": 319,
+      "current_count_reported": 319,
       "new_permits_count": 11,
-      "candidate_count": 165,
+      "candidate_count": 164,
       "verified_count": 80,
       "upbyeon_count": 1,
       "upbyeon_count_real": 1,
@@ -455,14 +377,14 @@
     "처갓집양념치킨": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 1631,
-      "new_permits_count": 38,
-      "candidate_count": 841,
+      "current_count_reported": 1530,
+      "new_permits_count": 34,
+      "candidate_count": 849,
       "verified_count": 80,
       "upbyeon_count": 1,
       "upbyeon_count_real": 1,
-      "total_growth": 39,
-      "upbyeon_ratio": 0.026,
+      "total_growth": 35,
+      "upbyeon_ratio": 0.029,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -480,15 +402,15 @@
     },
     "노랑통닭": {
       "service": "ilban",
-      "current_count": 1246,
-      "current_count_reported": 1246,
-      "new_permits_count": 45,
-      "candidate_count": 773,
+      "current_count": 1130,
+      "current_count_reported": 1130,
+      "new_permits_count": 43,
+      "candidate_count": 694,
       "verified_count": 80,
       "upbyeon_count": 6,
       "upbyeon_count_real": 6,
-      "total_growth": 51,
-      "upbyeon_ratio": 0.118,
+      "total_growth": 49,
+      "upbyeon_ratio": 0.122,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -562,9 +484,9 @@
     "페리카나": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 2750,
+      "current_count_reported": 2586,
       "new_permits_count": 17,
-      "candidate_count": 832,
+      "candidate_count": 816,
       "verified_count": 80,
       "upbyeon_count": 2,
       "upbyeon_count_real": 2,
@@ -598,10 +520,10 @@
     },
     "네네치킨": {
       "service": "ilban",
-      "current_count": 1500,
-      "current_count_reported": 1560,
+      "current_count": 1454,
+      "current_count_reported": 1454,
       "new_permits_count": 7,
-      "candidate_count": 868,
+      "candidate_count": 838,
       "verified_count": 80,
       "upbyeon_count": 1,
       "upbyeon_count_real": 1,
@@ -624,10 +546,10 @@
     },
     "호식이두마리치킨": {
       "service": "ilban",
-      "current_count": 1377,
-      "current_count_reported": 1377,
+      "current_count": 1268,
+      "current_count_reported": 1268,
       "new_permits_count": 12,
-      "candidate_count": 838,
+      "candidate_count": 769,
       "verified_count": 80,
       "upbyeon_count": 1,
       "upbyeon_count_real": 1,
@@ -650,15 +572,15 @@
     },
     "보드람치킨": {
       "service": "ilban",
-      "current_count": 368,
-      "current_count_reported": 368,
-      "new_permits_count": 18,
-      "candidate_count": 201,
+      "current_count": 349,
+      "current_count_reported": 349,
+      "new_permits_count": 17,
+      "candidate_count": 196,
       "verified_count": 80,
       "upbyeon_count": 3,
       "upbyeon_count_real": 3,
-      "total_growth": 21,
-      "upbyeon_ratio": 0.143,
+      "total_growth": 20,
+      "upbyeon_ratio": 0.15,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -698,15 +620,15 @@
     },
     "자담치킨": {
       "service": "ilban",
-      "current_count": 1258,
-      "current_count_reported": 1258,
-      "new_permits_count": 39,
-      "candidate_count": 715,
+      "current_count": 1155,
+      "current_count_reported": 1155,
+      "new_permits_count": 38,
+      "candidate_count": 652,
       "verified_count": 80,
-      "upbyeon_count": 7,
-      "upbyeon_count_real": 7,
-      "total_growth": 46,
-      "upbyeon_ratio": 0.152,
+      "upbyeon_count": 6,
+      "upbyeon_count_real": 6,
+      "total_growth": 44,
+      "upbyeon_ratio": 0.136,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -774,31 +696,20 @@
           "region_code": "4671000",
           "region_name": "기타 도",
           "trivial": false
-        },
-        {
-          "mng_no": "4820000-101-2024-00086",
-          "old_name": "위풍당닭",
-          "new_name": "자담치킨연향점",
-          "addr": "전라남도 순천시 연향상가3길 24, 1층 (연향동)",
-          "lcpmt": "2024-05-07",
-          "dat_updt": "2026-06-23 03:03:03",
-          "region_code": "4820000",
-          "region_name": "기타 도",
-          "trivial": false
         }
       ]
     },
     "멕시카나": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 2280,
-      "new_permits_count": 24,
-      "candidate_count": 912,
+      "current_count_reported": 2067,
+      "new_permits_count": 23,
+      "candidate_count": 904,
       "verified_count": 80,
-      "upbyeon_count": 13,
-      "upbyeon_count_real": 13,
-      "total_growth": 37,
-      "upbyeon_ratio": 0.351,
+      "upbyeon_count": 10,
+      "upbyeon_count_real": 10,
+      "total_growth": 33,
+      "upbyeon_ratio": 0.303,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -832,28 +743,6 @@
           "dat_updt": "2026-05-22 03:03:03",
           "region_code": "5690000",
           "region_name": "기타 지역",
-          "trivial": false
-        },
-        {
-          "mng_no": "3630000-101-2025-00107",
-          "old_name": "팔곡보쌈",
-          "new_name": "멕시카나 신창제일점",
-          "addr": "광주광역시 광산구 신창로35번길 7, 1층 (신가동)",
-          "lcpmt": "2025-05-13",
-          "dat_updt": "2026-05-07 22:37:26",
-          "region_code": "3630000",
-          "region_name": "기타 시도",
-          "trivial": false
-        },
-        {
-          "mng_no": "4800000-101-2025-00088",
-          "old_name": "포차처럼양아치킨목포옥암점",
-          "new_name": "멕시카나치킨평화광장점",
-          "addr": "전라남도 목포시 원형서로 46-1, 112호 (상동, 양우비치팰리스)",
-          "lcpmt": "2025-04-29",
-          "dat_updt": "2026-05-05 22:54:01",
-          "region_code": "4800000",
-          "region_name": "기타 도",
           "trivial": false
         },
         {
@@ -912,17 +801,6 @@
           "trivial": false
         },
         {
-          "mng_no": "4800000-101-2024-00006",
-          "old_name": "호식이두마리치킨목포산정점",
-          "new_name": "멕시카나산정점",
-          "addr": "전라남도 목포시 양을로53번길 16, 1층 (산정동)",
-          "lcpmt": "2024-01-05",
-          "dat_updt": "2026-05-05 22:53:57",
-          "region_code": "4800000",
-          "region_name": "기타 도",
-          "trivial": false
-        },
-        {
           "mng_no": "3510500-101-2023-00264",
           "old_name": "설맥 인천학익점",
           "new_name": "멕시카나 학익신기점",
@@ -949,9 +827,9 @@
     "투다리": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 3446,
+      "current_count_reported": 3139,
       "new_permits_count": 13,
-      "candidate_count": 893,
+      "candidate_count": 903,
       "verified_count": 80,
       "upbyeon_count": 2,
       "upbyeon_count_real": 2,
@@ -985,10 +863,10 @@
     },
     "봉구비어": {
       "service": "ilban",
-      "current_count": 486,
-      "current_count_reported": 486,
+      "current_count": 467,
+      "current_count_reported": 467,
       "new_permits_count": 0,
-      "candidate_count": 276,
+      "candidate_count": 269,
       "verified_count": 80,
       "upbyeon_count": 0,
       "upbyeon_count_real": 0,
@@ -999,28 +877,17 @@
     },
     "79대포": {
       "service": "ilban",
-      "current_count": 202,
-      "current_count_reported": 202,
-      "new_permits_count": 7,
-      "candidate_count": 126,
+      "current_count": 175,
+      "current_count_reported": 175,
+      "new_permits_count": 6,
+      "candidate_count": 108,
       "verified_count": 80,
-      "upbyeon_count": 2,
-      "upbyeon_count_real": 2,
-      "total_growth": 9,
-      "upbyeon_ratio": 0.222,
+      "upbyeon_count": 1,
+      "upbyeon_count_real": 1,
+      "total_growth": 7,
+      "upbyeon_ratio": 0.143,
       "is_upbyeon_specialist": false,
       "upbyeon": [
-        {
-          "mng_no": "4810000-101-2023-00215",
-          "old_name": "하누바다",
-          "new_name": "79대포 미평점",
-          "addr": "전라남도 여수시 대학로 6, 1층 (미평동)",
-          "lcpmt": "2023-05-24",
-          "dat_updt": "2026-03-04 22:50:05",
-          "region_code": "4810000",
-          "region_name": "기타 도",
-          "trivial": false
-        },
         {
           "mng_no": "4201000-101-2023-00001",
           "old_name": "안주가강릉교동점",
@@ -1036,11 +903,11 @@
     },
     "청담이상": {
       "service": "ilban",
-      "current_count": 89,
-      "current_count_reported": 89,
+      "current_count": 86,
+      "current_count_reported": 86,
       "new_permits_count": 0,
-      "candidate_count": 45,
-      "verified_count": 45,
+      "candidate_count": 44,
+      "verified_count": 44,
       "upbyeon_count": 0,
       "upbyeon_count_real": 0,
       "total_growth": 0,
@@ -1064,15 +931,15 @@
     },
     "우이락": {
       "service": "ilban",
-      "current_count": 101,
-      "current_count_reported": 101,
+      "current_count": 95,
+      "current_count_reported": 95,
       "new_permits_count": 9,
-      "candidate_count": 57,
-      "verified_count": 57,
-      "upbyeon_count": 7,
-      "upbyeon_count_real": 7,
-      "total_growth": 16,
-      "upbyeon_ratio": 0.438,
+      "candidate_count": 53,
+      "verified_count": 53,
+      "upbyeon_count": 6,
+      "upbyeon_count_real": 6,
+      "total_growth": 15,
+      "upbyeon_ratio": 0.4,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -1084,17 +951,6 @@
           "dat_updt": "2026-06-19 03:03:03",
           "region_code": "3130000",
           "region_name": "서울 서대문구",
-          "trivial": false
-        },
-        {
-          "mng_no": "4810000-101-2023-00268",
-          "old_name": "리버스영",
-          "new_name": "우이락 여수디오션점",
-          "addr": "전라남도 여수시 소호로 295, 디오션리조트 B층 202호 (소호동)",
-          "lcpmt": "2023-06-27",
-          "dat_updt": "2026-06-12 03:03:03",
-          "region_code": "4810000",
-          "region_name": "기타 도",
           "trivial": false
         },
         {
@@ -1156,10 +1012,10 @@
     },
     "새마을식당": {
       "service": "ilban",
-      "current_count": 276,
-      "current_count_reported": 276,
+      "current_count": 264,
+      "current_count_reported": 264,
       "new_permits_count": 7,
-      "candidate_count": 163,
+      "candidate_count": 156,
       "verified_count": 80,
       "upbyeon_count": 1,
       "upbyeon_count_real": 1,
@@ -1182,10 +1038,10 @@
     },
     "홍콩반점": {
       "service": "ilban",
-      "current_count": 691,
-      "current_count_reported": 691,
+      "current_count": 649,
+      "current_count_reported": 649,
       "new_permits_count": 1,
-      "candidate_count": 419,
+      "candidate_count": 396,
       "verified_count": 80,
       "upbyeon_count": 1,
       "upbyeon_count_real": 1,
@@ -1208,8 +1064,8 @@
     },
     "신선설농탕": {
       "service": "ilban",
-      "current_count": 75,
-      "current_count_reported": 75,
+      "current_count": 74,
+      "current_count_reported": 74,
       "new_permits_count": 0,
       "candidate_count": 49,
       "verified_count": 49,
@@ -1222,10 +1078,10 @@
     },
     "명륜진사갈비": {
       "service": "ilban",
-      "current_count": 654,
-      "current_count_reported": 654,
+      "current_count": 611,
+      "current_count_reported": 611,
       "new_permits_count": 4,
-      "candidate_count": 384,
+      "candidate_count": 359,
       "verified_count": 80,
       "upbyeon_count": 2,
       "upbyeon_count_real": 1,
