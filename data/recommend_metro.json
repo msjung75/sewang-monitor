@@ -1,12 +1,12 @@
 {
-  "updated": "2026-07-06T21:25:42+09:00",
+  "updated": "2026-07-07T04:54:40+09:00",
   "baseline": "20260623",
   "days": 14,
   "region": "metro",
   "score_threshold": 2.0,
-  "total_input": 1533,
-  "recommended_count": 937,
-  "excluded_count": 596,
+  "total_input": 1522,
+  "recommended_count": 927,
+  "excluded_count": 595,
   "items": [
     {
       "score": 7.0,
@@ -123,23 +123,6 @@
       "bzstat": "호프/통닭",
       "permitDate": "20260626",
       "mng_no": "3540000-101-2026-00179",
-      "tel": "",
-      "reasons": [
-        "수도권",
-        "ilban+1.0",
-        "호프/통닭+2.0",
-        "+호프"
-      ]
-    },
-    {
-      "score": 5.8,
-      "name": "화천호프",
-      "addr": "경기도 시흥시 거북섬둘레길 42, 웨이브파크 광장 앞 먹거리존 (정왕동)",
-      "type": "일반음식점",
-      "type_key": "ilban",
-      "bzstat": "호프/통닭",
-      "permitDate": "20260624",
-      "mng_no": "4010000-101-2026-00280",
       "tel": "",
       "reasons": [
         "수도권",
@@ -3338,6 +3321,22 @@
         "수도권",
         "ilban+1.0",
         "일식+1.2"
+      ]
+    },
+    {
+      "score": 3.2,
+      "name": "오늘육회",
+      "addr": "경기도 시흥시 은행로144번길 2, 1층 일부호 (은행동)",
+      "type": "일반음식점",
+      "type_key": "ilban",
+      "bzstat": "기타",
+      "permitDate": "20260701",
+      "mng_no": "4010000-101-2026-00301",
+      "tel": "",
+      "reasons": [
+        "수도권",
+        "ilban+1.0",
+        "+회"
       ]
     }
   ]
