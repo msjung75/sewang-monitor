@@ -1,7 +1,7 @@
 {
-  "updated": "2026-07-07T21:26:57+09:00",
+  "updated": "2026-07-08T04:22:31+09:00",
   "baseline_date": "20260101",
-  "current_date": "20260707",
+  "current_date": "20260708",
   "brands": {
     "88포차": {
       "service": "ilban",
@@ -67,10 +67,10 @@
     },
     "한신포차": {
       "service": "ilban",
-      "current_count": 207,
-      "current_count_reported": 207,
+      "current_count": 208,
+      "current_count_reported": 208,
       "new_permits_count": 1,
-      "candidate_count": 127,
+      "candidate_count": 128,
       "verified_count": 80,
       "upbyeon_count": 3,
       "upbyeon_count_real": 3,
@@ -215,14 +215,14 @@
     "BHC": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 2086,
-      "new_permits_count": 34,
+      "current_count_reported": 2088,
+      "new_permits_count": 35,
       "candidate_count": 897,
       "verified_count": 80,
-      "upbyeon_count": 3,
-      "upbyeon_count_real": 2,
-      "total_growth": 36,
-      "upbyeon_ratio": 0.056,
+      "upbyeon_count": 4,
+      "upbyeon_count_real": 3,
+      "total_growth": 38,
+      "upbyeon_ratio": 0.079,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -245,6 +245,17 @@
           "dat_updt": "2026-05-08 03:03:03",
           "region_code": "3180000",
           "region_name": "서울 금천구",
+          "trivial": false
+        },
+        {
+          "mng_no": "5870000-101-2024-00047",
+          "old_name": "초송식육식당",
+          "new_name": "비에이치씨(BHC) 해남산이점",
+          "addr": "전남광주통합특별시 해남군 산이면 비석길 107, 1층",
+          "lcpmt": "2024-12-17",
+          "dat_updt": "2026-07-07 10:07:40",
+          "region_code": "5870000",
+          "region_name": "기타 지역",
           "trivial": false
         },
         {
@@ -325,14 +336,14 @@
     "굽네치킨": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 1714,
-      "new_permits_count": 11,
-      "candidate_count": 872,
+      "current_count_reported": 1715,
+      "new_permits_count": 12,
+      "candidate_count": 871,
       "verified_count": 80,
       "upbyeon_count": 1,
       "upbyeon_count_real": 1,
-      "total_growth": 12,
-      "upbyeon_ratio": 0.083,
+      "total_growth": 13,
+      "upbyeon_ratio": 0.077,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -702,14 +713,14 @@
     "멕시카나": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 2067,
+      "current_count_reported": 2068,
       "new_permits_count": 23,
-      "candidate_count": 904,
+      "candidate_count": 905,
       "verified_count": 80,
-      "upbyeon_count": 10,
-      "upbyeon_count_real": 10,
-      "total_growth": 33,
-      "upbyeon_ratio": 0.303,
+      "upbyeon_count": 11,
+      "upbyeon_count_real": 11,
+      "total_growth": 34,
+      "upbyeon_ratio": 0.324,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -820,6 +831,17 @@
           "dat_updt": "2026-03-17 22:17:53",
           "region_code": "3050000",
           "region_name": "서울 광진구",
+          "trivial": false
+        },
+        {
+          "mng_no": "3270000-101-2022-00086",
+          "old_name": "비비큐 부산동구청점",
+          "new_name": "멕시카나치킨 수정점",
+          "addr": "부산광역시 동구 수정중로 14, 1층 (수정동)",
+          "lcpmt": "2022-11-04",
+          "dat_updt": "2026-07-07 10:07:40",
+          "region_code": "3270000",
+          "region_name": "기타 시도",
           "trivial": false
         }
       ]
