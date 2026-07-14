@@ -152,11 +152,12 @@
       "id": "4990178737",
       "nickname": "김영호",
       "profile": "http://k.kakaocdn.net/dn/syRuX/dJMcadJcZyA/c0uEKjKTpV3EfjhmkzuaP0/img_640x640.jpg",
-      "role": "owner",
+      "role": "staff",
       "memo": "테그히어대표",
-      "approved_at": "2026-07-14T03:31:02.821Z"
+      "approved_at": "2026-07-14T03:31:02.821Z",
+      "updated_at": "2026-07-14T03:33:24.450Z"
     }
   ],
   "blocked": [],
-  "updated_at": "2026-07-14T03:31:02.821Z"
+  "updated_at": "2026-07-14T03:33:24.450Z"
 }
