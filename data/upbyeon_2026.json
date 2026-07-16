@@ -1,7 +1,7 @@
 {
-  "updated": "2026-07-15T21:04:55+09:00",
+  "updated": "2026-07-16T04:23:52+09:00",
   "baseline_date": "20260101",
-  "current_date": "20260715",
+  "current_date": "20260716",
   "brands": {
     "88포차": {
       "service": "ilban",
@@ -226,14 +226,14 @@
     "BHC": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 2088,
-      "new_permits_count": 35,
-      "candidate_count": 900,
+      "current_count_reported": 2089,
+      "new_permits_count": 36,
+      "candidate_count": 899,
       "verified_count": 80,
       "upbyeon_count": 4,
       "upbyeon_count_real": 3,
-      "total_growth": 38,
-      "upbyeon_ratio": 0.079,
+      "total_growth": 39,
+      "upbyeon_ratio": 0.077,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -285,14 +285,14 @@
     "BBQ": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 1919,
-      "new_permits_count": 38,
-      "candidate_count": 892,
+      "current_count_reported": 1920,
+      "new_permits_count": 39,
+      "candidate_count": 891,
       "verified_count": 80,
       "upbyeon_count": 3,
       "upbyeon_count_real": 3,
-      "total_growth": 41,
-      "upbyeon_ratio": 0.073,
+      "total_growth": 42,
+      "upbyeon_ratio": 0.071,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -335,7 +335,7 @@
       "current_count": 1500,
       "current_count_reported": 2026,
       "new_permits_count": 21,
-      "candidate_count": 844,
+      "candidate_count": 845,
       "verified_count": 80,
       "upbyeon_count": 0,
       "upbyeon_count_real": 0,
@@ -372,15 +372,15 @@
     },
     "깐부치킨": {
       "service": "ilban",
-      "current_count": 320,
-      "current_count_reported": 320,
-      "new_permits_count": 12,
+      "current_count": 321,
+      "current_count_reported": 321,
+      "new_permits_count": 13,
       "candidate_count": 164,
       "verified_count": 80,
       "upbyeon_count": 1,
       "upbyeon_count_real": 1,
-      "total_growth": 13,
-      "upbyeon_ratio": 0.077,
+      "total_growth": 14,
+      "upbyeon_ratio": 0.071,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -424,10 +424,10 @@
     },
     "노랑통닭": {
       "service": "ilban",
-      "current_count": 1132,
-      "current_count_reported": 1132,
+      "current_count": 1133,
+      "current_count_reported": 1133,
       "new_permits_count": 43,
-      "candidate_count": 697,
+      "candidate_count": 698,
       "verified_count": 80,
       "upbyeon_count": 6,
       "upbyeon_count_real": 6,
@@ -506,14 +506,14 @@
     "페리카나": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 2587,
-      "new_permits_count": 18,
-      "candidate_count": 817,
+      "current_count_reported": 2589,
+      "new_permits_count": 20,
+      "candidate_count": 816,
       "verified_count": 80,
       "upbyeon_count": 2,
       "upbyeon_count_real": 2,
-      "total_growth": 20,
-      "upbyeon_ratio": 0.1,
+      "total_growth": 22,
+      "upbyeon_ratio": 0.091,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -568,8 +568,8 @@
     },
     "호식이두마리치킨": {
       "service": "ilban",
-      "current_count": 1268,
-      "current_count_reported": 1268,
+      "current_count": 1267,
+      "current_count_reported": 1267,
       "new_permits_count": 12,
       "candidate_count": 770,
       "verified_count": 80,
@@ -656,7 +656,7 @@
       "current_count": 1157,
       "current_count_reported": 1157,
       "new_permits_count": 38,
-      "candidate_count": 654,
+      "candidate_count": 655,
       "verified_count": 80,
       "upbyeon_count": 6,
       "upbyeon_count_real": 6,
