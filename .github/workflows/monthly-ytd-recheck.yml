@@ -1,4 +1,5 @@
 name: Monthly YTD Re-check (last 30 days)
+# v17.19 fix (2026-07-18): TO_DATE=어제 → API to는 미만(LT) 조건이라 어제 하루 누락 → 오늘로 변경
 on:
   schedule:
     - cron: '30 19 1 * *'   # 매월 1일 19:30 UTC = 04:30 KST
@@ -16,10 +17,10 @@ jobs:
         id: dates
         run: |
           FROM_DATE=$(TZ=Asia/Seoul date -d "30 days ago" +%Y%m%d)
-          TO_DATE=$(TZ=Asia/Seoul date -d "yesterday" +%Y%m%d)
+          TO_DATE=$(TZ=Asia/Seoul date +%Y%m%d)   # to는 미만조건 → 오늘 미만 = 어제까지 포함
           echo "from=$FROM_DATE" >> $GITHUB_OUTPUT
           echo "to=$TO_DATE" >> $GITHUB_OUTPUT
-          echo "Recheck: $FROM_DATE → $TO_DATE"
+          echo "Recheck: $FROM_DATE → $TO_DATE (exclusive)"
       - name: Fetch & re-check
         env:
           FROM_DATE: ${{ steps.dates.outputs.from }}
