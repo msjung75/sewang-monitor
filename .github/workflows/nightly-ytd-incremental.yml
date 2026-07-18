@@ -1,6 +1,11 @@
 name: Nightly YTD Incremental
 # v16.8: 다중 schedule (GitHub Actions silent skip 방어)
 # v17.14.4: 18:00/19:00 KST 추가 — 행안부 평일 publish (16~19시) 즉시 fetch
+# v17.19 fix (2026-07-18):
+#   [버그1] from=to 동일날짜 조회 → API의 to는 미만(LT) 조건이라 항상 0건 → 7월 데이터 수집 중단 원인
+#   [버그2] 커밋 대상이 일별 파일(YYYYMMDD.json)인데 fetch 스크립트는 월별 파일(YYYYMM.json)에 저장 → 커밋 누락
+#   [수정] 최근 4일 롤링 윈도우 조회 (행안부 2일 지연 + 주말 공백 자동 보정, id 기준 병합이라 중복 안전)
+#          커밋 대상을 변경된 월별 파일 + summary로 변경, 멱등 체크 제거 (병합 자체가 멱등)
 on:
   schedule:
     - cron: '15 19 * * *'   # 04:15 KST (메인)
@@ -15,67 +20,54 @@ permissions:
   contents: write
 
 jobs:
-  fetch-yesterday:
+  fetch-rolling:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Compute yesterday (KST)
+      - name: Compute rolling window (KST)
         id: dates
         run: |
-          YESTERDAY=$(TZ=Asia/Seoul date -d "yesterday" +%Y%m%d)
-          echo "from=$YESTERDAY" >> $GITHUB_OUTPUT
-          echo "to=$YESTERDAY" >> $GITHUB_OUTPUT
-          echo "Yesterday: $YESTERDAY"
-      - name: Check if today's data already exists (idempotent)
-        id: check
-        run: |
-          TODAY=$(TZ=Asia/Seoul date +%Y%m%d)
-          YESTERDAY_FILE="data/ytd_2026/${{ steps.dates.outputs.from }}.json"
-          if [ -f "$YESTERDAY_FILE" ]; then
-            SIZE=$(stat -c%s "$YESTERDAY_FILE" 2>/dev/null || stat -f%z "$YESTERDAY_FILE" 2>/dev/null)
-            if [ "$SIZE" -gt "1000" ]; then
-              echo "already_done=true" >> $GITHUB_OUTPUT
-              echo "Today already processed (size $SIZE) — skip"
-              exit 0
-            fi
-          fi
-          echo "already_done=false" >> $GITHUB_OUTPUT
-      - name: Fetch YTD daily
-        if: steps.check.outputs.already_done != 'true'
+          FROM=$(TZ=Asia/Seoul date -d "4 days ago" +%Y%m%d)
+          TO=$(TZ=Asia/Seoul date +%Y%m%d)
+          echo "from=$FROM" >> $GITHUB_OUTPUT
+          echo "to=$TO" >> $GITHUB_OUTPUT
+          echo "Rolling window: $FROM ~ $TO (to는 미만조건 → 어제까지 포함)"
+      - name: Fetch YTD rolling window
         env:
           FROM_DATE: ${{ steps.dates.outputs.from }}
           TO_DATE: ${{ steps.dates.outputs.to }}
         run: bash scripts/fetch-ytd-range.sh
       - name: Aggregate YTD
-        if: steps.check.outputs.already_done != 'true'
         run: python3 scripts/aggregate-ytd.py
       - name: Commit via GitHub Contents API (rebase 충돌 무관)
-        if: steps.check.outputs.already_done != 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
           DATE_FROM: ${{ steps.dates.outputs.from }}
         run: |
           python3 << 'PYEOF'
-          import base64, json, os, time, urllib.request, urllib.error
+          import base64, json, os, subprocess, time, urllib.request, urllib.error
           token = os.environ['GH_TOKEN']
           repo = os.environ['REPO']
           date_from = os.environ['DATE_FROM']
           headers = {'Authorization': f'Bearer {token}', 'Accept': 'application/vnd.github+json', 'User-Agent': 'ytd-cron'}
-          # 2개 파일: 일간 json + summary
+          # 변경·신규된 월별 파일 + summary 자동 감지
+          st = subprocess.check_output(['git', 'status', '--porcelain', 'data/']).decode()
           files = []
-          daily = f'data/ytd_2026/{date_from}.json'
-          if os.path.exists(daily): files.append(daily)
-          summary = 'data/ytd_2026_summary.json'
-          if os.path.exists(summary): files.append(summary)
+          for line in st.splitlines():
+              path = line[3:].strip()
+              if path.startswith('data/ytd_2026/') and path.endswith('.json'):
+                  files.append(path)
+              elif path == 'data/ytd_2026_summary.json':
+                  files.append(path)
           if not files:
-              print('No files to commit')
+              print('No changes to commit')
               raise SystemExit(0)
           for path in files:
               api = f'https://api.github.com/repos/{repo}/contents/{path}'
               with open(path, 'rb') as f:
                   content_b64 = base64.b64encode(f.read()).decode('ascii')
-              msg = f'YTD nightly: {date_from} — {path.split("/")[-1]}'
+              msg = f'YTD nightly: {date_from}~ — {path.split("/")[-1]}'
               def get_sha():
                   try:
                       req = urllib.request.Request(api, headers=headers)
@@ -91,7 +83,7 @@ jobs:
                   req = urllib.request.Request(api, data=data, headers={**headers, 'Content-Type': 'application/json'}, method='PUT')
                   try:
                       with urllib.request.urlopen(req) as r:
-                          print(f'✅ {path} (attempt {attempt+1})')
+                          print(f'OK {path} (attempt {attempt+1})')
                           break
                   except urllib.error.HTTPError as e:
                       print(f'  {path} attempt {attempt+1}: {e.code}')
