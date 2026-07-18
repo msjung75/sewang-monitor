@@ -1,9 +1,12 @@
 name: Backfill 2026 YTD (manual)
+# v17.19 fix (2026-07-18):
+#   [버그] NEXT=월말일 → API to는 미만(LT) 조건이라 매월 마지막 날 누락 (예: 6/30 약 300건 누락)
+#   [수정] NEXT=다음달 1일 (오늘 상한) · matrix에 202607~202612 추가 + 미래 월 자동 skip
 on:
   workflow_dispatch:
     inputs:
       month:
-        description: 'Month (yyyymm) — e.g. 202601 ~ 202606. all=전체 1~현재 월'
+        description: 'Month (yyyymm) — e.g. 202601 ~ 202612. all=전체 1~현재 월'
         required: true
         default: 'all'
 
@@ -17,7 +20,7 @@ jobs:
       max-parallel: 1
       fail-fast: false
       matrix:
-        month: ['202601', '202602', '202603', '202604', '202605', '202606']
+        month: ['202601', '202602', '202603', '202604', '202605', '202606', '202607', '202608', '202609', '202610', '202611', '202612']
     steps:
       - uses: actions/checkout@v4
         with:
@@ -27,6 +30,13 @@ jobs:
         run: |
           INPUT="${{ inputs.month }}"
           M="${{ matrix.month }}"
+          TODAY=$(TZ=Asia/Seoul date +%Y%m%d)
+          # 미래 월 자동 skip
+          if [ "${M}01" \> "$TODAY" ]; then
+            echo "run=false" >> $GITHUB_OUTPUT
+            echo "gate M=$M future month — skip"
+            exit 0
+          fi
           # 지원 입력: all | 202603 | 202603,202604 | 202603~202606 | 202603-202606
           if [ "$INPUT" = "all" ]; then
             RESULT=true
@@ -48,12 +58,12 @@ jobs:
           M="${{ matrix.month }}"
           YEAR=${M:0:4}; MM=${M:4:2}
           FROM_DATE="${YEAR}${MM}01"
-          NEXT=$(date -d "${YEAR}-${MM}-01 + 1 month - 1 day" +%Y%m%d)
+          NEXT=$(date -d "${YEAR}-${MM}-01 + 1 month" +%Y%m%d)   # 다음달 1일 (to 미만조건 → 월말까지 포함)
           TODAY=$(TZ=Asia/Seoul date +%Y%m%d)
           if [ "$NEXT" \> "$TODAY" ]; then NEXT="$TODAY"; fi
           echo "from=$FROM_DATE" >> $GITHUB_OUTPUT
           echo "to=$NEXT" >> $GITHUB_OUTPUT
-          echo "$M: $FROM_DATE -> $NEXT"
+          echo "$M: $FROM_DATE -> $NEXT (exclusive)"
       - name: Fetch month
         if: steps.gate.outputs.run == 'true'
         env:
