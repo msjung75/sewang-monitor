@@ -810,15 +810,15 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
   <!-- v17.2: 추세 탭은 6개월 YTD 정밀 분석 -->
   <!-- 월별 업종별 stacked bar (사장님 의도) -->
   <div class="card" id="card-monthly-trend" style="margin-bottom:12px;padding:16px">
-    <div class="card-title">🍽️ 월별 업종별 창업 추이 <span style="color:var(--txt3);font-size:10px;font-weight:500;margin-left:auto">2026년 1~6월</span></div>
+    <div class="card-title">🍽️ 월별 업종별 창업 추이 <span id="trend-title-months" style="color:var(--txt3);font-size:10px;font-weight:500;margin-left:auto">2026년 1~6월</span></div>
     <div id="monthly-trend-summary" style="font-size:11.5px;color:var(--txt2);margin-bottom:12px;line-height:1.5">업종별 신규 출점 로딩 중…</div>
     <div id="monthly-trend-chart"><div style="color:var(--txt3);font-size:11.5px;text-align:center;padding:22px">⏳ 업종 분류 중…</div></div>
     <div id="monthly-trend-legend" style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:10px;font-size:9.5px;color:var(--txt3)"></div>
-    <div style="font-size:10px;color:var(--txt3);text-align:center;margin-top:8px">※ 6월은 새벽 04:15 KST cron 시점까지 (대시보드는 실시간 30일)</div>
+    <div style="font-size:10px;color:var(--txt3);text-align:center;margin-top:8px">※ 최신 월은 새벽 04:15 KST cron 시점까지 (대시보드는 실시간 30일)</div>
   </div>
   <!-- 월별 신규 출점 (총합 막대) -->
   <div class="card" style="margin-bottom:12px;padding:16px">
-    <div class="card-title">📅 월별 신규/폐점 (1~6월)</div>
+    <div class="card-title">📅 월별 신규/폐점 <span id="trend-month-range" style="color:var(--txt3);font-size:10px;font-weight:500;margin-left:auto">(1~6월)</span></div>
     <div id="trend-month-summary" style="font-size:11.5px;color:var(--txt2);margin-bottom:10px"></div>
     <div id="trend-month-chart"></div>
   </div>
@@ -826,7 +826,7 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
   <div class="card" style="margin-bottom:12px;padding:16px">
     <div class="card-title">🔍 브랜드 월별 추이</div>
     <input id="trend-brand-search" type="text" placeholder="브랜드명 입력 (예: 야화 혼술바)" style="width:100%;padding:10px 12px;border:1px solid var(--border2);background:var(--surface);border-radius:10px;color:var(--txt);font-size:13px;margin-bottom:12px;box-sizing:border-box" oninput="renderTrendBrand(this.value)">
-    <div id="trend-brand-result" style="min-height:40px"><div style="color:var(--txt3);font-size:12px;padding:14px;text-align:center">위 검색창에 brand 입력하면 1~6월 출점/폐점 차트 표시</div></div>
+    <div id="trend-brand-result" style="min-height:40px"><div style="color:var(--txt3);font-size:12px;padding:14px;text-align:center">위 검색창에 brand 입력하면 월별 출점/폐점 차트 표시</div></div>
   </div>
   <!-- TOP 성장 브랜드 -->
   <div class="card" style="margin-bottom:12px;padding:16px">
@@ -840,7 +840,7 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
   </div>
   <!-- v17.5: 폐업 세부 분석 -->
   <div class="card" style="margin-bottom:12px;padding:16px;border-left:3px solid #f87171">
-    <div class="card-title">🚫 폐업 분석 <span style="color:var(--txt3);font-size:10px;font-weight:500;margin-left:auto">1~6월</span></div>
+    <div class="card-title">🚫 폐업 분석 <span id="close-months-label" style="color:var(--txt3);font-size:10px;font-weight:500;margin-left:auto">1~6월</span></div>
     <div id="trend-close-summary" style="font-size:11.5px;color:var(--txt2);margin-bottom:12px;line-height:1.5"></div>
     <div style="font-size:11px;color:var(--txt3);margin-bottom:6px;font-weight:700">📅 월별 폐업 (업종별)</div>
     <div id="trend-close-month" style="margin-bottom:14px"></div>
@@ -882,7 +882,7 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
       <div id="map-month-label" style="font-size:11.5px;font-weight:700;color:#7dd3fc">1~6월 전체</div>
     </div>
     <input type="range" id="map-month-slider" min="0" max="6" value="0" step="1" oninput="onMapMonthChange(this.value)" style="width:100%;accent-color:#7dd3fc">
-    <div style="display:flex;justify-content:space-between;font-size:9.5px;color:var(--txt3);margin-top:3px"><span>전체</span><span>1월</span><span>2월</span><span>3월</span><span>4월</span><span>5월</span><span>6월</span></div>
+    <div id="map-month-ticks" style="display:flex;justify-content:space-between;font-size:9.5px;color:var(--txt3);margin-top:3px"><span>전체</span><span>1월</span><span>2월</span><span>3월</span><span>4월</span><span>5월</span><span>6월</span></div>
   </div>
 
   <div style="position:relative;width:100%;height:60vh;min-height:400px;border-radius:14px;overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow-card);margin-bottom:12px">
@@ -2433,6 +2433,34 @@ function applyFranchiseLookup(lookup){
   window._segmentAliasesBuilt = false;
   if (typeof buildSegmentAliases === 'function') buildSegmentAliases();
 }
+// v17.20: YTD 최신 월 자동 감지 — 하드코딩 1~6월 제거
+function ytdMaxMonth(){
+  var ms = (window.YTD && window.YTD.months_loaded) || [];
+  var mx = 6;
+  ms.forEach(function(m){ var n = parseInt(String(m).slice(4,6),10); if (n>mx) mx=n; });
+  return mx;
+}
+function ytdMonthStr(n){ return '2026' + (n<10?'0':'') + n; }
+function updateMonthRangeLabels(){
+  var mx = ytdMaxMonth();
+  var rangeTxt = '1~' + mx + '월';
+  var el;
+  if ((el = document.getElementById('trend-title-months'))) el.textContent = '2026년 ' + rangeTxt;
+  if ((el = document.getElementById('trend-month-range'))) el.textContent = '(' + rangeTxt + ')';
+  if ((el = document.getElementById('close-months-label'))) el.textContent = rangeTxt;
+  var slider = document.getElementById('map-month-slider');
+  if (slider && parseInt(slider.max,10) !== mx) {
+    slider.max = mx;
+    var ticks = document.getElementById('map-month-ticks');
+    if (ticks) {
+      var h = '<span>전체</span>';
+      for (var i=1;i<=mx;i++) h += '<span>' + i + '월</span>';
+      ticks.innerHTML = h;
+    }
+  }
+  var lbl = document.getElementById('map-month-label');
+  if (lbl && !(window._mapSelectedMonth||0)) lbl.textContent = rangeTxt + ' 전체';
+}
 async function loadYTDSummary(){
   try {
     var r = await fetch('/data/ytd_2026_summary.json?_=' + Date.now(), { cache: 'no-store' });
@@ -2445,6 +2473,7 @@ async function loadYTDSummary(){
     // v15.13: 공정위 가맹점수·매출 lazy fetch (백그라운드)
     setTimeout(function(){ try { loadFranchiseStats(); } catch(e){} }, 3000);
     // v15.15: 월별 창업 추이 카드
+    try { updateMonthRangeLabels(); } catch(e){}
     try { renderMonthlyTrend(); } catch(e){}
     try { render30DayBreakdown(); } catch(e){}
     try { updateDataFreshness(); } catch(e){}  // v17.8.1
@@ -3412,8 +3441,8 @@ function openFrBrandModal(brand){
   for (var m in byMonth) { totalO += byMonth[m].open; totalC += byMonth[m].closed; }
   document.getElementById('fr-modal-sub').innerHTML = '올해 <span style="color:#34d399;font-weight:700">+' + totalO + '</span> 출점 · <span style="color:#f87171;font-weight:700">-' + totalC + '</span> 폐점';
   // 월별 mini 차트
-  var months = ['202601','202602','202603','202604','202605','202606'];
-  var labels = ['1','2','3','4','5','6'];
+  var _mmx = (typeof ytdMaxMonth === 'function') ? ytdMaxMonth() : 6;
+  var months = []; for (var _i = 1; _i <= _mmx; _i++) months.push(ytdMonthStr(_i));
   var maxN = 1;
   months.forEach(function(m){ if (byMonth[m]) maxN = Math.max(maxN, byMonth[m].open + byMonth[m].closed); });
   var mhtml = '<div style="font-size:11px;color:var(--txt3);margin-bottom:6px;font-weight:700">📅 월별 신규/폐점</div>';
@@ -3428,7 +3457,7 @@ function openFrBrandModal(brand){
       + (d.closed ? '<div style="background:#f87171;height:' + ch.toFixed(0) + 'px;border-radius:2px 2px 0 0"></div>' : '')
       + '<div style="background:#34d399;height:' + oh.toFixed(0) + 'px;border-radius:2px 2px 0 0;margin-top:1px"></div>'
       + '</div>'
-      + '<div style="font-size:9px;color:var(--txt2);font-weight:600">' + labels[i] + '월</div>'
+      + '<div style="font-size:9px;color:var(--txt2);font-weight:600">' + (i+1) + '월</div>'
       + '</div>';
   });
   mhtml += '</div>';
@@ -3609,7 +3638,7 @@ function renderTrendCloseAnalysis(){
     var splitHtml = (reg || pop || evt)
       ? '<br><span style="color:#34d399">✅ 정규 ' + reg.toLocaleString() + '</span> + <span style="color:#a78bfa">🏬 팝업 ' + pop.toLocaleString() + '</span> + <span style="color:#fbbf24">🎪 행사 ' + evt.toLocaleString() + '</span>'
       : '';
-    sumEl.innerHTML = '올해 누적 <b style="color:#f87171">' + totalClose.toLocaleString() + '</b>건 폐업 (월평균 ' + Math.round(totalClose/6).toLocaleString() + ')' + splitHtml;
+    sumEl.innerHTML = '올해 누적 <b style="color:#f87171">' + totalClose.toLocaleString() + '</b>건 폐업 (월평균 ' + Math.round(totalClose/Math.max(1,(window.YTD.months_loaded||[]).length)).toLocaleString() + ')' + splitHtml;
   }
   // 월별 폐업 stack
   var monthEl = document.getElementById('trend-close-month');
@@ -3617,7 +3646,7 @@ function renderTrendCloseAnalysis(){
     var months = Object.keys(byMonthCat).sort();
     var maxN = 1;
     months.forEach(function(m){ var s=0; Object.values(byMonthCat[m]).forEach(function(n){ s+=n; }); if (s>maxN) maxN=s; });
-    var monLabels = ['1월','2월','3월','4월','5월','6월'];
+    var monLabels = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
     var html = '';
     months.forEach(function(m){
       var idx = parseInt(m.slice(4,6),10)-1;
@@ -3685,7 +3714,7 @@ function renderTrendBrand(q){
   q = (q||'').trim().toLowerCase().replace(/\s/g,'');
   var resEl = document.getElementById('trend-brand-result');
   if (!q || q.length < 2 || !window.YTD || !window.YTD.by_brand) {
-    resEl.innerHTML = '<div style="color:var(--txt3);font-size:12px;padding:14px;text-align:center">brand 입력하면 1~6월 출점/폐점 차트 (alias 통합)</div>';
+    resEl.innerHTML = '<div style="color:var(--txt3);font-size:12px;padding:14px;text-align:center">brand 입력하면 월별 출점/폐점 차트 (alias 통합)</div>';
     return;
   }
   // matching brands
@@ -3723,12 +3752,12 @@ function renderTrendBrand(q){
     for (var m in b.monthly) bT += b.monthly[m].open + b.monthly[m].closed;
     return bT - aT;
   });
-  var labels = ['1','2','3','4','5','6'];
+  var _mx = (typeof ytdMaxMonth === 'function') ? ytdMaxMonth() : 6;
   var html = '';
   arr.slice(0,5).forEach(function(g){
     var maxN = 1;
-    for (var i = 0; i < 6; i++) {
-      var m = '20260' + (i+1);
+    for (var i = 0; i < _mx; i++) {
+      var m = ytdMonthStr(i+1);
       if (g.monthly[m]) maxN = Math.max(maxN, g.monthly[m].open + g.monthly[m].closed);
     }
     var tO = 0, tC = 0;
@@ -3743,8 +3772,8 @@ function renderTrendBrand(q){
     }
     html += '<div style="font-size:13px;font-weight:700;color:var(--txt);margin-bottom:8px">' + esc(g.name) + catLabel + ' <span style="font-size:11px;font-weight:500"><span style="color:#34d399">+' + tO + '</span> · <span style="color:#f87171">-' + tC + '</span></span></div>';
     html += '<div style="display:flex;gap:4px;align-items:flex-end;height:60px">';
-    for (var i = 0; i < 6; i++) {
-      var m = '20260' + (i+1);
+    for (var i = 0; i < _mx; i++) {
+      var m = ytdMonthStr(i+1);
       var d = g.monthly[m] || { open:0, closed:0 };
       var oH = d.open / maxN * 50;
       var cH = d.closed / maxN * 50;
@@ -3754,7 +3783,7 @@ function renderTrendBrand(q){
         + (d.closed ? '<div style="background:#f87171;height:' + cH.toFixed(0) + 'px;border-radius:2px 2px 0 0"></div>' : '')
         + '<div style="background:#34d399;height:' + oH.toFixed(0) + 'px;border-radius:2px 2px 0 0;margin-top:1px"></div>'
         + '</div>'
-        + '<div style="font-size:9px;color:var(--txt2);font-weight:600">' + labels[i] + '월</div>'
+        + '<div style="font-size:9px;color:var(--txt2);font-weight:600">' + (i+1) + '월</div>'
         + '</div>';
     }
     html += '</div></div>';
@@ -4665,7 +4694,7 @@ function renderMonthlyTrend(){
   window._monthlyTrendSkipCnt = skipCnt;
   var months = Object.keys(byMonth).sort();
   if (!months.length) {
-    chartEl.innerHTML = '<div style="color:var(--txt3);font-size:11.5px;text-align:center;padding:18px">데이터 없음 (1~6월 cron 후 표시)</div>';
+    chartEl.innerHTML = '<div style="color:var(--txt3);font-size:11.5px;text-align:center;padding:18px">데이터 없음 (cron 후 표시)</div>';
     return;
   }
   // 누적 max
@@ -4739,7 +4768,7 @@ function _renderMonthlyTrendOld(){
   }
   var months = Object.keys(byMonth).sort();
   if (!months.length) {
-    chartEl.innerHTML = '<div style="color:var(--txt3);font-size:11.5px;text-align:center;padding:18px">월별 데이터 없음 (1~6월 백필 후 표시)</div>';
+    chartEl.innerHTML = '<div style="color:var(--txt3);font-size:11.5px;text-align:center;padding:18px">월별 데이터 없음 (백필 후 표시)</div>';
     return;
   }
   var maxN = 1;
@@ -5695,7 +5724,7 @@ function renderMapMarkers(map){
   // v16.1: 카테고리·월·exclude 필터
   var cat = (typeof activeChip === 'function' ? activeChip('chip-map-cat') : 'all') || 'all';
   var selMonth = window._mapSelectedMonth || 0;
-  var monthFilter = selMonth ? ('20260' + selMonth) : null;
+  var monthFilter = selMonth ? ytdMonthStr(selMonth) : null;
 
   var sidoCenters = {
     '서울특별시': [37.5665, 126.9780], '경기도': [37.4138, 127.5183],
@@ -5794,9 +5823,9 @@ function showMapStorePanel(s){
 window._mapSelectedMonth = 0; // 0=전체, 1~6=월
 function onMapMonthChange(v){
   window._mapSelectedMonth = parseInt(v, 10);
-  var labels = ['1~6월 전체', '1월', '2월', '3월', '4월', '5월', '6월'];
+  var mx = (typeof ytdMaxMonth === 'function') ? ytdMaxMonth() : 6;
   var lblEl = document.getElementById('map-month-label');
-  if (lblEl) lblEl.textContent = labels[window._mapSelectedMonth];
+  if (lblEl) lblEl.textContent = window._mapSelectedMonth ? (window._mapSelectedMonth + '월') : ('1~' + mx + '월 전체');
   renderMapSidoStats();
 }
 function renderMapSidoStats(){
@@ -5809,7 +5838,7 @@ function renderMapSidoStats(){
   // v16.1: 카테고리·월 필터
   var cat = (typeof activeChip === 'function' ? activeChip('chip-map-cat') : 'all') || 'all';
   var selMonth = window._mapSelectedMonth || 0;
-  var monthFilter = selMonth ? ('20260' + selMonth) : null;
+  var monthFilter = selMonth ? ytdMonthStr(selMonth) : null;
   var sidoCnt = {};
   var totalCnt = 0;
   for (var b in window.YTD.by_brand) {
