@@ -1,7 +1,7 @@
 {
-  "updated": "2026-07-17T20:42:19+09:00",
+  "updated": "2026-07-18T04:08:17+09:00",
   "baseline_date": "20260101",
-  "current_date": "20260717",
+  "current_date": "20260718",
   "brands": {
     "88포차": {
       "service": "ilban",
@@ -53,11 +53,11 @@
     },
     "빅대디": {
       "service": "ilban",
-      "current_count": 65,
-      "current_count_reported": 65,
+      "current_count": 64,
+      "current_count_reported": 64,
       "new_permits_count": 1,
-      "candidate_count": 50,
-      "verified_count": 50,
+      "candidate_count": 49,
+      "verified_count": 49,
       "upbyeon_count": 0,
       "upbyeon_count_real": 0,
       "total_growth": 1,
@@ -226,14 +226,14 @@
     "BHC": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 2088,
-      "new_permits_count": 36,
-      "candidate_count": 899,
+      "current_count_reported": 2089,
+      "new_permits_count": 37,
+      "candidate_count": 898,
       "verified_count": 80,
       "upbyeon_count": 4,
       "upbyeon_count_real": 3,
-      "total_growth": 39,
-      "upbyeon_ratio": 0.077,
+      "total_growth": 40,
+      "upbyeon_ratio": 0.075,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -285,14 +285,14 @@
     "BBQ": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 1921,
-      "new_permits_count": 39,
-      "candidate_count": 892,
+      "current_count_reported": 1922,
+      "new_permits_count": 40,
+      "candidate_count": 891,
       "verified_count": 80,
       "upbyeon_count": 3,
       "upbyeon_count_real": 3,
-      "total_growth": 42,
-      "upbyeon_ratio": 0.071,
+      "total_growth": 43,
+      "upbyeon_ratio": 0.07,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -333,13 +333,13 @@
     "교촌치킨": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 2027,
-      "new_permits_count": 21,
-      "candidate_count": 845,
+      "current_count_reported": 2029,
+      "new_permits_count": 22,
+      "candidate_count": 846,
       "verified_count": 80,
       "upbyeon_count": 0,
       "upbyeon_count_real": 0,
-      "total_growth": 21,
+      "total_growth": 22,
       "upbyeon_ratio": 0.0,
       "is_upbyeon_specialist": false,
       "upbyeon": []
@@ -653,10 +653,10 @@
     },
     "자담치킨": {
       "service": "ilban",
-      "current_count": 1157,
-      "current_count_reported": 1157,
+      "current_count": 1159,
+      "current_count_reported": 1159,
       "new_permits_count": 38,
-      "candidate_count": 655,
+      "candidate_count": 656,
       "verified_count": 80,
       "upbyeon_count": 6,
       "upbyeon_count_real": 6,
@@ -961,17 +961,29 @@
     },
     "야화혼술바": {
       "service": "ilban",
-      "current_count": 15,
-      "current_count_reported": 15,
+      "current_count": 16,
+      "current_count_reported": 16,
       "new_permits_count": 15,
-      "candidate_count": 0,
-      "verified_count": 0,
-      "upbyeon_count": 0,
-      "upbyeon_count_real": 0,
-      "total_growth": 15,
-      "upbyeon_ratio": 0.0,
+      "candidate_count": 1,
+      "verified_count": 1,
+      "upbyeon_count": 1,
+      "upbyeon_count_real": 1,
+      "total_growth": 16,
+      "upbyeon_ratio": 0.062,
       "is_upbyeon_specialist": false,
-      "upbyeon": []
+      "upbyeon": [
+        {
+          "mng_no": "3180000-101-2022-00561",
+          "old_name": "노랑포차",
+          "new_name": "야화혼술바 영등포구청점",
+          "addr": "서울특별시 영등포구 국회대로34길 13, 2층 (당산동3가)",
+          "lcpmt": "2022-10-28",
+          "dat_updt": "2026-03-26 22:55:24",
+          "region_code": "3180000",
+          "region_name": "서울 금천구",
+          "trivial": false
+        }
+      ]
     },
     "우이락": {
       "service": "ilban",
@@ -1056,15 +1068,15 @@
     },
     "새마을식당": {
       "service": "ilban",
-      "current_count": 264,
-      "current_count_reported": 264,
-      "new_permits_count": 7,
+      "current_count": 265,
+      "current_count_reported": 265,
+      "new_permits_count": 8,
       "candidate_count": 156,
       "verified_count": 80,
       "upbyeon_count": 1,
       "upbyeon_count_real": 1,
-      "total_growth": 8,
-      "upbyeon_ratio": 0.125,
+      "total_growth": 9,
+      "upbyeon_ratio": 0.111,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
