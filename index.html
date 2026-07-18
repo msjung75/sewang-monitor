@@ -5092,6 +5092,27 @@ function showLoginScreen(){
     + '</div>';
 }
 
+// v17.21: 앱 포그라운드 복귀 시 데이터 자동 새로고침 — "업데이트 안 됨" 근본 해결
+// 사용자가 앱을 끄지 않고 백그라운드에 며칠 둬도, 다시 열면 30분 이상 지난 데이터를 자동 재로드
+window._lastDataRefresh = Date.now();
+function refreshAllData(force){
+  var STALE_MS = 30 * 60 * 1000; // 30분
+  if (!force && Date.now() - window._lastDataRefresh < STALE_MS) return;
+  window._lastDataRefresh = Date.now();
+  console.log('[AUTO-REFRESH] 백그라운드 복귀 — 데이터 재로드');
+  try { loadNightlyCache(); } catch(e){}
+  try { loadNaverNstatCache(); } catch(e){}
+  try { loadYTDSummary(); } catch(e){}
+  try { loadSnsBuzz(); } catch(e){}
+  try { loadSumtrendBuzz(); } catch(e){}
+  try { if (typeof loadRecommend === 'function') loadRecommend(); } catch(e){}
+  try { if (typeof loadUpbyeon === 'function') loadUpbyeon(); } catch(e){}
+}
+document.addEventListener('visibilitychange', function(){
+  if (document.visibilityState === 'visible') refreshAllData(false);
+});
+setInterval(function(){ if (document.visibilityState === 'visible') refreshAllData(false); }, 60 * 60 * 1000);
+
 function init(){
   syncScopeOnLoad();
   bindChipSido();
