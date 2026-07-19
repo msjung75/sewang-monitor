@@ -1,5 +1,5 @@
-// PWA Service Worker v17.15.1 — HOTFIX: restore /api/ original behavior (cookies)
-const CACHE = 'sewang-pwa-v17_15_1-franchise';
+// PWA Service Worker v17.20 — 인사이트 탭 + 자동 업데이트 강화 (canonical redirect, etag fresh check)
+const CACHE = 'sewang-pwa-v17_20-insight';
 const SHELL = ['/manifest.json', '/icon.svg'];
 
 self.addEventListener('install', e => {
@@ -21,7 +21,7 @@ self.addEventListener('activate', e => {
           c.postMessage({
             type: 'SW_UPDATED_RELOAD',
             forceClear: true,
-            version: 'v17_15_1',
+            version: 'v17_20',
             clearKeys: [
               'sewang_franchise_master',
               'sewang_franchise_stats',

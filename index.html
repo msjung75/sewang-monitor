@@ -8,6 +8,15 @@
 <meta name="theme-color" content="#090d1a">
 <title>세왕 신규업장 모니터</title>
 <link rel="manifest" href="/manifest.json">
+<script>
+/* v17.20: 옛 배포 스냅샷 URL(프리뷰)로 만든 바로가기 → 정식 주소로 강제 이동 */
+(function(){
+  var h = location.hostname;
+  if (h !== 'sewang-monitor.vercel.app' && /\.vercel\.app$/.test(h)) {
+    location.replace('https://sewang-monitor.vercel.app' + location.pathname + location.search + location.hash);
+  }
+})();
+</script>
 <link rel="apple-touch-icon" href="/icon.svg">
 <meta name="apple-mobile-web-app-title" content="세왕 모니터">
 <meta name="format-detection" content="telephone=no">
@@ -590,6 +599,40 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 
 </div>
 
+<!-- ======= PAGE: 💡 인사이트 (v17.20) ======= -->
+<div class="page" id="pg-insight">
+
+  <div class="alert-banner">
+    <span class="aico">💡</span>
+    <div>
+      <strong style="color:var(--c1)">브랜드 인사이트</strong><br>
+      <span style="font-size:11px;color:var(--txt2)">소비자 반응 · 창업시장 매력 브랜드 · 확실히 뜨는 트렌드를 한눈에</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🏆 창업시장 매력 브랜드 <span style="color:var(--txt3);font-size:10px;font-weight:500;margin-left:auto">출점세 × SNS 성장 × 소비자 반응</span></div>
+    <div id="ins-brand-rank"><div style="color:var(--txt3);font-size:11px;text-align:center;padding:14px">⏳ 데이터 로딩 중…</div></div>
+    <div style="font-size:10px;color:var(--txt3);text-align:center;margin-top:8px;line-height:1.5">
+      📐 <b>매력점수</b> = 3개월 출점세 + SNS 언급 성장률 + 인스타 반응(조회·좋아요) 종합 · 브랜드 클릭 → 상세 근거
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🗣️ 소비자 반응 <span style="color:var(--txt3);font-size:10px;font-weight:500;margin-left:auto">인스타 실제 게시물 기준</span></div>
+    <div id="ins-consumer"><div style="color:var(--txt3);font-size:11px;text-align:center;padding:14px">⏳ 데이터 로딩 중…</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📈 지금 뜨는 키워드 <span style="color:var(--txt3);font-size:10px;font-weight:500;margin-left:auto">최근 30일 · 전국 인허가</span></div>
+    <div id="ins-keywords"><div style="color:var(--txt3);font-size:11px;text-align:center;padding:14px">⏳ 데이터 로딩 중…</div></div>
+    <div style="font-size:10px;color:var(--txt3);text-align:center;margin-top:8px;line-height:1.5">
+      ▲▼ = 최근 15일 vs 이전 15일 신규 오픈 수 변화 · 상호명+업태 키워드 매칭
+    </div>
+  </div>
+
+</div>
+
 <!-- ======= PAGE: 신규업장 ======= -->
 <div class="page" id="pg-new">
 
@@ -1034,6 +1077,9 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
   </button>
   <button class="bnav-btn" data-pg="fr">
     <span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h20l-2 9H4L2 3z"/><path d="M4 12v9h16v-9"/><path d="M9 21v-6h6v6"/></svg></span>프랜차이즈
+  </button>
+  <button class="bnav-btn" data-pg="insight">
+    <span class="ico">💡</span>인사이트
   </button>
   <button class="bnav-btn" id="bnav-admin" data-pg="admin" style="display:none;position:relative">
     <span class="ico">👥</span>관리
@@ -3331,6 +3377,7 @@ function switchPage(pg){
   if (pg === 'track') renderTracked();
   if (pg === 'map') { try { initKakaoMap(); } catch(e) { renderMapSidoStats(); } }
   if (pg === 'trend') { try { renderTrendTab(); } catch(e){} }
+  if (pg === 'insight') { try { renderInsight(); } catch(e){} }
 }
 document.querySelectorAll('.bnav-btn').forEach(function(btn){
   btn.addEventListener('click', function(){ switchPage(btn.dataset.pg); });
@@ -4129,11 +4176,22 @@ function sumtrendOf(brand){
   for (var k in brands) if (_normBrand(k) === n) return brands[k];
   return null;
 }
+// v17.20 fix: 썸트렌드 monthly 포맷 지원 (옛 st.instagram [{freq}] 포맷 → 항상 0 집계되던 버그)
+function _stIgArr(st){
+  if (!st) return [];
+  if (st.instagram && st.instagram.length) return st.instagram;
+  return (st.monthly || []).map(function(m){ return { freq: m.instagram || 0 }; });
+}
+function _stBlogArr(st){
+  if (!st) return [];
+  if (st.blog && st.blog.length) return st.blog;
+  return (st.monthly || []).map(function(m){ return { freq: m.blog || 0 }; });
+}
 // v17.13 Phase 2.6: 사장님 규칙 — instagram 합계 0 OR growth_3m_pct ≤ 0 → TOP 제외
 function sumtrendExclude(brand){
   var st = sumtrendOf(brand);
   if (!st) return false;  // 데이터 없는 brand는 제외 X (모르는 brand는 일단 통과)
-  var igTotal = (st.instagram||[]).reduce(function(a,x){ return a+(x.freq||0); }, 0);
+  var igTotal = _stIgArr(st).reduce(function(a,x){ return a+(x.freq||0); }, 0);
   if (igTotal === 0) return true;  // 케이찹사라다 케이스 — SNS 흔적 0
   var g = (typeof st.growth_3m_pct === 'number') ? st.growth_3m_pct : null;
   // growth ≤ 0이고 절대 언급량도 적으면 제외 (가마치통닭 케이스: 감소세 + 인스타 100건↓ 검토)
@@ -4156,9 +4214,10 @@ function sumtrendMultiplier(brand){
   function sum(arr){ if (!arr||!arr.length) return 0; var s=0; for (var i=0;i<arr.length;i++) s+=(arr[i].freq||0); return s; }
   function lastN(arr, n){ if (!arr||!arr.length) return 0; var s=0; var st=Math.max(0,arr.length-n); for (var i=st;i<arr.length;i++) s+=(arr[i].freq||0); return s; }
   function firstN(arr, n){ if (!arr||!arr.length) return 0; var s=0; var en=Math.min(arr.length,n); for (var i=0;i<en;i++) s+=(arr[i].freq||0); return s; }
-  // 6개 소스 중 인스타+블로그+유튜브 합산 (3+3 구간)
-  var last3 = lastN(st.instagram, 3) + lastN(st.blog, 3) + lastN(st.youtube, 3);
-  var first3 = firstN(st.instagram, 3) + firstN(st.blog, 3) + firstN(st.youtube, 3);
+  // 6개 소스 중 인스타+블로그+유튜브 합산 (3+3 구간) — v17.20: monthly 포맷 어댑터 적용
+  var _ig = _stIgArr(st), _bl = _stBlogArr(st), _yt = st.youtube || [];
+  var last3 = lastN(_ig, 3) + lastN(_bl, 3) + lastN(_yt, 3);
+  var first3 = firstN(_ig, 3) + firstN(_bl, 3) + firstN(_yt, 3);
   // 절대값 가중
   var absMult;
   if (last3 === 0)       absMult = 0.2;   // 케이찹사라다 케이스 — 강 페널티
@@ -5111,7 +5170,219 @@ function refreshAllData(force){
 document.addEventListener('visibilitychange', function(){
   if (document.visibilityState === 'visible') refreshAllData(false);
 });
+
+/* v17.20: 화면 복귀 시 서버 배포 버전(etag) 비교 — 새 배포면 자동 새로고침 */
+window._pageEtag = null;
+window._lastFreshCheck = 0;
+function _checkFresh(){
+  fetch('/', { method: 'HEAD', cache: 'no-store' }).then(function(r){
+    var et = r.headers.get('etag');
+    if (!et) return;
+    if (window._pageEtag === null) { window._pageEtag = et; return; }
+    if (et !== window._pageEtag) {
+      console.log('[FRESH] 새 배포 감지 — 자동 새로고침');
+      location.reload();
+    }
+  }).catch(function(){});
+}
+_checkFresh();
+document.addEventListener('visibilitychange', function(){
+  if (document.visibilityState !== 'visible') return;
+  if (Date.now() - window._lastFreshCheck < 5 * 60 * 1000) return;
+  window._lastFreshCheck = Date.now();
+  _checkFresh();
+});
 setInterval(function(){ if (document.visibilityState === 'visible') refreshAllData(false); }, 60 * 60 * 1000);
+
+
+/* ============================================================
+   v17.20: 💡 인사이트 탭 — 소비자 반응 · 창업 매력 · 트렌드
+   (sumtrend_buzz + sns_buzz + trend30 기존 데이터 종합 — 함수 추가 0)
+============================================================ */
+function _insNum(n){
+  n = n || 0;
+  if (n >= 100000000) return (n/100000000).toFixed(1) + '억';
+  if (n >= 10000) return (n/10000).toFixed(1) + '만';
+  if (n >= 1000) return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return String(n);
+}
+function _insIgSeries(st){
+  // sumtrend 포맷 방어: monthly[{month,instagram,blog}] 또는 instagram[{freq}]
+  if (st && st.monthly && st.monthly.length) return st.monthly.map(function(m){ return m.instagram || 0; });
+  if (st && st.instagram && st.instagram.length) return st.instagram.map(function(m){ return m.freq || 0; });
+  return [];
+}
+function _insBlogSeries(st){
+  if (st && st.monthly && st.monthly.length) return st.monthly.map(function(m){ return m.blog || 0; });
+  if (st && st.blog && st.blog.length) return st.blog.map(function(m){ return m.freq || 0; });
+  return [];
+}
+function insBrandDetail(brand){
+  // SNS 카드 캐시에 있으면 근거 모달, 없으면 프랜차이즈 탭
+  try {
+    var c = JSON.parse(localStorage.getItem('sewang_sns_trend_v17_15') || 'null');
+    if (c && c.brands && c.brands.some(function(b){ return b.brand === brand; })) { openSnsModal(brand); return; }
+  } catch(e){}
+  try { gotoFrTab(brand); } catch(e){}
+}
+window._insRetry = 0;
+function renderInsight(){
+  var hasSum = window.SUMTREND_BUZZ && window.SUMTREND_BUZZ.brands;
+  var hasBuzz = window.SNS_BUZZ && window.SNS_BUZZ.brands;
+  var hasTrend = window.ST && ST.trend30 && ST.trend30.stores && ST.trend30.stores.length;
+  if ((!hasSum && !hasBuzz) || !hasTrend) {
+    if (window._insRetry < 8) { window._insRetry++; setTimeout(renderInsight, 1200); }
+  }
+  try { renderInsightBrands(); } catch(e){ console.log('[insight] brands err', e); }
+  try { renderInsightConsumer(); } catch(e){ console.log('[insight] consumer err', e); }
+  try { renderInsightKeywords(); } catch(e){ console.log('[insight] keywords err', e); }
+}
+function renderInsightBrands(){
+  var el = document.getElementById('ins-brand-rank');
+  if (!el) return;
+  var sums = (window.SUMTREND_BUZZ && window.SUMTREND_BUZZ.brands) || {};
+  var buzz = (window.SNS_BUZZ && window.SNS_BUZZ.brands) || {};
+  var names = {};
+  Object.keys(sums).forEach(function(k){ names[k] = 1; });
+  Object.keys(buzz).forEach(function(k){ names[k] = 1; });
+  var list = Object.keys(names).map(function(nm){
+    var st = sums[nm] || null;
+    var bz = buzz[nm] || null;
+    var opens = bz && typeof bz.newOpens3M === 'number' ? bz.newOpens3M : 0;
+    var growth = st && typeof st.growth_3m_pct === 'number' ? st.growth_3m_pct : null;
+    var views = bz ? (bz.totalViews || 0) : 0;
+    var likes = bz ? (bz.totalLikes || 0) : 0;
+    var ig = _insIgSeries(st);
+    var igLast = ig.length ? ig[ig.length-1] : 0;
+    var score = opens * 2
+      + Math.max(Math.min(growth === null ? 0 : growth, 300), 0) * 0.4
+      + Math.log10(1 + views) * 12
+      + Math.log10(1 + likes) * 8
+      + Math.log10(1 + igLast) * 6;
+    // 사장님 규칙 (v17.13 Phase 2.6): SNS 흔적 0 or 감소세 → 강 감점
+    var weak = false;
+    if (st) {
+      var _igSum = ig.reduce(function(a,b){ return a+b; }, 0);
+      if (_igSum === 0 || (growth !== null && growth <= 0 && _igSum < 300)) { score *= 0.25; weak = true; }
+    }
+    return { nm: nm, st: st, bz: bz, opens: opens, growth: growth, views: views, likes: likes, igLast: igLast, score: score, weak: weak,
+             verdict: st ? (st.verdict || '') : '' };
+  }).filter(function(x){ return x.score > 0; });
+  if (!list.length) { el.innerHTML = '<div style="color:var(--txt3);font-size:11px;text-align:center;padding:14px">⏳ SNS 수집 데이터 로딩 중… (새벽 자동 수집)</div>'; return; }
+  list.sort(function(a,b){ return b.score - a.score; });
+  var top = list.slice(0, 8);
+  var maxScore = top[0].score || 1;
+  var medals = ['🥇','🥈','🥉'];
+  el.innerHTML = top.map(function(x, i){
+    var rank = medals[i] || '<span style="color:var(--txt3);font-weight:800">' + (i+1) + '</span>';
+    var gTxt = x.growth === null ? '' :
+      '<span style="color:' + (x.growth >= 100 ? '#f87171' : x.growth >= 20 ? '#34d399' : x.growth <= 0 ? '#94a3b8' : '#7dd3fc') + ';font-weight:800">SNS ' + (x.growth >= 0 ? '+' : '') + x.growth + '%</span>';
+    var meta = [];
+    if (x.weak) meta.push('<span style="color:#f87171;font-weight:800">⚠ SNS 약함</span>');
+    if (x.opens) meta.push('출점 3M <b style="color:var(--txt)">' + x.opens + '건</b>');
+    if (gTxt) meta.push(gTxt);
+    if (x.views) meta.push('조회 <b style="color:var(--txt)">' + _insNum(x.views) + '</b>');
+    if (x.likes) meta.push('❤ ' + _insNum(x.likes));
+    var barW = Math.max(4, Math.round(x.score / maxScore * 100));
+    var verdict = x.verdict ? '<div style="font-size:10px;color:var(--txt3);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(x.verdict) + '</div>' : '';
+    return '<div onclick="insBrandDetail(\'' + esc(x.nm).replace(/\'/g, "\\'") + '\')" style="padding:9px 10px;background:rgba(251,191,36,0.04);border:1px solid rgba(251,191,36,0.14);border-radius:9px;margin-bottom:6px;cursor:pointer">'
+      + '<div style="display:flex;align-items:center;gap:8px;font-size:12px">'
+      +   '<div style="width:22px;text-align:center;font-size:13px">' + rank + '</div>'
+      +   '<div style="flex:1;font-weight:700;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(x.nm) + '</div>'
+      +   '<div style="font-size:10px;color:var(--txt3);white-space:nowrap">' + meta.join(' · ') + '</div>'
+      + '</div>'
+      + '<div style="height:4px;background:rgba(255,255,255,0.05);border-radius:2px;margin-top:6px;overflow:hidden"><div style="height:100%;width:' + barW + '%;background:linear-gradient(90deg,#fbbf24,#f59e0b);border-radius:2px"></div></div>'
+      + verdict
+      + '</div>';
+  }).join('');
+}
+function renderInsightConsumer(){
+  var el = document.getElementById('ins-consumer');
+  if (!el) return;
+  var buzz = (window.SNS_BUZZ && window.SNS_BUZZ.brands) || {};
+  var arr = Object.keys(buzz).map(function(nm){ var b = buzz[nm]; b._nm = nm; return b; })
+    .filter(function(b){ return (b.samplePosts || []).length; });
+  if (!arr.length) { el.innerHTML = '<div style="color:var(--txt3);font-size:11px;text-align:center;padding:14px">⏳ 인스타 수집 데이터 로딩 중…</div>'; return; }
+  arr.sort(function(a,b){ return (b.totalViews||0) - (a.totalViews||0); });
+  el.innerHTML = arr.slice(0, 5).map(function(b){
+    var tags = (b.topHashtags || []).slice(0, 6).map(function(t){
+      return '<span style="font-size:9.5px;padding:2px 7px;background:rgba(125,211,252,0.08);border:1px solid rgba(125,211,252,0.18);border-radius:10px;color:#7dd3fc;white-space:nowrap">#' + esc(t) + '</span>';
+    }).join(' ');
+    var posts = (b.samplePosts || []).slice(0, 2).map(function(pt){
+      var cap = (pt.caption || '').replace(/\s+/g, ' ').trim();
+      if (cap.length > 64) cap = cap.slice(0, 64) + '…';
+      return '<a href="' + esc(pt.url || '#') + '" target="_blank" style="display:block;text-decoration:none;padding:7px 9px;background:rgba(255,255,255,0.025);border:1px solid var(--border);border-radius:8px;margin-top:5px">'
+        + '<div style="font-size:10.5px;color:var(--txt2);line-height:1.45">' + esc(cap || '(캡션 없음)') + '</div>'
+        + '<div style="font-size:9.5px;color:var(--txt3);margin-top:3px">❤ ' + _insNum(pt.likes||0) + ' · ▶ ' + _insNum(pt.views||0) + ' · 인스타 열기 ↗</div>'
+        + '</a>';
+    }).join('');
+    return '<div style="padding:10px 11px;background:rgba(125,211,252,0.03);border:1px solid rgba(125,211,252,0.12);border-radius:9px;margin-bottom:7px">'
+      + '<div style="display:flex;align-items:center;gap:7px">'
+      +   '<div style="font-weight:800;font-size:12.5px;color:var(--txt);flex:1">' + esc(b._nm) + '</div>'
+      +   '<div style="font-size:10px;color:var(--txt3)">게시물 ' + (b.posts||0) + ' · ▶ ' + _insNum(b.totalViews||0) + ' · ❤ ' + _insNum(b.totalLikes||0) + '</div>'
+      + '</div>'
+      + (tags ? '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">' + tags + '</div>' : '')
+      + posts
+      + '</div>';
+  }).join('');
+}
+var INS_KEYWORDS = ['하이볼','요리주점','포차','이자카야','오뎅바','혼술','와인','위스키','샴페인','펍','스몰비어','호프','맥주','곱창','막창','대창','양꼬치','마라','훠궈','탕후루','오마카세','스시','초밥','라멘','우동','텐동','돈까스','카레','쌀국수','파스타','브런치','베이글','도넛','크로플','샐러드','버거','피자','치킨','닭갈비','삼겹','국밥','냉면','칼국수','샤브','스테이크','바베큐','꼬치','분식','떡볶이','김밥','제철','스마트','무인','노래'];
+function renderInsightKeywords(){
+  var el = document.getElementById('ins-keywords');
+  if (!el) return;
+  var stores = (window.ST && ST.trend30 && ST.trend30.stores) || [];
+  if (!stores.length) { el.innerHTML = '<div style="color:var(--txt3);font-size:11px;text-align:center;padding:14px">⏳ 새벽 수집 데이터 로딩 중…</div>'; return; }
+  var now = new Date();
+  function ymd(d){ return '' + d.getFullYear() + ('0'+(d.getMonth()+1)).slice(-2) + ('0'+d.getDate()).slice(-2); }
+  var cut15 = ymd(new Date(now.getTime() - 15*86400000));
+  var stats = {};
+  INS_KEYWORDS.forEach(function(k){ stats[k] = { recent: 0, prev: 0 }; });
+  stores.forEach(function(s){
+    var txt = (s.name || '') + ' ' + (s.upte || '');
+    var recent = (s.permitDate || '') >= cut15;
+    INS_KEYWORDS.forEach(function(k){
+      if (txt.indexOf(k) !== -1) { if (recent) stats[k].recent++; else stats[k].prev++; }
+    });
+  });
+  var rows = INS_KEYWORDS.map(function(k){
+    var v = stats[k]; var total = v.recent + v.prev;
+    var delta = v.prev > 0 ? Math.round((v.recent - v.prev) / v.prev * 100) : (v.recent > 0 ? null : 0);
+    return { k: k, recent: v.recent, prev: v.prev, total: total, delta: delta };
+  }).filter(function(r){ return r.total >= 3; });
+  if (!rows.length) { el.innerHTML = '<div style="color:var(--txt3);font-size:11px;text-align:center;padding:14px">키워드 매칭 데이터 부족</div>'; return; }
+  // 🚀 확실히 뜨는 키워드: 최근 15일 ≥ 5건 + 증가율 ≥ 15% (또는 신규 등장)
+  var risers = rows.filter(function(r){ return r.recent >= 5 && (r.delta === null || r.delta >= 15); })
+    .sort(function(a,b){ return (b.delta === null ? 999 : b.delta) - (a.delta === null ? 999 : a.delta); });
+  var riserHtml = '';
+  if (risers.length) {
+    riserHtml = '<div style="margin-bottom:10px;padding:9px 11px;background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.2);border-radius:9px">'
+      + '<div style="font-size:10.5px;font-weight:800;color:#34d399;margin-bottom:6px">\uD83D\uDE80 확실히 뜨는 중</div>'
+      + '<div style="display:flex;flex-wrap:wrap;gap:5px">'
+      + risers.slice(0, 8).map(function(r){
+          var d = r.delta === null ? 'NEW' : '+' + r.delta + '%';
+          return '<span style="font-size:10.5px;padding:3px 9px;background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.3);border-radius:11px;color:#6ee7b7;font-weight:700;white-space:nowrap">' + esc(r.k) + ' <b>' + d + '</b> · ' + r.recent + '건</span>';
+        }).join(' ')
+      + '</div></div>';
+  }
+  rows.sort(function(a,b){ return b.recent - a.recent || b.total - a.total; });
+  var top = rows.slice(0, 14);
+  var maxR = top[0].recent || 1;
+  el.innerHTML = riserHtml + top.map(function(r, i){
+    var arrow, ac;
+    if (r.delta === null) { arrow = 'NEW'; ac = '#fbbf24'; }
+    else if (r.delta >= 15) { arrow = '▲ ' + r.delta + '%'; ac = '#34d399'; }
+    else if (r.delta <= -15) { arrow = '▼ ' + Math.abs(r.delta) + '%'; ac = '#f87171'; }
+    else { arrow = '― ' + (r.delta >= 0 ? '+' : '') + r.delta + '%'; ac = 'var(--txt3)'; }
+    var barW = Math.max(4, Math.round(r.recent / maxR * 100));
+    return '<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:7px;margin-bottom:3px;background:rgba(255,255,255,0.015);font-size:11.5px">'
+      + '<div style="width:16px;color:var(--txt3);font-weight:800;text-align:center;font-size:10px">' + (i+1) + '</div>'
+      + '<div style="width:74px;font-weight:700;color:var(--txt)">' + esc(r.k) + '</div>'
+      + '<div style="flex:1;height:5px;background:rgba(255,255,255,0.05);border-radius:3px;overflow:hidden"><div style="height:100%;width:' + barW + '%;background:linear-gradient(90deg,#38bdf8,#a78bfa);border-radius:3px"></div></div>'
+      + '<div style="width:56px;text-align:right;color:var(--txt2);font-size:10.5px">15일 <b style="color:var(--txt)">' + r.recent + '</b>건</div>'
+      + '<div style="width:56px;text-align:right;font-size:10px;font-weight:800;color:' + ac + '">' + arrow + '</div>'
+      + '</div>';
+  }).join('');
+}
 
 function init(){
   syncScopeOnLoad();
