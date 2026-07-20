@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-20T04:49:01+09:00",
+  "updated": "2026-07-20T21:13:05+09:00",
   "baseline_date": "20260101",
   "current_date": "20260720",
   "brands": {
@@ -966,12 +966,24 @@
       "new_permits_count": 15,
       "candidate_count": 1,
       "verified_count": 1,
-      "upbyeon_count": 0,
-      "upbyeon_count_real": 0,
-      "total_growth": 15,
-      "upbyeon_ratio": 0.0,
+      "upbyeon_count": 1,
+      "upbyeon_count_real": 1,
+      "total_growth": 16,
+      "upbyeon_ratio": 0.062,
       "is_upbyeon_specialist": false,
-      "upbyeon": []
+      "upbyeon": [
+        {
+          "mng_no": "3180000-101-2022-00561",
+          "old_name": "노랑포차",
+          "new_name": "야화혼술바 영등포구청점",
+          "addr": "서울특별시 영등포구 국회대로34길 13, 2층 (당산동3가)",
+          "lcpmt": "2022-10-28",
+          "dat_updt": "2026-03-26 22:55:24",
+          "region_code": "3180000",
+          "region_name": "서울 금천구",
+          "trivial": false
+        }
+      ]
     },
     "우이락": {
       "service": "ilban",
