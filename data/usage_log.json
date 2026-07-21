@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-21T03:45:40.353Z",
+  "updated": "2026-07-21T21:40:41.695Z",
   "days": {
     "2026-06-23": {
       "users": {
@@ -536,6 +536,20 @@
           "visits": 1,
           "last_event": "visit",
           "last_ts": 1784605540353,
+          "tabs": {
+            "home": 1
+          }
+        }
+      },
+      "total": 1
+    },
+    "2026-07-22": {
+      "users": {
+        "4942623776": {
+          "role": "admin",
+          "visits": 1,
+          "last_event": "visit",
+          "last_ts": 1784670041695,
           "tabs": {
             "home": 1
           }
