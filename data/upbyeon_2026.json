@@ -1,7 +1,7 @@
 {
-  "updated": "2026-07-23T20:56:45+09:00",
+  "updated": "2026-07-24T04:22:08+09:00",
   "baseline_date": "20260101",
-  "current_date": "20260723",
+  "current_date": "20260724",
   "brands": {
     "88포차": {
       "service": "ilban",
@@ -296,14 +296,14 @@
     "BBQ": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 1923,
-      "new_permits_count": 41,
-      "candidate_count": 891,
+      "current_count_reported": 1924,
+      "new_permits_count": 42,
+      "candidate_count": 892,
       "verified_count": 80,
       "upbyeon_count": 3,
       "upbyeon_count_real": 3,
-      "total_growth": 44,
-      "upbyeon_ratio": 0.068,
+      "total_growth": 45,
+      "upbyeon_ratio": 0.067,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -435,15 +435,15 @@
     },
     "노랑통닭": {
       "service": "ilban",
-      "current_count": 1138,
-      "current_count_reported": 1138,
-      "new_permits_count": 46,
-      "candidate_count": 699,
+      "current_count": 1140,
+      "current_count_reported": 1140,
+      "new_permits_count": 48,
+      "candidate_count": 701,
       "verified_count": 80,
       "upbyeon_count": 6,
       "upbyeon_count_real": 6,
-      "total_growth": 52,
-      "upbyeon_ratio": 0.115,
+      "total_growth": 54,
+      "upbyeon_ratio": 0.111,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -553,10 +553,10 @@
     },
     "네네치킨": {
       "service": "ilban",
-      "current_count": 1453,
-      "current_count_reported": 1453,
+      "current_count": 1452,
+      "current_count_reported": 1452,
       "new_permits_count": 7,
-      "candidate_count": 839,
+      "candidate_count": 840,
       "verified_count": 80,
       "upbyeon_count": 1,
       "upbyeon_count_real": 1,
@@ -1037,7 +1037,7 @@
           "new_name": "우이락제주일도점",
           "addr": "제주특별자치도 제주시 고마로 142, 1층 (이도이동)",
           "lcpmt": "2022-02-04",
-          "dat_updt": "2026-06-24 03:03:03",
+          "dat_updt": "2026-07-23 22:47:48",
           "region_code": "6510000",
           "region_name": "6510000",
           "trivial": false
@@ -1079,15 +1079,15 @@
     },
     "새마을식당": {
       "service": "ilban",
-      "current_count": 265,
-      "current_count_reported": 265,
-      "new_permits_count": 8,
+      "current_count": 266,
+      "current_count_reported": 266,
+      "new_permits_count": 9,
       "candidate_count": 156,
       "verified_count": 80,
       "upbyeon_count": 1,
       "upbyeon_count_real": 1,
-      "total_growth": 9,
-      "upbyeon_ratio": 0.111,
+      "total_growth": 10,
+      "upbyeon_ratio": 0.1,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
