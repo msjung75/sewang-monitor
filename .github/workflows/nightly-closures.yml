@@ -1,9 +1,9 @@
 name: Nightly Closures (CLSBIZ_YMD)
 # 폐업일자 기준 cron — 옛 인허가 매장의 최근 폐업까지 포착
-# (LCPMT_YMD 기준은 신규 인허가만 잡힘 → 회전율 분석에 한계)
+# v18: DATA_GO_KR_KEY secret 불필요 — Vercel /api/permits 프록시(dateField=closed) 경유로 재작성
 on:
-  # schedule 비활성화 — GitHub Secret DATA_GO_KR_KEY 미등록으로 실패. Vercel 프록시 우회로 대체
-  # secret 등록 후 schedule 다시 활성화 가능
+  schedule:
+    - cron: '40 19 * * *'   # 04:40 KST
   workflow_dispatch:
     inputs:
       days:
@@ -24,24 +24,41 @@ jobs:
         run: |
           DAYS="${{ github.event.inputs.days || '14' }}"
           SINCE=$(TZ=Asia/Seoul date -d "$DAYS days ago" +%Y%m%d)
-          UNTIL=$(TZ=Asia/Seoul date +%Y%m%d)
+          UNTIL=$(TZ=Asia/Seoul date -d "tomorrow" +%Y%m%d)   # to는 미만(LT) 조건이라 내일
           echo "since=$SINCE" >> $GITHUB_OUTPUT
           echo "until=$UNTIL" >> $GITHUB_OUTPUT
-          echo "Window: $SINCE → $UNTIL ($DAYS days)"
-      - name: Fetch closures (17 시·도 × 4 type)
-        env:
-          DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
-          SINCE: ${{ steps.dates.outputs.since }}
-          UNTIL: ${{ steps.dates.outputs.until }}
-        run: python3 scripts/fetch-closures.py
-      - name: Commit if changed
+          echo "Window: $SINCE ~ $UNTIL ($DAYS days)"
+      - name: Fetch closures via Vercel proxy (17 sido)
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          BASE="https://sewang-monitor.vercel.app"
+          SINCE="${{ steps.dates.outputs.since }}"
+          UNTIL="${{ steps.dates.outputs.until }}"
+          REGIONS="seoul gyeonggi busan daegu incheon gwangju daejeon ulsan sejong gangwon chungbuk chungnam jeonbuk jeonnam gyeongbuk gyeongnam jeju"
+          mkdir -p /tmp/cls
+          ok=0; fail=0
+          for R in $REGIONS; do
+            for i in 1 2 3; do
+              HTTP=$(curl -s -o /tmp/cls/$R.json -w '%{http_code}' --max-time 290 \
+                "$BASE/api/permits?dateField=closed&status=all&region=$R&type=all&from=$SINCE&to=$UNTIL&maxPages=40")
+              if [ "$HTTP" = "200" ] && jq -e '.items' /tmp/cls/$R.json >/dev/null 2>&1; then
+                n=$(jq '.items|length' /tmp/cls/$R.json); echo "$R: $n items"; ok=$((ok+1)); break
+              fi
+              echo "$R try$i HTTP=$HTTP retry..."; sleep 5
+              if [ $i = 3 ]; then fail=$((fail+1)); echo '{"items":[]}' > /tmp/cls/$R.json; fi
+            done
+          done
+          echo "regions ok=$ok fail=$fail"
+          if [ $ok -lt 10 ]; then echo "too many failures"; exit 1; fi
+          jq -s --arg at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --arg since "$SINCE" --arg until "$UNTIL" \
+            '{at:$at, since:$since, until:$until,
+              items:([.[].items[]] | unique_by(.mgtNo // (.name+(.addr//"")+(.closedDate//""))) | sort_by(.closedDate) | reverse | .[0:4000]),
+              count:([.[].items[]] | length)}' \
+            /tmp/cls/*.json > data/closures_recent.json
+          jq '{count, at, since, until, sample:(.items[0:2])}' data/closures_recent.json
+      - name: Commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
           git add data/closures_recent.json
-          if git diff --cached --quiet; then
-            echo "No closures change"
-          else
-            git commit -m "Closures nightly: ${{ steps.dates.outputs.since }}~${{ steps.dates.outputs.until }}"
-            git push
-          fi
+          git diff --cached --quiet && echo 'no changes' || git commit -m "nightly closures: ${{ steps.dates.outputs.since }}~"
+          git push
