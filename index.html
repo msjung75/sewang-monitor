@@ -7122,27 +7122,37 @@ function renderSales(){
     +(goldRows||'<div class="v18-sub">데이터 없음</div>')
     +'<div style="margin-top:10px"><button onclick="try{switchPage(\'gold\')}catch(e){}" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:inherit;border-radius:10px;padding:9px 14px;font-size:13.5px;width:100%">전체 선점기회 보기 →</button></div>';
   pane.appendChild(goldCard);
-  /* 지방 확장 브랜드 */
+  /* 지방 확장 브랜드 — v18.5: 주류취급 가능 업장만(일반·단란·유흥), 백화점·팝업·축제·법인위탁 제외 */
   var locCard=el3('div','',''); locCard.className='v18-card';
   var locHtml='';
-  if(y&&y.by_brand){
-    var mks=(y.months_loaded||[]).slice(-2);
-    var list=[];
-    Object.keys(y.by_brand).forEach(function(b){
-      var bb=y.by_brand[b]; if(!bb.monthly) return;
-      var cnt=0, bySd={}, names=[];
-      mks.forEach(function(mk){ var m=bb.monthly[mk]; if(!m||!m.stores) return; m.stores.forEach(function(s0){ var sd=sido3(s0.addr); if(sd&&METRO.indexOf(sd)<0){ cnt++; bySd[sd]=(bySd[sd]||0)+1; if(names.length<3&&s0.status!=='폐업') names.push(s0.name+' ('+sd+')'); } }); });
-      var tot=0; mks.forEach(function(mk){ var m=bb.monthly[mk]; if(m&&m.stores) tot+=m.stores.length; });
-      if(cnt>=3&&tot>0&&cnt/tot>=0.6) list.push({b:b,c:cnt,sd:bySd,names:names});
+  if(tr&&tr.stores){
+    var BADADDR=/백화점|아울렛|스타필드|롯데몰|현대프리미엄|트레이더스|이마트|홈플러스|면세점|공항|휴게소|푸드코트|쇼핑몰/;
+    var BADNAME=/축제|팝업|페스티벌|박람회|주식회사|\(주\)|\(유\)|급식|케이터링|푸드트럭/;
+    var agg={};
+    tr.stores.forEach(function(s){
+      if(s.type!=='ilban'&&s.type!=='danran'&&s.type!=='yuheung') return;
+      var sd=sido3(s.addr); if(!sd) return;
+      if(BADADDR.test(s.addr||'')||/백화점/.test(s.upte||'')) return;
+      if(BADNAME.test(s.name||'')) return;
+      var b=null; try{ b=window.brandOf?window.brandOf(s.name):null; }catch(e){}
+      if(!b||BADNAME.test(b)) return;
+      var a=agg[b]||(agg[b]={c:0,m:0,sd:{},names:[],upte:{}});
+      if(METRO.indexOf(sd)>=0){ a.m++; return; }
+      a.c++; a.sd[sd]=(a.sd[sd]||0)+1;
+      if(a.names.length<3) a.names.push(s.name+' ('+sd+')');
+      var u=(s.upte||'').trim(); if(u) a.upte[u]=(a.upte[u]||0)+1;
     });
-    list.sort(function(a,b){ return b.c-a.c; });
+    var list=Object.keys(agg).map(function(b){ return {b:b,a:agg[b]}; })
+      .filter(function(x){ return x.a.c>=3 && x.a.c>x.a.m && Object.keys(x.a.sd).length>=2; });
+    list.sort(function(p,q){ return q.a.c-p.a.c; });
     locHtml=list.slice(0,8).map(function(x){
-      var sds=Object.keys(x.sd).map(function(k){ return [k,x.sd[k]]; }).sort(function(a,b){ return b[1]-a[1]; }).slice(0,3).map(function(p){ return p[0]+' '+p[1]; }).join(' · ');
-      return '<div class="v3-row"><div class="v3-main"><div class="v3-nm">'+esc3(x.b)+'</div><div class="v3-meta">'+esc3(sds)+(x.names.length?' — '+esc3(x.names.join(', ')):'')+'</div></div>'
-        +'<div class="v3-right"><span class="v3-num" style="color:#34d399">'+x.c+'</span><div class="v18-sub">2개월 지방출점</div></div></div>';
+      var sds=Object.keys(x.a.sd).map(function(k){ return [k,x.a.sd[k]]; }).sort(function(a,b){ return b[1]-a[1]; }).slice(0,3).map(function(p){ return p[0]+' '+p[1]; }).join(' · ');
+      var ut=Object.keys(x.a.upte).sort(function(a,b){ return x.a.upte[b]-x.a.upte[a]; })[0]||'';
+      return '<div class="v3-row"><div class="v3-main"><div class="v3-nm">'+esc3(x.b)+(ut?' <span class="v3-badge" style="background:rgba(96,165,250,.14);color:#93c5fd">'+esc3(ut)+'</span>':'')+'</div><div class="v3-meta">'+esc3(sds)+(x.a.names.length?' — '+esc3(x.a.names.join(', ')):'')+'</div></div>'
+        +'<div class="v3-right"><span class="v3-num" style="color:#34d399">'+x.a.c+'</span><div class="v18-sub">30일 지방출점</div></div></div>';
     }).join('');
   }
-  locCard.innerHTML='<div class="v18-tt">🚀 지방에서 확장 중인 브랜드 <span class="v18-sub">(최근 2개월 · 지방 비중 60%↑)</span></div>'+(locHtml||'<div class="v18-sub">데이터 없음</div>');
+  locCard.innerHTML='<div class="v18-tt">🚀 지방에서 확장 중인 브랜드 <span class="v18-sub">(최근 30일 · 주류취급 업장만 · 백화점/팝업 제외)</span></div>'+(locHtml||'<div class="v18-sub">조건 충족 브랜드 없음</div>');
   pane.appendChild(locCard);
   /* 최근 폐업 (수도권) */
   var clsCard=el3('div','',''); clsCard.className='v18-card';
