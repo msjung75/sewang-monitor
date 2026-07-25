@@ -55,6 +55,7 @@ export default async function handler(req, res) {
 
   const { days = '7', region = 'metro', type = 'all', from = '', to = '', status: statusFilter = 'open', dateField = 'permit' } = req.query;
   const maxPages = Math.min(parseInt(req.query.maxPages || '5', 10), 50);
+  const datefmt = req.query.datefmt || (dateField === 'permit' ? 'plain' : 'dash');  // v18: CLSBIZ_YMD/LASTMODTS는 대시 포맷
 
   if (!DATE_COLS[dateField]) {
     return res.status(400).json({ error: `dateField 파라미터 오류 (permit|closed|modified)` });
@@ -77,7 +78,7 @@ export default async function handler(req, res) {
   const prefixes = REGION_PREFIX[region] || REGION_PREFIX.metro;
 
   const jobs = [];
-  for (const t of types) for (const p of prefixes) jobs.push(fetchService(t, p, since, until, key, maxPages, dateField));
+  for (const t of types) for (const p of prefixes) jobs.push(fetchService(t, p, since, until, key, maxPages, dateField, datefmt));
 
   try {
     const results = await Promise.all(jobs);
@@ -109,11 +110,12 @@ export default async function handler(req, res) {
   }
 }
 
-async function fetchService(typeKey, addrPrefix, since, until, key, maxPages, dateField) {
+async function fetchService(typeKey, addrPrefix, since, until, key, maxPages, dateField, datefmt) {
   const svc = SERVICES[typeKey];
   const all = [];
   let capped = false;
   const dateCol = DATE_COLS[dateField];
+  const fmtD = d => (datefmt === 'dash' && /^\d{8}$/.test(d)) ? d.slice(0,4)+'-'+d.slice(4,6)+'-'+d.slice(6,8) : d;
 
   for (let page = 1; page <= maxPages; page++) {
     const qs = new URLSearchParams({
@@ -122,8 +124,8 @@ async function fetchService(typeKey, addrPrefix, since, until, key, maxPages, da
       numOfRows: '100',
       returnType: 'json',
     });
-    qs.append(`cond[${dateCol}::GTE]`, since);
-    if (until) qs.append(`cond[${dateCol}::LT]`, until);
+    qs.append(`cond[${dateCol}::GTE]`, fmtD(since));
+    if (until) qs.append(`cond[${dateCol}::LT]`, fmtD(until));
     if (addrPrefix) qs.append('cond[ROAD_NM_ADDR::LIKE]', addrPrefix);
     const url = `https://apis.data.go.kr/1741000/${svc.base}/info?${qs.toString()}`;
 
