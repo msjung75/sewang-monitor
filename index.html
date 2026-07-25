@@ -7043,3 +7043,200 @@ var vp18=setInterval(function(){
 },1000);
 })();
 </script>
+
+
+<script>
+/* ═══ v18.3 (2026-07-26) ═══
+   1) '영업' 탭 신설: 영업 추천 이동 + 선점기회(수도권) + 지방 확장 브랜드 + 최근 폐업(수도권)
+   2) 업종 도넛 → 숫자 리스트, 지역 TOP10 기간 라벨, 🔥 블로그 화제성 카드 제거
+   3) 인사이트 랭킹 브랜드의 최근 개점 매장명 표시
+   4) '오늘 N명 접속' 배지를 상단 헤더로 이동 */
+(function(){
+'use strict';
+function q3(s){ return document.querySelector(s); }
+function qa3(s){ return [].slice.call(document.querySelectorAll(s)); }
+function el3(t,css,h){ var e=document.createElement(t); if(css) e.style.cssText=css; if(h!=null) e.innerHTML=h; return e; }
+function esc3(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function fN3(n){ return n==null?'-':Number(n).toLocaleString('ko-KR'); }
+function ymd3(s){ s=String(s||''); return s.length>=8?(s.slice(4,6).replace(/^0/,'')+'/'+s.slice(6,8).replace(/^0/,'')):s; }
+function sido3(addr){ var a=String(addr||'');
+  if(a.indexOf('충청북')===0)return '충북'; if(a.indexOf('충청남')===0)return '충남';
+  if(a.indexOf('전라남')===0)return '전남'; if(a.indexOf('전라북')===0)return '전북';
+  if(a.indexOf('경상북')===0)return '경북'; if(a.indexOf('경상남')===0)return '경남';
+  var s=a.slice(0,2);
+  return ['서울','경기','부산','대구','인천','광주','대전','울산','세종','강원','충북','충남','전북','전남','경북','경남','제주'].indexOf(s)>=0?s:null; }
+function guOf3(addr){ var p=String(addr||'').split(' '); return (p[1]||'').replace(/(특별|광역)?시$/,'')||''; }
+function cardOf3(txt){ var t=qa3('.card-title').filter(function(e){ return e.textContent.indexOf(txt)>=0; })[0]; if(!t) return null; var c=t; while(c&&c.parentElement){ c=c.parentElement; if((c.className||'').indexOf('card')>=0&&(c.className||'').indexOf('card-title')<0) return c; } return null; }
+var METRO=['서울','경기','인천'];
+var D3={};
+function jf3(u){ return fetch(u,{cache:'no-store'}).then(function(r){ return r.ok?r.json():null; }).catch(function(){ return null; }); }
+
+/* CSS */
+var css3=['#pg-sales .v18-card{margin-bottom:13px;}',
+'.v3-row{display:flex;justify-content:space-between;align-items:center;padding:9px 2px;border-bottom:1px solid rgba(255,255,255,.06);font-size:14px;gap:8px;}',
+'.v3-row:last-child{border-bottom:none;}',
+'.v3-main{min-width:0;}',
+'.v3-nm{font-weight:700;font-size:14.5px;}',
+'.v3-meta{font-size:12.5px;opacity:.65;margin-top:2px;}',
+'.v3-right{text-align:right;flex-shrink:0;font-size:12.5px;}',
+'.v3-badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11.5px;font-weight:700;}',
+'.v3-num{font-size:20px;font-weight:800;}',
+'.v3-typerow{display:flex;gap:8px;text-align:center;margin-top:4px;}',
+'.v3-typerow>div{flex:1;background:rgba(255,255,255,.05);border-radius:10px;padding:10px 4px;}',
+'#v18-hdr-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(167,139,250,.15);color:#c4b5fd;border:1px solid rgba(167,139,250,.35);padding:3px 10px;border-radius:999px;font-size:12.5px;font-weight:700;white-space:nowrap;}'
+].join('');
+var st3=document.createElement('style'); st3.textContent=css3; document.head.appendChild(st3);
+
+/* ── 1. 영업 탭 ── */
+function buildSalesTab(){
+  if(document.getElementById('pg-sales')) return true;
+  var home=q3('#pg-home'), nav=q3('.bnav'); if(!home||!nav) return false;
+  var pane=el3('div','',''); pane.id='pg-sales'; pane.className='page';
+  home.parentElement.insertBefore(pane, home.nextSibling);
+  var btn=el3('button','','<span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></span>영업');
+  btn.className='bnav-btn'; btn.setAttribute('data-pg','sales');
+  btn.addEventListener('click',function(){ try{ switchPage('sales'); }catch(e){} });
+  var homeBtn=q3('.bnav-btn[data-pg="home"]');
+  nav.insertBefore(btn, homeBtn?homeBtn.nextSibling:nav.firstChild);
+  /* 영업 추천 카드 이동 */
+  var rec=cardOf3('영업 추천 TOP'); if(rec) pane.appendChild(rec);
+  return true;
+}
+function renderSales(){
+  var pane=q3('#pg-sales'); if(!pane||document.getElementById('v3-gold')) return;
+  var tr=D3.tr, ns=D3.ns, cls=D3.cls, y=D3.ytd;
+  /* 선점기회 (수도권, N미등록, 최신순) */
+  var goldRows='';
+  if(tr&&tr.stores&&ns){
+    var g=tr.stores.filter(function(s){ var sd=sido3(s.addr); if(METRO.indexOf(sd)<0) return false; var v=ns[s.id]; return v&&v.nstat==='unregistered'; })
+      .sort(function(a,b){ return String(b.permitDate).localeCompare(String(a.permitDate)); }).slice(0,20);
+    goldRows=g.map(function(s){
+      var nq=encodeURIComponent((s.name||'')+' '+guOf3(s.addr));
+      return '<div class="v3-row"><div class="v3-main"><div class="v3-nm">'+esc3(s.name)+' <span class="v3-badge" style="background:rgba(251,191,36,.15);color:#fbbf24">N미등록</span></div>'
+        +'<div class="v3-meta">'+esc3(sido3(s.addr)||'')+' '+esc3(guOf3(s.addr))+' · '+esc3(s.upte||'')+' · 인허가 '+ymd3(s.permitDate)+(s.tel?' · ☎ '+esc3(s.tel):'')+'</div></div>'
+        +'<div class="v3-right"><a href="https://m.search.naver.com/search.naver?query='+nq+'" target="_blank" style="color:#60a5fa">네이버 ↗</a></div></div>';
+    }).join('');
+  }
+  var goldCard=el3('div','',''); goldCard.id='v3-gold'; goldCard.className='v18-card';
+  goldCard.innerHTML='<div class="v18-tt">🏆 선점기회 — 네이버 미등록 신규 매장 <span class="v18-sub">(서울·경기·인천 최신 20)</span></div>'
+    +(goldRows||'<div class="v18-sub">데이터 없음</div>')
+    +'<div style="margin-top:10px"><button onclick="try{switchPage(\'gold\')}catch(e){}" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:inherit;border-radius:10px;padding:9px 14px;font-size:13.5px;width:100%">전체 선점기회 보기 →</button></div>';
+  pane.appendChild(goldCard);
+  /* 지방 확장 브랜드 */
+  var locCard=el3('div','',''); locCard.className='v18-card';
+  var locHtml='';
+  if(y&&y.by_brand){
+    var mks=(y.months_loaded||[]).slice(-2);
+    var list=[];
+    Object.keys(y.by_brand).forEach(function(b){
+      var bb=y.by_brand[b]; if(!bb.monthly) return;
+      var cnt=0, bySd={}, names=[];
+      mks.forEach(function(mk){ var m=bb.monthly[mk]; if(!m||!m.stores) return; m.stores.forEach(function(s0){ var sd=sido3(s0.addr); if(sd&&METRO.indexOf(sd)<0){ cnt++; bySd[sd]=(bySd[sd]||0)+1; if(names.length<3&&s0.status!=='폐업') names.push(s0.name+' ('+sd+')'); } }); });
+      var tot=0; mks.forEach(function(mk){ var m=bb.monthly[mk]; if(m&&m.stores) tot+=m.stores.length; });
+      if(cnt>=3&&tot>0&&cnt/tot>=0.6) list.push({b:b,c:cnt,sd:bySd,names:names});
+    });
+    list.sort(function(a,b){ return b.c-a.c; });
+    locHtml=list.slice(0,8).map(function(x){
+      var sds=Object.keys(x.sd).map(function(k){ return [k,x.sd[k]]; }).sort(function(a,b){ return b[1]-a[1]; }).slice(0,3).map(function(p){ return p[0]+' '+p[1]; }).join(' · ');
+      return '<div class="v3-row"><div class="v3-main"><div class="v3-nm">'+esc3(x.b)+'</div><div class="v3-meta">'+esc3(sds)+(x.names.length?' — '+esc3(x.names.join(', ')):'')+'</div></div>'
+        +'<div class="v3-right"><span class="v3-num" style="color:#34d399">'+x.c+'</span><div class="v18-sub">2개월 지방출점</div></div></div>';
+    }).join('');
+  }
+  locCard.innerHTML='<div class="v18-tt">🚀 지방에서 확장 중인 브랜드 <span class="v18-sub">(최근 2개월 · 지방 비중 60%↑)</span></div>'+(locHtml||'<div class="v18-sub">데이터 없음</div>');
+  pane.appendChild(locCard);
+  /* 최근 폐업 (수도권) */
+  var clsCard=el3('div','',''); clsCard.className='v18-card';
+  var clsHtml='';
+  if(cls&&cls.items){
+    var cc=cls.items.filter(function(s){ return METRO.indexOf(sido3(s.addr))>=0; })
+      .sort(function(a,b){ return String(b.closedDate).localeCompare(String(a.closedDate)); }).slice(0,30);
+    clsHtml=cc.map(function(s){
+      var months=null;
+      if(s.permitDate&&s.closedDate&&s.permitDate.length===8){
+        var pd=new Date(s.permitDate.slice(0,4)+'-'+s.permitDate.slice(4,6)+'-'+s.permitDate.slice(6,8));
+        var cd=new Date(s.closedDate.slice(0,4)+'-'+s.closedDate.slice(4,6)+'-'+s.closedDate.slice(6,8));
+        months=Math.max(0,Math.round((cd-pd)/2592000000));
+      }
+      var shortB=(months!=null&&months<12)?' <span class="v3-badge" style="background:rgba(239,68,68,.15);color:#f87171">'+months+'개월 단기</span>':'';
+      return '<div class="v3-row"><div class="v3-main"><div class="v3-nm">'+esc3(s.name)+shortB+'</div>'
+        +'<div class="v3-meta">'+esc3(sido3(s.addr)||'')+' '+esc3(guOf3(s.addr))+' · '+esc3(s.upte||'')+(months!=null?' · 운영 '+months+'개월':'')+'</div></div>'
+        +'<div class="v3-right" style="color:#f87171">'+ymd3(s.closedDate)+'<div class="v18-sub">폐업일</div></div></div>';
+    }).join('');
+  }
+  clsCard.innerHTML='<div class="v18-tt">🔴 최근 폐업 <span class="v18-sub">(서울·경기·인천 최신 30 · 거래처 정리 참고)</span></div>'+(clsHtml||'<div class="v18-sub">데이터 없음</div>');
+  pane.appendChild(clsCard);
+}
+
+/* ── 2. 업종 도넛 → 숫자 / 지역 라벨 / 화제성 제거 ── */
+function fixHomeCards(){
+  var tc=q3('#ch-type');
+  if(tc&&!document.getElementById('v3-types')&&D3.tr&&D3.tr.stores){
+    var byT={}, byU={};
+    D3.tr.stores.forEach(function(s){ var t=s.typeLabel||s.type||'?'; byT[t]=(byT[t]||0)+1; var u=(s.upte||'').trim(); if(u) byU[u]=(byU[u]||0)+1; });
+    var order=['일반음식점','휴게음식점','단란주점','유흥주점'];
+    var keys=order.filter(function(k){ return byT[k]; }).concat(Object.keys(byT).filter(function(k){ return order.indexOf(k)<0; }));
+    var box=el3('div','',''); box.id='v3-types';
+    box.innerHTML='<div class="v3-typerow">'+keys.map(function(k){ return '<div><div class="v3-num">'+fN3(byT[k])+'</div><div class="v18-sub" style="margin-top:2px">'+esc3(k)+'</div></div>'; }).join('')+'</div>'
+      +'<div style="margin-top:10px">'+Object.keys(byU).map(function(k){ return [k,byU[k]]; }).sort(function(a,b){ return b[1]-a[1]; }).slice(0,8).map(function(p){ return '<span class="v18-chip">'+esc3(p[0])+' '+fN3(p[1])+'</span>'; }).join('')+'</div>';
+    tc.parentElement.insertBefore(box, tc); tc.style.display='none';
+    var tt=cardOf3('업종 분포'); if(tt){ var t0=tt.querySelector('.card-title'); if(t0) t0.textContent='업종별 인허가 수 (최근 30일 · 전국)'; }
+  }
+  qa3('.card-title').forEach(function(e){
+    if(e.textContent.indexOf('지역(구·시) TOP 10')>=0&&e.textContent.indexOf('30일')<0){ e.textContent='지역(구·시) TOP 10 (최근 30일 · 전국)'; }
+  });
+  var hot=cardOf3('🔥 화제성 TOP 5'); if(hot) hot.style.display='none';
+}
+
+/* ── 3. 인사이트 랭킹 브랜드 최근 매장 ── */
+function insightStores(){
+  if(document.getElementById('v3-ins-stores')) return;
+  var sec=document.getElementById('v18-insight-sec'); if(!sec||!D3.ytd||!D3.ytd.by_brand) return;
+  var rankCard=null;
+  qa3('#v18-insight-sec .card-title, #v18-insight-sec div').some(function(e){ if(e.textContent&&e.textContent.indexOf('창업시장 매력 브랜드')>=0&&e.textContent.length<80){ rankCard=e; return true; } return false; });
+  var host=rankCard; while(host&&host.parentElement&&host.parentElement!==sec){ host=host.parentElement; }
+  if(!host) return;
+  var txt=(host.textContent||'');
+  var brands=[]; var re=/(?:🥇|🥈|🥉|[45]\s?)([가-힣A-Za-z0-9&.\- ]{2,24}?)출점/g; var m;
+  while((m=re.exec(txt))&&brands.length<5){ var b=m[1].trim().replace(/^[0-9\s]+/,''); if(b&&brands.indexOf(b)<0) brands.push(b); }
+  if(!brands.length) return;
+  var mks=(D3.ytd.months_loaded||[]).slice(-2);
+  var html=brands.map(function(b){
+    var bb=D3.ytd.by_brand[b]; if(!bb||!bb.monthly) return '';
+    var stores=[]; mks.slice().reverse().forEach(function(mk){ var mm=bb.monthly[mk]; if(mm&&mm.stores) mm.stores.slice().reverse().forEach(function(s0){ if(stores.length<3) stores.push(esc3(s0.name)+' ('+(sido3(s0.addr)||'')+' · '+ymd3(s0.permitDate)+')'); }); });
+    if(!stores.length) return '';
+    return '<div class="v3-row"><div class="v3-main"><div class="v3-nm">'+esc3(b)+'</div><div class="v3-meta">'+stores.join(' · ')+'</div></div></div>';
+  }).join('');
+  if(!html) return;
+  var card=el3('div','',''); card.id='v3-ins-stores'; card.className='v18-card';
+  card.innerHTML='<div class="v18-tt">🏬 랭킹 브랜드 최근 개점 매장</div>'+html;
+  host.parentElement.insertBefore(card, host.nextSibling);
+}
+
+/* ── 4. 접속 배지 → 상단 헤더 ── */
+function moveBadge(){
+  if(document.getElementById('v18-hdr-badge')) return;
+  var uToday=0;
+  try{ var d=new Date(Date.now()+9*3600*1000).toISOString().slice(0,10); var du=((D3.usage||{}).days||{})[d]; uToday=du?Object.keys(du.users||{}).filter(function(k){ return k!=='unknown'; }).length:0; }catch(e){}
+  if(!uToday) return;
+  var hdr=q3('header')||q3('.hdr')||q3('.topbar');
+  var pill=el3('span','','👀 오늘 '+uToday+'명'); pill.id='v18-hdr-badge';
+  if(hdr){ hdr.appendChild(pill); pill.style.marginLeft='8px'; }
+  else { pill.style.cssText+='position:fixed;top:8px;right:56px;z-index:9998;'; document.body.appendChild(pill); }
+  var old=q3('#v18-flow .v18-tt span'); if(old) old.style.display='none';
+}
+
+Promise.all([jf3('/data/ytd_2026_summary.json'),jf3('/data/trend30_all.json'),jf3('/data/closures_recent.json'),jf3('/data/naver_nstat_cache.json'),jf3('/data/usage_log.json')])
+.then(function(a){ D3.ytd=a[0];D3.tr=a[1];D3.cls=a[2];D3.ns=a[3];D3.usage=a[4];D3.ready=true; });
+var v3n=0;
+var v3t=setInterval(function(){
+  v3n++;
+  if(document.getElementById('pg-home')&&D3.ready){
+    try{ if(buildSalesTab()) renderSales(); }catch(e){ console.warn('v3 sales',e); }
+    try{ fixHomeCards(); }catch(e){}
+    try{ insightStores(); }catch(e){}
+    try{ moveBadge(); }catch(e){}
+  }
+  if((document.getElementById('v3-gold')&&document.getElementById('v3-ins-stores'))||v3n>900) clearInterval(v3t);
+},1200);
+})();
+</script>
