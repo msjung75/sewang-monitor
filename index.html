@@ -7195,7 +7195,7 @@ function insightStores(){
   qa3('#v18-insight-sec .card-title, #v18-insight-sec div').some(function(e){ if(e.textContent&&e.textContent.indexOf('창업시장 매력 브랜드')>=0&&e.textContent.length<80){ rankCard=e; return true; } return false; });
   var host=rankCard; while(host&&host.parentElement&&host.parentElement!==sec){ host=host.parentElement; }
   if(!host) return;
-  var txt=(host.textContent||'');
+  var txt=(sec.textContent||'');
   var brands=[]; var re=/(?:🥇|🥈|🥉|[45]\s?)([가-힣A-Za-z0-9&.\- ]{2,24}?)출점/g; var m;
   while((m=re.exec(txt))&&brands.length<5){ var b=m[1].trim().replace(/^[0-9\s]+/,''); if(b&&brands.indexOf(b)<0) brands.push(b); }
   if(!brands.length) return;
