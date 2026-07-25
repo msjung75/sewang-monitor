@@ -6775,3 +6775,93 @@ function startPendingPolling(){
   }
 })();
 </script>
+
+<script>
+/* ============================================================
+   v17.21 — 프랜차이즈 브랜드 접두어 매칭 (2026-07-25)
+   문제: '덤브치킨신림점'처럼 띄어쓰기 없이 지역명이 붙은 상호를 기존 brandOf가
+         못 잡아, 같은 프랜차이즈가 매장 수만큼 1건짜리 별개 브랜드로 쪼개졌음.
+         (2026년 치킨 전수 분석에서 883개 상호가 이런 식으로 산개해 있었음)
+   해결: 공정위 마스터(franchise_master.json, 11,600여 브랜드)를 접두어 사전으로 삼아
+         상호 compact 문자열의 '가장 긴' 접두어 매칭으로 브랜드를 확정.
+         첫 3글자 버킷 인덱스로 조회해 11k 전수 루프를 피함.
+   ============================================================ */
+(function(){
+  window._frNameIdx = null;
+
+  function buildFrPrefixIdx(){
+    if (window._frNameIdx || !window.FRANCHISE_MASTER) return;
+    var idx = {};
+    function add(k, disp){
+      if (!k || k.length < 3) return;
+      var b = k.slice(0, 3);
+      if (!idx[b]) idx[b] = [];
+      for (var i = 0; i < idx[b].length; i++) if (idx[b][i].k === k) return;
+      idx[b].push({ k: k, name: disp });
+    }
+    (window.FRANCHISE_MASTER.brands || []).forEach(function(b){
+      var n = b.name || '';
+      if (!n) return;
+      var disp = n.replace(/[\(（][^\)）]*[\)）]/g, '').replace(/\s+/g, ' ').trim() || n;
+      add(n.replace(/\s+/g, '').toLowerCase(), disp);
+      var base = n.replace(/[\(（][^\)）]*[\)）]/g, '').replace(/\s+/g, '').toLowerCase();
+      if (base) add(base, disp);
+      var m = n.match(/[\(（](\w{2,})[\)）]/);
+      if (m) add(m[1].toLowerCase(), disp);
+    });
+    Object.keys(idx).forEach(function(b){
+      idx[b].sort(function(x, y){ return y.k.length - x.k.length; });
+    });
+    window._frNameIdx = idx;
+  }
+
+  function masterBrandOf(name){
+    buildFrPrefixIdx();
+    if (!window._frNameIdx) return null;
+    var cmp = String(name || '').replace(/\((주|유|합)\)|주식회사|㈜/g, '')
+                                .replace(/[\s()\[\]{}<>·・,~\-_.'"&!?]+/g, '').toLowerCase();
+    if (cmp.length < 3) return null;
+    var bucket = window._frNameIdx[cmp.slice(0, 3)];
+    if (!bucket) return null;
+    for (var i = 0; i < bucket.length; i++) {        /* 긴 키 우선 = 최장 매칭 */
+      if (cmp.indexOf(bucket[i].k) === 0) {
+        var tail = cmp.slice(bucket[i].k.length);    /* 뒤에 붙은 지점·지역 꼬리 */
+        if (tail === '' || tail.length <= 12) return bucket[i].name;
+      }
+    }
+    return null;
+  }
+  window.masterBrandOf = masterBrandOf;
+
+  /* 기존 brandOf를 감싸서 0차 판정으로 마스터 매칭을 먼저 태운다 */
+  var _origBrandOf = window.brandOf;
+  window.brandOf = function(name){
+    try {
+      var mb = masterBrandOf(name);
+      if (mb) return mb;
+    } catch(e){}
+    return _origBrandOf ? _origBrandOf(name) : null;
+  };
+
+  /* 마스터는 비동기 로드 → 준비되는 즉시 인덱스 생성 + 브랜드 집계 재계산 */
+  var tries = 0;
+  var timer = setInterval(function(){
+    tries++;
+    if (window.FRANCHISE_MASTER) {
+      clearInterval(timer);
+      window._frNameIdx = null;
+      try { buildFrPrefixIdx(); } catch(e){}
+      try {
+        if (typeof rebuildBrands === 'function') rebuildBrands();
+        if (typeof renderFranchise === 'function') renderFranchise();
+      } catch(e){}
+      try {
+        console.log('[v17.21 brandmatch] idx buckets:', Object.keys(window._frNameIdx || {}).length,
+                    '| brands:', (typeof BRANDS !== 'undefined' ? BRANDS.length : '-'));
+      } catch(e){}
+    } else if (tries > 120) {
+      clearInterval(timer);   /* 60초 내 미로드 시 포기 — 기존 로직으로 동작 */
+    }
+  }, 500);
+})();
+</script>
