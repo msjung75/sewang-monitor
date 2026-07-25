@@ -1,5 +1,5 @@
 // PWA Service Worker v17.21 — 인사이트 탭 + 자동 업데이트 강화 (canonical redirect, etag fresh check)
-const CACHE = 'sewang-pwa-v17_21-brandmatch';
+const CACHE = 'sewang-pwa-v18-marketflow';
 const SHELL = ['/manifest.json', '/icon.svg'];
 
 self.addEventListener('install', e => {
