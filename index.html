@@ -6859,7 +6859,7 @@ function startPendingPolling(){
         console.log('[v17.21 brandmatch] idx buckets:', Object.keys(window._frNameIdx || {}).length,
                     '| brands:', (typeof BRANDS !== 'undefined' ? BRANDS.length : '-'));
       } catch(e){}
-    } else if (tries > 120) {
+    } else if (tries > 900) {
       clearInterval(timer);   /* 60초 내 미로드 시 포기 — 기존 로직으로 동작 */
     }
   }, 500);
