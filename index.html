@@ -7030,10 +7030,16 @@ function renderUsage18(){
 }
 
 Promise.all([jf18('/data/ytd_2026_summary.json'),jf18('/data/trend30_all.json'),jf18('/data/closures_recent.json'),jf18('/data/usage_log.json'),jf18('/data/allowlist.json')])
-.then(function(a){ D18.ytd=a[0];D18.tr=a[1];D18.cls=a[2];D18.usage=a[3];D18.allow=a[4];
-  try{ renderFlow18(); }catch(e){ console.warn('v18 flow',e); }
-  try{ renderUsage18(); }catch(e){ console.warn('v18 usage',e); }
-});
-try{ mergeInsight18(); }catch(e){ console.warn('v18 insight',e); }
+.then(function(a){ D18.ytd=a[0];D18.tr=a[1];D18.cls=a[2];D18.usage=a[3];D18.allow=a[4];D18.ready=true; });
+/* 로그인 후에야 pg-home DOM이 생기므로 폴링으로 대기 */
+var vp18n=0;
+var vp18=setInterval(function(){
+  vp18n++;
+  if(document.getElementById('pg-home')){
+    try{ mergeInsight18(); }catch(e){}
+    if(D18.ready){ try{ renderFlow18(); }catch(e){} try{ renderUsage18(); }catch(e){} }
+  }
+  if((document.getElementById('v18-flow')&&document.getElementById('v18-insight-sec'))||vp18n>900) clearInterval(vp18);
+},1000);
 })();
 </script>
