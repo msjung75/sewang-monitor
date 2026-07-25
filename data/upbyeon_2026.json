@@ -1,7 +1,7 @@
 {
-  "updated": "2026-07-24T21:07:54+09:00",
+  "updated": "2026-07-25T04:12:58+09:00",
   "baseline_date": "20260101",
-  "current_date": "20260724",
+  "current_date": "20260725",
   "brands": {
     "88포차": {
       "service": "ilban",
@@ -296,14 +296,14 @@
     "BBQ": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 1924,
-      "new_permits_count": 42,
-      "candidate_count": 892,
+      "current_count_reported": 1925,
+      "new_permits_count": 43,
+      "candidate_count": 891,
       "verified_count": 80,
       "upbyeon_count": 3,
       "upbyeon_count_real": 3,
-      "total_growth": 45,
-      "upbyeon_ratio": 0.067,
+      "total_growth": 46,
+      "upbyeon_ratio": 0.065,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -579,15 +579,15 @@
     },
     "호식이두마리치킨": {
       "service": "ilban",
-      "current_count": 1267,
-      "current_count_reported": 1267,
-      "new_permits_count": 12,
+      "current_count": 1268,
+      "current_count_reported": 1268,
+      "new_permits_count": 13,
       "candidate_count": 771,
       "verified_count": 80,
       "upbyeon_count": 2,
       "upbyeon_count_real": 1,
-      "total_growth": 13,
-      "upbyeon_ratio": 0.077,
+      "total_growth": 14,
+      "upbyeon_ratio": 0.071,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -746,14 +746,14 @@
     "멕시카나": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 2068,
-      "new_permits_count": 23,
-      "candidate_count": 909,
+      "current_count_reported": 2070,
+      "new_permits_count": 24,
+      "candidate_count": 910,
       "verified_count": 80,
       "upbyeon_count": 11,
       "upbyeon_count_real": 11,
-      "total_growth": 34,
-      "upbyeon_ratio": 0.324,
+      "total_growth": 35,
+      "upbyeon_ratio": 0.314,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -884,7 +884,7 @@
       "current_count": 1500,
       "current_count_reported": 3139,
       "new_permits_count": 14,
-      "candidate_count": 906,
+      "candidate_count": 907,
       "verified_count": 80,
       "upbyeon_count": 2,
       "upbyeon_count_real": 2,
@@ -961,8 +961,8 @@
       "current_count": 85,
       "current_count_reported": 85,
       "new_permits_count": 0,
-      "candidate_count": 44,
-      "verified_count": 44,
+      "candidate_count": 45,
+      "verified_count": 45,
       "upbyeon_count": 0,
       "upbyeon_count_real": 0,
       "total_growth": 0,
@@ -972,15 +972,15 @@
     },
     "야화혼술바": {
       "service": "ilban",
-      "current_count": 17,
-      "current_count_reported": 17,
-      "new_permits_count": 16,
+      "current_count": 20,
+      "current_count_reported": 20,
+      "new_permits_count": 19,
       "candidate_count": 1,
       "verified_count": 1,
       "upbyeon_count": 1,
       "upbyeon_count_real": 1,
-      "total_growth": 17,
-      "upbyeon_ratio": 0.059,
+      "total_growth": 20,
+      "upbyeon_ratio": 0.05,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -998,15 +998,15 @@
     },
     "우이락": {
       "service": "ilban",
-      "current_count": 95,
-      "current_count_reported": 95,
-      "new_permits_count": 10,
-      "candidate_count": 52,
-      "verified_count": 52,
-      "upbyeon_count": 6,
-      "upbyeon_count_real": 6,
-      "total_growth": 16,
-      "upbyeon_ratio": 0.375,
+      "current_count": 97,
+      "current_count_reported": 97,
+      "new_permits_count": 11,
+      "candidate_count": 53,
+      "verified_count": 53,
+      "upbyeon_count": 7,
+      "upbyeon_count_real": 7,
+      "total_growth": 18,
+      "upbyeon_ratio": 0.389,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -1040,6 +1040,17 @@
           "dat_updt": "2026-07-23 22:47:48",
           "region_code": "6510000",
           "region_name": "6510000",
+          "trivial": false
+        },
+        {
+          "mng_no": "3380000-101-2018-00101",
+          "old_name": "수영돼지갈비",
+          "new_name": "우이락 부산수영점",
+          "addr": "부산광역시 수영구 감포로102번길 19, 1층 (광안동)",
+          "lcpmt": "2018-05-03",
+          "dat_updt": "2026-07-24 22:17:50",
+          "region_code": "3380000",
+          "region_name": "부산 수영구",
           "trivial": false
         },
         {
