@@ -7014,7 +7014,7 @@ function renderUsage18(){
     return '<div class="v18-day" title="'+d.slice(5)+' · '+n+'명"><i style="height:'+Math.round(n/maxD*100)+'%;background:#a78bfa"></i></div>';
   }).join('')+'</div>';
   var roleCol={admin:'#f59e0b',owner:'#38bdf8',staff:'#34d399',viewer:'#a78bfa'};
-  var rows=Object.keys(agg).map(function(id){ return {id:id,v:agg[id].v,last:agg[id].last,r:(nameOf[id]&&nameOf[id].r)||agg[id].r||'?',n:(nameOf[id]&&nameOf[id].n)||('ID'+id.slice(0,6))}; })
+  var rows=Object.keys(agg).map(function(id){ return {id:id,v:agg[id].v,last:agg[id].last,r:(nameOf[id]&&nameOf[id].r)||agg[id].r||'?',n:(nameOf[id]&&nameOf[id].n)||(((nameOf[id]&&nameOf[id].r)||agg[id].r)==='admin'?'사장님(관리자)':('ID'+id.slice(0,6)))}; })
     .sort(function(a,b){return b.last-a.last;}).slice(0,30);
   var now=Date.now();
   var tbl='<table><tr><th>이름</th><th>역할</th><th>방문(14일)</th><th>마지막 접속</th></tr>'+rows.map(function(r){
