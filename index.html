@@ -7251,3 +7251,59 @@ var v3t=setInterval(function(){
 },1200);
 })();
 </script>
+
+<script>
+/* ===== v19: 브랜드 생맥주 뱃지 (네이버 플레이스 메뉴 기반) ===== */
+(function(){
+var BEER=null;
+function norm(s){ return String(s||'').replace(/[^0-9a-zA-Z가-힣]/g,'').toLowerCase(); }
+fetch('/data/brand_beer.json?v='+Date.now()).then(function(r){return r.json();}).then(function(d){
+  BEER={};
+  Object.keys((d&&d.brands)||{}).forEach(function(b){ var v=d.brands[b]; if(v&&v.st) BEER[norm(b)]=v; });
+}).catch(function(e){ console.warn('brand_beer load fail',e); });
+function badgeHtml(v){
+  var label,col,bg,bd,tip;
+  if(v.st==='ok'){
+    var kind=v.kind==='I'?'수입':v.kind==='M'?'국산+수입':'국산';
+    label='🍺생맥 '+kind+(v.scope==='some'?'·일부':'');
+    col='#fbbf24';bg='rgba(251,191,36,0.13)';bd='rgba(251,191,36,0.4)';
+    tip='생맥주 취급 확인('+kind+(v.scope==='some'?' · 일부 매장':' · 조사 매장 전부')+') — 네이버 메뉴 기준';
+  } else if(v.st==='est'){
+    label='🍺생맥?';
+    col='#c4b5fd';bg='rgba(167,139,250,0.12)';bd='rgba(167,139,250,0.35)';
+    tip='생맥주 취급 추정 (주점·호프 업종) — 메뉴 미등록';
+  } else {
+    label='🍶병맥';
+    col='#a8a29e';bg='rgba(168,162,158,0.12)';bd='rgba(168,162,158,0.3)';
+    tip='병맥주·소주 확인, 생맥주는 메뉴상 미확인';
+  }
+  if(v.note) tip+=' · '+v.note;
+  if(v.items&&v.items.length) tip+=' · 예: '+v.items.slice(0,3).join(', ');
+  return '<span class="bb-badge" title="'+tip.replace(/"/g,'&quot;')+'" style="color:'+col+';font-size:9px;font-weight:800;background:'+bg+';border:1px solid '+bd+';padding:1px 5px;border-radius:4px;vertical-align:middle;margin-left:4px;white-space:nowrap;cursor:help">'+label+'</span>';
+}
+function decorate(){
+  if(!BEER) return;
+  var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,{acceptNode:function(n){
+    var p=n.parentElement; if(!p) return NodeFilter.FILTER_REJECT;
+    var tag=p.tagName; if(tag==='SCRIPT'||tag==='STYLE'||tag==='TEXTAREA'||tag==='INPUT'||tag==='OPTION') return NodeFilter.FILTER_REJECT;
+    if(p.getAttribute('data-bb')) return NodeFilter.FILTER_REJECT;
+    var t=(n.nodeValue||'').trim(); if(t.length<2||t.length>40) return NodeFilter.FILTER_REJECT;
+    return NodeFilter.FILTER_ACCEPT;
+  }});
+  var hits=[];
+  while(w.nextNode()){
+    var n=w.currentNode, v=BEER[norm(n.nodeValue)];
+    if(v) hits.push([n,v]);
+  }
+  hits.forEach(function(h){
+    var n=h[0], p=n.parentElement;
+    if(!p||p.getAttribute('data-bb')) return;
+    p.setAttribute('data-bb','1');
+    var tmp=document.createElement('span'); tmp.innerHTML=badgeHtml(h[1]);
+    var el=tmp.firstChild;
+    if(n.nextSibling) p.insertBefore(el,n.nextSibling); else p.appendChild(el);
+  });
+}
+setInterval(function(){ try{ decorate(); }catch(e){} },1500);
+})();
+</script>
