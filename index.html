@@ -7272,11 +7272,15 @@ function badgeHtml(v){
     label='🍺생맥?';
     col='#c4b5fd';bg='rgba(167,139,250,0.12)';bd='rgba(167,139,250,0.35)';
     tip='생맥주 취급 추정 (주점·호프 업종) — 메뉴 미등록';
-  } else {
+  } else if(v.st==='bot'){
     label='🍶병맥';
     col='#a8a29e';bg='rgba(168,162,158,0.12)';bd='rgba(168,162,158,0.3)';
     tip='병맥주·소주 확인, 생맥주는 메뉴상 미확인';
-  }
+  } else if(v.st==='bd'){
+    label='🛵배달위주';
+    col='#7dd3fc';bg='rgba(125,211,252,0.10)';bd='rgba(125,211,252,0.3)';
+    tip='배달 중심 브랜드 추정 — 샘플 매장 메뉴에 주류 없음';
+  } else { return ''; }
   if(v.note) tip+=' · '+v.note;
   if(v.items&&v.items.length) tip+=' · 예: '+v.items.slice(0,3).join(', ');
   return '<span class="bb-badge" title="'+tip.replace(/"/g,'&quot;')+'" style="color:'+col+';font-size:9px;font-weight:800;background:'+bg+';border:1px solid '+bd+';padding:1px 5px;border-radius:4px;vertical-align:middle;margin-left:4px;white-space:nowrap;cursor:help">'+label+'</span>';
@@ -7299,7 +7303,8 @@ function decorate(){
     var n=h[0], p=n.parentElement;
     if(!p||p.getAttribute('data-bb')) return;
     p.setAttribute('data-bb','1');
-    var tmp=document.createElement('span'); tmp.innerHTML=badgeHtml(h[1]);
+    var bh=badgeHtml(h[1]); if(!bh) return;
+    var tmp=document.createElement('span'); tmp.innerHTML=bh;
     var el=tmp.firstChild;
     if(n.nextSibling) p.insertBefore(el,n.nextSibling); else p.appendChild(el);
   });
