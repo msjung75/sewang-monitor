@@ -131,7 +131,7 @@ input[type=text]:focus,input[type=search]:focus{outline:none;border-color:rgba(1
   font-size:20px;font-weight:900;color:#fff;
   box-shadow:0 6px 20px rgba(56,189,248,0.35), inset 0 1px 0 rgba(255,255,255,0.2);
 }
-.hdr-title{font-size:18px;font-weight:800;letter-spacing:-0.4px;
+.hdr-title{font-size:18px;font-weight:800;letter-spacing:-0.4px;white-space:nowrap;
   background:linear-gradient(90deg,#7dd3fc,#c4b5fd);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .hdr-sub{font-size:11px;color:var(--txt3);letter-spacing:0.4px;text-transform:uppercase;font-weight:600;margin-top:2px}
@@ -7228,9 +7228,10 @@ function moveBadge(){
   var uToday=0;
   try{ var d=new Date(Date.now()+9*3600*1000).toISOString().slice(0,10); var du=((D3.usage||{}).days||{})[d]; uToday=du?Object.keys(du.users||{}).filter(function(k){ return k!=='unknown'; }).length:0; }catch(e){}
   if(!uToday) return;
-  var hdr=q3('header')||q3('.hdr')||q3('.topbar');
+  var tt=q3('.hdr-logo .hdr-title'); var sub=tt?tt.nextElementSibling:null;
   var pill=el3('span','','👀 오늘 '+uToday+'명'); pill.id='v18-hdr-badge';
-  if(hdr){ hdr.appendChild(pill); pill.style.marginLeft='8px'; }
+  if(sub){ sub.appendChild(pill); pill.style.cssText+='margin-left:6px;font-size:9px;padding:1px 6px;gap:3px;vertical-align:middle;'; }
+  else if(tt&&tt.parentElement){ tt.parentElement.appendChild(pill); pill.style.cssText+='font-size:9px;padding:1px 6px;'; }
   else { pill.style.cssText+='position:fixed;top:8px;right:56px;z-index:9998;'; document.body.appendChild(pill); }
   var old=q3('#v18-flow .v18-tt span'); if(old) old.style.display='none';
 }
