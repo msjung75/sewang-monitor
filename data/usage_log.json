@@ -1,29 +1,6 @@
 {
-  "updated": "2026-07-26T10:25:00.606Z",
+  "updated": "2026-07-27T02:04:29.551Z",
   "days": {
-    "2026-06-26": {
-      "users": {
-        "4942623776": {
-          "role": "admin",
-          "visits": 2,
-          "last_event": "visit",
-          "last_ts": 1782484486860,
-          "tabs": {
-            "home": 2
-          }
-        },
-        "unknown": {
-          "role": "unknown",
-          "visits": 1,
-          "last_event": "visit",
-          "last_ts": 1782484453359,
-          "tabs": {
-            "home": 1
-          }
-        }
-      },
-      "total": 3
-    },
     "2026-06-27": {
       "users": {
         "4963472791": {
@@ -556,6 +533,20 @@
         }
       },
       "total": 24
+    },
+    "2026-07-27": {
+      "users": {
+        "4990178737": {
+          "role": "staff",
+          "visits": 1,
+          "last_event": "visit",
+          "last_ts": 1785117869551,
+          "tabs": {
+            "home": 1
+          }
+        }
+      },
+      "total": 1
     }
   }
 }
