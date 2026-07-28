@@ -1,38 +1,6 @@
 {
-  "updated": "2026-07-27T06:39:57.136Z",
+  "updated": "2026-07-28T03:48:29.600Z",
   "days": {
-    "2026-06-27": {
-      "users": {
-        "4963472791": {
-          "role": "owner",
-          "visits": 2,
-          "last_event": "visit",
-          "last_ts": 1782491653180,
-          "tabs": {
-            "home": 2
-          }
-        },
-        "4942623776": {
-          "role": "admin",
-          "visits": 4,
-          "last_event": "visit",
-          "last_ts": 1782503585297,
-          "tabs": {
-            "home": 4
-          }
-        },
-        "4963533063": {
-          "role": "owner",
-          "visits": 1,
-          "last_event": "visit",
-          "last_ts": 1782542605814,
-          "tabs": {
-            "home": 1
-          }
-        }
-      },
-      "total": 7
-    },
     "2026-06-30": {
       "users": {
         "4963533063": {
@@ -547,6 +515,20 @@
         }
       },
       "total": 2
+    },
+    "2026-07-28": {
+      "users": {
+        "4942623776": {
+          "role": "admin",
+          "visits": 1,
+          "last_event": "visit",
+          "last_ts": 1785210509600,
+          "tabs": {
+            "home": 1
+          }
+        }
+      },
+      "total": 1
     }
   }
 }
