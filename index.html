@@ -2057,27 +2057,35 @@ function isCafeYtdBrand(g){
   var ov = window.BRAND_OVERRIDES && window.BRAND_OVERRIDES.category_overrides;
   return ov && ov[g.brand] === 'cafe';
 }
-// v17.22: 치킨 계열 판별 (SOOL_RE에서 분리)
-// 닭발·닭갈비·닭볶음탕은 치킨 아님 → 순수 치킨/통닭/후라이드/닭강정만
+// v17.22b: 치킨 계열 판별 — 브랜드명 기준(엄격)
+// 매장명 fallback 제거 (야화·헤즈업·제주아홉도 오분류 방지)
+// 순수 치킨 키워드: 치킨/통닭/후라이드/닭강정 · 닭발·닭갈비·닭볶음탕은 제외
 var CHICKEN_RE = /치킨|통닭|후라이드|닭강정|chicken|CHICKEN/;
+// 브랜드명에 이런 키워드가 있으면 치킨 아님 — bar·pub·pocha 계열 강제 제외
+var NOT_CHICKEN_RE = /혼술|주점|포차|술집|호프|이자카야|사케|와인|막걸리|바베큐|곱창|막창|족발|보쌈|횟집|선술|주막|하이볼|아홉도|헤즈업/;
+// 브랜드명에 치킨 키워드 없어도 치킨으로 인정하는 알려진 프랜차이즈 (compact·lowercase 키)
+var KNOWN_CHICKEN_BRANDS = {
+  'bhc':1, 'bbq':1, 'bbqchicken':1, 'kfc':1, 'kyochon':1,
+  '페리카나':1, '처갓집':1, '처갓집양념치킨':1, '네네':1, '네네치킨':1, 'nene':1,
+  '굽네':1, '푸라닭':1, '노랑통닭':1, '자담':1, '자담치킨':1, '또래오래':1,
+  '호식이두마리':1, '호식이두마리치킨':1, '오븐마루':1, '멕시카나':1,
+  '지코바':1, '큰맘할매순대국':0, '한마리치킨':1, '두마리치킨':1
+};
 window._ytdChickenCache = {};
 function isChickenYtdBrand(g){
   var ov = window.BRAND_OVERRIDES && window.BRAND_OVERRIDES.category_overrides;
   if (ov && ov[g.brand]) return ov[g.brand] === 'chicken';
   if (window._ytdChickenCache[g.brand] !== undefined) return window._ytdChickenCache[g.brand];
-  // 브랜드명 자체에 치킨 키워드
-  if (CHICKEN_RE.test(g.brand.replace(/\s/g,''))) { window._ytdChickenCache[g.brand] = true; return true; }
-  var isChk = false;
-  for (var m in g.monthly) {
-    var stores = g.monthly[m].stores || [];
-    for (var i = 0; i < stores.length; i++) {
-      var s = stores[i];
-      if (CHICKEN_RE.test(s.upte || '') || CHICKEN_RE.test((s.name||'').replace(/\s/g,''))) { isChk = true; break; }
-    }
-    if (isChk) break;
-  }
-  window._ytdChickenCache[g.brand] = isChk;
-  return isChk;
+  var bc = g.brand.replace(/\s/g,'').toLowerCase();
+  // 1) 명시적 non-chicken 브랜드는 즉시 제외
+  if (NOT_CHICKEN_RE.test(bc)) { window._ytdChickenCache[g.brand] = false; return false; }
+  // 2) 브랜드명 자체에 치킨 키워드
+  if (CHICKEN_RE.test(bc)) { window._ytdChickenCache[g.brand] = true; return true; }
+  // 3) 알려진 치킨 프랜차이즈 (whitelist)
+  if (KNOWN_CHICKEN_BRANDS[bc]) { window._ytdChickenCache[g.brand] = true; return true; }
+  // 매장명 fallback은 제거 — 오분류의 원인
+  window._ytdChickenCache[g.brand] = false;
+  return false;
 }
 function frFiltered(){
   var kind = activeChip('chip-fr-kind');

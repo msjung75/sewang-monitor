@@ -1,5 +1,5 @@
-// PWA Service Worker v17.22 — 프랜차이즈 치킨 탭 추가 (canonical redirect, etag fresh check)
-const CACHE = 'sewang-pwa-v17_22-chickentab';
+// PWA Service Worker v17.22b — 치킨 판별 엄격화 (bar 제외) (canonical redirect, etag fresh check)
+const CACHE = 'sewang-pwa-v17_22b-chickenstrict';
 const SHELL = ['/manifest.json', '/icon.svg'];
 
 self.addEventListener('install', e => {
