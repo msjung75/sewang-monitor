@@ -1,5 +1,5 @@
-// PWA Service Worker v17.22b — 치킨 판별 엄격화 (bar 제외) (canonical redirect, etag fresh check)
-const CACHE = 'sewang-pwa-v17_22b-chickenstrict';
+// PWA Service Worker v17.22c — 닭다리 키워드 + 브랜드 추가 (canonical redirect, etag fresh check)
+const CACHE = 'sewang-pwa-v17_22c-morebrands';
 const SHELL = ['/manifest.json', '/icon.svg'];
 
 self.addEventListener('install', e => {
