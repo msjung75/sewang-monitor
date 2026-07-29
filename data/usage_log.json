@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-29T03:06:47.907Z",
+  "updated": "2026-07-29T03:07:50.264Z",
   "days": {
     "2026-06-30": {
       "users": {
@@ -549,9 +549,18 @@
           "tabs": {
             "home": 2
           }
+        },
+        "unknown": {
+          "role": "unknown",
+          "visits": 1,
+          "last_event": "visit",
+          "last_ts": 1785294470264,
+          "tabs": {
+            "home": 1
+          }
         }
       },
-      "total": 2
+      "total": 3
     }
   }
 }
