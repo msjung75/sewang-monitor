@@ -1,5 +1,5 @@
-// PWA Service Worker v17.21 — 인사이트 탭 + 자동 업데이트 강화 (canonical redirect, etag fresh check)
-const CACHE = 'sewang-pwa-v18_3-sales';
+// PWA Service Worker v17.22 — 프랜차이즈 치킨 탭 추가 (canonical redirect, etag fresh check)
+const CACHE = 'sewang-pwa-v17_22-chickentab';
 const SHELL = ['/manifest.json', '/icon.svg'];
 
 self.addEventListener('install', e => {
@@ -21,7 +21,7 @@ self.addEventListener('activate', e => {
           c.postMessage({
             type: 'SW_UPDATED_RELOAD',
             forceClear: true,
-            version: 'v17_21',
+            version: 'v17_20',
             clearKeys: [
               'sewang_franchise_master',
               'sewang_franchise_stats',
