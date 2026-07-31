@@ -1,7 +1,7 @@
 {
-  "updated": "2026-07-30T21:07:01+09:00",
+  "updated": "2026-07-31T04:28:12+09:00",
   "baseline_date": "20260101",
-  "current_date": "20260730",
+  "current_date": "20260731",
   "brands": {
     "88포차": {
       "service": "ilban",
@@ -237,9 +237,9 @@
     "BHC": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 2092,
+      "current_count_reported": 2091,
       "new_permits_count": 40,
-      "candidate_count": 900,
+      "candidate_count": 899,
       "verified_count": 80,
       "upbyeon_count": 5,
       "upbyeon_count_real": 4,
@@ -638,15 +638,15 @@
     },
     "보드람치킨": {
       "service": "ilban",
-      "current_count": 349,
-      "current_count_reported": 349,
-      "new_permits_count": 17,
+      "current_count": 350,
+      "current_count_reported": 350,
+      "new_permits_count": 18,
       "candidate_count": 196,
       "verified_count": 80,
       "upbyeon_count": 3,
       "upbyeon_count_real": 3,
-      "total_growth": 20,
-      "upbyeon_ratio": 0.15,
+      "total_growth": 21,
+      "upbyeon_ratio": 0.143,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -686,15 +686,15 @@
     },
     "자담치킨": {
       "service": "ilban",
-      "current_count": 1161,
-      "current_count_reported": 1161,
-      "new_permits_count": 39,
+      "current_count": 1162,
+      "current_count_reported": 1162,
+      "new_permits_count": 40,
       "candidate_count": 660,
       "verified_count": 80,
       "upbyeon_count": 6,
       "upbyeon_count_real": 6,
-      "total_growth": 45,
-      "upbyeon_ratio": 0.133,
+      "total_growth": 46,
+      "upbyeon_ratio": 0.13,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -770,7 +770,7 @@
       "current_count": 1500,
       "current_count_reported": 2071,
       "new_permits_count": 24,
-      "candidate_count": 911,
+      "candidate_count": 912,
       "verified_count": 80,
       "upbyeon_count": 11,
       "upbyeon_count_real": 11,
