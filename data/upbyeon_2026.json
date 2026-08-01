@@ -1,7 +1,7 @@
 {
-  "updated": "2026-07-31T21:07:05+09:00",
+  "updated": "2026-08-01T04:24:49+09:00",
   "baseline_date": "20260101",
-  "current_date": "20260731",
+  "current_date": "20260801",
   "brands": {
     "88포차": {
       "service": "ilban",
@@ -239,7 +239,7 @@
       "current_count": 1500,
       "current_count_reported": 2091,
       "new_permits_count": 40,
-      "candidate_count": 899,
+      "candidate_count": 900,
       "verified_count": 80,
       "upbyeon_count": 5,
       "upbyeon_count_real": 4,
@@ -307,7 +307,7 @@
     "BBQ": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 1929,
+      "current_count_reported": 1930,
       "new_permits_count": 44,
       "candidate_count": 892,
       "verified_count": 80,
@@ -357,7 +357,7 @@
       "current_count": 1500,
       "current_count_reported": 2030,
       "new_permits_count": 23,
-      "candidate_count": 845,
+      "candidate_count": 846,
       "verified_count": 80,
       "upbyeon_count": 0,
       "upbyeon_count_real": 0,
@@ -567,7 +567,7 @@
       "current_count": 1453,
       "current_count_reported": 1453,
       "new_permits_count": 7,
-      "candidate_count": 841,
+      "candidate_count": 842,
       "verified_count": 80,
       "upbyeon_count": 2,
       "upbyeon_count_real": 2,
@@ -686,10 +686,10 @@
     },
     "자담치킨": {
       "service": "ilban",
-      "current_count": 1162,
-      "current_count_reported": 1162,
+      "current_count": 1163,
+      "current_count_reported": 1163,
       "new_permits_count": 40,
-      "candidate_count": 660,
+      "candidate_count": 662,
       "verified_count": 80,
       "upbyeon_count": 6,
       "upbyeon_count_real": 6,
@@ -768,7 +768,7 @@
     "멕시카나": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 2071,
+      "current_count_reported": 2072,
       "new_permits_count": 24,
       "candidate_count": 912,
       "verified_count": 80,
@@ -994,15 +994,15 @@
     },
     "야화혼술바": {
       "service": "ilban",
-      "current_count": 20,
-      "current_count_reported": 20,
+      "current_count": 21,
+      "current_count_reported": 21,
       "new_permits_count": 19,
-      "candidate_count": 1,
-      "verified_count": 1,
-      "upbyeon_count": 1,
-      "upbyeon_count_real": 1,
-      "total_growth": 20,
-      "upbyeon_ratio": 0.05,
+      "candidate_count": 2,
+      "verified_count": 2,
+      "upbyeon_count": 2,
+      "upbyeon_count_real": 2,
+      "total_growth": 21,
+      "upbyeon_ratio": 0.095,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -1014,6 +1014,17 @@
           "dat_updt": "2026-03-26 22:55:24",
           "region_code": "3180000",
           "region_name": "서울 금천구",
+          "trivial": false
+        },
+        {
+          "mng_no": "3020000-101-2017-00054",
+          "old_name": "심상블랙",
+          "new_name": "야화혼술바 용산점",
+          "addr": "서울특별시 용산구 한강대로40길 9-8, 지하1층 (한강로2가)",
+          "lcpmt": "2017-02-21",
+          "dat_updt": "2026-07-31 22:47:50",
+          "region_code": "3020000",
+          "region_name": "서울 중구",
           "trivial": false
         }
       ]
@@ -1192,7 +1203,7 @@
       "current_count": 607,
       "current_count_reported": 607,
       "new_permits_count": 4,
-      "candidate_count": 359,
+      "candidate_count": 361,
       "verified_count": 80,
       "upbyeon_count": 2,
       "upbyeon_count_real": 1,
