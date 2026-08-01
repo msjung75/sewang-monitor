@@ -5258,6 +5258,9 @@ function refreshAllData(force){
   try { loadSumtrendBuzz(); } catch(e){}
   try { if (typeof loadRecommend === 'function') loadRecommend(); } catch(e){}
   try { if (typeof loadUpbyeon === 'function') loadUpbyeon(); } catch(e){}
+  /* v17.22: 거래처 공유 명단도 함께 재로드 */
+  try { if (typeof window._reloadCustNameHashes === 'function') window._reloadCustNameHashes(); } catch(e){}
+  try { if (typeof window._reloadCustAddrHashes === 'function') window._reloadCustAddrHashes(); } catch(e){}
 }
 document.addEventListener('visibilitychange', function(){
   if (document.visibilityState === 'visible') refreshAllData(false);
@@ -6708,7 +6711,24 @@ function startPendingPolling(){
     return (fnv(c, 2166136261) + fnv(c, 424242421)).slice(0, 12);
   }
   window._custHkey = hkey;
-  fetch('/data/customers_hash.json?v=' + Date.now(), { cache: 'no-store' })
+  /* v17.22: 명단 로드 함수화 — 복귀·새로고침 때마다 재로드 + 기준일 항상 갱신 */
+  function updateSharedLine(){
+    var box = document.getElementById('cust-store-box');
+    if (!box) return;
+    var ln = document.getElementById('cust-shared-line');
+    if (!ln) {
+      ln = document.createElement('div');
+      ln.id = 'cust-shared-line';
+      ln.style.cssText = 'font-size:10.5px;color:#34d399;margin-top:6px';
+      box.appendChild(ln);
+    }
+    ln.textContent = '🌐 공유 명단 적용 중: ' + (window._CUST_SHARED_N || 0).toLocaleString() + '곳'
+      + (window._CUST_SHARED_U ? ' · 기준 ' + window._CUST_SHARED_U : '')
+      + (window._CUST_SHARED_AT ? ' · 확인 ' + window._CUST_SHARED_AT : '') + ' — 전 사용자 자동 표시';
+  }
+  window._updateCustSharedLine = updateSharedLine;
+  function loadNameHashes(){
+    return fetch('/data/customers_hash.json?v=' + Date.now(), { cache: 'no-store' })
     .then(function(r){ return r.ok ? r.json() : null; })
     .then(function(d){
       if (!d || !Array.isArray(d.e) || !d.e.length) return;
@@ -6720,17 +6740,16 @@ function startPendingPolling(){
         (HIDX[k] = HIDX[k] || []).push(r);
       });
       window._CUST_SHARED_N = d.n || d.e.length;
-      var box = document.getElementById('cust-store-box');
-      if (box && !document.getElementById('cust-shared-line')) {
-        var ln = document.createElement('div');
-        ln.id = 'cust-shared-line';
-        ln.style.cssText = 'font-size:10.5px;color:#34d399;margin-top:6px';
-        ln.textContent = '🌐 공유 명단 적용 중: ' + (d.n || d.e.length).toLocaleString() + '곳' + (d.u ? ' · 기준 ' + d.u : '') + ' — 전 사용자 자동 표시';
-        box.appendChild(ln);
-      }
+      window._CUST_SHARED_U = d.u || '';
+      var _t = new Date();
+      window._CUST_SHARED_AT = ('0' + _t.getHours()).slice(-2) + ':' + ('0' + _t.getMinutes()).slice(-2);
+      updateSharedLine();
       try { if (typeof renderNew === 'function') renderNew(); } catch(e){}
       try { if (typeof renderGold === 'function') renderGold(); } catch(e){}
     }).catch(function(){});
+  }
+  window._reloadCustNameHashes = loadNameHashes;
+  loadNameHashes();
   var _prevICS = window.isCustomerStore;
   window.isCustomerStore = function(name, addr){
     if (HIDX) {
@@ -6806,7 +6825,9 @@ function startPendingPolling(){
     var m = ROAD.exec(String(addr||''));
     return m ? (m[1] + m[2]).replace(/\s/g,'').toLowerCase() : null;
   }
-  fetch('/data/customers_hash.json?v=' + Date.now(), { cache: 'no-store' })
+  /* v17.22: 주소 해시도 재로드 가능하게 함수화 */
+  function loadAddrHashes(){
+    return fetch('/data/customers_hash.json?v=' + Date.now(), { cache: 'no-store' })
     .then(function(r){ return r.ok ? r.json() : null; })
     .then(function(d){
       if (!d || !Array.isArray(d.ea) || !d.ea.length || typeof window._custHkey !== 'function') return;
@@ -6817,9 +6838,13 @@ function startPendingPolling(){
         var r = i < 0 ? '' : x.slice(i + 1);
         (AIDX[k] = AIDX[k] || []).push(r);
       });
+      CNT = null; CNT_LEN = -1;
       try { if (typeof renderNew === 'function') renderNew(); } catch(e){}
       try { if (typeof renderGold === 'function') renderGold(); } catch(e){}
     }).catch(function(){});
+  }
+  window._reloadCustAddrHashes = loadAddrHashes;
+  loadAddrHashes();
   var CNT = null, CNT_LEN = -1;
   function hitCounts(){
     var list = (window.ST && ST.permits) ? ST.permits : [];
