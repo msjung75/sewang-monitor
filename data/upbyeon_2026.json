@@ -1,7 +1,7 @@
 {
-  "updated": "2026-08-01T20:49:02+09:00",
+  "updated": "2026-08-02T04:20:36+09:00",
   "baseline_date": "20260101",
-  "current_date": "20260801",
+  "current_date": "20260802",
   "brands": {
     "88포차": {
       "service": "ilban",
@@ -446,10 +446,10 @@
     },
     "노랑통닭": {
       "service": "ilban",
-      "current_count": 1141,
-      "current_count_reported": 1141,
+      "current_count": 1143,
+      "current_count_reported": 1143,
       "new_permits_count": 48,
-      "candidate_count": 702,
+      "candidate_count": 704,
       "verified_count": 80,
       "upbyeon_count": 6,
       "upbyeon_count_real": 6,
@@ -530,7 +530,7 @@
       "current_count": 1500,
       "current_count_reported": 2589,
       "new_permits_count": 20,
-      "candidate_count": 818,
+      "candidate_count": 819,
       "verified_count": 80,
       "upbyeon_count": 2,
       "upbyeon_count_real": 2,
@@ -638,15 +638,15 @@
     },
     "보드람치킨": {
       "service": "ilban",
-      "current_count": 350,
-      "current_count_reported": 350,
+      "current_count": 351,
+      "current_count_reported": 351,
       "new_permits_count": 18,
-      "candidate_count": 196,
+      "candidate_count": 197,
       "verified_count": 80,
-      "upbyeon_count": 3,
-      "upbyeon_count_real": 3,
-      "total_growth": 21,
-      "upbyeon_ratio": 0.143,
+      "upbyeon_count": 4,
+      "upbyeon_count_real": 4,
+      "total_growth": 22,
+      "upbyeon_ratio": 0.182,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -680,6 +680,17 @@
           "dat_updt": "2026-06-25 03:03:03",
           "region_code": "4000000",
           "region_name": "경기 오산시",
+          "trivial": false
+        },
+        {
+          "mng_no": "3900000-101-2018-00196",
+          "old_name": "60계치킨소하일직점",
+          "new_name": "보드람치킨광명소하점",
+          "addr": "경기도 광명시 성채안로 38, 1(일부)층 (소하동)",
+          "lcpmt": "2018-11-02",
+          "dat_updt": "2026-08-01 21:17:50",
+          "region_code": "3900000",
+          "region_name": "경기 고양시",
           "trivial": false
         }
       ]
@@ -769,13 +780,13 @@
       "service": "ilban",
       "current_count": 1500,
       "current_count_reported": 2072,
-      "new_permits_count": 24,
-      "candidate_count": 912,
+      "new_permits_count": 25,
+      "candidate_count": 911,
       "verified_count": 80,
       "upbyeon_count": 11,
       "upbyeon_count_real": 11,
-      "total_growth": 35,
-      "upbyeon_ratio": 0.314,
+      "total_growth": 36,
+      "upbyeon_ratio": 0.306,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -906,7 +917,7 @@
       "current_count": 1500,
       "current_count_reported": 3139,
       "new_permits_count": 14,
-      "candidate_count": 907,
+      "candidate_count": 908,
       "verified_count": 80,
       "upbyeon_count": 2,
       "upbyeon_count_real": 2,
@@ -1149,8 +1160,8 @@
     },
     "홍콩반점": {
       "service": "ilban",
-      "current_count": 648,
-      "current_count_reported": 648,
+      "current_count": 647,
+      "current_count_reported": 647,
       "new_permits_count": 1,
       "candidate_count": 397,
       "verified_count": 80,
