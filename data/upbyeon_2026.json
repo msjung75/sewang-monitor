@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-02T04:20:36+09:00",
+  "updated": "2026-08-02T20:39:28+09:00",
   "baseline_date": "20260101",
   "current_date": "20260802",
   "brands": {
@@ -564,15 +564,15 @@
     },
     "네네치킨": {
       "service": "ilban",
-      "current_count": 1453,
+      "current_count": 1353,
       "current_count_reported": 1453,
       "new_permits_count": 7,
-      "candidate_count": 842,
+      "candidate_count": 788,
       "verified_count": 80,
-      "upbyeon_count": 2,
-      "upbyeon_count_real": 2,
-      "total_growth": 9,
-      "upbyeon_ratio": 0.222,
+      "upbyeon_count": 1,
+      "upbyeon_count_real": 1,
+      "total_growth": 8,
+      "upbyeon_ratio": 0.125,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -585,26 +585,15 @@
           "region_code": "3060000",
           "region_name": "서울 동대문구",
           "trivial": false
-        },
-        {
-          "mng_no": "5430000-101-2019-00051",
-          "old_name": "비에이치씨(BHC)남해남면점",
-          "new_name": "네네치킨 남해남면점",
-          "addr": "경상남도 남해군 남면 남서대로 798 (102호)",
-          "lcpmt": "2019-10-30",
-          "dat_updt": "2026-06-05 03:03:03",
-          "region_code": "5430000",
-          "region_name": "기타 지역",
-          "trivial": false
         }
       ]
     },
     "호식이두마리치킨": {
       "service": "ilban",
-      "current_count": 1268,
+      "current_count": 1168,
       "current_count_reported": 1268,
       "new_permits_count": 13,
-      "candidate_count": 771,
+      "candidate_count": 714,
       "verified_count": 80,
       "upbyeon_count": 2,
       "upbyeon_count_real": 1,
