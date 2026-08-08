@@ -1,5 +1,5 @@
-// PWA Service Worker v17.22d — permits 갱신 조건 시간 비교로 fix (canonical redirect, etag fresh check)
-const CACHE = 'sewang-pwa-v17_22d-freshpermits';
+// PWA Service Worker v17.22e — 업변 재개장·새오너 태그 (오끼 override) (canonical redirect, etag fresh check)
+const CACHE = 'sewang-pwa-v17_22e-upbyeon-tags';
 const SHELL = ['/manifest.json', '/icon.svg'];
 
 self.addEventListener('install', e => {
