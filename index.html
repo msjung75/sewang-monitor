@@ -3124,18 +3124,34 @@ async function loadUpbyeon(){
   }
 }
 
+// v17.22e: override_type별 배지 (재간판 · 재개장 · 새오너)
+function _upbyeonBadge(u){
+  var t = u.override_type;
+  var bt = u.reopen_type;
+  if (t === 'reopened_new_owner') return '<span style="display:inline-block;padding:1px 6px;border-radius:4px;background:#7c3aed;color:#fff;font-size:9.5px;font-weight:700;margin-left:4px" title="'+(u.override_note||'')+'">👤 공실후 새오너</span>';
+  if (t === 'reopened') return '<span style="display:inline-block;padding:1px 6px;border-radius:4px;background:#0891b2;color:#fff;font-size:9.5px;font-weight:700;margin-left:4px" title="'+(u.override_note||'')+'">🔓 재개장</span>';
+  if (t === 'not_upbyeon') return '<span style="display:inline-block;padding:1px 6px;border-radius:4px;background:#64748b;color:#fff;font-size:9.5px;font-weight:700;margin-left:4px" title="'+(u.override_note||'')+'">🚫 업변 아님</span>';
+  if (bt === 'reopened') return '<span style="display:inline-block;padding:1px 6px;border-radius:4px;background:#0891b2;color:#fff;font-size:9.5px;font-weight:700;margin-left:4px">🔓 재개장</span>';
+  return '<span style="display:inline-block;padding:1px 6px;border-radius:4px;background:#f59e0b;color:#000;font-size:9.5px;font-weight:700;margin-left:4px">🔄 순수재간판</span>';
+}
+
 async function openUpbyeonModal(brand){
   try {
     var r = await fetch('/api/upbyeon?view=cases&brand=' + encodeURIComponent(brand));
     if (!r.ok) throw new Error('fetch failed');
     var j = await r.json();
     var items = (j.items || []);
+    var pureCount = j.count_pure_rename || 0;
+    var overridenCount = j.count_overridden || 0;
     var html = '<div style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.85);z-index:9999;overflow-y:auto;padding:20px" onclick="if(event.target===this)this.remove()">';
     html += '<div style="max-width:680px;margin:20px auto;background:#0f1828;border:1px solid var(--border);border-radius:12px;padding:18px">';
     html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">';
     html += '<div style="font-size:15px;font-weight:700">🔄 ' + (typeof esc === 'function' ? esc(brand) : brand) + ' 업변 매장 (' + items.length + '건)</div>';
     html += '<button style="background:transparent;border:none;color:#fff;font-size:20px;cursor:pointer" onclick="this.closest(\'div[style*=fixed]\').remove()">×</button>';
     html += '</div>';
+    if (overridenCount > 0) {
+      html += '<div style="font-size:10.5px;color:var(--txt2);background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.35);padding:8px 12px;border-radius:8px;margin-bottom:12px">🔍 순수 재간판 <b>'+pureCount+'</b>건 · 재개장/새오너 <b>'+overridenCount+'</b>건 (사장님 검증 override 적용됨)</div>';
+    }
     if (!items.length) {
       html += '<div style="color:var(--txt3);text-align:center;padding:30px;font-size:12px">업변 매장 없음</div>';
     } else {
@@ -3145,11 +3161,15 @@ async function openUpbyeonModal(brand){
         var newN = (typeof esc === 'function') ? esc(u.new_name) : u.new_name;
         var region = (typeof esc === 'function') ? esc(u.region_name || u.region_code || '') : (u.region_name || '');
         var addr = (typeof esc === 'function') ? esc(u.addr || '') : (u.addr || '');
+        var badge = _upbyeonBadge(u);
+        var overrideNote = u.override_note ? '<div style="font-size:9px;color:#c4b5fd;margin-top:2px;font-style:italic">「'+u.override_note+'」 — '+(u.override_by||'')+'</div>' : '';
         html += '<tr>'
           + '<td class="rn">' + (i+1) + '</td>'
           + '<td style="font-size:11.5px"><div style="color:#94a3b8">' + oldN + '</div>'
           + '<div style="color:#fbbf24">→ ' + newN + '</div>'
-          + '<div style="font-size:9.5px;color:var(--txt3);margin-top:2px">' + addr.substring(0,60) + '</div></td>'
+          + '<div style="margin-top:4px">' + badge + '</div>'
+          + overrideNote
+          + '<div style="font-size:9.5px;color:var(--txt3);margin-top:4px">' + addr.substring(0,60) + '</div></td>'
           + '<td style="font-size:10px;color:var(--txt2)">' + region + '<br><span style="color:var(--txt3);font-size:9px">' + (u.lcpmt || '') + '</span></td>'
           + '</tr>';
       });
