@@ -106,5 +106,15 @@
     "덤브치킨충북증": "덤브치킨"
   },
   "store_excluded": [],
-  "updated_at": "2026-07-25T10:33:03.124Z"
+  "updated_at": "2026-08-08T04:23:06.874755Z",
+  "upbyeon_overrides": {
+    "3820000-101-2004-00090": {
+      "type": "reopened_new_owner",
+      "note": "6개월 공실 후 새 오너가 인수·재오픈. 순수 상호변경이 아님.",
+      "old_name_actual": "오끼 의정부점 (폐업 상태)",
+      "gap_months": 6,
+      "verified_by": "정민성",
+      "at": "2026-08-08"
+    }
+  }
 }
