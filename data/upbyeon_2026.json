@@ -1,7 +1,7 @@
 {
-  "updated": "2026-08-07T20:20:12+09:00",
+  "updated": "2026-08-08T02:39:19+09:00",
   "baseline_date": "20260101",
-  "current_date": "20260807",
+  "current_date": "20260808",
   "brands": {
     "88포차": {
       "service": "ilban",
@@ -237,14 +237,14 @@
     "BHC": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 2091,
-      "new_permits_count": 40,
-      "candidate_count": 901,
+      "current_count_reported": 2092,
+      "new_permits_count": 41,
+      "candidate_count": 902,
       "verified_count": 80,
       "upbyeon_count": 5,
       "upbyeon_count_real": 4,
-      "total_growth": 44,
-      "upbyeon_ratio": 0.091,
+      "total_growth": 45,
+      "upbyeon_ratio": 0.089,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -307,14 +307,14 @@
     "BBQ": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 1932,
-      "new_permits_count": 47,
+      "current_count_reported": 1933,
+      "new_permits_count": 48,
       "candidate_count": 892,
       "verified_count": 80,
       "upbyeon_count": 3,
       "upbyeon_count_real": 3,
-      "total_growth": 50,
-      "upbyeon_ratio": 0.06,
+      "total_growth": 51,
+      "upbyeon_ratio": 0.059,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -421,13 +421,13 @@
     "처갓집양념치킨": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 1536,
-      "new_permits_count": 37,
+      "current_count_reported": 1537,
+      "new_permits_count": 38,
       "candidate_count": 852,
       "verified_count": 80,
       "upbyeon_count": 1,
       "upbyeon_count_real": 1,
-      "total_growth": 38,
+      "total_growth": 39,
       "upbyeon_ratio": 0.026,
       "is_upbyeon_specialist": false,
       "upbyeon": [
@@ -1024,8 +1024,8 @@
     },
     "청담이상": {
       "service": "ilban",
-      "current_count": 85,
-      "current_count_reported": 85,
+      "current_count": 84,
+      "current_count_reported": 84,
       "new_permits_count": 0,
       "candidate_count": 45,
       "verified_count": 45,
