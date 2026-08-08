@@ -1,5 +1,5 @@
-// PWA Service Worker v17.22c — 닭다리 키워드 + 브랜드 추가 (canonical redirect, etag fresh check)
-const CACHE = 'sewang-pwa-v17_22c-morebrands';
+// PWA Service Worker v17.22d — permits 갱신 조건 시간 비교로 fix (canonical redirect, etag fresh check)
+const CACHE = 'sewang-pwa-v17_22d-freshpermits';
 const SHELL = ['/manifest.json', '/icon.svg'];
 
 self.addEventListener('install', e => {
