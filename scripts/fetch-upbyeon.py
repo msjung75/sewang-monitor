@@ -172,6 +172,14 @@ async def process_brand(sess, brand, svc_key, sem):
         new_name = cand.get("BPLC_NM","")
         if old_name and old_name != new_name:
             code = cand.get("OPN_ATMY_GRP_CD") or cand.get("MNG_NO","").split("-")[0]
+            # v2 (2026-08-08): baseline 시점 영업상태 저장 → 재개장 detection
+            #   - baseline_state == '폐업'/'말소' 이었다면 "공실 후 재개장" 신호
+            #   - baseline_state == '영업'/'정상' 이면 순수 재간판
+            baseline_state = old.get("TRDSTATE_NM","") or old.get("DTL_STATE_NM","")
+            current_state = cand.get("TRDSTATE_NM","") or cand.get("DTL_STATE_NM","")
+            reopen_type = "pure_rename"  # default
+            if baseline_state and any(x in baseline_state for x in ["폐업","말소","취소"]):
+                reopen_type = "reopened"  # 폐업/말소 이었는데 지금 영업 = 재개장
             entry = {
                 "mng_no": cand.get("MNG_NO"),
                 "old_name": old_name,
@@ -182,9 +190,13 @@ async def process_brand(sess, brand, svc_key, sem):
                 "region_code": code,
                 "region_name": region_name(code),
                 "trivial": is_trivial_rename(old_name, new_name),
+                "baseline_state": baseline_state,
+                "current_state": current_state,
+                "reopen_type": reopen_type,
             }
             upbyeon.append(entry)
-            if not entry["trivial"]:
+            # 순수 재간판만 real upbyeon으로 카운트 (재개장·인수신규는 별도)
+            if not entry["trivial"] and reopen_type == "pure_rename":
                 upbyeon_real.append(entry)
 
     total_growth = new_perm + len(upbyeon_real)
