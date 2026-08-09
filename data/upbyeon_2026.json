@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-09T02:45:12+09:00",
+  "updated": "2026-08-09T20:11:40+09:00",
   "baseline_date": "20260101",
   "current_date": "20260809",
   "brands": {
@@ -417,10 +417,10 @@
     },
     "교촌치킨": {
       "service": "ilban",
-      "current_count": 1500,
+      "current_count": 1400,
       "current_count_reported": 2033,
       "new_permits_count": 25,
-      "candidate_count": 850,
+      "candidate_count": 802,
       "verified_count": 80,
       "upbyeon_count": 0,
       "upbyeon_count_real": 0,
