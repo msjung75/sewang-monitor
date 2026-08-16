@@ -1,7 +1,7 @@
 {
-  "updated": "2026-08-15T19:57:30+09:00",
+  "updated": "2026-08-16T02:22:44+09:00",
   "baseline_date": "20260101",
-  "current_date": "20260815",
+  "current_date": "20260816",
   "brands": {
     "88포차": {
       "service": "ilban",
@@ -375,9 +375,9 @@
     "BBQ": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 1933,
+      "current_count_reported": 1932,
       "new_permits_count": 48,
-      "candidate_count": 893,
+      "candidate_count": 892,
       "verified_count": 80,
       "upbyeon_count": 3,
       "upbyeon_count_real": 3,
@@ -431,10 +431,10 @@
     },
     "교촌치킨": {
       "service": "ilban",
-      "current_count": 1500,
+      "current_count": 1400,
       "current_count_reported": 2033,
       "new_permits_count": 25,
-      "candidate_count": 850,
+      "candidate_count": 795,
       "verified_count": 80,
       "upbyeon_count": 0,
       "upbyeon_count_real": 0,
@@ -618,14 +618,14 @@
     "페리카나": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 2592,
-      "new_permits_count": 21,
+      "current_count_reported": 2593,
+      "new_permits_count": 22,
       "candidate_count": 820,
       "verified_count": 80,
       "upbyeon_count": 3,
       "upbyeon_count_real": 3,
-      "total_growth": 24,
-      "upbyeon_ratio": 0.125,
+      "total_growth": 25,
+      "upbyeon_ratio": 0.12,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -674,10 +674,10 @@
     },
     "네네치킨": {
       "service": "ilban",
-      "current_count": 1454,
-      "current_count_reported": 1454,
+      "current_count": 1453,
+      "current_count_reported": 1453,
       "new_permits_count": 7,
-      "candidate_count": 844,
+      "candidate_count": 843,
       "verified_count": 80,
       "upbyeon_count": 3,
       "upbyeon_count_real": 3,
@@ -845,15 +845,15 @@
     },
     "자담치킨": {
       "service": "ilban",
-      "current_count": 1169,
-      "current_count_reported": 1169,
-      "new_permits_count": 43,
+      "current_count": 1170,
+      "current_count_reported": 1170,
+      "new_permits_count": 44,
       "candidate_count": 665,
       "verified_count": 80,
       "upbyeon_count": 6,
       "upbyeon_count_real": 6,
-      "total_growth": 49,
-      "upbyeon_ratio": 0.122,
+      "total_growth": 50,
+      "upbyeon_ratio": 0.12,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -945,14 +945,14 @@
     "멕시카나": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 2078,
-      "new_permits_count": 26,
+      "current_count_reported": 2079,
+      "new_permits_count": 27,
       "candidate_count": 916,
       "verified_count": 80,
       "upbyeon_count": 13,
       "upbyeon_count_real": 13,
-      "total_growth": 39,
-      "upbyeon_ratio": 0.333,
+      "total_growth": 40,
+      "upbyeon_ratio": 0.325,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -1497,8 +1497,8 @@
     },
     "명륜진사갈비": {
       "service": "ilban",
-      "current_count": 605,
-      "current_count_reported": 605,
+      "current_count": 604,
+      "current_count_reported": 604,
       "new_permits_count": 4,
       "candidate_count": 361,
       "verified_count": 80,
