@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-19T02:11:21+09:00",
+  "updated": "2026-08-19T20:04:03+09:00",
   "baseline_date": "20260101",
   "current_date": "20260819",
   "brands": {
@@ -503,10 +503,10 @@
     },
     "처갓집양념치킨": {
       "service": "ilban",
-      "current_count": 1500,
+      "current_count": 1400,
       "current_count_reported": 1537,
       "new_permits_count": 38,
-      "candidate_count": 852,
+      "candidate_count": 794,
       "verified_count": 80,
       "upbyeon_count": 1,
       "upbyeon_count_real": 1,
