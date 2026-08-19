@@ -1,12 +1,12 @@
 {
-  "updated": "2026-08-18T20:16:48+09:00",
+  "updated": "2026-08-19T02:18:54+09:00",
   "baseline": "20260805",
   "days": 14,
   "region": "metro",
   "score_threshold": 2.0,
-  "total_input": 1351,
-  "recommended_count": 863,
-  "excluded_count": 488,
+  "total_input": 1336,
+  "recommended_count": 856,
+  "excluded_count": 480,
   "items": [
     {
       "score": 7.3,
@@ -1492,23 +1492,6 @@
         "ilban+1.0",
         "양식+1.0",
         "+룸"
-      ]
-    },
-    {
-      "score": 4.1,
-      "name": "화덕쪽갈비",
-      "addr": "서울특별시 서대문구 통일로 205-6, 독립문문화공원 내 (영천동)",
-      "type": "일반음식점",
-      "type_key": "ilban",
-      "bzstat": "한식",
-      "permitDate": "20260814",
-      "mng_no": "3120000-101-2026-00281",
-      "tel": "",
-      "reasons": [
-        "수도권",
-        "ilban+1.0",
-        "한식+1.0",
-        "+갈비"
       ]
     },
     {
@@ -3328,6 +3311,22 @@
         "수도권",
         "ilban+1.0",
         "+룸"
+      ]
+    },
+    {
+      "score": 3.2,
+      "name": "츠무",
+      "addr": "서울특별시 마포구 토정로3안길 18, 1층 (합정동)",
+      "type": "일반음식점",
+      "type_key": "ilban",
+      "bzstat": "일식",
+      "permitDate": "20260807",
+      "mng_no": "3130000-101-2026-00593",
+      "tel": "",
+      "reasons": [
+        "수도권",
+        "ilban+1.0",
+        "일식+1.2"
       ]
     }
   ]
