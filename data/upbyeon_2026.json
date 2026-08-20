@@ -1,7 +1,7 @@
 {
-  "updated": "2026-08-19T20:04:03+09:00",
+  "updated": "2026-08-20T02:10:32+09:00",
   "baseline_date": "20260101",
-  "current_date": "20260819",
+  "current_date": "20260820",
   "brands": {
     "88포차": {
       "service": "ilban",
@@ -290,14 +290,14 @@
     "BHC": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 2092,
-      "new_permits_count": 41,
+      "current_count_reported": 2094,
+      "new_permits_count": 42,
       "candidate_count": 903,
       "verified_count": 80,
       "upbyeon_count": 5,
       "upbyeon_count_real": 4,
-      "total_growth": 45,
-      "upbyeon_ratio": 0.089,
+      "total_growth": 46,
+      "upbyeon_ratio": 0.087,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -375,14 +375,14 @@
     "BBQ": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 1932,
-      "new_permits_count": 48,
-      "candidate_count": 892,
+      "current_count_reported": 1936,
+      "new_permits_count": 49,
+      "candidate_count": 893,
       "verified_count": 80,
       "upbyeon_count": 3,
       "upbyeon_count_real": 3,
-      "total_growth": 51,
-      "upbyeon_ratio": 0.059,
+      "total_growth": 52,
+      "upbyeon_ratio": 0.058,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -503,10 +503,10 @@
     },
     "처갓집양념치킨": {
       "service": "ilban",
-      "current_count": 1400,
+      "current_count": 1500,
       "current_count_reported": 1537,
       "new_permits_count": 38,
-      "candidate_count": 794,
+      "candidate_count": 852,
       "verified_count": 80,
       "upbyeon_count": 1,
       "upbyeon_count_real": 1,
@@ -532,15 +532,15 @@
     },
     "노랑통닭": {
       "service": "ilban",
-      "current_count": 1145,
-      "current_count_reported": 1145,
+      "current_count": 1146,
+      "current_count_reported": 1146,
       "new_permits_count": 48,
-      "candidate_count": 709,
+      "candidate_count": 711,
       "verified_count": 80,
-      "upbyeon_count": 5,
-      "upbyeon_count_real": 5,
-      "total_growth": 53,
-      "upbyeon_ratio": 0.094,
+      "upbyeon_count": 6,
+      "upbyeon_count_real": 6,
+      "total_growth": 54,
+      "upbyeon_ratio": 0.111,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -612,6 +612,20 @@
           "baseline_state": "",
           "current_state": "",
           "reopen_type": "pure_rename"
+        },
+        {
+          "mng_no": "3100000-101-2024-00385",
+          "old_name": "순대고집 노원점",
+          "new_name": "노랑통닭 노원역점",
+          "addr": "서울특별시 노원구 노해로 517, 1층 (상계동)",
+          "lcpmt": "2024-09-23",
+          "dat_updt": "2026-08-19 22:17:50",
+          "region_code": "3100000",
+          "region_name": "서울 도봉구",
+          "trivial": false,
+          "baseline_state": "",
+          "current_state": "",
+          "reopen_type": "pure_rename"
         }
       ]
     },
@@ -674,15 +688,15 @@
     },
     "네네치킨": {
       "service": "ilban",
-      "current_count": 1453,
-      "current_count_reported": 1453,
+      "current_count": 1452,
+      "current_count_reported": 1452,
       "new_permits_count": 7,
       "candidate_count": 843,
       "verified_count": 80,
-      "upbyeon_count": 3,
-      "upbyeon_count_real": 3,
-      "total_growth": 10,
-      "upbyeon_ratio": 0.3,
+      "upbyeon_count": 4,
+      "upbyeon_count_real": 4,
+      "total_growth": 11,
+      "upbyeon_ratio": 0.364,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -694,6 +708,20 @@
           "dat_updt": "2026-07-29 22:47:50",
           "region_code": "3060000",
           "region_name": "서울 동대문구",
+          "trivial": false,
+          "baseline_state": "",
+          "current_state": "",
+          "reopen_type": "pure_rename"
+        },
+        {
+          "mng_no": "3980000-101-2022-00131",
+          "old_name": "네네치킨 갈매점",
+          "new_name": "네네치킨 & 봉구스 밥버거 갈매점",
+          "addr": "경기도 구리시 산마루로 19, 진영트윈타워 B동 1층 B110호 (갈매동)",
+          "lcpmt": "2022-09-19",
+          "dat_updt": "2026-08-19 21:17:50",
+          "region_code": "3980000",
+          "region_name": "경기 파주시",
           "trivial": false,
           "baseline_state": "",
           "current_state": "",
@@ -734,7 +762,7 @@
       "current_count": 1271,
       "current_count_reported": 1271,
       "new_permits_count": 15,
-      "candidate_count": 773,
+      "candidate_count": 774,
       "verified_count": 80,
       "upbyeon_count": 2,
       "upbyeon_count_real": 1,
@@ -845,15 +873,15 @@
     },
     "자담치킨": {
       "service": "ilban",
-      "current_count": 1170,
-      "current_count_reported": 1170,
-      "new_permits_count": 44,
-      "candidate_count": 665,
+      "current_count": 1172,
+      "current_count_reported": 1172,
+      "new_permits_count": 46,
+      "candidate_count": 666,
       "verified_count": 80,
       "upbyeon_count": 6,
       "upbyeon_count_real": 6,
-      "total_growth": 50,
-      "upbyeon_ratio": 0.12,
+      "total_growth": 52,
+      "upbyeon_ratio": 0.115,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -1411,15 +1439,15 @@
     },
     "새마을식당": {
       "service": "ilban",
-      "current_count": 266,
-      "current_count_reported": 266,
-      "new_permits_count": 9,
+      "current_count": 267,
+      "current_count_reported": 267,
+      "new_permits_count": 10,
       "candidate_count": 156,
       "verified_count": 80,
       "upbyeon_count": 1,
       "upbyeon_count_real": 1,
-      "total_growth": 10,
-      "upbyeon_ratio": 0.1,
+      "total_growth": 11,
+      "upbyeon_ratio": 0.091,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -1497,8 +1525,8 @@
     },
     "명륜진사갈비": {
       "service": "ilban",
-      "current_count": 604,
-      "current_count_reported": 604,
+      "current_count": 603,
+      "current_count_reported": 603,
       "new_permits_count": 4,
       "candidate_count": 361,
       "verified_count": 80,
