@@ -1,7 +1,7 @@
 {
-  "updated": "2026-08-21T19:59:47+09:00",
+  "updated": "2026-08-22T02:10:01+09:00",
   "baseline_date": "20260101",
-  "current_date": "20260821",
+  "current_date": "20260822",
   "brands": {
     "88포차": {
       "service": "ilban",
@@ -76,8 +76,8 @@
     },
     "한신포차": {
       "service": "ilban",
-      "current_count": 209,
-      "current_count_reported": 209,
+      "current_count": 208,
+      "current_count_reported": 208,
       "new_permits_count": 1,
       "candidate_count": 130,
       "verified_count": 80,
@@ -304,14 +304,14 @@
     "BHC": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 2095,
-      "new_permits_count": 43,
-      "candidate_count": 903,
+      "current_count_reported": 2096,
+      "new_permits_count": 44,
+      "candidate_count": 902,
       "verified_count": 80,
       "upbyeon_count": 5,
       "upbyeon_count_real": 4,
-      "total_growth": 47,
-      "upbyeon_ratio": 0.085,
+      "total_growth": 48,
+      "upbyeon_ratio": 0.083,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -389,14 +389,14 @@
     "BBQ": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 1936,
-      "new_permits_count": 49,
-      "candidate_count": 893,
+      "current_count_reported": 1937,
+      "new_permits_count": 50,
+      "candidate_count": 892,
       "verified_count": 80,
       "upbyeon_count": 3,
       "upbyeon_count_real": 3,
-      "total_growth": 52,
-      "upbyeon_ratio": 0.058,
+      "total_growth": 53,
+      "upbyeon_ratio": 0.057,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -987,14 +987,14 @@
     "멕시카나": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 2079,
-      "new_permits_count": 27,
-      "candidate_count": 916,
+      "current_count_reported": 2080,
+      "new_permits_count": 28,
+      "candidate_count": 915,
       "verified_count": 80,
       "upbyeon_count": 13,
       "upbyeon_count_real": 13,
-      "total_growth": 40,
-      "upbyeon_ratio": 0.325,
+      "total_growth": 41,
+      "upbyeon_ratio": 0.317,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -1186,7 +1186,7 @@
       "current_count": 1500,
       "current_count_reported": 3141,
       "new_permits_count": 15,
-      "candidate_count": 907,
+      "candidate_count": 908,
       "verified_count": 80,
       "upbyeon_count": 2,
       "upbyeon_count_real": 2,
@@ -1283,15 +1283,15 @@
     },
     "청담이상": {
       "service": "ilban",
-      "current_count": 83,
-      "current_count_reported": 83,
-      "new_permits_count": 0,
+      "current_count": 84,
+      "current_count_reported": 84,
+      "new_permits_count": 1,
       "candidate_count": 44,
       "verified_count": 44,
       "upbyeon_count": 0,
       "upbyeon_count_real": 0,
-      "total_growth": 0,
-      "upbyeon_ratio": 0,
+      "total_growth": 1,
+      "upbyeon_ratio": 0.0,
       "is_upbyeon_specialist": false,
       "upbyeon": []
     },
