@@ -21,7 +21,7 @@ const REGION_PREFIX = {
   busan:    ['부산광역시'],
   daegu:    ['대구광역시'],
   incheon:  ['인천광역시'],
-  gwangju:  ['광주광역시'],
+  gwangju:  ['광주광역시', '전남광주통합특별시', '광주특별시'],
   daejeon:  ['대전광역시'],
   ulsan:    ['울산광역시'],
   sejong:   ['세종특별자치시'],
@@ -30,7 +30,7 @@ const REGION_PREFIX = {
   chungbuk: ['충청북도'],
   chungnam: ['충청남도'],
   jeonbuk:  ['전북특별자치도'],
-  jeonnam:  ['전라남도'],
+  jeonnam:  ['전라남도', '전남광주통합특별시', '광주특별시'],
   gyeongbuk:['경상북도'],
   gyeongnam:['경상남도'],
   jeju:     ['제주특별자치도'],
@@ -38,6 +38,7 @@ const REGION_PREFIX = {
   all: [
     '서울특별시','경기도','부산광역시','대구광역시','인천광역시','광주광역시',
     '대전광역시','울산광역시','세종특별자치시','강원특별자치도','충청북도',
+    '전남광주통합특별시','광주특별시',
     '충청남도','전북특별자치도','전라남도','경상북도','경상남도','제주특별자치도',
   ],
 };
@@ -46,7 +47,7 @@ const REGION_PREFIX = {
 const DATE_COLS = {
   permit:   'LCPMT_YMD',
   closed:   'CLSBIZ_YMD',
-  modified: 'LASTMODTS',
+  modified: 'LAST_MDFCN_PNT',
 };
 
 export default async function handler(req, res) {
@@ -136,7 +137,7 @@ async function fetchService(typeKey, addrPrefix, since, until, key, maxPages, da
       returnType: 'json',
     });
     qs.append(`cond[${dateCol}::GTE]`, fmtD(since));
-    if (until) qs.append(`cond[${dateCol}::LT]`, fmtD(until));
+    if (until) qs.append(`cond[${dateCol}::LT]`, fmtD(until) + (dateField === 'modified' ? ' 00:00:00' : ''));
     if (addrPrefix) qs.append('cond[ROAD_NM_ADDR::LIKE]', addrPrefix);
     const url = `https://apis.data.go.kr/1741000/${svc.base}/info?${qs.toString()}`;
 
