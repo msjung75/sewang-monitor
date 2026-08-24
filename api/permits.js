@@ -55,6 +55,8 @@ export default async function handler(req, res) {
 
   const { days = '7', region = 'metro', type = 'all', from = '', to = '', status: statusFilter = 'open', dateField = 'permit' } = req.query;
   const maxPages = Math.min(parseInt(req.query.maxPages || '5', 10), 50);
+  const colOverride = String(req.query.col || '').replace(/[^A-Za-z0-9_]/g, '');  // 진단용 컬럼 오버라이드
+  const debug = req.query.debug === '1';
   const datefmt = req.query.datefmt || (dateField === 'permit' ? 'plain' : 'dash');  // v18: CLSBIZ_YMD/LASTMODTS는 대시 포맷
 
   if (!DATE_COLS[dateField]) {
@@ -78,7 +80,7 @@ export default async function handler(req, res) {
   const prefixes = REGION_PREFIX[region] || REGION_PREFIX.metro;
 
   const jobs = [];
-  for (const t of types) for (const p of prefixes) jobs.push(fetchService(t, p, since, until, key, maxPages, dateField, datefmt));
+  for (const t of types) for (const p of prefixes) jobs.push(fetchService(t, p, since, until, key, maxPages, dateField, datefmt, colOverride, debug));
 
   try {
     const results = await Promise.all(jobs);
@@ -103,18 +105,27 @@ export default async function handler(req, res) {
     const sortKey = dateField === 'modified' ? 'modifiedDate' : (dateField === 'closed' ? 'closedDate' : 'permitDate');
     items.sort((a, b) => (b[sortKey] || '').localeCompare(a[sortKey] || ''));
 
-    res.setHeader('Cache-Control', 's-maxage=1800, stale-while-revalidate=300');
-    return res.status(200).json({ since, until, dateField, count: items.length, capped, items });
+    res.setHeader('Cache-Control', debug ? 'no-store' : 's-maxage=1800, stale-while-revalidate=300');
+    const out = { since, until, dateField, count: items.length, capped, items };
+    if (debug) {
+      const dbg = results.find(r => r.rawKeys) || {};
+      out.usedCol = colOverride || DATE_COLS[dateField];
+      out.rawKeys = dbg.rawKeys || null;
+      out.rawSample = dbg.rawSample || null;
+      out.items = items.slice(0, 3);
+    }
+    return res.status(200).json(out);
   } catch (e) {
     return res.status(500).json({ error: e.message });
   }
 }
 
-async function fetchService(typeKey, addrPrefix, since, until, key, maxPages, dateField, datefmt) {
+async function fetchService(typeKey, addrPrefix, since, until, key, maxPages, dateField, datefmt, colOverride, debug) {
   const svc = SERVICES[typeKey];
   const all = [];
   let capped = false;
-  const dateCol = DATE_COLS[dateField];
+  const dateCol = colOverride || DATE_COLS[dateField];
+  let rawKeys = null, rawSample = null;
   const fmtD = d => (datefmt === 'dash' && /^\d{8}$/.test(d)) ? d.slice(0,4)+'-'+d.slice(4,6)+'-'+d.slice(6,8) : d;
 
   for (let page = 1; page <= maxPages; page++) {
@@ -141,11 +152,12 @@ async function fetchService(typeKey, addrPrefix, since, until, key, maxPages, da
     let arr = (body.items && body.items.item) || body.items || [];
     if (!Array.isArray(arr)) arr = arr ? [arr] : [];
 
+    if (debug && !rawKeys && arr.length) { rawKeys = Object.keys(arr[0]); rawSample = arr[0]; }
     for (const it of arr) {
       const pd = String(it.LCPMT_YMD || '').replace(/[^0-9]/g, '').slice(0, 8);
       const cd = String(it.CLSBIZ_YMD || '').replace(/[^0-9]/g, '').slice(0, 8);
       // v17.16: LASTMODTS는 보통 YYYYMMDDHHMMSS 또는 YYYY-MM-DD 형태
-      const md = String(it.LASTMODTS || it.LCMODY_DT || '').replace(/[^0-9]/g, '').slice(0, 8);
+      const md = String(it.LASTMODTS || it.LAST_MODTS || it.LCMODY_DT || it.LAST_UPDT_DT || it.UPDT_DT || it.DATA_UPDT_DT || '').replace(/[^0-9]/g, '').slice(0, 8);
       all.push({
         id: it.MNG_NO || ((it.BPLC_NM || '') + pd),
         name: it.BPLC_NM || '',
@@ -166,5 +178,5 @@ async function fetchService(typeKey, addrPrefix, since, until, key, maxPages, da
     if (page * 100 >= total || arr.length < 100) break;
     if (page === maxPages && total > maxPages * 100) capped = true;
   }
-  return { items: all, capped };
+  return { items: all, capped, rawKeys, rawSample };
 }
