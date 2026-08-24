@@ -158,7 +158,8 @@ async function fetchService(typeKey, addrPrefix, since, until, key, maxPages, da
       const pd = String(it.LCPMT_YMD || '').replace(/[^0-9]/g, '').slice(0, 8);
       const cd = String(it.CLSBIZ_YMD || '').replace(/[^0-9]/g, '').slice(0, 8);
       // v17.16: LASTMODTS는 보통 YYYYMMDDHHMMSS 또는 YYYY-MM-DD 형태
-      const md = String(it.LASTMODTS || it.LAST_MODTS || it.LCMODY_DT || it.LAST_UPDT_DT || it.UPDT_DT || it.DATA_UPDT_DT || '').replace(/[^0-9]/g, '').slice(0, 8);
+      const md = String(it.LAST_MDFCN_PNT || it.DAT_UPDT_PNT || it.LASTMODTS || '').replace(/[^0-9]/g, '').slice(0, 8);
+      const updSe = it.DAT_UPDT_SE || '';  // I=신규, U=수정(상호변경·승계 등)
       all.push({
         id: it.MNG_NO || ((it.BPLC_NM || '') + pd),
         name: it.BPLC_NM || '',
@@ -167,7 +168,8 @@ async function fetchService(typeKey, addrPrefix, since, until, key, maxPages, da
         upte: it.SNTTN_BZSTAT_NM || '',
         permitDate: pd,
         closedDate: cd,
-        modifiedDate: md, // v17.16: 데이터 갱신일자
+        modifiedDate: md, // 최종수정시점(LAST_MDFCN_PNT)
+        updateSe: updSe, // I=신규 / U=변경(승계·상호변경)
         status: it.DTL_SALS_STTS_NM || it.SALS_STTS_NM || '',
         addr: it.ROAD_NM_ADDR || it.LOTNO_ADDR || '',
         tel: it.TELNO || '',
