@@ -1,34 +1,174 @@
 {
-  "updated": "2026-06-22T04:04:44+09:00",
+  "updated": "2026-08-25T04:05:45+09:00",
   "source": "Sometrend MCP (Vibecompany)",
-  "period": "202601 ~ 20260622",
+  "period": "2026-03 ~ 2026-08-25",
   "brands": {
     "야화 혼술바": {
-      "instagram_peak_month": "202604",
-      "instagram_peak_freq": 284,
-      "monthly": [{"month":"202601", "instagram":36, "blog":488}, {"month":"202602", "instagram":68, "blog":424}, {"month":"202603", "instagram":199, "blog":550}, {"month":"202604", "instagram":284, "blog":757}, {"month":"202605", "instagram":256, "blog":1164}, {"month":"202606", "instagram":243, "blog":879}],
-      "growth_3m_pct": 158,
-      "verdict": "🔥 실제 화제성 폭증 — 인스타 36→243 (+158%) · 릴스 전략 효과"
+      "keywords": ["야화혼술바", "야화"],
+      "instagram": [
+        {"date": "202603", "freq": 201},
+        {"date": "202604", "freq": 302},
+        {"date": "202605", "freq": 284},
+        {"date": "202606", "freq": 514},
+        {"date": "202607", "freq": 457},
+        {"date": "202608", "freq": 456}
+      ],
+      "blog": [
+        {"date": "202603", "freq": 550},
+        {"date": "202604", "freq": 757},
+        {"date": "202605", "freq": 1164},
+        {"date": "202606", "freq": 1342},
+        {"date": "202607", "freq": 1553},
+        {"date": "202608", "freq": 1437}
+      ],
+      "topAssoc": [
+        {"label": "혼술바", "freq": 332},
+        {"label": "#야화혼술바", "freq": 217},
+        {"label": "#야화", "freq": 173},
+        {"label": "술집", "freq": 168},
+        {"label": "야화혼술바", "freq": 131},
+        {"label": "#혼술바", "freq": 131},
+        {"label": "칵테일", "freq": 128},
+        {"label": "야화", "freq": 85},
+        {"label": "분위기", "freq": 82},
+        {"label": "혼술", "freq": 53}
+      ],
+      "growth_3m_pct": 81,
+      "verdict": "🔥 실제 화제성 폭증 — 인스타 월평균 262→476 (+81%) · 릴스 전략 효과"
     },
     "가마치통닭": {
-      "growth_3m_pct": -16,
-      "verdict": "🟡 안정이 frequency — 감소세 -16%"
+      "keywords": ["가마치통닭"],
+      "instagram": [
+        {"date": "202603", "freq": 103},
+        {"date": "202604", "freq": 71},
+        {"date": "202605", "freq": 75},
+        {"date": "202606", "freq": 72},
+        {"date": "202607", "freq": 92},
+        {"date": "202608", "freq": 58}
+      ],
+      "blog": [
+        {"date": "202603", "freq": 549},
+        {"date": "202604", "freq": 500},
+        {"date": "202605", "freq": 575},
+        {"date": "202606", "freq": 545},
+        {"date": "202607", "freq": 677},
+        {"date": "202608", "freq": 426}
+      ],
+      "topAssoc": [
+        {"label": "통닭", "freq": 145},
+        {"label": "치킨", "freq": 50},
+        {"label": "#가마치통닭", "freq": 28},
+        {"label": "맛집", "freq": 19},
+        {"label": "먹다", "freq": 12},
+        {"label": "누룽지통닭", "freq": 9},
+        {"label": "즐기다", "freq": 9},
+        {"label": "누룽지", "freq": 9},
+        {"label": "양념", "freq": 8}
+      ],
+      "growth_3m_pct": -11,
+      "verdict": "🟡 안정 frequency — 감소세 (인스타 월 58~92건 유지, 최근 3개월 -11%)"
     },
     "토핑몬스터피자": {
-      "growth_3m_pct": 163,
-      "verdict": "💤 미미함 — 인스타 월 한자릿수 (노이즈), 성장률은 절대량 참고용"
+      "keywords": ["토핑몬스터피자"],
+      "instagram": [
+        {"date": "202603", "freq": 1},
+        {"date": "202604", "freq": 5},
+        {"date": "202605", "freq": 8},
+        {"date": "202606", "freq": 12},
+        {"date": "202607", "freq": 4},
+        {"date": "202608", "freq": 6}
+      ],
+      "blog": [
+        {"date": "202603", "freq": 27},
+        {"date": "202604", "freq": 28},
+        {"date": "202605", "freq": 39},
+        {"date": "202606", "freq": 49},
+        {"date": "202607", "freq": 37},
+        {"date": "202608", "freq": 39}
+      ],
+      "topAssoc": [
+        {"label": "몬스터", "freq": 4},
+        {"label": "#토핑몬스터피자", "freq": 4},
+        {"label": "피자", "freq": 4},
+        {"label": "피다", "freq": 2},
+        {"label": "반반 주문하면", "freq": 1},
+        {"label": "근래 보다", "freq": 1},
+        {"label": "더블치즈맛 괜찮다", "freq": 1},
+        {"label": "아쉬움 감추지못하다", "freq": 1}
+      ],
+      "growth_3m_pct": 57,
+      "verdict": "🟢 안정 성장 — 최근 3개월 +57%지만 절대량은 인스타 월 10건 미만으로 아직 초기 단계"
     },
     "처갓집양념치킨": {
-      "growth_3m_pct": -10,
-      "verdict": "🔥 높은 화제성 유지 — 인스타 월평균 342건 고볼릨"
+      "keywords": ["처갓집양념치킨", "처갓집"],
+      "instagram": [
+        {"date": "202603", "freq": 371},
+        {"date": "202604", "freq": 392},
+        {"date": "202605", "freq": 440},
+        {"date": "202606", "freq": 443},
+        {"date": "202607", "freq": 484},
+        {"date": "202608", "freq": 338}
+      ],
+      "blog": [
+        {"date": "202603", "freq": 2282},
+        {"date": "202604", "freq": 1792},
+        {"date": "202605", "freq": 1902},
+        {"date": "202606", "freq": 2223},
+        {"date": "202607", "freq": 2292},
+        {"date": "202608", "freq": 1702}
+      ],
+      "topAssoc": [
+        {"label": "치킨", "freq": 320},
+        {"label": "양념치킨", "freq": 284},
+        {"label": "#처갓집양념치킨", "freq": 128},
+        {"label": "슈프림", "freq": 110},
+        {"label": "양념", "freq": 75},
+        {"label": "#처갓집", "freq": 70},
+        {"label": "미트칠리", "freq": 64},
+        {"label": "후라이드", "freq": 64},
+        {"label": "메뉴", "freq": 61},
+        {"label": "미트칠리양념치킨", "freq": 58}
+      ],
+      "growth_3m_pct": 5,
+      "verdict": "🔥 높은 화제성 유지 — 인스타 월평균 422건 (+5%) · 전국구 brand 고정 buzz (미트칠리 신메뉴 언급 활발)"
     },
     "케이찹사라다": {
-      "growth_3m_pct": 0,
-      "verdict": "❌ SNS 흔적 0건 — 화제성 평가 불가"
+      "keywords": ["케이찹사라다"],
+      "instagram": [
+        {"date": "202603", "freq": 172},
+        {"date": "202604", "freq": 352},
+        {"date": "202605", "freq": 310},
+        {"date": "202606", "freq": 264},
+        {"date": "202607", "freq": 177},
+        {"date": "202608", "freq": 108}
+      ],
+      "blog": [
+        {"date": "202603", "freq": 346},
+        {"date": "202604", "freq": 726},
+        {"date": "202605", "freq": 659},
+        {"date": "202606", "freq": 521},
+        {"date": "202607", "freq": 368},
+        {"date": "202608", "freq": 208}
+      ],
+      "topAssoc": [
+        {"label": "사라다", "freq": 345},
+        {"label": "#케이찹사라다", "freq": 198},
+        {"label": "빵", "freq": 182},
+        {"label": "맛집", "freq": 158},
+        {"label": "이벤트", "freq": 90},
+        {"label": "간식", "freq": 85},
+        {"label": "오픈", "freq": 68},
+        {"label": "텀블러", "freq": 68},
+        {"label": "재료", "freq": 43},
+        {"label": "오픈이벤트", "freq": 42}
+      ],
+      "growth_3m_pct": -34,
+      "verdict": "🟡 안정 frequency — 감소세 (4~5월 오픈 buzz 피크 후 하락, 인스타 264→108건, -34%)"
     }
   },
   "_methodology": {
-    "data_source": "Sometrend (Vibecompany)",
-    "growth_3m_pct_formula": "최근 3개월 평균 / 직전 3개월 평균 - 1 <<⇑> 100, instagram 기준"
+    "data_source": "Sometrend (Vibecompany) — 다음소프트 SNS analytics",
+    "growth_3m_pct_formula": "(최근 3개월 평균 / 직전 3개월 평균 - 1) * 100, instagram 기준",
+    "notes": "2026-08은 8/25까지 부분 집계. 연관어에서 작성자 코드(#@AU#) 항목은 노이즈로 제외. 처갓집양념치킨은 growth +5%지만 인스타 월 200건 이상 규칙에 따라 🔥 �q급(문구는 '폭증' 대신 '높은 화제성 유지'로 조정)."
   }
 }
