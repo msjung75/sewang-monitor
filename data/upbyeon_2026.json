@@ -1,7 +1,7 @@
 {
-  "updated": "2026-08-25T20:08:41+09:00",
+  "updated": "2026-08-26T02:19:54+09:00",
   "baseline_date": "20260101",
-  "current_date": "20260825",
+  "current_date": "20260826",
   "brands": {
     "88포차": {
       "service": "ilban",
@@ -446,13 +446,13 @@
     "교촌치킨": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 2032,
-      "new_permits_count": 25,
+      "current_count_reported": 2033,
+      "new_permits_count": 26,
       "candidate_count": 851,
       "verified_count": 80,
       "upbyeon_count": 0,
       "upbyeon_count_real": 0,
-      "total_growth": 25,
+      "total_growth": 26,
       "upbyeon_ratio": 0.0,
       "is_upbyeon_specialist": false,
       "upbyeon": []
@@ -518,14 +518,14 @@
     "처갓집양념치킨": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 1537,
-      "new_permits_count": 38,
-      "candidate_count": 855,
+      "current_count_reported": 1539,
+      "new_permits_count": 40,
+      "candidate_count": 854,
       "verified_count": 80,
       "upbyeon_count": 1,
       "upbyeon_count_real": 1,
-      "total_growth": 39,
-      "upbyeon_ratio": 0.026,
+      "total_growth": 41,
+      "upbyeon_ratio": 0.024,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -646,14 +646,14 @@
     "페리카나": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 2592,
-      "new_permits_count": 22,
+      "current_count_reported": 2593,
+      "new_permits_count": 23,
       "candidate_count": 820,
       "verified_count": 80,
       "upbyeon_count": 3,
       "upbyeon_count_real": 3,
-      "total_growth": 25,
-      "upbyeon_ratio": 0.12,
+      "total_growth": 26,
+      "upbyeon_ratio": 0.115,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -887,15 +887,15 @@
     },
     "자담치킨": {
       "service": "ilban",
-      "current_count": 1172,
-      "current_count_reported": 1172,
-      "new_permits_count": 46,
-      "candidate_count": 666,
+      "current_count": 1174,
+      "current_count_reported": 1174,
+      "new_permits_count": 47,
+      "candidate_count": 668,
       "verified_count": 80,
       "upbyeon_count": 6,
       "upbyeon_count_real": 6,
-      "total_growth": 52,
-      "upbyeon_ratio": 0.115,
+      "total_growth": 53,
+      "upbyeon_ratio": 0.113,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
