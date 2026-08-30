@@ -1,52 +1,6 @@
 {
-  "updated": "2026-08-28T14:51:24.822Z",
+  "updated": "2026-08-30T21:04:05.958Z",
   "days": {
-    "2026-07-29": {
-      "users": {
-        "4942623776": {
-          "role": "admin",
-          "visits": 3,
-          "last_event": "visit",
-          "last_ts": 1785303235811,
-          "tabs": {
-            "home": 3
-          }
-        },
-        "unknown": {
-          "role": "unknown",
-          "visits": 4,
-          "last_event": "visit",
-          "last_ts": 1785294520512,
-          "tabs": {
-            "home": 4
-          }
-        },
-        "4990178737": {
-          "role": "staff",
-          "visits": 1,
-          "last_event": "visit",
-          "last_ts": 1785315576379,
-          "tabs": {
-            "home": 1
-          }
-        }
-      },
-      "total": 8
-    },
-    "2026-07-30": {
-      "users": {
-        "4942623776": {
-          "role": "admin",
-          "visits": 3,
-          "last_event": "visit",
-          "last_ts": 1785409047767,
-          "tabs": {
-            "home": 3
-          }
-        }
-      },
-      "total": 3
-    },
     "2026-07-31": {
       "users": {
         "unknown": {
@@ -361,6 +315,20 @@
         }
       },
       "total": 2
+    },
+    "2026-08-31": {
+      "users": {
+        "4942623776": {
+          "role": "admin",
+          "visits": 1,
+          "last_event": "visit",
+          "last_ts": 1788123845958,
+          "tabs": {
+            "home": 1
+          }
+        }
+      },
+      "total": 1
     }
   }
 }
