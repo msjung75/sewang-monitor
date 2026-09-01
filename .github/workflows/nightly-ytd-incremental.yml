@@ -6,6 +6,9 @@ name: Nightly YTD Incremental
 #   [버그2] 커밋 대상이 일별 파일(YYYYMMDD.json)인데 fetch 스크립트는 월별 파일(YYYYMM.json)에 저장 → 커밋 누락
 #   [수정] 최근 4일 롤링 윈도우 조회 (행안부 2일 지연 + 주말 공백 자동 보정, id 기준 병합이라 중복 안전)
 #          커밋 대상을 변경된 월별 파일 + summary로 변경, 멱등 체크 제거 (병합 자체가 멱등)
+# v17.24 (2026-09-02): Contents API PUT 재시도 강화 — attempts 3→6 + exponential backoff(3·6·12·24·48·96s),
+#          5xx/403/429에서도 SHA 재조회 (부분 성공 후 HEAD 이동 방어). 원인: 2026-09-01 14:02 UTC run에서
+#          summary PUT 502→403→502 연속 발생 → 3회 소진 후 실패. 후속 run이 자동 복구했으나 알림 소음 감소 목적.
 on:
   schedule:
     - cron: '15 19 * * *'   # 04:15 KST (메인)
@@ -63,6 +66,7 @@ jobs:
           if not files:
               print('No changes to commit')
               raise SystemExit(0)
+          MAX_ATTEMPTS = 6
           for path in files:
               api = f'https://api.github.com/repos/{repo}/contents/{path}'
               with open(path, 'rb') as f:
@@ -76,7 +80,7 @@ jobs:
                   except Exception:
                       return ''
               sha = get_sha()
-              for attempt in range(3):
+              for attempt in range(MAX_ATTEMPTS):
                   body = {'message': msg, 'content': content_b64}
                   if sha: body['sha'] = sha
                   data = json.dumps(body).encode()
@@ -87,11 +91,17 @@ jobs:
                           break
                   except urllib.error.HTTPError as e:
                       print(f'  {path} attempt {attempt+1}: {e.code}')
+                      # exponential backoff: 3·6·12·24·48·96s (attempt=0..5)
+                      backoff = 3 * (2 ** attempt)
                       if e.code == 409:
-                          time.sleep(3)
+                          time.sleep(backoff)
+                          sha = get_sha()
+                      elif e.code in (403, 429, 500, 502, 503, 504):
+                          # 5xx·rate-limit: 이전 시도가 실제로 성공했을 수 있으므로 SHA 재조회
+                          time.sleep(backoff)
                           sha = get_sha()
                       else:
-                          time.sleep(3)
+                          time.sleep(backoff)
               else:
                   raise SystemExit(1)
           PYEOF
