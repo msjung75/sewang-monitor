@@ -747,7 +747,10 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 
   <div class="chips" id="chip-fr-kind">
     <div class="chip on" data-v="">전체</div>
-    <div class="chip" data-v="sool">🍺 주점·술집</div>
+    <div class="chip" data-v="sool">🍺 주점 전체</div>
+    <div class="chip" data-v="sool_chicken">🍗 치킨</div>
+    <div class="chip" data-v="sool_izakaya">🏮 이자카야</div>
+    <div class="chip" data-v="sool_bar">🍻 일반주점</div>
     <div class="chip" data-v="food">🍽️ 음식점</div>
     <div class="chip" data-v="cafe">☕ 카페·빵</div>
   </div>
@@ -2051,6 +2054,23 @@ function isSoolYtdBrand(g){
   window._ytdSoolCache[g.brand] = isSool;
   return isSool;
 }
+// v18.7: 주점 세분화 — 치킨 / 이자카야 / 일반주점 (상호명 기준. upte '호프/통닭'은 치킨 판정에 쓰지 않음 — 일반 호프집 오분류 방지)
+var FR_IZA_RE = /이자카야|이자까야|이지카야|사케|니혼슈|야키토리|야끼토리|오뎅바|일본식주점|일본주점|일식주점|로바다야끼|쿠시카츠/i;
+var FR_CHK_RE = /치킨|chicken|통닭|닭강정|비비큐|bbq|bhc|네네|굽네|페리카나|또래오래|호식이|땅땅|가마치|푸라닭|처갓집|멕시카나|교촌|60계|자담|지코바|깐부|훌랄라|보드람|부어치킨|꾸브라꼬|맘스치킨/i;
+window._frSoolSubCache = {};
+function frSoolSub(g){
+  var key = (g.brand || '') + ':' + (g.total_open || 0) + ':' + (g.total_closed || 0);
+  if (window._frSoolSubCache[key] !== undefined) return window._frSoolSubCache[key];
+  var names = [g.brand || ''];
+  for (var m in g.monthly) {
+    var stores = g.monthly[m].stores || [];
+    for (var i = 0; i < stores.length; i++) names.push(stores[i].name || '');
+  }
+  var t = names.join(' ').toLowerCase();
+  var sub = FR_IZA_RE.test(t) ? 'izakaya' : (FR_CHK_RE.test(t) ? 'chicken' : 'bar');
+  window._frSoolSubCache[key] = sub;
+  return sub;
+}
 // 카페·빵 override
 function isCafeYtdBrand(g){
   var ov = window.BRAND_OVERRIDES && window.BRAND_OVERRIDES.category_overrides;
@@ -2108,6 +2128,9 @@ function frFiltered(){
     }
   }
   if (kind === 'sool') arr = arr.filter(isSoolYtdBrand);
+  else if (kind === 'sool_chicken') arr = arr.filter(function(g){ return frSoolSub(g) === 'chicken'; });
+  else if (kind === 'sool_izakaya') arr = arr.filter(function(g){ return frSoolSub(g) === 'izakaya'; });
+  else if (kind === 'sool_bar') arr = arr.filter(function(g){ return isSoolYtdBrand(g) && frSoolSub(g) === 'bar'; });
   else if (kind === 'food') arr = arr.filter(function(g){ return !isSoolYtdBrand(g); });
   // 사장님 안: 신규 출점 1순위 정렬 (동률이면 폐점 적은 순 — 깨끗한 성장 위로)
   arr.sort(function(a,b){
