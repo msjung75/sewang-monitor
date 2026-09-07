@@ -1,7 +1,7 @@
 {
-  "updated": "2026-09-06T21:53:19+09:00",
+  "updated": "2026-09-07T05:13:54+09:00",
   "baseline_date": "20260101",
-  "current_date": "20260906",
+  "current_date": "20260907",
   "brands": {
     "88포차": {
       "service": "ilban",
@@ -459,10 +459,10 @@
     },
     "교촌치킨": {
       "service": "ilban",
-      "current_count": 1500,
+      "current_count": 1400,
       "current_count_reported": 2033,
       "new_permits_count": 26,
-      "candidate_count": 855,
+      "candidate_count": 794,
       "verified_count": 80,
       "upbyeon_count": 0,
       "upbyeon_count_real": 0,
