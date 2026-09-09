@@ -1,7 +1,7 @@
 {
-  "updated": "2026-09-08T22:19:05+09:00",
+  "updated": "2026-09-09T05:10:52+09:00",
   "baseline_date": "20260101",
-  "current_date": "20260908",
+  "current_date": "20260909",
   "brands": {
     "88포차": {
       "service": "ilban",
@@ -659,10 +659,10 @@
     },
     "페리카나": {
       "service": "ilban",
-      "current_count": 900,
+      "current_count": 1500,
       "current_count_reported": 2593,
       "new_permits_count": 23,
-      "candidate_count": 502,
+      "candidate_count": 822,
       "verified_count": 80,
       "upbyeon_count": 3,
       "upbyeon_count_real": 3,
