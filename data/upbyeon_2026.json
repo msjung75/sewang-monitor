@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-10T05:14:59+09:00",
+  "updated": "2026-09-10T21:58:14+09:00",
   "baseline_date": "20260101",
   "current_date": "20260910",
   "brands": {
@@ -1253,10 +1253,10 @@
     },
     "투다리": {
       "service": "ilban",
-      "current_count": 1400,
+      "current_count": 1500,
       "current_count_reported": 3140,
       "new_permits_count": 16,
-      "candidate_count": 842,
+      "candidate_count": 907,
       "verified_count": 80,
       "upbyeon_count": 2,
       "upbyeon_count_real": 2,
@@ -1637,10 +1637,10 @@
     },
     "명륜진사갈비": {
       "service": "ilban",
-      "current_count": 596,
-      "current_count_reported": 596,
+      "current_count": 595,
+      "current_count_reported": 595,
       "new_permits_count": 4,
-      "candidate_count": 358,
+      "candidate_count": 357,
       "verified_count": 80,
       "upbyeon_count": 2,
       "upbyeon_count_real": 1,
