@@ -1,7 +1,7 @@
 {
-  "updated": "2026-09-09T22:05:33+09:00",
+  "updated": "2026-09-10T05:14:59+09:00",
   "baseline_date": "20260101",
-  "current_date": "20260909",
+  "current_date": "20260910",
   "brands": {
     "88포차": {
       "service": "ilban",
@@ -403,9 +403,9 @@
     "BBQ": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 1943,
+      "current_count_reported": 1944,
       "new_permits_count": 56,
-      "candidate_count": 890,
+      "candidate_count": 891,
       "verified_count": 80,
       "upbyeon_count": 3,
       "upbyeon_count_real": 3,
@@ -1253,10 +1253,10 @@
     },
     "투다리": {
       "service": "ilban",
-      "current_count": 1500,
+      "current_count": 1400,
       "current_count_reported": 3140,
       "new_permits_count": 16,
-      "candidate_count": 907,
+      "candidate_count": 842,
       "verified_count": 80,
       "upbyeon_count": 2,
       "upbyeon_count_real": 2,
