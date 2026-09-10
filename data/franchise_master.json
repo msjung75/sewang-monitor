@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-09T22:52:39+09:00",
+  "updated": "2026-09-10T22:54:15+09:00",
   "source": "sewang-monitor API nationwide 14d auto-detect",
   "total": 11609,
   "compact_lookup": [
@@ -11622,7 +11622,8 @@
     },
     {
       "name": "해남짬뽕",
-      "stores": 0
+      "stores": 1,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "바로심김밥",
@@ -11808,8 +11809,8 @@
     },
     {
       "name": "커스텀커피",
-      "stores": 118,
-      "last_updated": "2026-09-09"
+      "stores": 119,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "커슐랭",
@@ -11853,7 +11854,8 @@
     },
     {
       "name": "청담족발",
-      "stores": 14
+      "stores": 15,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "청담물갈비",
@@ -11893,8 +11895,8 @@
     },
     {
       "name": "분분",
-      "stores": 5,
-      "last_updated": "2026-09-09"
+      "stores": 6,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "료혼",
@@ -11902,7 +11904,8 @@
     },
     {
       "name": "돈카춘",
-      "stores": 27
+      "stores": 28,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "돈카와치",
@@ -11922,8 +11925,8 @@
     },
     {
       "name": "긴자료코",
-      "stores": 92,
-      "last_updated": "2026-09-09"
+      "stores": 93,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "구름카츠",
@@ -11955,8 +11958,8 @@
     },
     {
       "name": "삼형제김밥",
-      "stores": 43,
-      "last_updated": "2026-09-09"
+      "stores": 44,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "삼춘김밥",
@@ -12056,8 +12059,8 @@
     },
     {
       "name": "새벽회",
-      "stores": 18,
-      "last_updated": "2026-09-09"
+      "stores": 19,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "삼도숙성회",
@@ -12086,8 +12089,8 @@
     },
     {
       "name": "미스타교자",
-      "stores": 21,
-      "last_updated": "2026-09-09"
+      "stores": 22,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "쌀국수집을하려던소바집",
@@ -12311,8 +12314,8 @@
     },
     {
       "name": "버거리(BURGERRY)",
-      "stores": 50,
-      "last_updated": "2026-09-09"
+      "stores": 51,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "목동버거",
@@ -12332,8 +12335,8 @@
     },
     {
       "name": "맘스터치",
-      "stores": 1412,
-      "last_updated": "2026-09-03"
+      "stores": 1413,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "코만도",
@@ -12353,8 +12356,8 @@
     },
     {
       "name": "치킨주막",
-      "stores": 26,
-      "last_updated": "2026-09-09"
+      "stores": 27,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "치킨에꼬치다",
@@ -12479,8 +12482,8 @@
     },
     {
       "name": "호식이두마리치킨",
-      "stores": 738,
-      "last_updated": "2026-09-09"
+      "stores": 740,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "호랭관치킨",
@@ -12521,8 +12524,8 @@
     },
     {
       "name": "인생아구찜",
-      "stores": 121,
-      "last_updated": "2026-09-09"
+      "stores": 123,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "인생숯불구이",
@@ -12803,8 +12806,8 @@
     },
     {
       "name": "1번지통닭",
-      "stores": 7,
-      "last_updated": "2026-09-09"
+      "stores": 8,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "호텔토랑",
@@ -12862,8 +12865,8 @@
     },
     {
       "name": "한찜두찜 돼지김치찜",
-      "stores": 7,
-      "last_updated": "2026-09-09"
+      "stores": 8,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "한제소곱창전골",
@@ -12899,8 +12902,8 @@
     },
     {
       "name": "BBQ",
-      "stores": 2245,
-      "last_updated": "2026-09-07"
+      "stores": 2247,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "87닭강정",
@@ -13058,8 +13061,8 @@
     },
     {
       "name": "고려통닭",
-      "stores": 15,
-      "last_updated": "2026-09-09"
+      "stores": 17,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "고동경양",
@@ -13119,8 +13122,8 @@
     },
     {
       "name": "불당마라깡패",
-      "stores": 9,
-      "last_updated": "2026-09-09"
+      "stores": 10,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "백미원",
@@ -13212,8 +13215,8 @@
     },
     {
       "name": "호호솥밥",
-      "stores": 10,
-      "last_updated": "2026-09-09"
+      "stores": 11,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "호박꽃",
@@ -13573,8 +13576,8 @@
     },
     {
       "name": "이디야커피",
-      "stores": 2814,
-      "last_updated": "2026-09-09"
+      "stores": 2815,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "술렘주의",
@@ -13602,8 +13605,8 @@
     },
     {
       "name": "생마차",
-      "stores": 28,
-      "last_updated": "2026-09-09"
+      "stores": 29,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "비턴",
@@ -13800,8 +13803,8 @@
     },
     {
       "name": "사실빙",
-      "stores": 1,
-      "last_updated": "2026-09-09"
+      "stores": 2,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "빙찌&샐프레시",
@@ -13817,8 +13820,8 @@
     },
     {
       "name": "카페인중독",
-      "stores": 182,
-      "last_updated": "2026-09-09"
+      "stores": 184,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "카페온나",
@@ -14012,8 +14015,8 @@
     },
     {
       "name": "인쌩맥주",
-      "stores": 220,
-      "last_updated": "2026-09-09"
+      "stores": 221,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "우기식당 바다점",
@@ -14057,8 +14060,8 @@
     },
     {
       "name": "커피볶는시골커피",
-      "stores": 26,
-      "last_updated": "2026-09-09"
+      "stores": 29,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "커피라빈트",
@@ -14352,8 +14355,8 @@
     },
     {
       "name": "투썸플레이스",
-      "stores": 1515,
-      "last_updated": "2026-09-09"
+      "stores": 1518,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "더치앤빈",
@@ -14712,8 +14715,8 @@
     },
     {
       "name": "모리커피",
-      "stores": 80,
-      "last_updated": "2026-09-09"
+      "stores": 81,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "명륜커피",
@@ -14725,8 +14728,8 @@
     },
     {
       "name": "메가엠지씨커피(MEGA MGC COFFEE)",
-      "stores": 2807,
-      "last_updated": "2026-09-09"
+      "stores": 2821,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "맛있는커피",
@@ -14830,8 +14833,8 @@
     },
     {
       "name": "공차",
-      "stores": 845,
-      "last_updated": "2026-09-09"
+      "stores": 847,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "고망고",
@@ -14851,8 +14854,8 @@
     },
     {
       "name": "봉명동내커피",
-      "stores": 140,
-      "last_updated": "2026-09-09"
+      "stores": 141,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "복고다방",
@@ -14872,8 +14875,8 @@
     },
     {
       "name": "바나프레소",
-      "stores": 48,
-      "last_updated": "2026-09-09"
+      "stores": 49,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "피피노피자",
@@ -14993,7 +14996,8 @@
     },
     {
       "name": "사과당",
-      "stores": 7
+      "stores": 8,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "빈스트커피",
@@ -15677,8 +15681,8 @@
     },
     {
       "name": "남도분식",
-      "stores": 18,
-      "last_updated": "2026-09-09"
+      "stores": 19,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "꿈떡꿈떡",
@@ -15766,8 +15770,8 @@
     },
     {
       "name": "코지하우스",
-      "stores": 47,
-      "last_updated": "2026-09-09"
+      "stores": 49,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "카츠헤세드",
@@ -15855,8 +15859,8 @@
     },
     {
       "name": "빙동댕",
-      "stores": 5,
-      "last_updated": "2026-09-09"
+      "stores": 6,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "밀탑(MEALTOP)",
@@ -15880,8 +15884,8 @@
     },
     {
       "name": "홍루이젠",
-      "stores": 154,
-      "last_updated": "2026-09-09"
+      "stores": 155,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "홉슈크림",
@@ -16253,8 +16257,8 @@
     },
     {
       "name": "이마트24(emart24)",
-      "stores": 6480,
-      "last_updated": "2026-09-09"
+      "stores": 6490,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "이마트24 스마트(emart24 SMART)",
@@ -16266,8 +16270,8 @@
     },
     {
       "name": "씨유(CU)",
-      "stores": 17866,
-      "last_updated": "2026-09-09"
+      "stores": 17887,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "미니스톱",
@@ -16288,8 +16292,8 @@
     },
     {
       "name": "가득피자",
-      "stores": 26,
-      "last_updated": "2026-09-09"
+      "stores": 27,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "PJ피자",
@@ -16847,8 +16851,8 @@
     },
     {
       "name": "스윗앤샷",
-      "stores": 9,
-      "last_updated": "2026-09-09"
+      "stores": 10,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "스몰굿",
@@ -17392,8 +17396,8 @@
     },
     {
       "name": "큰맘할매순대국",
-      "stores": 408,
-      "last_updated": "2026-09-09"
+      "stores": 409,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "콩밭뜰",
@@ -17910,8 +17914,8 @@
     },
     {
       "name": "진교동찜닭",
-      "stores": 29,
-      "last_updated": "2026-09-09"
+      "stores": 30,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "진 메밀냉면",
@@ -17951,8 +17955,8 @@
     },
     {
       "name": "담가 화로구이",
-      "stores": 17,
-      "last_updated": "2026-09-09"
+      "stores": 19,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "닭발굽는청년",
@@ -17964,8 +17968,8 @@
     },
     {
       "name": "달빛에 구운 고등어",
-      "stores": 27,
-      "last_updated": "2026-09-09"
+      "stores": 29,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "달마설렁탕숯불갈비",
@@ -18026,8 +18030,8 @@
     },
     {
       "name": "짜글이미식회",
-      "stores": 25,
-      "last_updated": "2026-09-09"
+      "stores": 27,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "집밥뚝딱",
@@ -18287,8 +18291,8 @@
     },
     {
       "name": "한식한술",
-      "stores": 2,
-      "last_updated": "2026-09-09"
+      "stores": 3,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "한식의품격",
@@ -18448,8 +18452,8 @@
     },
     {
       "name": "열정국밥",
-      "stores": 245,
-      "last_updated": "2026-09-09"
+      "stores": 247,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "열광회관",
@@ -18669,8 +18673,8 @@
     },
     {
       "name": "두번먹는명인김치찜",
-      "stores": 27,
-      "last_updated": "2026-09-09"
+      "stores": 28,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "두물머리양평해장국",
@@ -19221,8 +19225,8 @@
     },
     {
       "name": "국밥생각",
-      "stores": 30,
-      "last_updated": "2026-09-09"
+      "stores": 31,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "국민순대국",
@@ -19623,8 +19627,8 @@
     },
     {
       "name": "멕시카나",
-      "stores": 875,
-      "last_updated": "2026-09-09"
+      "stores": 876,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "매드후라이치킨",
@@ -19834,8 +19838,8 @@
     },
     {
       "name": "슬로우캘리",
-      "stores": 122,
-      "last_updated": "2026-09-09"
+      "stores": 123,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "차이쿡",
@@ -20112,8 +20116,8 @@
     },
     {
       "name": "피자와일드",
-      "stores": 15,
-      "last_updated": "2026-09-09"
+      "stores": 17,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "피넛스토어",
@@ -20562,8 +20566,8 @@
     },
     {
       "name": "꼬들대패",
-      "stores": 17,
-      "last_updated": "2026-09-09"
+      "stores": 19,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "꼬육꼬밥",
@@ -20651,8 +20655,8 @@
     },
     {
       "name": "꿉는 남자",
-      "stores": 9,
-      "last_updated": "2026-09-09"
+      "stores": 10,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "꿉당",
@@ -20836,8 +20840,8 @@
     },
     {
       "name": "서청미역",
-      "stores": 8,
-      "last_updated": "2026-09-09"
+      "stores": 9,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "서초동국밥",
@@ -21210,8 +21214,8 @@
     },
     {
       "name": "돼지영농후계자",
-      "stores": 42,
-      "last_updated": "2026-09-09"
+      "stores": 43,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "돼지생갈비상회",
@@ -21628,8 +21632,8 @@
     },
     {
       "name": "부막숯불닭갈비",
-      "stores": 3,
-      "last_updated": "2026-09-09"
+      "stores": 4,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "부산갈매기",
@@ -21734,8 +21738,8 @@
     },
     {
       "name": "따봉시래기",
-      "stores": 12,
-      "last_updated": "2026-09-09"
+      "stores": 13,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "따로 삼계탕",
@@ -22125,8 +22129,8 @@
     },
     {
       "name": "북창동순두부",
-      "stores": 76,
-      "last_updated": "2026-09-02"
+      "stores": 77,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "북평댁칼국수",
@@ -22359,8 +22363,8 @@
     },
     {
       "name": "5.5닭갈비",
-      "stores": 60,
-      "last_updated": "2026-09-09"
+      "stores": 61,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "406고깃집",
@@ -22544,8 +22548,8 @@
     },
     {
       "name": "어밤부(abamboo)",
-      "stores": 3,
-      "last_updated": "2026-09-09"
+      "stores": 4,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "엉클인더키친",
@@ -23033,8 +23037,8 @@
     },
     {
       "name": "육식사관학교",
-      "stores": 9,
-      "last_updated": "2026-09-09"
+      "stores": 10,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "육식청년",
@@ -23074,8 +23078,8 @@
     },
     {
       "name": "육칠이",
-      "stores": 106,
-      "last_updated": "2026-09-09"
+      "stores": 107,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "육칠팔",
@@ -23148,8 +23152,8 @@
     },
     {
       "name": "삼동소바",
-      "stores": 52,
-      "last_updated": "2026-09-09"
+      "stores": 53,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "삼미당",
@@ -23510,8 +23514,8 @@
     },
     {
       "name": "맛찬들왕소금구이",
-      "stores": 98,
-      "last_updated": "2026-09-09"
+      "stores": 99,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "맛찜랭킹",
@@ -24049,8 +24053,8 @@
     },
     {
       "name": "방배김밥",
-      "stores": 12,
-      "last_updated": "2026-09-09"
+      "stores": 13,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "배떡",
@@ -24178,8 +24182,8 @@
     },
     {
       "name": "1키로탕수육",
-      "stores": 116,
-      "last_updated": "2026-09-09"
+      "stores": 117,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "43 Zhouzhuang(저우장)",
@@ -24637,8 +24641,8 @@
     },
     {
       "name": "영천얼큰돼지국밥",
-      "stores": 11,
-      "last_updated": "2026-09-09"
+      "stores": 13,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "영화당",
@@ -24898,8 +24902,8 @@
     },
     {
       "name": "보스짬뽕",
-      "stores": 21,
-      "last_updated": "2026-09-09"
+      "stores": 23,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "복만천하",
@@ -24963,8 +24967,8 @@
     },
     {
       "name": "샹츠마라",
-      "stores": 34,
-      "last_updated": "2026-09-09"
+      "stores": 35,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "전주24시참편한39콩나물국밥",
@@ -25149,8 +25153,8 @@
     },
     {
       "name": "포케올데이",
-      "stores": 116,
-      "last_updated": "2026-09-09"
+      "stores": 117,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "포인비에트",
@@ -25672,8 +25676,8 @@
     },
     {
       "name": "현대옥",
-      "stores": 156,
-      "last_updated": "2026-09-09"
+      "stores": 157,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "현방오백소갈비살",
@@ -25994,8 +25998,8 @@
     },
     {
       "name": "우렁각시",
-      "stores": 11,
-      "last_updated": "2026-09-09"
+      "stores": 12,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "우리다",
@@ -26079,8 +26083,8 @@
     },
     {
       "name": "민영활어공장",
-      "stores": 24,
-      "last_updated": "2026-09-09"
+      "stores": 25,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "최고남 제육명가",
@@ -26823,8 +26827,8 @@
     },
     {
       "name": "서대문김치찜&김치찌개",
-      "stores": 27,
-      "last_updated": "2026-09-09"
+      "stores": 28,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "서래갈매기",
@@ -27265,8 +27269,8 @@
     },
     {
       "name": "우동 키노야",
-      "stores": 2,
-      "last_updated": "2026-09-09"
+      "stores": 3,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "우동가조쿠",
@@ -27647,8 +27651,8 @@
     },
     {
       "name": "명객양꼬치",
-      "stores": 15,
-      "last_updated": "2026-09-09"
+      "stores": 16,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "스폰티니",
@@ -27817,8 +27821,8 @@
     },
     {
       "name": "호맥",
-      "stores": 133,
-      "last_updated": "2026-09-09"
+      "stores": 134,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "호랭이행님",
@@ -27830,8 +27834,8 @@
     },
     {
       "name": "헤즈업",
-      "stores": 54,
-      "last_updated": "2026-09-09"
+      "stores": 57,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "향촌로타리",
@@ -27959,13 +27963,13 @@
     },
     {
       "name": "움버거앤윙스",
-      "stores": 18,
-      "last_updated": "2026-09-09"
+      "stores": 19,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "왓더버거",
-      "stores": 45,
-      "last_updated": "2026-09-09"
+      "stores": 47,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "올드맨필리샌드위치",
@@ -28125,8 +28129,8 @@
     },
     {
       "name": "그라츠커피랩(GRAZ COFFEE LAB)",
-      "stores": 27,
-      "last_updated": "2026-09-09"
+      "stores": 28,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "그레이핍플커피",
@@ -28688,8 +28692,8 @@
     },
     {
       "name": "삐딱",
-      "stores": 10,
-      "last_updated": "2026-09-09"
+      "stores": 11,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "사계절 시장골목집",
@@ -28769,8 +28773,8 @@
     },
     {
       "name": "컴포즈커피(COMPOSE COFFEE)",
-      "stores": 2404,
-      "last_updated": "2026-09-09"
+      "stores": 2410,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "케이엠엘리갤러리카페",
@@ -28846,8 +28850,8 @@
     },
     {
       "name": "부어치킨",
-      "stores": 235,
-      "last_updated": "2026-09-09"
+      "stores": 236,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "부여통닭",
@@ -28887,8 +28891,8 @@
     },
     {
       "name": "비에이치씨(BHC)",
-      "stores": 2317,
-      "last_updated": "2026-09-09"
+      "stores": 2319,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "빛고을닭강정",
@@ -28952,8 +28956,8 @@
     },
     {
       "name": "초선마라",
-      "stores": 1,
-      "last_updated": "2026-09-09"
+      "stores": 2,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "촉천하마라샹궈",
@@ -29358,8 +29362,8 @@
     },
     {
       "name": "통큰아구찜",
-      "stores": 10,
-      "last_updated": "2026-09-09"
+      "stores": 11,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "파도수산",
@@ -29427,8 +29431,8 @@
     },
     {
       "name": "탕화쿵푸마라탕",
-      "stores": 440,
-      "last_updated": "2026-09-09"
+      "stores": 442,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "태향원",
@@ -29500,8 +29504,8 @@
     },
     {
       "name": "정직유부",
-      "stores": 171,
-      "last_updated": "2026-09-09"
+      "stores": 172,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "정진관의일품정",
@@ -29557,8 +29561,8 @@
     },
     {
       "name": "제육의 법칙",
-      "stores": 89,
-      "last_updated": "2026-09-09"
+      "stores": 90,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "제육의달인",
@@ -29871,8 +29875,8 @@
     },
     {
       "name": "장호덕손만두",
-      "stores": 180,
-      "last_updated": "2026-09-09"
+      "stores": 182,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "저 세상 불닭 떡볶이",
@@ -29933,8 +29937,8 @@
     },
     {
       "name": "지지고(GGGO)",
-      "stores": 66,
-      "last_updated": "2026-09-09"
+      "stores": 67,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "지축김밥",
@@ -29946,8 +29950,8 @@
     },
     {
       "name": "진심왕돈까스",
-      "stores": 15,
-      "last_updated": "2026-09-09"
+      "stores": 16,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "쫄쫄맨",
@@ -30084,8 +30088,8 @@
     },
     {
       "name": "효자오리바베큐",
-      "stores": 11,
-      "last_updated": "2026-09-09"
+      "stores": 12,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "효자동솥뚜껑삼겹살감자탕순대국",
@@ -30680,8 +30684,8 @@
     },
     {
       "name": "더벤티",
-      "stores": 1138,
-      "last_updated": "2026-09-09"
+      "stores": 1139,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "더블업",
@@ -30709,8 +30713,8 @@
     },
     {
       "name": "더커피(The coffee)",
-      "stores": 5,
-      "last_updated": "2026-09-09"
+      "stores": 6,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "더피터커피",
@@ -30830,8 +30834,8 @@
     },
     {
       "name": "화수브루어리",
-      "stores": 11,
-      "last_updated": "2026-09-09"
+      "stores": 12,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "회장님댁",
@@ -30947,13 +30951,13 @@
     },
     {
       "name": "약선 흑염소",
-      "stores": 2,
-      "last_updated": "2026-09-09"
+      "stores": 3,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "언양닭칼국수",
-      "stores": 67,
-      "last_updated": "2026-09-09"
+      "stores": 68,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "어천궁 돌솥매운탕",
@@ -31034,8 +31038,8 @@
     },
     {
       "name": "양은이네",
-      "stores": 5,
-      "last_updated": "2026-09-09"
+      "stores": 6,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "양인환대(羊人歡待)",
@@ -31115,8 +31119,8 @@
     },
     {
       "name": "피자다오",
-      "stores": 7,
-      "last_updated": "2026-09-09"
+      "stores": 8,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "플라잉볼",
@@ -32297,8 +32301,8 @@
     },
     {
       "name": "조마루감자탕",
-      "stores": 174,
-      "last_updated": "2026-09-09"
+      "stores": 175,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "조박사 소머리국밥",
@@ -32326,8 +32330,8 @@
     },
     {
       "name": "조선대패",
-      "stores": 9,
-      "last_updated": "2026-09-09"
+      "stores": 10,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "다복향 마라탕",
@@ -32675,8 +32679,8 @@
     },
     {
       "name": "밥풀릭스",
-      "stores": 153,
-      "last_updated": "2026-09-09"
+      "stores": 155,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "황금 파스타",
@@ -33187,8 +33191,8 @@
     },
     {
       "name": "설맥(SEOL MAC)",
-      "stores": 100,
-      "last_updated": "2026-09-09"
+      "stores": 101,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "성대생우동짜장",
@@ -33392,8 +33396,8 @@
     },
     {
       "name": "아담만두",
-      "stores": 15,
-      "last_updated": "2026-09-09"
+      "stores": 16,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "아뜨뜨",
@@ -33574,8 +33578,8 @@
     },
     {
       "name": "김치찜은못참지",
-      "stores": 83,
-      "last_updated": "2026-09-09"
+      "stores": 84,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "김치찜와썹",
@@ -34050,8 +34054,8 @@
     },
     {
       "name": "동동꽈배기",
-      "stores": 12,
-      "last_updated": "2026-09-09"
+      "stores": 13,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "동산만두",
@@ -34195,8 +34199,8 @@
     },
     {
       "name": "제주남문숯불치킨",
-      "stores": 2,
-      "last_updated": "2026-09-09"
+      "stores": 3,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "젠틀닭",
@@ -34464,8 +34468,8 @@
     },
     {
       "name": "단막",
-      "stores": 7,
-      "last_updated": "2026-09-09"
+      "stores": 8,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "단물곤물",
@@ -34776,8 +34780,8 @@
     },
     {
       "name": "육거리소문난만두",
-      "stores": 8,
-      "last_updated": "2026-09-09"
+      "stores": 9,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "육거리만두",
@@ -34801,8 +34805,8 @@
     },
     {
       "name": "경성카츠",
-      "stores": 9,
-      "last_updated": "2026-09-09"
+      "stores": 10,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "경양카츠",
@@ -35044,7 +35048,8 @@
     },
     {
       "name": "고래부대찌개",
-      "stores": 4
+      "stores": 5,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "고래식당",
@@ -35513,8 +35518,8 @@
     },
     {
       "name": "삼겹식당",
-      "stores": 6,
-      "last_updated": "2026-09-09"
+      "stores": 7,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "고집남",
@@ -35546,8 +35551,8 @@
     },
     {
       "name": "구구족",
-      "stores": 118,
-      "last_updated": "2026-09-09"
+      "stores": 119,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "교반",
@@ -35631,7 +35636,8 @@
     },
     {
       "name": "진곱도리탕",
-      "stores": 0
+      "stores": 1,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "진고집동해동태탕&코다리조림",
@@ -35784,8 +35790,8 @@
     },
     {
       "name": "지호한방삼계탕",
-      "stores": 74,
-      "last_updated": "2026-09-09"
+      "stores": 75,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "지환이네왕족발",
@@ -36057,8 +36063,8 @@
     },
     {
       "name": "도리신닭도리탕",
-      "stores": 34,
-      "last_updated": "2026-09-09"
+      "stores": 35,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "도리명가",
@@ -36218,8 +36224,8 @@
     },
     {
       "name": "김복남맥주",
-      "stores": 216,
-      "last_updated": "2026-09-09"
+      "stores": 217,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "김봉남맥주",
@@ -36592,8 +36598,8 @@
     },
     {
       "name": "티엠티피자(TMT피자)",
-      "stores": 14,
-      "last_updated": "2026-09-09"
+      "stores": 15,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "투맨피자 (Two Man Pizza)",
@@ -36626,8 +36632,8 @@
     },
     {
       "name": "오르다피자",
-      "stores": 12,
-      "last_updated": "2026-09-09"
+      "stores": 13,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "오르새피자",
@@ -37067,8 +37073,8 @@
     },
     {
       "name": "월하",
-      "stores": 9,
-      "last_updated": "2026-09-09"
+      "stores": 10,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "월하주",
@@ -37124,8 +37130,8 @@
     },
     {
       "name": "큭큭피자",
-      "stores": 8,
-      "last_updated": "2026-09-09"
+      "stores": 9,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "둘둘치킨",
@@ -37781,8 +37787,8 @@
     },
     {
       "name": "에그박스",
-      "stores": 32,
-      "last_updated": "2026-09-09"
+      "stores": 33,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "엉터리생고기 두번째이야기 무한삼겹",
@@ -38275,8 +38281,8 @@
     },
     {
       "name": "매머드커피(Mammoth coffee)",
-      "stores": 38,
-      "last_updated": "2026-09-09"
+      "stores": 39,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "냉면입니다",
@@ -38296,7 +38302,8 @@
     },
     {
       "name": "노랑강정",
-      "stores": 20
+      "stores": 21,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "놀러와",
@@ -38610,8 +38617,8 @@
     },
     {
       "name": "배스킨라빈스",
-      "stores": 1708,
-      "last_updated": "2026-09-09"
+      "stores": 1711,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "브알라",
@@ -38631,8 +38638,8 @@
     },
     {
       "name": "설빙",
-      "stores": 567,
-      "last_updated": "2026-09-09"
+      "stores": 568,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "솔리드웍스아이스크림",
@@ -38684,8 +38691,8 @@
     },
     {
       "name": "뉴욕버거",
-      "stores": 175,
-      "last_updated": "2026-09-09"
+      "stores": 176,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "뉴에라 버거",
@@ -38739,8 +38746,8 @@
     },
     {
       "name": "퍼그피자",
-      "stores": 9,
-      "last_updated": "2026-09-09"
+      "stores": 10,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "엑스오엑스오핫도그앤커피",
@@ -38812,8 +38819,8 @@
     },
     {
       "name": "오네쉬",
-      "stores": 5,
-      "last_updated": "2026-09-09"
+      "stores": 6,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "오늘김해생뒷고기",
@@ -38989,8 +38996,8 @@
     },
     {
       "name": "프레드피자",
-      "stores": 139,
-      "last_updated": "2026-09-09"
+      "stores": 140,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "피굽남피자",
@@ -39047,8 +39054,8 @@
     },
     {
       "name": "피자덕",
-      "stores": 48,
-      "last_updated": "2026-09-09"
+      "stores": 50,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "피자런",
@@ -39056,8 +39063,8 @@
     },
     {
       "name": "피자마루",
-      "stores": 533,
-      "last_updated": "2026-09-09"
+      "stores": 534,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "피자먹다",
@@ -39081,8 +39088,8 @@
     },
     {
       "name": "헤이키 커피",
-      "stores": 4,
-      "last_updated": "2026-09-09"
+      "stores": 5,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "헤브어나이스데이",
@@ -39106,8 +39113,8 @@
     },
     {
       "name": "해쉬커피",
-      "stores": 27,
-      "last_updated": "2026-09-09"
+      "stores": 29,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "항아리카노 FRIED COFFEE",
@@ -39115,8 +39122,8 @@
     },
     {
       "name": "하프커피(HALFF COFFEE)",
-      "stores": 6,
-      "last_updated": "2026-09-09"
+      "stores": 7,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "하타오",
@@ -39140,8 +39147,8 @@
     },
     {
       "name": "호앙비엣",
-      "stores": 1,
-      "last_updated": "2026-09-09"
+      "stores": 2,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "홍대쌀국수",
@@ -39494,7 +39501,8 @@
     },
     {
       "name": "치킨뱅이",
-      "stores": 39
+      "stores": 40,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "치킨본능",
@@ -39602,12 +39610,13 @@
     },
     {
       "name": "핑퐁커피",
-      "stores": 11
+      "stores": 12,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "하삼동커피",
-      "stores": 595,
-      "last_updated": "2026-09-09"
+      "stores": 596,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "하와이코나 사자커피",
@@ -39635,8 +39644,8 @@
     },
     {
       "name": "맥시칸치킨",
-      "stores": 435,
-      "last_updated": "2026-09-09"
+      "stores": 436,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "맛통(맛있는통닭)",
@@ -39660,8 +39669,8 @@
     },
     {
       "name": "맛닭꼬",
-      "stores": 131,
-      "last_updated": "2026-09-09"
+      "stores": 132,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "디디치킨(DD치킨)",
@@ -39793,8 +39802,8 @@
     },
     {
       "name": "청담동말자싸롱",
-      "stores": 97,
-      "last_updated": "2026-09-09"
+      "stores": 98,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "청담딜리버리",
@@ -39842,7 +39851,8 @@
     },
     {
       "name": "에그맘",
-      "stores": 0
+      "stores": 1,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "에그브로",
@@ -39906,8 +39916,8 @@
     },
     {
       "name": "오마뎅",
-      "stores": 95,
-      "last_updated": "2026-09-09"
+      "stores": 96,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "오마떡",
@@ -40047,7 +40057,8 @@
     },
     {
       "name": "큰집닭강정",
-      "stores": 0
+      "stores": 1,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "킹스타치킨",
@@ -40087,8 +40098,8 @@
     },
     {
       "name": "또래오래",
-      "stores": 561,
-      "last_updated": "2026-09-09"
+      "stores": 562,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "또봉이통닭",
@@ -40614,8 +40625,8 @@
     },
     {
       "name": "동네포차주민",
-      "stores": 45,
-      "last_updated": "2026-09-09"
+      "stores": 46,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "동래별장",
@@ -40695,8 +40706,8 @@
     },
     {
       "name": "피자헛",
-      "stores": 298,
-      "last_updated": "2026-09-09"
+      "stores": 299,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "피자헤븐",
@@ -40832,8 +40843,8 @@
     },
     {
       "name": "칼리가리 박사의 밀실",
-      "stores": 13,
-      "last_updated": "2026-09-09"
+      "stores": 14,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "캠토토스트",
@@ -40954,7 +40965,8 @@
     },
     {
       "name": "휴식",
-      "stores": 3
+      "stores": 4,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "20LINE",
@@ -41210,8 +41222,8 @@
     },
     {
       "name": "발도스커피(valdos coffee)",
-      "stores": 87,
-      "last_updated": "2026-09-09"
+      "stores": 88,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "배달의카페",
@@ -41464,8 +41476,8 @@
     },
     {
       "name": "백억커피",
-      "stores": 98,
-      "last_updated": "2026-09-09"
+      "stores": 100,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "백제당",
@@ -41618,8 +41630,8 @@
     },
     {
       "name": "버거킹(Burger King)",
-      "stores": 163,
-      "last_updated": "2026-09-09"
+      "stores": 166,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "버거킴",
@@ -41949,8 +41961,8 @@
     },
     {
       "name": "읍천리 382",
-      "stores": 175,
-      "last_updated": "2026-09-09"
+      "stores": 176,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "카페몬스터",
@@ -42087,8 +42099,8 @@
     },
     {
       "name": "봉구스밥버거",
-      "stores": 507,
-      "last_updated": "2026-09-09"
+      "stores": 508,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "본품딜리버리",
@@ -42140,7 +42152,8 @@
     },
     {
       "name": "천씨씨커피",
-      "stores": 99
+      "stores": 100,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "청담커피",
@@ -42152,8 +42165,8 @@
     },
     {
       "name": "청자다방",
-      "stores": 134,
-      "last_updated": "2026-09-09"
+      "stores": 135,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "츄로's Coffee&Ice cream",
@@ -42429,8 +42442,8 @@
     },
     {
       "name": "시온담",
-      "stores": 12,
-      "last_updated": "2026-09-09"
+      "stores": 13,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "씨이오스무디",
@@ -42618,8 +42631,8 @@
     },
     {
       "name": "병아리김밥",
-      "stores": 67,
-      "last_updated": "2026-09-09"
+      "stores": 68,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "병천황토방순대",
@@ -42975,8 +42988,8 @@
     },
     {
       "name": "왕새우직판장",
-      "stores": 20,
-      "last_updated": "2026-09-09"
+      "stores": 22,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "왕양 하오하오",
@@ -43156,8 +43169,8 @@
     },
     {
       "name": "수김밥",
-      "stores": 16,
-      "last_updated": "2026-09-09"
+      "stores": 17,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "이야스위밍",
@@ -43341,13 +43354,13 @@
     },
     {
       "name": "갓튀긴후라이드",
-      "stores": 86,
-      "last_updated": "2026-09-09"
+      "stores": 87,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "감탄계숯불치킨",
-      "stores": 35,
-      "last_updated": "2026-09-09"
+      "stores": 36,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "가장맛있는치킨",
@@ -43556,8 +43569,8 @@
     },
     {
       "name": "매드피자",
-      "stores": 17,
-      "last_updated": "2026-09-09"
+      "stores": 19,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "마루업_피치떡",
@@ -43573,8 +43586,8 @@
     },
     {
       "name": "라쿤피자(LA COON PIZZA)",
-      "stores": 6,
-      "last_updated": "2026-09-09"
+      "stores": 7,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "기버스테이션",
@@ -43687,8 +43700,8 @@
     },
     {
       "name": "가마치통닭",
-      "stores": 728,
-      "last_updated": "2026-09-08"
+      "stores": 729,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "가마통",
@@ -44140,8 +44153,8 @@
     },
     {
       "name": "육회바른연어",
-      "stores": 108,
-      "last_updated": "2026-09-09"
+      "stores": 111,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "육회야문연어",
@@ -44477,8 +44490,8 @@
     },
     {
       "name": "펀비어킹",
-      "stores": 346,
-      "last_updated": "2026-09-09"
+      "stores": 347,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "퍼스트비어",
@@ -44688,8 +44701,8 @@
     },
     {
       "name": "푸드시스터즈",
-      "stores": 9,
-      "last_updated": "2026-09-09"
+      "stores": 10,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "가위이야기",
@@ -44905,8 +44918,8 @@
     },
     {
       "name": "카페아이엔지(CAFE ING)",
-      "stores": 16,
-      "last_updated": "2026-09-09"
+      "stores": 17,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "카페아이엠티",
@@ -44978,8 +44991,8 @@
     },
     {
       "name": "타코락",
-      "stores": 6,
-      "last_updated": "2026-09-09"
+      "stores": 7,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "텀즈업PUB",
@@ -45436,8 +45449,8 @@
     },
     {
       "name": "롯데슈퍼(LOTTE SUPER)",
-      "stores": 9,
-      "last_updated": "2026-09-02"
+      "stores": 10,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "롯데프레시(LOTTE FRESH)",
@@ -45505,8 +45518,8 @@
     },
     {
       "name": "빽다방",
-      "stores": 1458,
-      "last_updated": "2026-09-09"
+      "stores": 1459,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "빡벳(VAC VIET)",
@@ -45890,8 +45903,8 @@
     },
     {
       "name": "돈까스짱",
-      "stores": 73,
-      "last_updated": "2026-09-09"
+      "stores": 74,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "돈까스팩토리",
@@ -45951,8 +45964,8 @@
     },
     {
       "name": "달리는커피",
-      "stores": 272,
-      "last_updated": "2026-09-09"
+      "stores": 273,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "달다구니(DALDAGUNI)",
@@ -45972,8 +45985,8 @@
     },
     {
       "name": "노배드바이브스",
-      "stores": 15,
-      "last_updated": "2026-09-09"
+      "stores": 16,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "넌테",
@@ -46353,8 +46366,8 @@
     },
     {
       "name": "본호두(BON HODU)",
-      "stores": 7,
-      "last_updated": "2026-09-09"
+      "stores": 8,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "봉쥬르호떡",
@@ -46810,8 +46823,8 @@
     },
     {
       "name": "그린브라우니(green brownie)",
-      "stores": 29,
-      "last_updated": "2026-09-09"
+      "stores": 30,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "그여행(B.H.F.H)",
@@ -47393,13 +47406,13 @@
     },
     {
       "name": "몽슈슈",
-      "stores": 13,
-      "last_updated": "2026-09-09"
+      "stores": 14,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "몽키친",
-      "stores": 1,
-      "last_updated": "2026-09-09"
+      "stores": 2,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "무쇠치킨",
@@ -47595,7 +47608,8 @@
     },
     {
       "name": "숨쉬는 순두부",
-      "stores": 9
+      "stores": 10,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "숯부래",
@@ -47808,8 +47822,8 @@
     },
     {
       "name": "와플샵",
-      "stores": 18,
-      "last_updated": "2026-09-09"
+      "stores": 19,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "와플스튜디오",
@@ -47905,8 +47919,8 @@
     },
     {
       "name": "수내닭꼬치",
-      "stores": 111,
-      "last_updated": "2026-09-09"
+      "stores": 112,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "수누리",
@@ -48411,8 +48425,8 @@
     },
     {
       "name": "우지커피(OOZYCOFFEE)",
-      "stores": 145,
-      "last_updated": "2026-09-09"
+      "stores": 154,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "우주라이크(WOULDULIKE)",
@@ -48504,8 +48518,8 @@
     },
     {
       "name": "영계소문옛날통닭",
-      "stores": 58,
-      "last_updated": "2026-09-09"
+      "stores": 59,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "영도통닭",
@@ -48699,8 +48713,8 @@
     },
     {
       "name": "올선데이",
-      "stores": 1,
-      "last_updated": "2026-09-09"
+      "stores": 2,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "올차",
@@ -48860,8 +48874,8 @@
     },
     {
       "name": "한신우동",
-      "stores": 95,
-      "last_updated": "2026-09-09"
+      "stores": 96,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "한끼플러스",
@@ -49257,8 +49271,8 @@
     },
     {
       "name": "간이역",
-      "stores": 374,
-      "last_updated": "2026-09-09"
+      "stores": 375,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "감성호프",
@@ -49270,8 +49284,8 @@
     },
     {
       "name": "갓생맥주",
-      "stores": 9,
-      "last_updated": "2026-09-09"
+      "stores": 10,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "강남역에서 맥주한잔",
@@ -49404,12 +49418,13 @@
     },
     {
       "name": "아이러브피자",
-      "stores": 28,
-      "last_updated": "2026-09-09"
+      "stores": 29,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "아메리칸피자",
-      "stores": 18
+      "stores": 19,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "무모한 피자",
@@ -49465,8 +49480,8 @@
     },
     {
       "name": "수안초밥",
-      "stores": 1,
-      "last_updated": "2026-09-09"
+      "stores": 2,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "수완초밥생각",
@@ -49482,8 +49497,8 @@
     },
     {
       "name": "숯토리",
-      "stores": 7,
-      "last_updated": "2026-09-09"
+      "stores": 8,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "스구식탁",
@@ -49688,7 +49703,8 @@
     },
     {
       "name": "빅스타피자(Bigstar Pizza)",
-      "stores": 127
+      "stores": 128,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "빨간토마토피자",
@@ -49696,8 +49712,8 @@
     },
     {
       "name": "빽보이피자",
-      "stores": 216,
-      "last_updated": "2026-09-09"
+      "stores": 218,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "뽕뜨락피자",
@@ -49834,8 +49850,8 @@
     },
     {
       "name": "갱상도파절이대패삼겹",
-      "stores": 9,
-      "last_updated": "2026-09-09"
+      "stores": 10,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "거부기식당",
@@ -49983,8 +49999,8 @@
     },
     {
       "name": "지에스25(GS25)",
-      "stores": 17432,
-      "last_updated": "2026-09-09"
+      "stores": 17448,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "간식창고",
@@ -50044,8 +50060,8 @@
     },
     {
       "name": "세븐일레븐",
-      "stores": 12926,
-      "last_updated": "2026-09-09"
+      "stores": 12938,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "스토리웨이(Storyway)",
@@ -50089,8 +50105,8 @@
     },
     {
       "name": "꽈백최선생",
-      "stores": 30,
-      "last_updated": "2026-09-09"
+      "stores": 31,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "꾸분",
@@ -50318,8 +50334,8 @@
     },
     {
       "name": "처갓집양념치킨",
-      "stores": 1253,
-      "last_updated": "2026-09-09"
+      "stores": 1255,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "처갓집플러스케이준치킨",
@@ -50736,8 +50752,8 @@
     },
     {
       "name": "꾸브라꼬숯불치킨",
-      "stores": 220,
-      "last_updated": "2026-09-09"
+      "stores": 221,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "꾸븐닭선생 숯불두마리치킨",
@@ -50785,8 +50801,8 @@
     },
     {
       "name": "노랑통닭",
-      "stores": 676,
-      "last_updated": "2026-09-09"
+      "stores": 679,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "노마진 두마리치킨",
@@ -51171,8 +51187,8 @@
     },
     {
       "name": "콩꼬물꽈배기",
-      "stores": 2,
-      "last_updated": "2026-09-09"
+      "stores": 3,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "크라상점",
@@ -51358,8 +51374,8 @@
     },
     {
       "name": "더타코부스",
-      "stores": 2,
-      "last_updated": "2026-09-09"
+      "stores": 3,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "더밀데이",
@@ -51483,8 +51499,8 @@
     },
     {
       "name": "본죽&비빔밥",
-      "stores": 1021,
-      "last_updated": "2026-09-09"
+      "stores": 1024,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "본초맘죽",
@@ -51508,8 +51524,8 @@
     },
     {
       "name": "봄봄",
-      "stores": 7,
-      "last_updated": "2026-09-09"
+      "stores": 8,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "봄설",
@@ -51553,8 +51569,8 @@
     },
     {
       "name": "봉자막창",
-      "stores": 62,
-      "last_updated": "2026-09-09"
+      "stores": 63,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "봉추찜닭",
@@ -51587,8 +51603,8 @@
     },
     {
       "name": "교촌치킨",
-      "stores": 1383,
-      "last_updated": "2026-09-06"
+      "stores": 1385,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "구이쟁이꾼",
@@ -51678,8 +51694,8 @@
     },
     {
       "name": "오슬로우(OHSLOW)",
-      "stores": 36,
-      "last_updated": "2026-09-09"
+      "stores": 37,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "오우가",
@@ -51915,8 +51931,8 @@
     },
     {
       "name": "한솥",
-      "stores": 799,
-      "last_updated": "2026-09-09"
+      "stores": 800,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "한술식당",
@@ -52376,8 +52392,8 @@
     },
     {
       "name": "고기듬뿍국물두루치기",
-      "stores": 41,
-      "last_updated": "2026-09-09"
+      "stores": 42,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "고기명작",
@@ -52521,8 +52537,8 @@
     },
     {
       "name": "글라쇼",
-      "stores": 6,
-      "last_updated": "2026-09-09"
+      "stores": 7,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "꾸슬(GGUSLE)",
@@ -52826,8 +52842,8 @@
     },
     {
       "name": "롤리팝",
-      "stores": 1,
-      "last_updated": "2026-09-09"
+      "stores": 2,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "마마앤코(mamanco)",
@@ -53419,8 +53435,8 @@
     },
     {
       "name": "머든",
-      "stores": 2,
-      "last_updated": "2026-09-09"
+      "stores": 3,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "머큐어(Mercure)",
@@ -53488,8 +53504,8 @@
     },
     {
       "name": "우시야",
-      "stores": 20,
-      "last_updated": "2026-09-09"
+      "stores": 21,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "우와",
@@ -54441,8 +54457,8 @@
     },
     {
       "name": "일품대패",
-      "stores": 55,
-      "last_updated": "2026-09-09"
+      "stores": 56,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "일품보쌈",
@@ -54450,8 +54466,8 @@
     },
     {
       "name": "일품양평해장국",
-      "stores": 298,
-      "last_updated": "2026-09-09"
+      "stores": 299,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "일행",
@@ -55152,8 +55168,8 @@
     },
     {
       "name": "이루팜",
-      "stores": 14,
-      "last_updated": "2026-09-09"
+      "stores": 15,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "인사동곱돌쌍화차",
@@ -55234,8 +55250,8 @@
     },
     {
       "name": "팔공티",
-      "stores": 143,
-      "last_updated": "2026-09-09"
+      "stores": 144,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "페이브(fave)",
@@ -55351,7 +55367,8 @@
     },
     {
       "name": "석암생소금구이",
-      "stores": 0
+      "stores": 1,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "선굼터",
@@ -56168,8 +56185,8 @@
     },
     {
       "name": "헬키푸키",
-      "stores": 22,
-      "last_updated": "2026-09-09"
+      "stores": 23,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "필라프에빠지다",
@@ -56449,8 +56466,8 @@
     },
     {
       "name": "로코스비비큐",
-      "stores": 8,
-      "last_updated": "2026-09-09"
+      "stores": 9,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "롤링파스타",
@@ -57086,8 +57103,8 @@
     },
     {
       "name": "쪽쪽갈비",
-      "stores": 8,
-      "last_updated": "2026-09-09"
+      "stores": 9,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "쪼쪼찜닭",
@@ -57468,7 +57485,8 @@
     },
     {
       "name": "갓잇",
-      "stores": 6
+      "stores": 7,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "강경불고기",
@@ -57516,7 +57534,8 @@
     },
     {
       "name": "옐로우캔",
-      "stores": 0
+      "stores": 1,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "국대찜닭",
@@ -57676,8 +57695,8 @@
     },
     {
       "name": "연꽃치",
-      "stores": 7,
-      "last_updated": "2026-09-09"
+      "stores": 8,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "연심",
@@ -57733,8 +57752,8 @@
     },
     {
       "name": "오레노카츠",
-      "stores": 37,
-      "last_updated": "2026-09-09"
+      "stores": 38,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "오빈라멘",
@@ -58120,8 +58139,8 @@
     },
     {
       "name": "우리할매 떡볶이",
-      "stores": 354,
-      "last_updated": "2026-09-09"
+      "stores": 355,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "우림칼국수",
@@ -58189,8 +58208,8 @@
     },
     {
       "name": "이백장 돈가스",
-      "stores": 137,
-      "last_updated": "2026-09-09"
+      "stores": 138,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "이삭토스트",
@@ -58250,13 +58269,13 @@
     },
     {
       "name": "야화 혼술바",
-      "stores": 34,
-      "last_updated": "2026-09-09"
+      "stores": 37,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "버블케미스트리",
-      "stores": 18,
-      "last_updated": "2026-09-09"
+      "stores": 19,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "링크업",
@@ -58265,73 +58284,73 @@
     },
     {
       "name": "리은푸드",
-      "stores": 22,
-      "last_updated": "2026-09-09"
+      "stores": 24,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "카페큐브",
-      "stores": 37,
-      "last_updated": "2026-09-09"
+      "stores": 40,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "선인수산",
-      "stores": 26,
-      "last_updated": "2026-09-09"
+      "stores": 28,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "텐퍼센트커피",
-      "stores": 56,
-      "last_updated": "2026-09-09"
+      "stores": 62,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "텐퍼센트",
-      "stores": 22,
-      "last_updated": "2026-09-09"
+      "stores": 24,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "써브웨이",
-      "stores": 27,
-      "last_updated": "2026-09-09"
+      "stores": 31,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "CU",
-      "stores": 13,
-      "last_updated": "2026-09-09"
+      "stores": 14,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "시프트PC",
-      "stores": 32,
-      "last_updated": "2026-09-09"
+      "stores": 34,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "GS25",
-      "stores": 32,
-      "last_updated": "2026-09-09"
+      "stores": 35,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "이프",
-      "stores": 34,
-      "last_updated": "2026-09-09"
+      "stores": 40,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "계근상",
-      "stores": 19,
-      "last_updated": "2026-09-09"
+      "stores": 20,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "스타벅스",
-      "stores": 44,
-      "last_updated": "2026-09-09"
+      "stores": 51,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "카페세로숲",
-      "stores": 11,
-      "last_updated": "2026-09-06"
+      "stores": 12,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "차백도",
-      "stores": 29,
-      "last_updated": "2026-09-09"
+      "stores": 31,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "봄날엔",
@@ -58340,38 +58359,38 @@
     },
     {
       "name": "브라운트리 치즈케이크&버터팜",
-      "stores": 19,
-      "last_updated": "2026-09-09"
+      "stores": 20,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "큰손닭강정",
-      "stores": 18,
-      "last_updated": "2026-09-09"
+      "stores": 19,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "하복당",
-      "stores": 24,
-      "last_updated": "2026-09-09"
+      "stores": 26,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "현승에프앤디",
-      "stores": 26,
-      "last_updated": "2026-09-09"
+      "stores": 31,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "오빠찜",
-      "stores": 21,
-      "last_updated": "2026-09-09"
+      "stores": 23,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "러너펍",
-      "stores": 24,
-      "last_updated": "2026-09-09"
+      "stores": 27,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "노원수제맥주협동조합",
-      "stores": 23,
-      "last_updated": "2026-09-09"
+      "stores": 24,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "야밤도주",
@@ -58380,21 +58399,23 @@
     },
     {
       "name": "디저트팩토리",
-      "stores": 15,
-      "last_updated": "2026-09-09"
+      "stores": 18,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "던킨",
-      "stores": 5,
-      "last_updated": "2026-09-09"
+      "stores": 7,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "영웅본색",
-      "stores": 3
+      "stores": 6,
+      "last_updated": "2026-09-10"
     },
     {
       "name": "토핑몬스터피자",
-      "stores": 3
+      "stores": 6,
+      "last_updated": "2026-09-10"
     }
   ],
   "audit": [
@@ -58450,6 +58471,12 @@
       "run_at": "2026-09-09T22:52:39+09:00",
       "new_franchises_added": 2,
       "existing_updated": 249,
+      "window_days": 14
+    },
+    {
+      "run_at": "2026-09-10T22:54:15+09:00",
+      "new_franchises_added": 0,
+      "existing_updated": 260,
       "window_days": 14
     }
   ]
