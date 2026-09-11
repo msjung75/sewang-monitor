@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-11T05:07:51+09:00",
+  "updated": "2026-09-11T22:06:59+09:00",
   "baseline_date": "20260101",
   "current_date": "20260911",
   "brands": {
@@ -1652,29 +1652,19 @@
     },
     "신선설농탕": {
       "service": "ilban",
-      "current_count": 74,
-      "current_count_reported": 74,
-      "new_permits_count": 0,
-      "candidate_count": 49,
-      "verified_count": 49,
-      "upbyeon_count": 0,
-      "upbyeon_count_real": 0,
-      "total_growth": 0,
-      "upbyeon_ratio": 0,
-      "is_upbyeon_specialist": false,
-      "upbyeon": []
+      "error": ""
     },
     "명륜진사갈비": {
       "service": "ilban",
-      "current_count": 595,
-      "current_count_reported": 595,
-      "new_permits_count": 4,
+      "current_count": 597,
+      "current_count_reported": 597,
+      "new_permits_count": 6,
       "candidate_count": 357,
       "verified_count": 80,
       "upbyeon_count": 2,
       "upbyeon_count_real": 1,
-      "total_growth": 5,
-      "upbyeon_ratio": 0.2,
+      "total_growth": 7,
+      "upbyeon_ratio": 0.143,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
