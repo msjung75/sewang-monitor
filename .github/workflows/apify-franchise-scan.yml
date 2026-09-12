@@ -1,0 +1,42 @@
+name: apify-franchise-scan
+# Franchise v1 — Apify Naver Map scan + lead processor
+# Cost: ~15 brands × 30 items × $0.006 ≈ $2.7/run × 2 runs/week ≈ $22/month
+on:
+  schedule:
+    # 월·목 05:00 KST == 20:00 UTC on Sun & Wed
+    - cron: '0 20 * * 0,3'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install deps
+        run: pip install --no-cache-dir requests
+      - name: Fetch Apify Naver Map
+        env:
+          APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
+        run: python3 scripts/fetch_apify_naver.py
+      - name: Process leads
+        env:
+          BASE_URL: 'https://sewang-monitor.vercel.app'
+        run: python3 scripts/franchise_lead_processor.py
+      - name: Commit outputs
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/franchise_raw.json data/franchise_leads.json || true
+          if git diff --cached --quiet; then
+            echo "no changes"; exit 0
+          fi
+          git commit -m "chore(franchise-v1): scan $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push
