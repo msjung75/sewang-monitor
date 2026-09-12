@@ -6574,6 +6574,90 @@ function startPendingPolling(){
   });
 })();
 </script>
+<!-- franchise-v1: 선행 감지 (lead) 배지 & 필터 chip -->
+<script>
+(function(){
+  var LEAD_ONLY = false;
+  try { LEAD_ONLY = sessionStorage.getItem('franchise-lead-only') === '1'; } catch(e){}
+  var STATE = { leads: [], byPermit: {}, byBrand: {}, hidden: {} };
+
+  function normName(s){ return String(s||'').toLowerCase().replace(/[\s()\[\]<>\-_.·:,'"`\/\\]/g,''); }
+
+  function loadLeads(){
+    fetch('/api/franchise-leads?status=all', {cache:'no-store'}).then(function(r){ return r.json(); }).then(function(j){
+      var leads = (j && j.leads) || [];
+      STATE.leads = leads;
+      STATE.byPermit = {}; STATE.byBrand = {}; STATE.hidden = {};
+      leads.forEach(function(l){
+        if (l.permit && l.permit.mng_no) STATE.byPermit[String(l.permit.mng_no)] = l;
+        if (l.id) STATE.byPermit[String(l.id)] = STATE.byPermit[String(l.id)] || l;
+        var b = normName(l.brand);
+        (STATE.byBrand[b] = STATE.byBrand[b] || []).push(l);
+        if (l.priority === 'internal_track_only') STATE.hidden[String(l.id)] = true;
+      });
+      annotate();
+    }).catch(function(e){ console.warn('[franchise-v1]', e); });
+  }
+
+  function badgeFor(status){
+    if (status === 'confirmed') return '<span title="정부 인허가와 매칭" style="background:rgba(52,211,153,.18);color:#34d399;font-size:10px;font-weight:800;padding:3px 7px;border-radius:6px;margin-left:6px">🟢 확인</span>';
+    if (status === 'lead')      return '<span title="Apify 선행 감지 (인허가 전)" style="background:rgba(251,191,36,.20);color:#fbbf24;font-size:10px;font-weight:800;padding:3px 7px;border-radius:6px;margin-left:6px">🟡 선행감지</span>';
+    if (status === 'gov_only')  return '<span title="정부 인허가만 있음" style="background:rgba(96,165,250,.18);color:#60a5fa;font-size:10px;font-weight:800;padding:3px 7px;border-radius:6px;margin-left:6px">🔵 정부</span>';
+    if (status === 'booth_suspect') return '<span title="7일내 다수 등록 — 부스/팝업 의심" style="background:rgba(244,114,182,.18);color:#f472b6;font-size:10px;font-weight:800;padding:3px 7px;border-radius:6px;margin-left:6px">⚠️ 부스의심</span>';
+    return '';
+  }
+
+  function annotate(){
+    var list = document.getElementById('new-list'); if (!list) return;
+    var cards = list.querySelectorAll('.card, [data-mng-no], [data-id]');
+    cards.forEach(function(c){
+      if (c.__frv1) return;
+      var mng = c.getAttribute('data-mng-no') || c.getAttribute('data-id') || '';
+      var name = normName(c.querySelector('.name, .title, h3, h4') && c.querySelector('.name, .title, h3, h4').textContent);
+      var lead = (mng && STATE.byPermit[mng]) || null;
+      if (!lead && name) {
+        for (var b in STATE.byBrand) {
+          if (b && name.indexOf(b) !== -1) { lead = STATE.byBrand[b][0]; break; }
+        }
+      }
+      if (!lead) return;
+      c.__frv1 = true;
+      if (lead.priority === 'internal_track_only') { c.style.display='none'; return; }
+      var target = c.querySelector('.name, .title, h3, h4') || c.firstElementChild;
+      if (target) target.insertAdjacentHTML('beforeend', badgeFor(lead.status));
+      if (LEAD_ONLY && lead.status !== 'lead' && lead.status !== 'booth_suspect') c.style.display='none';
+    });
+  }
+
+  function installFilterChip(){
+    var chips = document.getElementById('chip-nstat'); if (!chips) return;
+    if (document.getElementById('chip-fr-lead')) return;
+    var chip = document.createElement('div');
+    chip.className = 'chip' + (LEAD_ONLY ? ' on' : '');
+    chip.id = 'chip-fr-lead';
+    chip.dataset.v = 'lead';
+    chip.textContent = '🟡 선행 감지만';
+    chip.title = '가맹점 확장 선행 감지 (인허가 전)';
+    chip.addEventListener('click', function(){
+      LEAD_ONLY = !LEAD_ONLY;
+      try { sessionStorage.setItem('franchise-lead-only', LEAD_ONLY ? '1' : '0'); } catch(e){}
+      chip.classList.toggle('on', LEAD_ONLY);
+      if (typeof renderNew === 'function') renderNew();
+      setTimeout(annotate, 30);
+    });
+    chips.appendChild(chip);
+  }
+
+  var _renderNew = window.renderNew;
+  if (typeof _renderNew === 'function') {
+    window.renderNew = function(){ var r = _renderNew.apply(this, arguments); setTimeout(annotate, 20); return r; };
+  }
+
+  if (document.readyState !== 'loading') { installFilterChip(); loadLeads(); }
+  else document.addEventListener('DOMContentLoaded', function(){ installFilterChip(); loadLeads(); });
+})();
+</script>
+<!-- /franchise-v1 -->
 </body>
 </html>
 
