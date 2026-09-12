@@ -6658,6 +6658,96 @@ function startPendingPolling(){
 })();
 </script>
 <!-- /franchise-v1 -->
+
+<!-- ===== VISIT HISTORY (localStorage) v1 ===== -->
+<style>
+.vh-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:8px;background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.22);color:#7dd3fc;font-size:10.5px;font-weight:600;cursor:pointer;transition:all .15s ease;line-height:1.35;letter-spacing:-0.1px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:inherit}
+.vh-badge:hover{background:rgba(56,189,248,0.14);border-color:rgba(56,189,248,0.35)}
+.vh-badge.welcome{background:linear-gradient(135deg,rgba(251,191,36,0.18),rgba(167,139,250,0.15));border-color:rgba(251,191,36,0.35);color:#fcd34d}
+.vh-badge.frequent{opacity:0.65;font-weight:500}
+.vh-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:10000;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;animation:vh-fade .18s ease}
+@keyframes vh-fade{from{opacity:0}to{opacity:1}}
+.vh-modal{position:relative;max-width:480px;width:100%;max-height:88vh;overflow-y:auto;background:var(--surface-solid,#131a30);border:1px solid rgba(56,189,248,0.35);border-radius:16px;box-shadow:0 24px 64px rgba(0,0,0,0.7);padding:20px;color:var(--txt,#f8fafc);backdrop-filter:blur(20px)}
+.vh-modal h3{font-size:16px;font-weight:800;margin-bottom:4px;letter-spacing:-0.3px}
+.vh-close{position:absolute;top:14px;right:14px;background:rgba(255,255,255,0.06);border:0;color:#cbd5e1;width:30px;height:30px;border-radius:50%;font-size:15px;cursor:pointer;padding:0;line-height:1}
+.vh-kpi-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:14px 0}
+.vh-kpi{background:rgba(30,41,64,0.5);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:10px 8px;text-align:center}
+.vh-kpi-n{font-size:19px;font-weight:800;color:#7dd3fc;font-variant-numeric:tabular-nums;letter-spacing:-0.3px}
+.vh-kpi-l{font-size:10px;color:#94a3b8;margin-top:2px;font-weight:600}
+.vh-section{margin-top:14px}
+.vh-section-t{font-size:11px;color:#94a3b8;font-weight:700;letter-spacing:0.4px;text-transform:uppercase;margin-bottom:8px}
+.vh-tabtop{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:rgba(30,41,64,0.4);border:1px solid rgba(255,255,255,0.05);border-radius:8px;margin-bottom:6px;font-size:12px}
+.vh-tabtop b{color:#c4b5fd;font-weight:700;margin-right:4px}
+.vh-list{max-height:220px;overflow-y:auto;border:1px solid rgba(255,255,255,0.05);border-radius:10px;background:rgba(15,23,42,0.4)}
+.vh-item{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;font-size:12px;border-bottom:1px solid rgba(255,255,255,0.04);gap:8px}
+.vh-item:last-child{border-bottom:0}
+.vh-item .d{color:#cbd5e1;font-variant-numeric:tabular-nums;font-weight:600}
+.vh-item .t{color:#94a3b8;font-size:10.5px;text-align:right}
+.vh-actions{display:flex;gap:8px;margin-top:14px}
+.vh-actions button{flex:1;padding:10px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid transparent;font-family:inherit}
+.vh-close-btn{background:rgba(56,189,248,0.14);border-color:rgba(56,189,248,0.3);color:#7dd3fc}
+.vh-clear-btn{background:rgba(248,113,113,0.1);border-color:rgba(248,113,113,0.25);color:#fca5a5}
+@media (max-width:400px){.vh-badge{max-width:130px;font-size:10px;padding:3px 7px}}
+</style>
+<script>
+(function(){
+  var KEY='sewang_visits';
+  var MAX_DAYS=30;
+  var NOW=Date.now();
+  var startTs=NOW;
+  var currentTabs=new Set();
+  function safeLoad(){try{var s=localStorage.getItem(KEY);if(!s)return null;var d=JSON.parse(s);if(!d||typeof d!=='object')return null;d.visits=Array.isArray(d.visits)?d.visits:[];return d;}catch(e){return null}}
+  function safeSave(d){try{localStorage.setItem(KEY,JSON.stringify(d));}catch(e){}}
+  function prune(d){var cutoff=NOW-MAX_DAYS*86400000;d.visits=d.visits.filter(function(v){return v&&v.ts&&v.ts>=cutoff;});return d;}
+  function fmtRel(ts){var m=Math.floor((NOW-ts)/60000);if(m<1)return '방금';if(m<60)return m+'분 전';var h=Math.floor(m/60);if(h<24)return h+'시간 전';var d=Math.floor(h/24);if(d<30)return d+'일 전';return Math.floor(d/30)+'개월 전';}
+  function fmtDT(ts){var d=new Date(ts);var p=function(n){return String(n).padStart(2,'0');};return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes());}
+  function fmtDur(sec){if(!sec||sec<0)return '-';if(sec<60)return sec+'초';var m=Math.floor(sec/60);if(m<60)return m+'분';return Math.floor(m/60)+'시간 '+(m%60)+'분';}
+  function guessTab(){try{var on=document.querySelector('.bnav-btn.on');if(on){var lbl=on.textContent.replace(/\s+/g,'').trim();if(lbl)return lbl;}var pg=document.querySelector('.page.on');if(pg){var m={'pg-home':'대시보드','pg-new':'신규','pg-gold':'선점','pg-fr':'프랜차이즈','pg-track':'추적','pg-trend':'추이','pg-map':'지도','pg-insight':'인사이트','pg-admin':'관리'};return m[pg.id]||pg.id;}}catch(e){}return '';}
+  function trackTab(){var t=guessTab();if(t)currentTabs.add(t);}
+  var state=safeLoad()||{visits:[],first_visit:NOW,total_count:0};
+  state=prune(state);
+  var lastVisit=state.visits.length?state.visits[state.visits.length-1]:null;
+  var todayCount=(function(){var t=new Date();t.setHours(0,0,0,0);var s=t.getTime();return state.visits.filter(function(v){return v.ts>=s;}).length;})();
+  var isFirst=state.total_count===0;
+  state.visits.push({ts:NOW,tabs:[],duration_sec:0});
+  state.total_count=(state.total_count||0)+1;
+  if(!state.first_visit)state.first_visit=NOW;
+  safeSave(state);
+  trackTab();
+  document.addEventListener('DOMContentLoaded',trackTab);
+  document.addEventListener('click',function(e){if(e.target&&e.target.closest&&e.target.closest('.bnav-btn')){setTimeout(trackTab,60);}});
+  function finalize(){try{var d=safeLoad();if(!d||!d.visits||!d.visits.length)return;var last=d.visits[d.visits.length-1];if(!last||Math.abs(last.ts-NOW)>60*60*1000)return;last.duration_sec=Math.min(6*3600,Math.floor((Date.now()-startTs)/1000));last.tabs=Array.from(currentTabs);safeSave(d);}catch(e){}}
+  window.addEventListener('beforeunload',finalize);
+  document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden')finalize();});
+  function badgeText(){if(isFirst)return {t:'🎉 환영합니다 · 첫 방문',cls:'welcome'};var days=lastVisit?Math.floor((NOW-lastVisit.ts)/86400000):0;if(todayCount>=5)return {t:'오늘 '+todayCount+'번째 열람',cls:'frequent'};if(days>=3)return {t:days+'일 만에 다시 오셨네요 📅',cls:''};if(todayCount>=2)return {t:'오늘 '+todayCount+'번째 열람',cls:''};if(lastVisit)return {t:'이전 방문 '+fmtRel(lastVisit.ts),cls:''};return {t:'환영합니다',cls:''};}
+  function mountBadge(retry){var host=document.querySelector('.hdr .hdr-meta');if(!host){if((retry||0)<20)return setTimeout(function(){mountBadge((retry||0)+1);},300);return;}if(document.getElementById('vh-badge'))return;var b=badgeText();var btn=document.createElement('button');btn.id='vh-badge';btn.className='vh-badge '+b.cls;btn.type='button';btn.title='방문 기록 보기';btn.textContent=b.t;btn.onclick=openModal;host.insertBefore(btn,host.firstChild);}
+  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',function(){mountBadge();});}else{mountBadge();}
+  function tabRank(visits){var c={};visits.forEach(function(v){(v.tabs||[]).forEach(function(t){c[t]=(c[t]||0)+1;});});var arr=Object.keys(c).map(function(k){return {k:k,n:c[k]};});arr.sort(function(a,b){return b.n-a.n;});return arr.slice(0,3);}
+  function avgDur(visits){var d=visits.filter(function(v){return v.duration_sec>0;});if(!d.length)return 0;return Math.round(d.reduce(function(s,v){return s+v.duration_sec;},0)/d.length);}
+  function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function openModal(){
+    var d=safeLoad()||state;
+    var visits=(d.visits||[]).slice().reverse();
+    var top=tabRank(d.visits||[]);
+    var avg=avgDur(d.visits||[]);
+    var firstFmt=d.first_visit?fmtDT(d.first_visit):'-';
+    var html='<div class="vh-modal-bg" id="vh-modal-bg"><div class="vh-modal"><button class="vh-close" id="vh-close">×</button><h3>👣 방문 기록</h3><div style="font-size:11.5px;color:#94a3b8">최근 30일 기록 · 첫 방문 '+esc(firstFmt)+'</div><div class="vh-kpi-row"><div class="vh-kpi"><div class="vh-kpi-n">'+(d.total_count||0)+'</div><div class="vh-kpi-l">총 방문</div></div><div class="vh-kpi"><div class="vh-kpi-n">'+(d.visits||[]).length+'</div><div class="vh-kpi-l">30일 방문</div></div><div class="vh-kpi"><div class="vh-kpi-n">'+esc(fmtDur(avg))+'</div><div class="vh-kpi-l">평균 체류</div></div></div>';
+    if(top.length){html+='<div class="vh-section"><div class="vh-section-t">자주 보는 탭 TOP 3</div>';top.forEach(function(x,i){html+='<div class="vh-tabtop"><span><b>'+(i+1)+'.</b>'+esc(x.k)+'</span><span style="color:#94a3b8">'+x.n+'회</span></div>';});html+='</div>';}
+    html+='<div class="vh-section"><div class="vh-section-t">최근 방문 ('+visits.length+')</div>';
+    if(visits.length===0){html+='<div style="padding:14px;text-align:center;color:#94a3b8;font-size:11.5px">기록 없음</div>';}else{html+='<div class="vh-list">';visits.slice(0,50).forEach(function(v){var tabs=(v.tabs||[]).join(', ');html+='<div class="vh-item"><span class="d">'+esc(fmtDT(v.ts))+'</span><span class="t">'+esc(tabs||'-')+(v.duration_sec?' · '+esc(fmtDur(v.duration_sec)):'')+'</span></div>';});html+='</div>';}
+    html+='</div><div class="vh-actions"><button class="vh-close-btn" id="vh-close2">닫기</button><button class="vh-clear-btn" id="vh-clear">이력 전체 삭제</button></div></div></div>';
+    var wrap=document.createElement('div');wrap.innerHTML=html;var node=wrap.firstChild;document.body.appendChild(node);
+    function close(){if(node&&node.parentNode)node.parentNode.removeChild(node);document.removeEventListener('keydown',onEsc);}
+    function onEsc(e){if(e.key==='Escape')close();}
+    document.addEventListener('keydown',onEsc);
+    node.addEventListener('click',function(e){if(e.target===node)close();});
+    document.getElementById('vh-close').onclick=close;
+    document.getElementById('vh-close2').onclick=close;
+    document.getElementById('vh-clear').onclick=function(){if(confirm('방문 이력을 모두 삭제할까요?')){try{localStorage.removeItem(KEY);}catch(e){}close();var b=document.getElementById('vh-badge');if(b&&b.parentNode)b.parentNode.removeChild(b);}};
+  }
+})();
+</script>
+<!-- ===== END VISIT HISTORY ===== -->
 </body>
 </html>
 
