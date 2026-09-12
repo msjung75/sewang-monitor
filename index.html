@@ -956,6 +956,7 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
     <div class="card-title">📊 사용자 현황</div>
     <div id="admin-stats" style="font-size:12px;color:var(--txt2);line-height:1.8">로딩 중...</div>
     <button onclick="loadAdminPanel()" style="margin-top:8px;padding:6px 12px;background:var(--surface2);border:1px solid var(--border2);color:var(--txt);border-radius:8px;font-size:11px;cursor:pointer">🔄 새로고침</button>
+    <button id="adm-sort-toggle" onclick="toggleAdminSort()" style="margin-top:8px;margin-left:6px;padding:6px 12px;background:var(--surface2);border:1px solid var(--border2);color:var(--txt);border-radius:8px;font-size:11px;cursor:pointer">🕒 최근 방문순</button>
   </div>
   <div class="card" style="margin-bottom:12px;border:1px solid rgba(245,158,11,.35)">
     <div class="card-title" style="color:#fbbf24">⏳ 승인 대기 (<span id="adm-pending-count">0</span>명)</div>
@@ -5658,6 +5659,26 @@ function showBlockedScreen(){
   init();
 })();
 
+// v18: 최근 방문 뱃지 helper
+function _lastVisitBadge(iso){
+  if (!iso) return '<div class="last-visit-badge lv-never" style="font-size:11px;color:#94a3b8;margin-top:4px">📭 방문 기록 없음</div>';
+  var t = new Date(iso).getTime();
+  if (isNaN(t)) return '';
+  var days = Math.floor((Date.now() - t) / 86400000);
+  var label, cls, bg, fg;
+  if (days <= 0)      { label='오늘 방문';       cls='lv-today';  bg='rgba(16,185,129,.15)'; fg='#10b981'; }
+  else if (days === 1){ label='1일 전 방문';    cls='lv-1d';     bg='rgba(251,191,36,.15)'; fg='#f59e0b'; }
+  else if (days < 7)  { label=days+'일 전 방문'; cls='lv-week';   bg='rgba(251,191,36,.10)'; fg='#f59e0b'; }
+  else if (days < 30) { label=days+'일 전 방문'; cls='lv-warn';   bg='rgba(249,115,22,.15)'; fg='#f97316'; }
+  else                { label=days+'일 전 방문 (이탈 위험)'; cls='lv-risk'; bg='rgba(239,68,68,.15)'; fg='#ef4444'; }
+  var dot = days<=0?'🟢':days===1?'🟡':days<7?'🟡':days<30?'⚠️':'🔴';
+  return '<div class="last-visit-badge '+cls+'" style="display:inline-block;margin-top:6px;padding:3px 9px;border-radius:10px;background:'+bg+';color:'+fg+';font-size:11px;font-weight:700">'+dot+' '+label+'</div>';
+}
+function toggleAdminSort(){
+  window._adminSortMode = (window._adminSortMode === 'recent') ? 'default' : 'recent';
+  try { loadAdminPanel(); } catch(e){}
+}
+
 // ============================================================
 // admin 패널 (v12)
 // ============================================================
@@ -5668,6 +5689,16 @@ async function loadAdminPanel(){
     var d = await r.json();
     if (!d.ok) { document.getElementById('admin-stats').textContent = '권한 오류 또는 API 응답 실패'; return; }
     window._adminData = d;
+    // v18: 최근 방문 시각 조회 (관리 탭 전용, Vercel KV) — 실패해도 무시
+    var lastSeen = {};
+    try {
+      var lsr = await fetch('/api/log?userId=all', { credentials:'same-origin' });
+      if (lsr.ok) {
+        var lsj = await lsr.json();
+        if (lsj && lsj.last_seen && typeof lsj.last_seen === 'object') lastSeen = lsj.last_seen;
+      }
+    } catch(e) {}
+    window._lastSeenMap = lastSeen;
     var users = d.users || []; var blocked = d.blocked || []; var pending = d.pending || []; var byRole = {};
     users.forEach(function(u){ byRole[u.role||'unknown'] = (byRole[u.role||'unknown']||0)+1; });
     var pendingN = pending.length;
@@ -5706,6 +5737,18 @@ async function loadAdminPanel(){
     }
 
     // 활성 사용자 섹션
+
+    // v18: 최근 방문순 정렬 (window._adminSortMode: 'recent'|'default', 기본 recent)
+    if (window._adminSortMode == null) window._adminSortMode = 'recent';
+    if (window._adminSortMode === 'recent') {
+      users = users.slice().sort(function(a,b){
+        var ta = lastSeen[String(a.id)] || '';
+        var tb = lastSeen[String(b.id)] || '';
+        if (ta === tb) return 0;
+        return ta < tb ? 1 : -1;  // desc
+      });
+    }
+
     var el = document.getElementById('admin-users-list');
     if (!users.length) {
       el.innerHTML = '<div class="empty" style="padding:18px"><div class="etxt" style="font-size:11px">등록된 사용자 없음</div></div>';
@@ -5718,6 +5761,7 @@ async function loadAdminPanel(){
           + '<div style="font-weight:700;color:var(--txt);font-size:16px">' + esc(u.nickname || '(닉네임 없음)') + '</div>'
           + '<span style="font-size:11px;padding:4px 10px;border-radius:12px;font-weight:700;' + rolePill + '">' + roleLabel + '</span></div>'
           + '<div style="font-size:12px;color:var(--txt3);margin-top:5px">ID: ' + esc(u.id) + (u.approved_at?' · 승인 '+esc((u.approved_at||'').slice(0,10)):'') + '</div>'
+          + _lastVisitBadge(lastSeen[String(u.id)])
           + (u.memo ? '<div style="font-size:13px;color:var(--txt2);margin-top:5px;font-weight:500">📝 ' + esc(u.memo) + '</div>' : '')
           + '<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">'
           + '<button onclick="editUserInfo(\'' + esc(u.id) + '\', \'' + esc((u.nickname||'').replace(/\047/g,"\\'")) + '\', \'' + esc((u.memo||'').replace(/\047/g,"\\'")) + '\')" style="flex:1;min-width:30%;padding:8px;background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.3);color:#6ee7b7;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">✏️ 이름 수정</button>'
