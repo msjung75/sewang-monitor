@@ -6584,7 +6584,7 @@ function startPendingPolling(){
   function normName(s){ return String(s||'').toLowerCase().replace(/[\s()\[\]<>\-_.·:,'"`\/\\]/g,''); }
 
   function loadLeads(){
-    fetch('/api/franchise-leads?status=all', {cache:'no-store'}).then(function(r){ return r.json(); }).then(function(j){
+    fetch('/data/franchise_leads.json?_=' + Date.now() + '', {cache:'no-store'}).then(function(r){ return r.json(); }).then(function(j){
       var leads = (j && j.leads) || [];
       STATE.leads = leads;
       STATE.byPermit = {}; STATE.byBrand = {}; STATE.hidden = {};
