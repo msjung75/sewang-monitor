@@ -41,10 +41,14 @@ def http(method: str, url: str, body=None, timeout: int = 90):
 
 
 def run_actor(query: str):
-    url = f"{BASE}/acts/{ACTOR_ID}/run-sync-get-dataset-items?token={APIFY_TOKEN}&timeout=180"
-    payload = {"queries": [query], "maxResults": RESULTS_PER_BRAND, "language": "ko"}
+    url = f"{BASE}/acts/{ACTOR_ID}/run-sync-get-dataset-items?token={APIFY_TOKEN}&timeout=300"
+    payload = {
+        "keywords": [query],
+        "maxResultsPerKeyword": RESULTS_PER_BRAND,
+        "scrapePlaceDetails": False,
+    }
     try:
-        return http("POST", url, payload, timeout=200)
+        return http("POST", url, payload, timeout=320)
     except urllib.error.HTTPError as e:
         print(f"[franchise] HTTP {e.code} for '{query}': {e.read()[:200]!r}")
         return []
@@ -79,8 +83,9 @@ def main() -> int:
     os.makedirs(os.path.dirname(OUT_PATH), exist_ok=True)
     with open(OUT_PATH, "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, indent=2)
-    est_credits = total_items * 0.006  # rough est per docs
-    print(f"[franchise] wrote {OUT_PATH}, total items={total_items}, est spend≈${est_credits:.3f}")
+    # Pricing (2026): $0.0015/dataset item + $0.00005 actor start (per GB)
+    est_credits = total_items * 0.0015 + len(brands) * 0.00005
+    print(f"[franchise] wrote {OUT_PATH}, total items={total_items}, est spend≈${est_credits:.4f}")
     return 0
 
 
