@@ -1,9 +1,9 @@
-// api/franchise-leads.js — Vercel serverless function
+// api/franchise-leads.js — Vercel serverless function (ESM)
 // Query: ?status=lead|confirmed|gov_only|booth_suspect|all&brand=<name>
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
-module.exports = (req, res) => {
+export default function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -35,4 +35,4 @@ module.exports = (req, res) => {
     total: leads.length,
     leads
   });
-};
+}
