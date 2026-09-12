@@ -1,5 +1,5 @@
 {
-  "at": "2026-09-12T16:22:40+09:00",
+  "at": "2026-09-12T16:33:09+09:00",
   "brands": {
     "야화 혼술바": {
       "query": "야화 혼술바",
@@ -4699,8 +4699,8 @@
           "Address": "새창로 15",
           "FullAddress": "",
           "Contact": "0507-1485-6696",
-          "BusinessStatus": "곧 영업 종료",
-          "BusinessHours": "곧 영업 종료 01:30에 영업 종료",
+          "BusinessStatus": "영업 종료",
+          "BusinessHours": "영업 종료 14:00에 영업 시작",
           "BusinessHoursDetail": [],
           "Latitude": "37.5422531",
           "Longitude": "126.9516841",
@@ -4744,8 +4744,8 @@
           "Address": "지봉로20길 81 1층 3호",
           "FullAddress": "",
           "Contact": "070-7694-8282",
-          "BusinessStatus": "영업 중",
-          "BusinessHours": "영업 중 01:40에 영업 종료",
+          "BusinessStatus": "곧 영업 종료",
+          "BusinessHours": "곧 영업 종료 01:40에 영업 종료",
           "BusinessHoursDetail": [],
           "Latitude": "37.5814592",
           "Longitude": "127.0198861",
@@ -4919,8 +4919,8 @@
           "Address": "고려대로13길 43 1층",
           "FullAddress": "",
           "Contact": "02-929-2975",
-          "BusinessStatus": "곧 영업 종료",
-          "BusinessHours": "곧 영업 종료 01:30에 영업 종료",
+          "BusinessStatus": "영업 종료",
+          "BusinessHours": "영업 종료 12:00에 영업 시작",
           "BusinessHoursDetail": [],
           "Latitude": "37.5883180",
           "Longitude": "127.0226362",
@@ -10241,8 +10241,8 @@
           "Address": "서오릉로 79 1층",
           "FullAddress": "서울특별시 은평구 서오릉로 79 1층",
           "Contact": "02-6956-3025",
-          "BusinessStatus": "곧 영업 종료",
-          "BusinessHours": "곧 영업 종료 01:30에 영업 종료",
+          "BusinessStatus": "영업 종료",
+          "BusinessHours": "영업 종료 10:50에 영업 시작",
           "BusinessHoursDetail": [],
           "Latitude": "37.6073065",
           "Longitude": "126.9217267",
@@ -10793,7 +10793,7 @@
         {
           "Name": "야키토리동작 왕십리점",
           "Category": "요리주점",
-          "BusinessCategory": "bar",
+          "BusinessCategory": "place",
           "OverallRating": "4.92",
           "ReviewCount": 66,
           "VisitorReviewCount": 66,
@@ -10835,7 +10835,7 @@
         {
           "Name": "야키토리동작 인천시청점",
           "Category": "이자카야",
-          "BusinessCategory": "bar",
+          "BusinessCategory": "place",
           "OverallRating": "",
           "ReviewCount": 1783,
           "VisitorReviewCount": 1567,
@@ -10886,7 +10886,7 @@
         {
           "Name": "야키토리동작 시흥배곧점",
           "Category": "이자카야",
-          "BusinessCategory": "bar",
+          "BusinessCategory": "place",
           "OverallRating": "4.91",
           "ReviewCount": 443,
           "VisitorReviewCount": 388,
@@ -10937,7 +10937,7 @@
         {
           "Name": "야키토리동작 과천지식정보타운점",
           "Category": "이자카야",
-          "BusinessCategory": "bar",
+          "BusinessCategory": "place",
           "OverallRating": "",
           "ReviewCount": 193,
           "VisitorReviewCount": 190,
@@ -10988,7 +10988,7 @@
         {
           "Name": "야키토리동작 수지구청점",
           "Category": "이자카야",
-          "BusinessCategory": "bar",
+          "BusinessCategory": "place",
           "OverallRating": "4.81",
           "ReviewCount": 1297,
           "VisitorReviewCount": 1140,
@@ -11039,7 +11039,7 @@
         {
           "Name": "야키토리동작",
           "Category": "경영컨설팅",
-          "BusinessCategory": "bar",
+          "BusinessCategory": "place",
           "OverallRating": "",
           "ReviewCount": 37,
           "VisitorReviewCount": 37,
@@ -11081,7 +11081,7 @@
         {
           "Name": "야키토리동작 인천루원시티점",
           "Category": "요리주점",
-          "BusinessCategory": "bar",
+          "BusinessCategory": "place",
           "OverallRating": "4.98",
           "ReviewCount": 63,
           "VisitorReviewCount": 63,
@@ -11123,7 +11123,7 @@
         {
           "Name": "야키토리동작 김포구래점",
           "Category": "이자카야",
-          "BusinessCategory": "bar",
+          "BusinessCategory": "place",
           "OverallRating": "4.85",
           "ReviewCount": 487,
           "VisitorReviewCount": 443,
@@ -11174,7 +11174,7 @@
         {
           "Name": "야키토리동작 송도워터프런트점",
           "Category": "요리주점",
-          "BusinessCategory": "bar",
+          "BusinessCategory": "place",
           "OverallRating": "",
           "ReviewCount": 0,
           "VisitorReviewCount": 0,
@@ -11216,7 +11216,7 @@
         {
           "Name": "야키토리 흑연",
           "Category": "이자카야",
-          "BusinessCategory": "bar",
+          "BusinessCategory": "place",
           "OverallRating": "",
           "ReviewCount": 29,
           "VisitorReviewCount": 28,
@@ -11258,7 +11258,7 @@
         {
           "Name": "야키토리동작 청주성안점",
           "Category": "이자카야",
-          "BusinessCategory": "bar",
+          "BusinessCategory": "place",
           "OverallRating": "4.85",
           "ReviewCount": 1393,
           "VisitorReviewCount": 1167,
@@ -11305,7 +11305,7 @@
         {
           "Name": "야키토리동작 청주강서점",
           "Category": "이자카야",
-          "BusinessCategory": "bar",
+          "BusinessCategory": "place",
           "OverallRating": "4.9",
           "ReviewCount": 1499,
           "VisitorReviewCount": 1062,
@@ -11356,7 +11356,7 @@
         {
           "Name": "야키토리동작 대전가수원점",
           "Category": "이자카야",
-          "BusinessCategory": "bar",
+          "BusinessCategory": "place",
           "OverallRating": "",
           "ReviewCount": 1260,
           "VisitorReviewCount": 1111,
@@ -11407,7 +11407,7 @@
         {
           "Name": "야키토리동작 천안신부점",
           "Category": "이자카야",
-          "BusinessCategory": "bar",
+          "BusinessCategory": "place",
           "OverallRating": "",
           "ReviewCount": 1204,
           "VisitorReviewCount": 897,
@@ -11458,7 +11458,7 @@
         {
           "Name": "야키토리동작 전주객리단길점",
           "Category": "이자카야",
-          "BusinessCategory": "bar",
+          "BusinessCategory": "place",
           "OverallRating": "",
           "ReviewCount": 405,
           "VisitorReviewCount": 386,
@@ -11509,7 +11509,7 @@
         {
           "Name": "야키토리동작 청주복대지웰점",
           "Category": "이자카야",
-          "BusinessCategory": "bar",
+          "BusinessCategory": "place",
           "OverallRating": "4.92",
           "ReviewCount": 1254,
           "VisitorReviewCount": 1043,
@@ -11560,7 +11560,7 @@
         {
           "Name": "야키토리 동작 청주오송점",
           "Category": "이자카야",
-          "BusinessCategory": "bar",
+          "BusinessCategory": "place",
           "OverallRating": "4.89",
           "ReviewCount": 1733,
           "VisitorReviewCount": 1455,
@@ -11611,7 +11611,7 @@
         {
           "Name": "야키토리동작 청주동남지구본점",
           "Category": "이자카야",
-          "BusinessCategory": "bar",
+          "BusinessCategory": "place",
           "OverallRating": "4.89",
           "ReviewCount": 2767,
           "VisitorReviewCount": 1605,
@@ -11662,7 +11662,7 @@
         {
           "Name": "야키토리동작 광주수완점",
           "Category": "이자카야",
-          "BusinessCategory": "bar",
+          "BusinessCategory": "place",
           "OverallRating": "",
           "ReviewCount": 883,
           "VisitorReviewCount": 686,
@@ -11709,7 +11709,7 @@
         {
           "Name": "야키토리동작 청주오창점",
           "Category": "이자카야",
-          "BusinessCategory": "bar",
+          "BusinessCategory": "place",
           "OverallRating": "",
           "ReviewCount": 1055,
           "VisitorReviewCount": 929,
@@ -11756,7 +11756,7 @@
         {
           "Name": "야키토리동작 군산지곡점",
           "Category": "이자카야",
-          "BusinessCategory": "bar",
+          "BusinessCategory": "place",
           "OverallRating": "",
           "ReviewCount": 149,
           "VisitorReviewCount": 147,
@@ -11807,7 +11807,7 @@
         {
           "Name": "야키토리 다온",
           "Category": "요리주점",
-          "BusinessCategory": "bar",
+          "BusinessCategory": "place",
           "OverallRating": "4.92",
           "ReviewCount": 442,
           "VisitorReviewCount": 379,
@@ -11854,7 +11854,7 @@
         {
           "Name": "마요네즈 사당점",
           "Category": "이자카야",
-          "BusinessCategory": "bar",
+          "BusinessCategory": "place",
           "OverallRating": "4.88",
           "ReviewCount": 1735,
           "VisitorReviewCount": 1320,
@@ -11901,7 +11901,7 @@
         {
           "Name": "야키오 진격 상도동본점",
           "Category": "이자카야",
-          "BusinessCategory": "bar",
+          "BusinessCategory": "place",
           "OverallRating": "",
           "ReviewCount": 91,
           "VisitorReviewCount": 58,
@@ -11943,7 +11943,7 @@
         {
           "Name": "야키토리 히노야 이수점",
           "Category": "이자카야",
-          "BusinessCategory": "bar",
+          "BusinessCategory": "place",
           "OverallRating": "",
           "ReviewCount": 428,
           "VisitorReviewCount": 125,
@@ -11990,7 +11990,7 @@
         {
           "Name": "노군꼬치 이수점",
           "Category": "이자카야",
-          "BusinessCategory": "bar",
+          "BusinessCategory": "place",
           "OverallRating": "",
           "ReviewCount": 447,
           "VisitorReviewCount": 402,
@@ -12037,7 +12037,7 @@
         {
           "Name": "야키토리 히히",
           "Category": "일식튀김,꼬치",
-          "BusinessCategory": "bar",
+          "BusinessCategory": "place",
           "OverallRating": "",
           "ReviewCount": 6,
           "VisitorReviewCount": 5,
@@ -12079,7 +12079,7 @@
         {
           "Name": "야키도리 굽",
           "Category": "일식튀김,꼬치",
-          "BusinessCategory": "bar",
+          "BusinessCategory": "place",
           "OverallRating": "",
           "ReviewCount": 164,
           "VisitorReviewCount": 117,
@@ -17156,8 +17156,8 @@
           "Address": "월드컵북로 236",
           "FullAddress": "",
           "Contact": null,
-          "BusinessStatus": "영업 종료",
-          "BusinessHours": "영업 종료 07:30에 영업 시작",
+          "BusinessStatus": "영업 전",
+          "BusinessHours": "영업 전 07:30에 영업 시작",
           "BusinessHoursDetail": [],
           "Latitude": "37.5702305",
           "Longitude": "126.9034754",
