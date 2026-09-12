@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "updated": "2026-09-13",
+  "notes": "franchise expansion detection v1 — brand watchlist",
+  "brands": [
+    {"name": "야화 혼술바", "aliases": ["야화혼술바", "야화"], "exclude_terms": ["축제", "부스", "이벤트", "팝업", "임시"], "priority": "normal"},
+    {"name": "우규 이자카야", "aliases": ["우규이자카야", "우규"], "exclude_terms": ["축제", "부스", "이벤트", "팝업", "임시"], "priority": "normal"},
+    {"name": "호앙비엣", "aliases": ["호앙비엣", "Pho Hoang Viet"], "exclude_terms": ["축제", "부스", "이벤트", "팝업", "임시"], "priority": "internal_track_only"},
+    {"name": "처갓집양념치킨", "aliases": ["처갓집", "처갓집치킨"], "exclude_terms": ["축제", "부스", "이벤트", "팝업", "임시"], "priority": "normal"},
+    {"name": "가마치통닭", "aliases": ["가마치"], "exclude_terms": ["축제", "부스", "이벤트", "팝업", "임시"], "priority": "normal"},
+    {"name": "토핑몬스터피자", "aliases": ["토핑몬스터", "toppingmonster"], "exclude_terms": ["축제", "부스", "이벤트", "팝업", "임시"], "priority": "normal"},
+    {"name": "케이찹사라다", "aliases": ["케이찹", "케이찹사라다"], "exclude_terms": ["축제", "부스", "이벤트", "팝업", "임시"], "priority": "normal"},
+    {"name": "육회바른연어", "aliases": ["육회바른연어"], "exclude_terms": ["축제", "부스", "이벤트", "팝업", "임시"], "priority": "normal"},
+    {"name": "야키토리동작", "aliases": ["야키토리동작"], "exclude_terms": ["축제", "부스", "이벤트", "팝업", "임시"], "priority": "normal"},
+    {"name": "우지커피", "aliases": ["우지커피"], "exclude_terms": ["축제", "부스", "이벤트", "팝업", "임시"], "priority": "normal"},
+    {"name": "러너펍", "aliases": ["러너펍", "runner pub"], "exclude_terms": ["축제", "부스", "이벤트", "팝업", "임시"], "priority": "normal"},
+    {"name": "타코로", "aliases": ["타코로"], "exclude_terms": ["축제", "부스", "이벤트", "팝업", "임시"], "priority": "normal"},
+    {"name": "텐퍼센트커피", "aliases": ["텐퍼센트커피", "10% coffee"], "exclude_terms": ["축제", "부스", "이벤트", "팝업", "임시"], "priority": "normal"},
+    {"name": "연막창", "aliases": ["연막창"], "exclude_terms": ["축제", "부스", "이벤트", "팝업", "임시"], "priority": "normal"},
+    {"name": "한들미 미니포차", "aliases": ["한들미味니포차", "한들미"], "exclude_terms": ["축제", "부스", "이벤트", "팝업", "임시"], "priority": "normal"}
+  ]
+}
