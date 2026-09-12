@@ -52,7 +52,6 @@ def normalize_addr(s: str) -> str:
     if not s:
         return ""
     s = re.sub(r"\s+", " ", s).strip()
-    # strip common suffixes
     s = re.sub(r"\s*\d+층.*$", "", s)
     s = re.sub(r"\s*[가-힣]?\d+호.*$", "", s)
     return s
@@ -81,7 +80,7 @@ def fetch_permits():
     return []
 
 
-def match_brand(name: str, brands_cfg: list[dict]) -> dict | None:
+def match_brand(name: str, brands_cfg):
     n = normalize_name(name)
     if not n:
         return None
@@ -95,42 +94,71 @@ def match_brand(name: str, brands_cfg: list[dict]) -> dict | None:
 
 
 def is_excluded(item: dict, brand: dict) -> bool:
-    text = " ".join(str(item.get(k, "")) for k in ("name", "title", "category", "description"))
+    text = " ".join(
+        str(item.get(k, ""))
+        for k in ("name", "title", "category", "description", "Name", "Category", "Description")
+    )
     for term in brand.get("exclude_terms", []):
         if term and term in text:
             return True
     return False
 
 
+def _to_float(v):
+    try:
+        return float(v)
+    except (TypeError, ValueError):
+        return None
+
+
 def apify_coords(item: dict):
-    for lat_k, lon_k in (("y", "x"), ("lat", "lng"), ("latitude", "longitude"), ("mapy", "mapx")):
-        try:
-            lat = float(item.get(lat_k))
-            lon = float(item.get(lon_k))
-            if abs(lat) < 90 and abs(lon) < 180:
-                return lat, lon
-        except (TypeError, ValueError):
-            continue
+    for lat_k, lon_k in (
+        ("Latitude", "Longitude"),
+        ("y", "x"),
+        ("lat", "lng"),
+        ("latitude", "longitude"),
+        ("mapy", "mapx"),
+    ):
+        lat = _to_float(item.get(lat_k))
+        lon = _to_float(item.get(lon_k))
+        if lat is not None and lon is not None and abs(lat) < 90 and abs(lon) < 180:
+            return lat, lon
     return None
 
 
 def apify_name(item: dict) -> str:
-    return str(item.get("name") or item.get("title") or item.get("placeName") or "").strip()
+    for k in ("Name", "name", "title", "placeName"):
+        v = item.get(k)
+        if v:
+            return str(v).strip()
+    return ""
 
 
 def apify_addr(item: dict) -> str:
-    return str(item.get("address") or item.get("roadAddress") or item.get("addr") or "").strip()
+    for k in ("FullAddress", "Address", "address", "roadAddress", "addr"):
+        v = item.get(k)
+        if v:
+            return str(v).strip()
+    return ""
+
+
+def apify_url(item: dict):
+    for k in ("NaverMapUrl", "link", "url"):
+        v = item.get(k)
+        if v:
+            return v
+    pid = item.get("PlaceId") or item.get("placeId")
+    if pid:
+        return f"https://map.naver.com/p/entry/place/{pid}"
+    return None
 
 
 def permit_coords(p: dict):
     for lat_k, lon_k in (("lat", "lng"), ("y", "x"), ("latitude", "longitude")):
-        try:
-            lat = float(p.get(lat_k))
-            lon = float(p.get(lon_k))
-            if abs(lat) < 90 and abs(lon) < 180:
-                return lat, lon
-        except (TypeError, ValueError):
-            continue
+        lat = _to_float(p.get(lat_k))
+        lon = _to_float(p.get(lon_k))
+        if lat is not None and lon is not None and abs(lat) < 90 and abs(lon) < 180:
+            return lat, lon
     return None
 
 
@@ -152,7 +180,6 @@ def main() -> int:
     print(f"[franchise-proc] permits loaded: {len(permits)}")
 
     now = datetime.now()
-    window_start = now - timedelta(days=BOOTH_WINDOW_DAYS)
 
     leads = []
     matched_permit_ids = set()
@@ -160,15 +187,21 @@ def main() -> int:
     for brand_name, block in raw.get("brands", {}).items():
         brand_cfg = next((b for b in brands_cfg if b["name"] == brand_name), None)
         if not brand_cfg:
+            print(f"[franchise-proc] no cfg for brand {brand_name}, skip")
             continue
+        items = block.get("items", [])
         recent_count = 0
         brand_leads = []
-        for it in block.get("items", []):
+        skipped_noname = 0
+        skipped_excluded = 0
+        for it in items:
             nm = apify_name(it)
             addr = apify_addr(it)
             if not nm:
+                skipped_noname += 1
                 continue
             if is_excluded(it, brand_cfg):
+                skipped_excluded += 1
                 continue
             coords = apify_coords(it)
             status = "lead"
@@ -197,7 +230,7 @@ def main() -> int:
                 "status": status,
                 "source": "apify_naver",
                 "detected_at": now.isoformat(timespec="seconds"),
-                "raw_url": it.get("link") or it.get("url"),
+                "raw_url": apify_url(it),
             }
             if matched_permit:
                 entry["permit"] = {
@@ -210,9 +243,12 @@ def main() -> int:
             for e in brand_leads:
                 if e["status"] == "lead":
                     e["status"] = "booth_suspect"
+        print(
+            f"[franchise-proc] {brand_name}: items={len(items)} kept={len(brand_leads)} "
+            f"skip_noname={skipped_noname} skip_excluded={skipped_excluded}"
+        )
         leads.extend(brand_leads)
 
-    # gov_only: permits that carry a franchise brand name but no Apify match
     for p in permits:
         pid = str(p.get("mng_no") or p.get("mgtno") or p.get("id") or "")
         if not pid or pid in matched_permit_ids:
