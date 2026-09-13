@@ -673,6 +673,8 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
     <div class="chip" data-v="gold">N미등록</div>
     <div class="chip" data-v="reg">N등록</div>
     <div class="chip" data-v="buzz">화제순</div>
+    <div class="chip" data-v="tel">📞 전번있음</div>
+    <div class="chip" data-v="notel">🚫📞 전번없음</div>
   </div>
 
   <!-- 검색창 + 시·도 + 시·군·구 (v10.6) -->
@@ -1075,7 +1077,7 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
   <button class="bnav-btn" data-pg="new">
     <span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/><line x1="9" y1="11" x2="9.01" y2="11"/><line x1="15" y1="11" x2="15.01" y2="11"/></svg></span>신규업장
   </button>
-  <button class="bnav-btn" id="bnav-gold" data-pg="gold">
+  <button class="bnav-btn" id="bnav-gold" data-pg="gold" style="display:none">
     <span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 010-5H6"/><path d="M18 9h1.5a2.5 2.5 0 000-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0012 0V2z"/></svg></span>선점기회
   </button>
   <button class="bnav-btn" data-pg="fr">
@@ -1768,7 +1770,7 @@ function storeCard(s, opts){
       nvBadge = '<span class="tag t-naver">N등록</span>' +
         (bz > 0 ? '<span class="tag t-buzz">🔥 블로그 ' + (bz > 999 ? '999+' : bz) + '</span>' : '');
     } else {
-      nvBadge = '<span class="tag t-gold">🏆 N미등록 — 선점기회</span>';
+      nvBadge = '<span class="tag t-gold">N미등록</span>';
     }
   } else {
     nvBadge = '<span class="tag t-gray">분석 대기</span>';
@@ -1865,6 +1867,8 @@ function filteredPermits(){
   if (nstat === 'gold') list = list.filter(function(s){ return nv(s) && !nv(s).found; });
   else if (nstat === 'reg') list = list.filter(function(s){ return nv(s) && nv(s).found; });
   else if (nstat === 'buzz') list.sort(function(a,b){ return buzzScore(nv(b)) - buzzScore(nv(a)); });
+  else if (nstat === 'tel') list = list.filter(function(s){ return !!(s.tel && String(s.tel).trim()); });
+  else if (nstat === 'notel') list = list.filter(function(s){ return !(s.tel && String(s.tel).trim()); });
   // v12.4: 기본 정렬 — 인허가일 내림차순 (최신 매장 먼저). buzz/gold/reg 외 기본 케이스
   else list.sort(function(a,b){ return (b.permitDate||'').localeCompare(a.permitDate||''); });
   return list;
@@ -6676,6 +6680,7 @@ function startPendingPolling(){
   }
 
   function installFilterChip(){
+    return; // baseline 단계 — 선행 감지만 chip 비활성화
     var chips = document.getElementById('chip-nstat'); if (!chips) return;
     if (document.getElementById('chip-fr-lead')) return;
     var chip = document.createElement('div');
