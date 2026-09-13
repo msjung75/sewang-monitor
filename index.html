@@ -1934,6 +1934,7 @@ function bindChipSido(){
 }
 
 function showLeadEmptyState(){try{var host=document.querySelector('#page-new')||document.querySelector('#page-new-list')||document.body;var existing=document.getElementById('lead-empty-banner');if(typeof LEAD_ONLY==='undefined'||!LEAD_ONLY){if(existing)existing.remove();return;}var cards=host.querySelectorAll('.card, .sc');if(cards.length>0){if(existing)existing.remove();return;}if(!existing){existing=document.createElement('div');existing.id='lead-empty-banner';existing.style.cssText='margin:14px;padding:14px 16px;background:#fff8e1;border:1px solid #ffca28;border-radius:12px;color:#5d4037;font-size:14px;line-height:1.55;box-shadow:0 2px 8px rgba(0,0,0,.05);';existing.innerHTML='\uD83D\uDFE1 <b>\uC120\uD589 \uAC10\uC9C0</b>\uB294 <b>\uAC00\uB9F9\uC810 \uD655\uC7A5\uC744 \uC778\uD5C8\uAC00 \uC804\uC5D0 \uBBF8\uB9AC \uC7A1\uC544\uB0B4\uB294 \uAE30\uB2A5</b>\uC774\uC5D0\uC694.<br>\uC9C0\uAE08\uC740 \uCCAB \uC2A4\uCE94 baseline \uB2E8\uACC4 \u2014 \uB2E4\uC74C \uC2A4\uCE94(\uC6D4\u00B7\uBAA9 \uC0C8\uBCBD 05:00)\uBD80\uD130 \uC2E4\uC81C \uAC10\uC9C0 \uD6C4\uBCF4\uAC00 \uC774\uACF3\uC5D0 \uB728\uC5B4\uC694.';host.insertBefore(existing, host.firstChild);}}catch(e){console.warn('lead empty state err',e);}}
+function showLeadEmptyState(){try{var host=document.querySelector('#page-new')||document.querySelector('#page-new-list')||document.body;var existing=document.getElementById('lead-empty-banner');if(typeof LEAD_ONLY==='undefined'||!LEAD_ONLY){if(existing)existing.remove();return;}var cards=host.querySelectorAll('.card, .sc');if(cards.length>0){if(existing)existing.remove();return;}if(!existing){existing=document.createElement('div');existing.id='lead-empty-banner';existing.style.cssText='margin:14px;padding:14px 16px;background:#fff8e1;border:1px solid #ffca28;border-radius:12px;color:#5d4037;font-size:14px;line-height:1.55;box-shadow:0 2px 8px rgba(0,0,0,.05);';existing.innerHTML='\uD83D\uDFE1 <b>\uC120\uD589 \uAC10\uC9C0</b>\uB294 <b>\uAC00\uB9F9\uC810 \uD655\uC7A5\uC744 \uC778\uD5C8\uAC00 \uC804\uC5D0 \uBBF8\uB9AC \uC7A1\uC544\uB0B4\uB294 \uAE30\uB2A5</b>\uC774\uC5D0\uC694.<br>\uC9C0\uAE08\uC740 \uCCAB \uC2A4\uCE94 baseline \uB2E8\uACC4 \u2014 \uB2E4\uC74C \uC2A4\uCE94(\uC6D4\u00B7\uBAA9 \uC0C8\uBCBD 05:00)\uBD80\uD130 \uC2E4\uC81C \uAC10\uC9C0 \uD6C4\uBCF4\uAC00 \uC774\uACF3\uC5D0 \uB728\uC5B4\uC694.';host.insertBefore(existing, host.firstChild);}}catch(e){console.warn('lead empty state err',e);}}
 function renderNew(){
   // v15.14: N등록 통계 카드 갱신
   var summaryEl = document.getElementById('nstat-summary');
@@ -6684,7 +6685,7 @@ function startPendingPolling(){
     chip.textContent = '🟡 선행 감지만';
     chip.title = '가맹점 확장 선행 감지 (인허가 전)';
     chip.addEventListener('click', function(){
-      LEAD_ONLY = !LEAD_ONLY; setTimeout(showLeadEmptyState,150);
+      LEAD_ONLY = !LEAD_ONLY; setTimeout(showLeadEmptyState,150); setTimeout(showLeadEmptyState,150);
       try { sessionStorage.setItem('franchise-lead-only', LEAD_ONLY ? '1' : '0'); } catch(e){}
       chip.classList.toggle('on', LEAD_ONLY);
       if (typeof renderNew === 'function') renderNew();
@@ -6793,6 +6794,7 @@ function startPendingPolling(){
 })();
 </script>
 <!-- ===== END VISIT HISTORY ===== -->
+<script>document.addEventListener("DOMContentLoaded",function(){setTimeout(showLeadEmptyState,500);});setInterval(function(){if(typeof showLeadEmptyState==="function")showLeadEmptyState();},2000);</script>
 <script>document.addEventListener("DOMContentLoaded",function(){setTimeout(showLeadEmptyState,500);});setInterval(function(){if(typeof showLeadEmptyState==="function")showLeadEmptyState();},2000);</script>
 </body>
 </html>
