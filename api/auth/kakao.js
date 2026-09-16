@@ -744,7 +744,6 @@ export default async function handler(req, res) {
     if (['approve', 'add_user', 'update_role'].includes(action)) {
       const input = await readBody(req);
       if (input.role && !ROLES.includes(input.role)) return res.status(400).json({ error: 'invalid_role' });
-      req.body = input;
     }
 
     if (action === 'list_users') {
