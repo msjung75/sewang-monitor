@@ -3559,6 +3559,7 @@ function showNightlyOnly(){
 // CLOCK + INIT
 // ============================================================
 function updateClock(isFetch){
+  if (!document.getElementById('hdr-time') || !document.getElementById('hdr-date')) return;
   var now = new Date();
   document.getElementById('hdr-time').textContent =
     now.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
