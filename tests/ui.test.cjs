@@ -9,6 +9,7 @@ function setup(){
  w.eval(fs.readFileSync('assets/intelligence-core.js','utf8'));
  const d=new Date().toISOString().slice(0,10).replace(/-/g,'');
  w.ME={id:'test-user',role:'staff'};
+ w.APP_DATA_STATE={'trend30_all.json':'ready','ytd_2026_summary.json':'ready'};
  w.ST={permits:[{id:'test-store',name:'테스트 주막',addr:'서울특별시 강남구 테헤란로 12',permitDate:d,type:'ilban',typeLabel:'일반음식점',upte:'기타'}],naver:{},tracked:[],lastFetch:new Date().toISOString()};
  w.fmtYmd=x=>x||'-';w.save=()=>{};w.renderCharts=()=>{};w.loadCustomers=()=>[];w.saveCustomers=()=>{};w.isCustomerBrand=()=>false;w.isFranchiseRegistered=()=>false;w.switchPage=pg=>{w.lastPage=pg;};w.selectBrand=()=>{};
  w.analyzeStore=async s=>{w.ST.naver[s.id]=w.SewangIntelligence.match(s,[]);};

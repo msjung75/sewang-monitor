@@ -28,3 +28,11 @@ button,input,select,textarea,a{touch-action:manipulation}button:focus-visible,a:
 @media(max-width:860px){.bnav-btn[data-pg=insight],.bnav-btn[data-pg=trend],.bnav-btn[data-pg=map],.bnav-btn[data-pg=admin]{display:none!important}.si-more-toggle{display:flex}.si-more-toggle .ico{font-size:23px}.bnav-btn{font-size:11px}.si-heading{display:block;margin-top:14px}.si-stamp{border:0;padding:0;margin-top:12px;max-width:none}.si-stamp strong{display:inline;margin-right:8px}.si-kpis{gap:8px}.si-kpi strong{font-size:23px}.si-kpi span{font-size:11px}.si-tab{padding:12px}.si-tab b{font-size:15px}.si-tab span{font-size:11px}.si-detail{padding:18px}.hdr-meta #hdr-time,.hdr-meta #hdr-date{display:none}.hdr-title{font-size:16px}}
 @media(max-width:380px){.si-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.si-tab span{display:none}.si-toolbar select{min-width:0;flex:1}.page{padding:12px}.si-row{padding:14px 12px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+/* Data recovery and transfer state: visible across all app sections. */
+.si-data-notices{display:grid;gap:10px;margin:0 0 18px}
+.si-data-notices[hidden]{display:none}
+.si-data-notice{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:15px 18px;border:1px solid #466587;border-radius:12px;background:#172c43;color:#e4eef8;font-size:13px;line-height:1.65}
+.si-data-notice p{margin:0;overflow-wrap:anywhere}
+.si-data-notice button{flex-shrink:0}
+.si-data-notice.error{border-color:#ae8547;background:#302a20;color:#ffe2ac}
+@media(max-width:719px){.si-data-notice{align-items:stretch;flex-direction:column;gap:10px;padding:13px}.si-data-notice button{width:100%}}

@@ -48,6 +48,13 @@
     refreshData();
     host.innerHTML=heading()+'<div id="si-tabs">'+tabs()+'</div><div id="si-content" role="tabpanel" aria-labelledby="si-tab-'+view+'"></div>';
     bindTabs();
+    const file=view==='sales'?'trend30_all.json':'ytd_2026_summary.json';
+    const usable=view==='sales'?(ST.permits||[]).length>0:!!window.YTD;
+    const state=(window.APP_DATA_STATE||{})[file];
+    if(!usable && state!=='ready'){
+      $('si-content').innerHTML='<div class="si-panel si-empty" role="status">'+(['error','denied','session-expired'].includes(state)?'자료를 불러오지 못했습니다. 상단의 다시 불러오기를 이용해 주세요. 기존 자료가 삭제되거나 0건이라는 뜻은 아닙니다.':'기존 자료를 불러오고 있습니다. 잠시만 기다려 주세요.')+'</div>';
+      return;
+    }
     if(view==='sales')renderSales();else if(view==='trends')renderTrends();else renderBrands();
   }
   function salesList(){return rows.map(s=>({s,info:I.lead(s,entry(s),review(s))})).filter(x=>{
