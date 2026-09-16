@@ -21,6 +21,7 @@ jobs:
           import json, urllib.request, urllib.parse, time, re, os
           key=os.environ.get("DATA_GO_KR_KEY")
           if not key: raise SystemExit("Government key missing; previous master preserved")
+          key=urllib.parse.unquote(key.strip())
           complete=False
           all_brands = []
           all_compact = {}

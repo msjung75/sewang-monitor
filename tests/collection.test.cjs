@@ -5,6 +5,12 @@ const path=require('node:path');
 const os=require('node:os');
 const {spawnSync}=require('node:child_process');
 const response=(items=[],total=items.length)=>({ok:true,text:async()=>JSON.stringify({response:{header:{resultCode:'00'},body:{totalCount:total,items:{item:items}}}})});
+test('encoded and decoded government credentials produce the same serviceKey without double encoding',async()=>{
+ const {collectPermits}=await import('../lib/permit-source.mjs');
+ for(const key of ['fixture+/=','fixture%2B%2F%3D']){
+  await collectPermits({region:'seoul',type:'ilban'},key,{fetcher:async url=>{assert.equal(new URL(url).searchParams.get('serviceKey'),'fixture+/=');return response();}});
+ }
+});
 test('government transport, permission, malformed response and partial service failures never become zero results',async()=>{
  const {collectPermits}=await import('../lib/permit-source.mjs');
  for(const fetcher of [async()=>({ok:false,status:403}),async()=>({ok:true,text:async()=>'<error>'}),async()=>({ok:true,text:async()=>JSON.stringify({error:'denied'})}),async()=>response([],1)]){
