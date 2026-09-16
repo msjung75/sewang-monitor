@@ -1,12 +1,12 @@
 {
-  "updated": "2026-09-13T22:10:53",
+  "updated": "2026-09-16T22:42:02",
   "counts": {
     "total": 418,
     "confirmed": 0,
-    "lead": 3,
+    "lead": 7,
     "gov_only": 0,
     "booth_suspect": 0,
-    "existing": 415,
+    "existing": 411,
     "baseline": 0
   },
   "meta": {
@@ -29,10 +29,10 @@
     {
       "brand": "우규 이자카야",
       "items": 30,
-      "new": 0,
-      "existing": 30,
+      "new": 1,
+      "existing": 29,
       "confirmed": 0,
-      "lead": 0,
+      "lead": 1,
       "booth": 0,
       "skip_noname": 0,
       "skip_excluded": 0
@@ -73,10 +73,10 @@
     {
       "brand": "토핑몬스터피자",
       "items": 30,
-      "new": 0,
-      "existing": 30,
+      "new": 2,
+      "existing": 28,
       "confirmed": 0,
-      "lead": 0,
+      "lead": 2,
       "booth": 0,
       "skip_noname": 0,
       "skip_excluded": 0
@@ -84,10 +84,10 @@
     {
       "brand": "케이찹사라다",
       "items": 30,
-      "new": 1,
-      "existing": 29,
+      "new": 0,
+      "existing": 30,
       "confirmed": 0,
-      "lead": 1,
+      "lead": 0,
       "booth": 0,
       "skip_noname": 0,
       "skip_excluded": 0
@@ -161,10 +161,10 @@
     {
       "brand": "연막창",
       "items": 30,
-      "new": 0,
-      "existing": 30,
+      "new": 2,
+      "existing": 28,
       "confirmed": 0,
-      "lead": 0,
+      "lead": 2,
       "booth": 0,
       "skip_noname": 0,
       "skip_excluded": 0
@@ -194,7 +194,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2079703163"
     },
     {
@@ -209,7 +209,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2045833152"
     },
     {
@@ -224,7 +224,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2053052633"
     },
     {
@@ -239,7 +239,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2043967910"
     },
     {
@@ -254,7 +254,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2054352388"
     },
     {
@@ -269,7 +269,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2040601565"
     },
     {
@@ -284,7 +284,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2052399357"
     },
     {
@@ -299,7 +299,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2097429247"
     },
     {
@@ -314,7 +314,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2026829069"
     },
     {
@@ -329,7 +329,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2040317190"
     },
     {
@@ -344,7 +344,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2010762580"
     },
     {
@@ -359,7 +359,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2070324156"
     },
     {
@@ -374,23 +374,8 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2093648647"
-    },
-    {
-      "id": "2058291919",
-      "place_id": "2058291919",
-      "brand": "야화 혼술바",
-      "priority": "normal",
-      "name": "야화 혼술바 당산역점",
-      "address": "서울특별시 영등포구 양평로 14 지하",
-      "lat": 37.5327677,
-      "lng": 126.904713,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2058291919"
     },
     {
       "id": "2000357125",
@@ -404,7 +389,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2000357125"
     },
     {
@@ -419,7 +404,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2032685854"
     },
     {
@@ -434,23 +419,23 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2077029622"
     },
     {
-      "id": "2061310762",
-      "place_id": "2061310762",
+      "id": "2058291919",
+      "place_id": "2058291919",
       "brand": "야화 혼술바",
       "priority": "normal",
-      "name": "야화 혼술바 문래점",
-      "address": "서울특별시 영등포구 도림로125가길 13-1",
-      "lat": 37.5136667,
-      "lng": 126.8937088,
+      "name": "야화 혼술바 당산역점",
+      "address": "서울특별시 영등포구 양평로 14 지하",
+      "lat": 37.5327677,
+      "lng": 126.904713,
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2061310762"
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2058291919"
     },
     {
       "id": "2094268763",
@@ -464,53 +449,23 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2094268763"
     },
     {
-      "id": "2064999667",
-      "place_id": "2064999667",
+      "id": "2061310762",
+      "place_id": "2061310762",
       "brand": "야화 혼술바",
       "priority": "normal",
-      "name": "야화 혼술바 서울 건대점",
-      "address": "서울특별시 광진구 아차산로33길 16-4 지하",
-      "lat": 37.5409634,
-      "lng": 127.0704233,
+      "name": "야화 혼술바 문래점",
+      "address": "서울특별시 영등포구 도림로125가길 13-1",
+      "lat": 37.5136667,
+      "lng": 126.8937088,
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2064999667"
-    },
-    {
-      "id": "2046657838",
-      "place_id": "2046657838",
-      "brand": "야화 혼술바",
-      "priority": "normal",
-      "name": "야화 혼술바 구로디지털단지점",
-      "address": "서울특별시 관악구 조원로 8 민영빌딩",
-      "lat": 37.4833701,
-      "lng": 126.903042,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2046657838"
-    },
-    {
-      "id": "2071544525",
-      "place_id": "2071544525",
-      "brand": "야화 혼술바",
-      "priority": "normal",
-      "name": "야화 혼술바 서울 신림점",
-      "address": "서울특별시 관악구 남부순환로 1600-12 지하",
-      "lat": 37.4834283,
-      "lng": 126.9288627,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2071544525"
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2061310762"
     },
     {
       "id": "2035366510",
@@ -524,8 +479,53 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2035366510"
+    },
+    {
+      "id": "2064999667",
+      "place_id": "2064999667",
+      "brand": "야화 혼술바",
+      "priority": "normal",
+      "name": "야화 혼술바 서울 건대점",
+      "address": "서울특별시 광진구 아차산로33길 16-4 지하",
+      "lat": 37.5409634,
+      "lng": 127.0704233,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2064999667"
+    },
+    {
+      "id": "2071544525",
+      "place_id": "2071544525",
+      "brand": "야화 혼술바",
+      "priority": "normal",
+      "name": "야화 혼술바 서울 신림점",
+      "address": "서울특별시 관악구 남부순환로 1600-12 지하",
+      "lat": 37.4834283,
+      "lng": 126.9288627,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2071544525"
+    },
+    {
+      "id": "2046657838",
+      "place_id": "2046657838",
+      "brand": "야화 혼술바",
+      "priority": "normal",
+      "name": "야화 혼술바 구로디지털단지점",
+      "address": "서울특별시 관악구 조원로 8 민영빌딩",
+      "lat": 37.4833701,
+      "lng": 126.903042,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2046657838"
     },
     {
       "id": "2066182425",
@@ -539,7 +539,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2066182425"
     },
     {
@@ -554,8 +554,23 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2062415615"
+    },
+    {
+      "id": "2044887552",
+      "place_id": "2044887552",
+      "brand": "야화 혼술바",
+      "priority": "normal",
+      "name": "야화 혼술바 잠실방이점",
+      "address": "서울특별시 송파구 올림픽로32길 22-13",
+      "lat": 37.5136479,
+      "lng": 127.1088519,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2044887552"
     },
     {
       "id": "2050339742",
@@ -569,7 +584,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2050339742"
     },
     {
@@ -584,23 +599,8 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2021796944"
-    },
-    {
-      "id": "2044887552",
-      "place_id": "2044887552",
-      "brand": "야화 혼술바",
-      "priority": "normal",
-      "name": "야화 혼술바 잠실방이점",
-      "address": "서울특별시 송파구 올림픽로32길 22-13",
-      "lat": 37.5136479,
-      "lng": 127.1088519,
-      "status": "lead",
-      "source": "apify_naver",
-      "first_seen": "2026-09-13T22:10:53",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2044887552"
     },
     {
       "id": "2008289924",
@@ -614,23 +614,23 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2008289924"
     },
     {
-      "id": "2008833784",
-      "place_id": "2008833784",
+      "id": "2099197697",
+      "place_id": "2099197697",
       "brand": "야화 혼술바",
       "priority": "normal",
-      "name": "야화 혼술바 다산신도시점",
-      "address": "경기도 남양주시 다산중앙로123번길 22-30",
-      "lat": 37.6254944,
-      "lng": 127.1521046,
-      "status": "existing",
+      "name": "야화 혼술바 망원점",
+      "address": "서울특별시 마포구 월드컵로15길 17",
+      "lat": 37.5561101,
+      "lng": 126.9087896,
+      "status": "lead",
       "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2008833784"
+      "first_seen": "2026-09-16T22:42:02",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2099197697"
     },
     {
       "id": "1425934319",
@@ -644,7 +644,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1425934319"
     },
     {
@@ -659,7 +659,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1433153629"
     },
     {
@@ -674,7 +674,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2055317908"
     },
     {
@@ -689,23 +689,8 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2021067592"
-    },
-    {
-      "id": "1529987476",
-      "place_id": "1529987476",
-      "brand": "우규 이자카야",
-      "priority": "normal",
-      "name": "이자카야 우규 마곡점",
-      "address": "서울특별시 강서구 마곡중앙6로 42",
-      "lat": 37.5602741,
-      "lng": 126.8320756,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/1529987476"
     },
     {
       "id": "1242831807",
@@ -719,8 +704,23 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1242831807"
+    },
+    {
+      "id": "1529987476",
+      "place_id": "1529987476",
+      "brand": "우규 이자카야",
+      "priority": "normal",
+      "name": "이자카야 우규 마곡점",
+      "address": "서울특별시 강서구 마곡중앙6로 42",
+      "lat": 37.5602741,
+      "lng": 126.8320756,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/1529987476"
     },
     {
       "id": "1496002938",
@@ -734,23 +734,8 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1496002938"
-    },
-    {
-      "id": "2048375945",
-      "place_id": "2048375945",
-      "brand": "우규 이자카야",
-      "priority": "normal",
-      "name": "이자카야 우규 하남미사점",
-      "address": "경기도 하남시 미사강변중앙로170번길 10",
-      "lat": 37.5614202,
-      "lng": 127.1918768,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2048375945"
     },
     {
       "id": "1166775201",
@@ -764,23 +749,23 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1166775201"
     },
     {
-      "id": "1203613792",
-      "place_id": "1203613792",
+      "id": "2048375945",
+      "place_id": "2048375945",
       "brand": "우규 이자카야",
       "priority": "normal",
-      "name": "이자카야 우규 마곡나루역점",
-      "address": "서울특별시 강서구 마곡중앙로 161-22",
-      "lat": 37.5685555,
-      "lng": 126.8255631,
+      "name": "이자카야 우규 하남미사점",
+      "address": "경기도 하남시 미사강변중앙로170번길 10",
+      "lat": 37.5614202,
+      "lng": 127.1918768,
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/1203613792"
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2048375945"
     },
     {
       "id": "2008922480",
@@ -794,8 +779,23 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2008922480"
+    },
+    {
+      "id": "1203613792",
+      "place_id": "1203613792",
+      "brand": "우규 이자카야",
+      "priority": "normal",
+      "name": "이자카야 우규 마곡나루역점",
+      "address": "서울특별시 강서구 마곡중앙로 161-22",
+      "lat": 37.5685555,
+      "lng": 126.8255631,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/1203613792"
     },
     {
       "id": "1515426512",
@@ -809,8 +809,23 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1515426512"
+    },
+    {
+      "id": "1185770907",
+      "place_id": "1185770907",
+      "brand": "우규 이자카야",
+      "priority": "normal",
+      "name": "이자카야 우규 영등포구청점",
+      "address": "서울특별시 영등포구 당산로32길 6",
+      "lat": 37.5263388,
+      "lng": 126.8974572,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/1185770907"
     },
     {
       "id": "2079774606",
@@ -824,23 +839,8 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2079774606"
-    },
-    {
-      "id": "1096265890",
-      "place_id": "1096265890",
-      "brand": "우규 이자카야",
-      "priority": "normal",
-      "name": "이자카야 우규 부평점",
-      "address": "인천광역시 부평구 시장로30번길 20",
-      "lat": 37.4929854,
-      "lng": 126.7268162,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/1096265890"
     },
     {
       "id": "2060642932",
@@ -854,7 +854,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2060642932"
     },
     {
@@ -869,38 +869,8 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2061293105"
-    },
-    {
-      "id": "1185770907",
-      "place_id": "1185770907",
-      "brand": "우규 이자카야",
-      "priority": "normal",
-      "name": "이자카야 우규 영등포구청점",
-      "address": "서울특별시 영등포구 당산로32길 6",
-      "lat": 37.5263388,
-      "lng": 126.8974572,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/1185770907"
-    },
-    {
-      "id": "1274984856",
-      "place_id": "1274984856",
-      "brand": "우규 이자카야",
-      "priority": "normal",
-      "name": "이자카야 우규 동탄산척점",
-      "address": "경기도 화성시 동탄구 동탄순환대로14길 86-6",
-      "lat": 37.1700033,
-      "lng": 127.1199882,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/1274984856"
     },
     {
       "id": "1172044110",
@@ -914,8 +884,38 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1172044110"
+    },
+    {
+      "id": "1096265890",
+      "place_id": "1096265890",
+      "brand": "우규 이자카야",
+      "priority": "normal",
+      "name": "이자카야 우규 부평점",
+      "address": "인천광역시 부평구 시장로30번길 20",
+      "lat": 37.4929854,
+      "lng": 126.7268162,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/1096265890"
+    },
+    {
+      "id": "1274984856",
+      "place_id": "1274984856",
+      "brand": "우규 이자카야",
+      "priority": "normal",
+      "name": "이자카야 우규 동탄산척점",
+      "address": "경기도 화성시 동탄구 동탄순환대로14길 86-6",
+      "lat": 37.1700033,
+      "lng": 127.1199882,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/1274984856"
     },
     {
       "id": "1389033208",
@@ -929,8 +929,38 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1389033208"
+    },
+    {
+      "id": "2079431828",
+      "place_id": "2079431828",
+      "brand": "우규 이자카야",
+      "priority": "normal",
+      "name": "이자카야 우규 일산탄현점",
+      "address": "경기도 고양시 일산서구 일현로 32",
+      "lat": 37.6900191,
+      "lng": 126.7623643,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2079431828"
+    },
+    {
+      "id": "1142094141",
+      "place_id": "1142094141",
+      "brand": "우규 이자카야",
+      "priority": "normal",
+      "name": "이자카야 우규 당산역점",
+      "address": "서울특별시 영등포구 당산로47길 12",
+      "lat": 37.5352519,
+      "lng": 126.9021615,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/1142094141"
     },
     {
       "id": "1344503968",
@@ -944,7 +974,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1344503968"
     },
     {
@@ -959,23 +989,8 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2040157655"
-    },
-    {
-      "id": "1142094141",
-      "place_id": "1142094141",
-      "brand": "우규 이자카야",
-      "priority": "normal",
-      "name": "이자카야 우규 당산역점",
-      "address": "서울특별시 영등포구 당산로47길 12",
-      "lat": 37.5352519,
-      "lng": 126.9021615,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/1142094141"
     },
     {
       "id": "2098961272",
@@ -989,7 +1004,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2098961272"
     },
     {
@@ -1004,7 +1019,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1654953290"
     },
     {
@@ -1019,23 +1034,8 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1808081619"
-    },
-    {
-      "id": "2079431828",
-      "place_id": "2079431828",
-      "brand": "우규 이자카야",
-      "priority": "normal",
-      "name": "이자카야 우규 일산탄현점",
-      "address": "경기도 고양시 일산서구 일현로 32",
-      "lat": 37.6900191,
-      "lng": 126.7623643,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2079431828"
     },
     {
       "id": "2092613072",
@@ -1049,23 +1049,8 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2092613072"
-    },
-    {
-      "id": "2087138223",
-      "place_id": "2087138223",
-      "brand": "우규 이자카야",
-      "priority": "normal",
-      "name": "이자카야 우규 오남점",
-      "address": "경기도 남양주시 오남읍 진건오남로 533",
-      "lat": 37.6814764,
-      "lng": 127.2096121,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2087138223"
     },
     {
       "id": "1684601919",
@@ -1079,8 +1064,23 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1684601919"
+    },
+    {
+      "id": "1928040801",
+      "place_id": "1928040801",
+      "brand": "우규 이자카야",
+      "priority": "normal",
+      "name": "이자카야 우규 성신여대점",
+      "address": "서울특별시 성북구 동소문로20길 29-15",
+      "lat": 37.5915188,
+      "lng": 127.0175672,
+      "status": "lead",
+      "source": "apify_naver",
+      "first_seen": "2026-09-16T22:42:02",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/1928040801"
     },
     {
       "id": "2087511813",
@@ -1094,7 +1094,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2087511813"
     },
     {
@@ -1109,7 +1109,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1245294991"
     },
     {
@@ -1124,7 +1124,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2011346646"
     },
     {
@@ -1139,7 +1139,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1341148720"
     },
     {
@@ -1154,7 +1154,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1510468143"
     },
     {
@@ -1169,7 +1169,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1824561421"
     },
     {
@@ -1184,7 +1184,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1295691544"
     },
     {
@@ -1199,7 +1199,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1162120759"
     },
     {
@@ -1214,7 +1214,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1329111123"
     },
     {
@@ -1229,23 +1229,8 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2080555665"
-    },
-    {
-      "id": "2021878792",
-      "place_id": "2021878792",
-      "brand": "호앙비엣",
-      "priority": "internal_track_only",
-      "name": "호앙비엣 합정점",
-      "address": "서울특별시 마포구 양화로6길 14",
-      "lat": 37.5491707,
-      "lng": 126.9149505,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2021878792"
     },
     {
       "id": "2042797682",
@@ -1259,7 +1244,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2042797682"
     },
     {
@@ -1274,8 +1259,23 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2081403834"
+    },
+    {
+      "id": "2021878792",
+      "place_id": "2021878792",
+      "brand": "호앙비엣",
+      "priority": "internal_track_only",
+      "name": "호앙비엣 합정점",
+      "address": "서울특별시 마포구 양화로6길 14",
+      "lat": 37.5491707,
+      "lng": 126.9149505,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2021878792"
     },
     {
       "id": "2096604207",
@@ -1289,7 +1289,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2096604207"
     },
     {
@@ -1304,7 +1304,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2069800265"
     },
     {
@@ -1319,7 +1319,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2089671853"
     },
     {
@@ -1334,68 +1334,8 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2001957982"
-    },
-    {
-      "id": "2051239666",
-      "place_id": "2051239666",
-      "brand": "호앙비엣",
-      "priority": "internal_track_only",
-      "name": "호앙비엣 오목교역점",
-      "address": "서울특별시 양천구 오목로 339",
-      "lat": 37.5247573,
-      "lng": 126.8753182,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2051239666"
-    },
-    {
-      "id": "2097730929",
-      "place_id": "2097730929",
-      "brand": "호앙비엣",
-      "priority": "internal_track_only",
-      "name": "호앙비엣 강남점",
-      "address": "서울특별시 서초구 서초대로78길 36",
-      "lat": 37.4947481,
-      "lng": 127.0282277,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2097730929"
-    },
-    {
-      "id": "2011412104",
-      "place_id": "2011412104",
-      "brand": "호앙비엣",
-      "priority": "internal_track_only",
-      "name": "호앙비엣 상암점",
-      "address": "서울특별시 마포구 월드컵북로44길 71",
-      "lat": 37.5774877,
-      "lng": 126.8938226,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2011412104"
-    },
-    {
-      "id": "2072215701",
-      "place_id": "2072215701",
-      "brand": "호앙비엣",
-      "priority": "internal_track_only",
-      "name": "호앙비엣 삼성역점",
-      "address": "서울특별시 강남구 영동대로85길 20 대치3차 아이파크 오피스텔",
-      "lat": 37.5070284,
-      "lng": 127.0616837,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2072215701"
     },
     {
       "id": "1141297607",
@@ -1409,8 +1349,83 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1141297607"
+    },
+    {
+      "id": "2011412104",
+      "place_id": "2011412104",
+      "brand": "호앙비엣",
+      "priority": "internal_track_only",
+      "name": "호앙비엣 상암점",
+      "address": "서울특별시 마포구 월드컵북로44길 71",
+      "lat": 37.5774877,
+      "lng": 126.8938226,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2011412104"
+    },
+    {
+      "id": "2097730929",
+      "place_id": "2097730929",
+      "brand": "호앙비엣",
+      "priority": "internal_track_only",
+      "name": "호앙비엣 강남점",
+      "address": "서울특별시 서초구 서초대로78길 36",
+      "lat": 37.4947481,
+      "lng": 127.0282277,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2097730929"
+    },
+    {
+      "id": "2051239666",
+      "place_id": "2051239666",
+      "brand": "호앙비엣",
+      "priority": "internal_track_only",
+      "name": "호앙비엣 오목교역점",
+      "address": "서울특별시 양천구 오목로 339",
+      "lat": 37.5247573,
+      "lng": 126.8753182,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2051239666"
+    },
+    {
+      "id": "2022819406",
+      "place_id": "2022819406",
+      "brand": "호앙비엣",
+      "priority": "internal_track_only",
+      "name": "호앙비엣 교대사거리점",
+      "address": "서울특별시 서초구 효령로53길 67",
+      "lat": 37.4876838,
+      "lng": 127.0127587,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2022819406"
+    },
+    {
+      "id": "2072215701",
+      "place_id": "2072215701",
+      "brand": "호앙비엣",
+      "priority": "internal_track_only",
+      "name": "호앙비엣 삼성역점",
+      "address": "서울특별시 강남구 영동대로85길 20 대치3차 아이파크 오피스텔",
+      "lat": 37.5070284,
+      "lng": 127.0616837,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2072215701"
     },
     {
       "id": "2095034821",
@@ -1424,7 +1439,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2095034821"
     },
     {
@@ -1439,23 +1454,8 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1065596805"
-    },
-    {
-      "id": "2022819406",
-      "place_id": "2022819406",
-      "brand": "호앙비엣",
-      "priority": "internal_track_only",
-      "name": "호앙비엣 교대사거리점",
-      "address": "서울특별시 서초구 효령로53길 67",
-      "lat": 37.4876838,
-      "lng": 127.0127587,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2022819406"
     },
     {
       "id": "2056253347",
@@ -1469,7 +1469,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2056253347"
     },
     {
@@ -1484,7 +1484,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2024175810"
     },
     {
@@ -1499,23 +1499,8 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2095788686"
-    },
-    {
-      "id": "2066711742",
-      "place_id": "2066711742",
-      "brand": "호앙비엣",
-      "priority": "internal_track_only",
-      "name": "호앙비엣 천호점",
-      "address": "서울특별시 강동구 진황도로 2",
-      "lat": 37.5401035,
-      "lng": 127.1281328,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2066711742"
     },
     {
       "id": "2076074751",
@@ -1529,8 +1514,23 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2076074751"
+    },
+    {
+      "id": "2066711742",
+      "place_id": "2066711742",
+      "brand": "호앙비엣",
+      "priority": "internal_track_only",
+      "name": "호앙비엣 천호점",
+      "address": "서울특별시 강동구 진황도로 2",
+      "lat": 37.5401035,
+      "lng": 127.1281328,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2066711742"
     },
     {
       "id": "1172974197",
@@ -1544,7 +1544,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1172974197"
     },
     {
@@ -1559,7 +1559,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1495081658"
     },
     {
@@ -1574,7 +1574,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1802911840"
     },
     {
@@ -1589,7 +1589,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1763685800"
     },
     {
@@ -1604,7 +1604,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2073562575"
     },
     {
@@ -1619,7 +1619,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/37427397"
     },
     {
@@ -1634,7 +1634,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1285366166"
     },
     {
@@ -1649,7 +1649,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2081733987"
     },
     {
@@ -1664,7 +1664,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1335343767"
     },
     {
@@ -1679,7 +1679,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1451267769"
     },
     {
@@ -1694,7 +1694,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/11782746"
     },
     {
@@ -1709,7 +1709,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/11782583"
     },
     {
@@ -1724,7 +1724,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2089640913"
     },
     {
@@ -1739,7 +1739,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1145200407"
     },
     {
@@ -1754,7 +1754,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/36199965"
     },
     {
@@ -1769,7 +1769,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2099585679"
     },
     {
@@ -1784,7 +1784,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1592347405"
     },
     {
@@ -1799,7 +1799,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1826242319"
     },
     {
@@ -1814,7 +1814,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1129752349"
     },
     {
@@ -1829,7 +1829,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/11782762"
     },
     {
@@ -1844,7 +1844,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1643270469"
     },
     {
@@ -1859,7 +1859,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/34016941"
     },
     {
@@ -1874,7 +1874,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/36414376"
     },
     {
@@ -1889,7 +1889,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/36830394"
     },
     {
@@ -1904,7 +1904,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/11782768"
     },
     {
@@ -1919,7 +1919,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1234817467"
     },
     {
@@ -1934,7 +1934,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1652810631"
     },
     {
@@ -1949,7 +1949,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/11782737"
     },
     {
@@ -1964,7 +1964,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1973149204"
     },
     {
@@ -1979,7 +1979,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1518622545"
     },
     {
@@ -1994,7 +1994,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1789037966"
     },
     {
@@ -2009,7 +2009,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1112871663"
     },
     {
@@ -2024,7 +2024,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1294446925"
     },
     {
@@ -2039,7 +2039,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1332412521"
     },
     {
@@ -2054,7 +2054,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1708461543"
     },
     {
@@ -2069,7 +2069,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1162130967"
     },
     {
@@ -2084,7 +2084,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1586158554"
     },
     {
@@ -2099,7 +2099,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1903732331"
     },
     {
@@ -2114,7 +2114,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1592095270"
     },
     {
@@ -2129,7 +2129,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2083707285"
     },
     {
@@ -2144,7 +2144,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1140739482"
     },
     {
@@ -2159,7 +2159,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1815670508"
     },
     {
@@ -2174,7 +2174,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1873575833"
     },
     {
@@ -2189,7 +2189,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2054675350"
     },
     {
@@ -2204,7 +2204,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2011848912"
     },
     {
@@ -2219,7 +2219,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1469988912"
     },
     {
@@ -2234,7 +2234,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1982054820"
     },
     {
@@ -2249,7 +2249,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1006681910"
     },
     {
@@ -2264,7 +2264,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2019322200"
     },
     {
@@ -2279,7 +2279,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1891162699"
     },
     {
@@ -2294,7 +2294,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1352639085"
     },
     {
@@ -2309,7 +2309,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1612602399"
     },
     {
@@ -2324,7 +2324,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1504930972"
     },
     {
@@ -2339,7 +2339,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1043283089"
     },
     {
@@ -2354,7 +2354,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1042687009"
     },
     {
@@ -2369,7 +2369,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1658684390"
     },
     {
@@ -2384,7 +2384,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1991586524"
     },
     {
@@ -2399,7 +2399,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1454701748"
     },
     {
@@ -2414,7 +2414,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2038382198"
     },
     {
@@ -2429,7 +2429,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1286864354"
     },
     {
@@ -2444,7 +2444,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2070444110"
     },
     {
@@ -2459,7 +2459,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2042688307"
     },
     {
@@ -2474,23 +2474,8 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2025590754"
-    },
-    {
-      "id": "2005499946",
-      "place_id": "2005499946",
-      "brand": "토핑몬스터피자",
-      "priority": "normal",
-      "name": "토핑몬스터피자 건대점",
-      "address": "서울특별시 광진구 아차산로29길 71",
-      "lat": 37.5439305,
-      "lng": 127.0695352,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2005499946"
     },
     {
       "id": "2086860402",
@@ -2504,23 +2489,23 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2086860402"
     },
     {
-      "id": "2024233777",
-      "place_id": "2024233777",
+      "id": "2005499946",
+      "place_id": "2005499946",
       "brand": "토핑몬스터피자",
       "priority": "normal",
-      "name": "토핑몬스터피자 관악점",
-      "address": "서울특별시 관악구 봉천로33길 7",
-      "lat": 37.4836392,
-      "lng": 126.9435547,
+      "name": "토핑몬스터피자 건대점",
+      "address": "서울특별시 광진구 아차산로29길 71",
+      "lat": 37.5439305,
+      "lng": 127.0695352,
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2024233777"
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2005499946"
     },
     {
       "id": "2044901998",
@@ -2534,8 +2519,23 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2044901998"
+    },
+    {
+      "id": "2024233777",
+      "place_id": "2024233777",
+      "brand": "토핑몬스터피자",
+      "priority": "normal",
+      "name": "토핑몬스터피자 관악점",
+      "address": "서울특별시 관악구 봉천로33길 7",
+      "lat": 37.4836392,
+      "lng": 126.9435547,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2024233777"
     },
     {
       "id": "2034900553",
@@ -2549,23 +2549,8 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2034900553"
-    },
-    {
-      "id": "2086483562",
-      "place_id": "2086483562",
-      "brand": "토핑몬스터피자",
-      "priority": "normal",
-      "name": "토핑몬스터피자 부천소사역곡점",
-      "address": "경기도 부천시 소사구 안곡로 60 B동",
-      "lat": 37.478613,
-      "lng": 126.8090189,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2086483562"
     },
     {
       "id": "2050414377",
@@ -2579,7 +2564,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2050414377"
     },
     {
@@ -2594,23 +2579,23 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2094533493"
     },
     {
-      "id": "2092691736",
-      "place_id": "2092691736",
+      "id": "2005365207",
+      "place_id": "2005365207",
       "brand": "토핑몬스터피자",
       "priority": "normal",
-      "name": "토핑몬스터피자 성남점",
-      "address": "경기도 성남시 수정구 남문로112번길 17-1",
-      "lat": 37.4459924,
-      "lng": 127.1397571,
+      "name": "토핑몬스터피자 청라점",
+      "address": "인천광역시 서해구 중봉대로612번길 10-17",
+      "lat": 37.533907,
+      "lng": 126.6520454,
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2092691736"
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2005365207"
     },
     {
       "id": "2048784270",
@@ -2624,23 +2609,68 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2048784270"
     },
     {
-      "id": "1051860639",
-      "place_id": "1051860639",
+      "id": "2063140305",
+      "place_id": "2063140305",
       "brand": "토핑몬스터피자",
       "priority": "normal",
-      "name": "토핑몬스터피자",
-      "address": "강원특별자치도 원주시 단구로 45",
-      "lat": 37.3446011,
-      "lng": 127.9376734,
+      "name": "토핑몬스터피자 부천점",
+      "address": "경기도 부천시 원미구 길주로378번길 34",
+      "lat": 37.5017566,
+      "lng": 126.7846649,
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/1051860639"
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2063140305"
+    },
+    {
+      "id": "2092691736",
+      "place_id": "2092691736",
+      "brand": "토핑몬스터피자",
+      "priority": "normal",
+      "name": "토핑몬스터피자 성남점",
+      "address": "경기도 성남시 수정구 남문로112번길 17-1",
+      "lat": 37.4459924,
+      "lng": 127.1397571,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2092691736"
+    },
+    {
+      "id": "2003562447",
+      "place_id": "2003562447",
+      "brand": "토핑몬스터피자",
+      "priority": "normal",
+      "name": "토핑몬스터피자 화성봉담점",
+      "address": "경기도 화성시 효행구 봉담읍 오래2길 6 1동",
+      "lat": 37.2199959,
+      "lng": 126.9537064,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2003562447"
+    },
+    {
+      "id": "2086483562",
+      "place_id": "2086483562",
+      "brand": "토핑몬스터피자",
+      "priority": "normal",
+      "name": "토핑몬스터피자 부천소사역곡점",
+      "address": "경기도 부천시 소사구 안곡로 60 B동",
+      "lat": 37.478613,
+      "lng": 126.8090189,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2086483562"
     },
     {
       "id": "2025912888",
@@ -2654,7 +2684,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2025912888"
     },
     {
@@ -2669,53 +2699,8 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2087960138"
-    },
-    {
-      "id": "2012929914",
-      "place_id": "2012929914",
-      "brand": "토핑몬스터피자",
-      "priority": "normal",
-      "name": "토핑몬스터피자 의정부점",
-      "address": "경기도 의정부시 가능로119번길 17 지상",
-      "lat": 37.7478299,
-      "lng": 127.0438968,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2012929914"
-    },
-    {
-      "id": "2063140305",
-      "place_id": "2063140305",
-      "brand": "토핑몬스터피자",
-      "priority": "normal",
-      "name": "토핑몬스터피자 부천점",
-      "address": "경기도 부천시 원미구 길주로378번길 34",
-      "lat": 37.5017566,
-      "lng": 126.7846649,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2063140305"
-    },
-    {
-      "id": "2013211886",
-      "place_id": "2013211886",
-      "brand": "토핑몬스터피자",
-      "priority": "normal",
-      "name": "토핑몬스터피자 시흥장현지구점",
-      "address": "경기도 시흥시 장현서3길 30",
-      "lat": 37.3723794,
-      "lng": 126.7973322,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2013211886"
     },
     {
       "id": "2094380486",
@@ -2729,8 +2714,53 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2094380486"
+    },
+    {
+      "id": "2012929914",
+      "place_id": "2012929914",
+      "brand": "토핑몬스터피자",
+      "priority": "normal",
+      "name": "토핑몬스터피자 의정부점",
+      "address": "경기도 의정부시 가능로119번길 17 지상",
+      "lat": 37.7478299,
+      "lng": 127.0438968,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2012929914"
+    },
+    {
+      "id": "2013211886",
+      "place_id": "2013211886",
+      "brand": "토핑몬스터피자",
+      "priority": "normal",
+      "name": "토핑몬스터피자 시흥장현지구점",
+      "address": "경기도 시흥시 장현서3길 30",
+      "lat": 37.3723794,
+      "lng": 126.7973322,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2013211886"
+    },
+    {
+      "id": "1051860639",
+      "place_id": "1051860639",
+      "brand": "토핑몬스터피자",
+      "priority": "normal",
+      "name": "토핑몬스터피자",
+      "address": "강원특별자치도 원주시 단구로 45",
+      "lat": 37.3446011,
+      "lng": 127.9376734,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/1051860639"
     },
     {
       "id": "2091668702",
@@ -2744,7 +2774,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2091668702"
     },
     {
@@ -2759,23 +2789,53 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2009382560"
     },
     {
-      "id": "2005365207",
-      "place_id": "2005365207",
+      "id": "2039576547",
+      "place_id": "2039576547",
       "brand": "토핑몬스터피자",
       "priority": "normal",
-      "name": "토핑몬스터피자 청라점",
-      "address": "인천광역시 서해구 중봉대로612번길 10-17",
-      "lat": 37.533907,
-      "lng": 126.6520454,
+      "name": "토핑몬스터피자 정발산점",
+      "address": "경기도 고양시 일산동구 일산로 428 제",
+      "lat": 37.6730149,
+      "lng": 126.7792339,
+      "status": "lead",
+      "source": "apify_naver",
+      "first_seen": "2026-09-16T22:42:02",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2039576547"
+    },
+    {
+      "id": "2008695082",
+      "place_id": "2008695082",
+      "brand": "토핑몬스터피자",
+      "priority": "normal",
+      "name": "토핑몬스터피자 영등포점",
+      "address": "서울특별시 영등포구 국회대로50길 20 상가동 B",
+      "lat": 37.5236015,
+      "lng": 126.9056744,
+      "status": "lead",
+      "source": "apify_naver",
+      "first_seen": "2026-09-16T22:42:02",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2008695082"
+    },
+    {
+      "id": "2067367555",
+      "place_id": "2067367555",
+      "brand": "토핑몬스터피자",
+      "priority": "normal",
+      "name": "토핑몬스터피자 수원망포점",
+      "address": "경기도 수원시 영통구 덕영대로1555번길 16",
+      "lat": 37.2467959,
+      "lng": 127.0615894,
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2005365207"
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2067367555"
     },
     {
       "id": "2097768532",
@@ -2789,7 +2849,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2097768532"
     },
     {
@@ -2804,7 +2864,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2012363390"
     },
     {
@@ -2819,68 +2879,8 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2073626194"
-    },
-    {
-      "id": "2067367555",
-      "place_id": "2067367555",
-      "brand": "토핑몬스터피자",
-      "priority": "normal",
-      "name": "토핑몬스터피자 수원망포점",
-      "address": "경기도 수원시 영통구 덕영대로1555번길 16",
-      "lat": 37.2467959,
-      "lng": 127.0615894,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2067367555"
-    },
-    {
-      "id": "2003562447",
-      "place_id": "2003562447",
-      "brand": "토핑몬스터피자",
-      "priority": "normal",
-      "name": "토핑몬스터피자 화성봉담점",
-      "address": "경기도 화성시 효행구 봉담읍 오래2길 6 1동",
-      "lat": 37.2199959,
-      "lng": 126.9537064,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2003562447"
-    },
-    {
-      "id": "2020332080",
-      "place_id": "2020332080",
-      "brand": "토핑몬스터피자",
-      "priority": "normal",
-      "name": "토핑몬스터피자 기흥점",
-      "address": "경기도 용인시 기흥구 어정로 96",
-      "lat": 37.2743376,
-      "lng": 127.1404549,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2020332080"
-    },
-    {
-      "id": "2014493217",
-      "place_id": "2014493217",
-      "brand": "토핑몬스터피자",
-      "priority": "normal",
-      "name": "토핑몬스터피자 오산점",
-      "address": "경기도 오산시 오산로 366",
-      "lat": 37.1594624,
-      "lng": 127.0666677,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2014493217"
     },
     {
       "id": "2064881574",
@@ -2894,7 +2894,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2064881574"
     },
     {
@@ -2909,7 +2909,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2094095820"
     },
     {
@@ -2924,7 +2924,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2040717513"
     },
     {
@@ -2939,7 +2939,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2027597810"
     },
     {
@@ -2954,7 +2954,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2035600643"
     },
     {
@@ -2969,7 +2969,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2046891444"
     },
     {
@@ -2984,7 +2984,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2094823159"
     },
     {
@@ -2999,7 +2999,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2061261989"
     },
     {
@@ -3014,23 +3014,8 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2032220054"
-    },
-    {
-      "id": "2016676344",
-      "place_id": "2016676344",
-      "brand": "케이찹사라다",
-      "priority": "normal",
-      "name": "케이찹사라다 인천작전점",
-      "address": "인천광역시 계양구 주부토로 361",
-      "lat": 37.5265317,
-      "lng": 126.7296256,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2016676344"
     },
     {
       "id": "2065331803",
@@ -3044,7 +3029,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2065331803"
     },
     {
@@ -3059,8 +3044,38 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2058562761"
+    },
+    {
+      "id": "2016676344",
+      "place_id": "2016676344",
+      "brand": "케이찹사라다",
+      "priority": "normal",
+      "name": "케이찹사라다 인천작전점",
+      "address": "인천광역시 계양구 주부토로 361",
+      "lat": 37.5265317,
+      "lng": 126.7296256,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2016676344"
+    },
+    {
+      "id": "2015452738",
+      "place_id": "2015452738",
+      "brand": "케이찹사라다",
+      "priority": "normal",
+      "name": "케이찹사라다 청라점",
+      "address": "인천광역시 서해구 청라커낼로 300 판매1동",
+      "lat": 37.5343661,
+      "lng": 126.644963,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2015452738"
     },
     {
       "id": "2010165704",
@@ -3074,7 +3089,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2010165704"
     },
     {
@@ -3089,38 +3104,8 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2028472269"
-    },
-    {
-      "id": "2015452738",
-      "place_id": "2015452738",
-      "brand": "케이찹사라다",
-      "priority": "normal",
-      "name": "케이찹사라다 청라점",
-      "address": "인천광역시 서해구 청라커낼로 300 판매1동",
-      "lat": 37.5343661,
-      "lng": 126.644963,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2015452738"
-    },
-    {
-      "id": "2042763636",
-      "place_id": "2042763636",
-      "brand": "케이찹사라다",
-      "priority": "normal",
-      "name": "케이찹사라다 루원시티점",
-      "address": "인천광역시 서해구 염곡로 468 드림타",
-      "lat": 37.5264653,
-      "lng": 126.6695362,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2042763636"
     },
     {
       "id": "2059007851",
@@ -3134,23 +3119,23 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2059007851"
     },
     {
-      "id": "2079959101",
-      "place_id": "2079959101",
+      "id": "2042763636",
+      "place_id": "2042763636",
       "brand": "케이찹사라다",
       "priority": "normal",
-      "name": "케이찹사라다 부평점",
-      "address": "인천광역시 부평구 부평문화로 69-2",
-      "lat": 37.4942323,
-      "lng": 126.7241196,
+      "name": "케이찹사라다 루원시티점",
+      "address": "인천광역시 서해구 염곡로 468 드림타",
+      "lat": 37.5264653,
+      "lng": 126.6695362,
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2079959101"
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2042763636"
     },
     {
       "id": "2056009238",
@@ -3164,23 +3149,23 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2056009238"
     },
     {
-      "id": "2026664842",
-      "place_id": "2026664842",
+      "id": "2079959101",
+      "place_id": "2079959101",
       "brand": "케이찹사라다",
       "priority": "normal",
-      "name": "케이찹사라다 수원정자시장점",
-      "address": "경기도 수원시 장안구 장안로75번길 61",
-      "lat": 37.289979,
-      "lng": 126.9996769,
+      "name": "케이찹사라다 부평점",
+      "address": "인천광역시 부평구 부평문화로 69-2",
+      "lat": 37.4942323,
+      "lng": 126.7241196,
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2026664842"
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2079959101"
     },
     {
       "id": "2013390327",
@@ -3194,7 +3179,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2013390327"
     },
     {
@@ -3209,8 +3194,23 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2058776600"
+    },
+    {
+      "id": "2026664842",
+      "place_id": "2026664842",
+      "brand": "케이찹사라다",
+      "priority": "normal",
+      "name": "케이찹사라다 수원정자시장점",
+      "address": "경기도 수원시 장안구 장안로75번길 61",
+      "lat": 37.289979,
+      "lng": 126.9996769,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2026664842"
     },
     {
       "id": "2026058523",
@@ -3224,7 +3224,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2026058523"
     },
     {
@@ -3239,7 +3239,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2095511413"
     },
     {
@@ -3254,8 +3254,38 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2085758354"
+    },
+    {
+      "id": "2069842121",
+      "place_id": "2069842121",
+      "brand": "케이찹사라다",
+      "priority": "normal",
+      "name": "케이찹사라다 광주봉선점",
+      "address": "전남광주통합특별시 남구 봉선로25번길 4",
+      "lat": 35.1308286,
+      "lng": 126.9034642,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2069842121"
+    },
+    {
+      "id": "2016560375",
+      "place_id": "2016560375",
+      "brand": "케이찹사라다",
+      "priority": "normal",
+      "name": "케이찹사라다 황리단길점",
+      "address": "경상북도 경주시 첨성로81번길 15-1",
+      "lat": 35.8344663,
+      "lng": 129.2110273,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2016560375"
     },
     {
       "id": "2045883444",
@@ -3269,7 +3299,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2045883444"
     },
     {
@@ -3284,38 +3314,8 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2022116400"
-    },
-    {
-      "id": "2016560375",
-      "place_id": "2016560375",
-      "brand": "케이찹사라다",
-      "priority": "normal",
-      "name": "케이찹사라다 황리단길점",
-      "address": "경상북도 경주시 첨성로81번길 15-1",
-      "lat": 35.8344663,
-      "lng": 129.2110273,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2016560375"
-    },
-    {
-      "id": "2069842121",
-      "place_id": "2069842121",
-      "brand": "케이찹사라다",
-      "priority": "normal",
-      "name": "케이찹사라다 광주봉선점",
-      "address": "전남광주통합특별시 남구 봉선로25번길 4",
-      "lat": 35.1308286,
-      "lng": 126.9034642,
-      "status": "lead",
-      "source": "apify_naver",
-      "first_seen": "2026-09-13T22:10:53",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2069842121"
     },
     {
       "id": "2095153377",
@@ -3329,7 +3329,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2095153377"
     },
     {
@@ -3344,7 +3344,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1027607661"
     },
     {
@@ -3359,7 +3359,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2066647870"
     },
     {
@@ -3374,7 +3374,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2082636871"
     },
     {
@@ -3389,7 +3389,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1087929464"
     },
     {
@@ -3404,7 +3404,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2045230678"
     },
     {
@@ -3419,7 +3419,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1133049892"
     },
     {
@@ -3434,7 +3434,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1296771839"
     },
     {
@@ -3449,7 +3449,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1378528228"
     },
     {
@@ -3464,7 +3464,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1365295999"
     },
     {
@@ -3479,7 +3479,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1165284848"
     },
     {
@@ -3494,7 +3494,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1026061608"
     },
     {
@@ -3509,7 +3509,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2086673825"
     },
     {
@@ -3524,7 +3524,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2010397633"
     },
     {
@@ -3539,7 +3539,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2015036563"
     },
     {
@@ -3554,7 +3554,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1052453695"
     },
     {
@@ -3569,7 +3569,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1635943491"
     },
     {
@@ -3584,7 +3584,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2018021377"
     },
     {
@@ -3599,7 +3599,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1979991019"
     },
     {
@@ -3614,7 +3614,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1948174763"
     },
     {
@@ -3629,7 +3629,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2077190870"
     },
     {
@@ -3644,7 +3644,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2061556033"
     },
     {
@@ -3659,7 +3659,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1751899318"
     },
     {
@@ -3674,7 +3674,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1563464575"
     },
     {
@@ -3689,7 +3689,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2009935277"
     },
     {
@@ -3704,7 +3704,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1325459936"
     },
     {
@@ -3719,7 +3719,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1325309672"
     },
     {
@@ -3734,7 +3734,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1833567634"
     },
     {
@@ -3749,7 +3749,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1987619178"
     },
     {
@@ -3764,7 +3764,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2074526680"
     },
     {
@@ -3779,7 +3779,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1883298295"
     },
     {
@@ -3794,23 +3794,8 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2066196543"
-    },
-    {
-      "id": "2038981294",
-      "place_id": "2038981294",
-      "brand": "야키토리동작",
-      "priority": "normal",
-      "name": "야키토리동작 과천지식정보타운점",
-      "address": "경기도 과천시 과천대로7길 20 B동 144~",
-      "lat": 37.4148738,
-      "lng": 126.9794469,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2038981294"
     },
     {
       "id": "2073201817",
@@ -3824,8 +3809,23 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2073201817"
+    },
+    {
+      "id": "2038981294",
+      "place_id": "2038981294",
+      "brand": "야키토리동작",
+      "priority": "normal",
+      "name": "야키토리동작 과천지식정보타운점",
+      "address": "경기도 과천시 과천대로7길 20 B동 144~",
+      "lat": 37.4148738,
+      "lng": 126.9794469,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2038981294"
     },
     {
       "id": "2027091325",
@@ -3839,23 +3839,8 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2027091325"
-    },
-    {
-      "id": "1008044677",
-      "place_id": "1008044677",
-      "brand": "야키토리동작",
-      "priority": "normal",
-      "name": "야키토리동작",
-      "address": "충청북도 청주시 서원구 산남로70번길 34 1동 406-",
-      "lat": 36.6126746,
-      "lng": 127.4664318,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/1008044677"
     },
     {
       "id": "2067711783",
@@ -3869,7 +3854,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2067711783"
     },
     {
@@ -3884,8 +3869,23 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2005487839"
+    },
+    {
+      "id": "1008044677",
+      "place_id": "1008044677",
+      "brand": "야키토리동작",
+      "priority": "normal",
+      "name": "야키토리동작",
+      "address": "충청북도 청주시 서원구 산남로70번길 34 1동 406-",
+      "lat": 36.6126746,
+      "lng": 127.4664318,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/1008044677"
     },
     {
       "id": "2089981222",
@@ -3899,7 +3899,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2089981222"
     },
     {
@@ -3914,7 +3914,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2049949216"
     },
     {
@@ -3929,23 +3929,8 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2019849532"
-    },
-    {
-      "id": "1333344337",
-      "place_id": "1333344337",
-      "brand": "야키토리동작",
-      "priority": "normal",
-      "name": "야키토리동작 청주성안점",
-      "address": "충청북도 청주시 상당구 사직대로361번길 14-1",
-      "lat": 36.6376355,
-      "lng": 127.4876158,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/1333344337"
     },
     {
       "id": "1602891102",
@@ -3959,23 +3944,23 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1602891102"
     },
     {
-      "id": "1945493375",
-      "place_id": "1945493375",
+      "id": "1333344337",
+      "place_id": "1333344337",
       "brand": "야키토리동작",
       "priority": "normal",
-      "name": "야키토리동작 대전가수원점",
-      "address": "대전광역시 서구 도안동로11번길 16",
-      "lat": 36.3064443,
-      "lng": 127.3519521,
+      "name": "야키토리동작 청주성안점",
+      "address": "충청북도 청주시 상당구 사직대로361번길 14-1",
+      "lat": 36.6376355,
+      "lng": 127.4876158,
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/1945493375"
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/1333344337"
     },
     {
       "id": "2093253228",
@@ -3989,8 +3974,23 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2093253228"
+    },
+    {
+      "id": "1945493375",
+      "place_id": "1945493375",
+      "brand": "야키토리동작",
+      "priority": "normal",
+      "name": "야키토리동작 대전가수원점",
+      "address": "대전광역시 서구 도안동로11번길 16",
+      "lat": 36.3064443,
+      "lng": 127.3519521,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/1945493375"
     },
     {
       "id": "2086899405",
@@ -4004,7 +4004,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2086899405"
     },
     {
@@ -4019,7 +4019,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1127726850"
     },
     {
@@ -4034,7 +4034,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1686112727"
     },
     {
@@ -4049,7 +4049,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1662183897"
     },
     {
@@ -4064,7 +4064,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2048556187"
     },
     {
@@ -4079,7 +4079,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2087647409"
     },
     {
@@ -4094,23 +4094,8 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2090291182"
-    },
-    {
-      "id": "2017593626",
-      "place_id": "2017593626",
-      "brand": "야키토리동작",
-      "priority": "normal",
-      "name": "야키토리 다온",
-      "address": "서울특별시 동작구 장승배기로 62-1",
-      "lat": 37.5032796,
-      "lng": 126.93982,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2017593626"
     },
     {
       "id": "1540250111",
@@ -4124,23 +4109,23 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1540250111"
     },
     {
-      "id": "2073555622",
-      "place_id": "2073555622",
+      "id": "2017593626",
+      "place_id": "2017593626",
       "brand": "야키토리동작",
       "priority": "normal",
-      "name": "야키토리 히노야 이수점",
-      "address": "서울특별시 동작구 동작대로25길 51",
-      "lat": 37.4850768,
-      "lng": 126.9798976,
+      "name": "야키토리 다온",
+      "address": "서울특별시 동작구 장승배기로 62-1",
+      "lat": 37.5032796,
+      "lng": 126.93982,
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2073555622"
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2017593626"
     },
     {
       "id": "1520273549",
@@ -4154,8 +4139,23 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1520273549"
+    },
+    {
+      "id": "2073555622",
+      "place_id": "2073555622",
+      "brand": "야키토리동작",
+      "priority": "normal",
+      "name": "야키토리 히노야 이수점",
+      "address": "서울특별시 동작구 동작대로25길 51",
+      "lat": 37.4850768,
+      "lng": 126.9798976,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2073555622"
     },
     {
       "id": "2097358942",
@@ -4169,7 +4169,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2097358942"
     },
     {
@@ -4184,7 +4184,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2093310336"
     },
     {
@@ -4199,7 +4199,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1866906415"
     },
     {
@@ -4214,7 +4214,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2005902449"
     },
     {
@@ -4229,7 +4229,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2010596439"
     },
     {
@@ -4244,7 +4244,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2039783953"
     },
     {
@@ -4259,7 +4259,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2058650734"
     },
     {
@@ -4269,12 +4269,12 @@
       "priority": "normal",
       "name": "우지커피 광화문점",
       "address": "새문안로5가길 11",
-      "lat": 37.5730993,
-      "lng": 126.9738397,
+      "lat": 37.5731745,
+      "lng": 126.9738836,
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2093491282"
     },
     {
@@ -4289,7 +4289,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2032530841"
     },
     {
@@ -4304,7 +4304,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2030555340"
     },
     {
@@ -4319,7 +4319,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2033765741"
     },
     {
@@ -4334,7 +4334,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1259026902"
     },
     {
@@ -4349,7 +4349,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1797903666"
     },
     {
@@ -4364,7 +4364,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2030339645"
     },
     {
@@ -4379,7 +4379,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2034097020"
     },
     {
@@ -4394,7 +4394,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2005964171"
     },
     {
@@ -4409,7 +4409,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2077660492"
     },
     {
@@ -4424,7 +4424,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2036001410"
     },
     {
@@ -4439,7 +4439,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2080124362"
     },
     {
@@ -4454,7 +4454,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2011604724"
     },
     {
@@ -4469,7 +4469,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1093550949"
     },
     {
@@ -4484,7 +4484,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2005774819"
     },
     {
@@ -4499,7 +4499,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2073742967"
     },
     {
@@ -4514,7 +4514,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2089338130"
     },
     {
@@ -4529,7 +4529,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2079549169"
     },
     {
@@ -4544,7 +4544,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1554483120"
     },
     {
@@ -4559,7 +4559,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2028247959"
     },
     {
@@ -4574,7 +4574,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2035233899"
     },
     {
@@ -4589,7 +4589,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1835690138"
     },
     {
@@ -4604,7 +4604,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2063459948"
     },
     {
@@ -4619,7 +4619,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2008060350"
     },
     {
@@ -4634,7 +4634,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2007176455"
     },
     {
@@ -4649,7 +4649,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1788809385"
     },
     {
@@ -4664,7 +4664,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2040088995"
     },
     {
@@ -4679,23 +4679,8 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2046841051"
-    },
-    {
-      "id": "1355597216",
-      "place_id": "1355597216",
-      "brand": "러너펍",
-      "priority": "normal",
-      "name": "러너펍 논현점",
-      "address": "서울특별시 강남구 학동로2길 56",
-      "lat": 37.5079527,
-      "lng": 127.0236557,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/1355597216"
     },
     {
       "id": "2018635124",
@@ -4709,8 +4694,23 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2018635124"
+    },
+    {
+      "id": "1355597216",
+      "place_id": "1355597216",
+      "brand": "러너펍",
+      "priority": "normal",
+      "name": "러너펍 논현점",
+      "address": "서울특별시 강남구 학동로2길 56",
+      "lat": 37.5079527,
+      "lng": 127.0236557,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/1355597216"
     },
     {
       "id": "1013284413",
@@ -4724,7 +4724,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1013284413"
     },
     {
@@ -4739,23 +4739,8 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2086672411"
-    },
-    {
-      "id": "2011274375",
-      "place_id": "2011274375",
-      "brand": "러너펍",
-      "priority": "normal",
-      "name": "러너펍 신림점",
-      "address": "서울특별시 관악구 신림로 323",
-      "lat": 37.4832417,
-      "lng": 126.9295624,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2011274375"
     },
     {
       "id": "2054088358",
@@ -4769,8 +4754,23 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2054088358"
+    },
+    {
+      "id": "2011274375",
+      "place_id": "2011274375",
+      "brand": "러너펍",
+      "priority": "normal",
+      "name": "러너펍 신림점",
+      "address": "서울특별시 관악구 신림로 323",
+      "lat": 37.4832417,
+      "lng": 126.9295624,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2011274375"
     },
     {
       "id": "1001572777",
@@ -4784,7 +4784,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1001572777"
     },
     {
@@ -4799,23 +4799,8 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2086674448"
-    },
-    {
-      "id": "2075878914",
-      "place_id": "2075878914",
-      "brand": "러너펍",
-      "priority": "normal",
-      "name": "러너펍 철산점",
-      "address": "경기도 광명시 오리로856번길 12",
-      "lat": 37.4750341,
-      "lng": 126.8682269,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2075878914"
     },
     {
       "id": "2073483960",
@@ -4829,8 +4814,23 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2073483960"
+    },
+    {
+      "id": "2075878914",
+      "place_id": "2075878914",
+      "brand": "러너펍",
+      "priority": "normal",
+      "name": "러너펍 철산점",
+      "address": "경기도 광명시 오리로856번길 12",
+      "lat": 37.4750341,
+      "lng": 126.8682269,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2075878914"
     },
     {
       "id": "2030340889",
@@ -4844,7 +4844,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2030340889"
     },
     {
@@ -4859,7 +4859,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1143938579"
     },
     {
@@ -4874,7 +4874,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2026114589"
     },
     {
@@ -4889,23 +4889,8 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2076651187"
-    },
-    {
-      "id": "2004809036",
-      "place_id": "2004809036",
-      "brand": "러너펍",
-      "priority": "normal",
-      "name": "러너펍 일산백석점",
-      "address": "경기도 고양시 일산동구 백석로71번길 35",
-      "lat": 37.6480066,
-      "lng": 126.7844115,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2004809036"
     },
     {
       "id": "2070213600",
@@ -4919,7 +4904,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2070213600"
     },
     {
@@ -4934,23 +4919,23 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1407178024"
     },
     {
-      "id": "2029476712",
-      "place_id": "2029476712",
+      "id": "2004809036",
+      "place_id": "2004809036",
       "brand": "러너펍",
       "priority": "normal",
-      "name": "러너펍 부천신중동점",
-      "address": "경기도 부천시 원미구 조마루로297번길 51",
-      "lat": 37.4999578,
-      "lng": 126.7760146,
+      "name": "러너펍 일산백석점",
+      "address": "경기도 고양시 일산동구 백석로71번길 35",
+      "lat": 37.6480066,
+      "lng": 126.7844115,
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2029476712"
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2004809036"
     },
     {
       "id": "1040064335",
@@ -4964,7 +4949,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1040064335"
     },
     {
@@ -4979,8 +4964,23 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1833222432"
+    },
+    {
+      "id": "2029476712",
+      "place_id": "2029476712",
+      "brand": "러너펍",
+      "priority": "normal",
+      "name": "러너펍 부천신중동점",
+      "address": "경기도 부천시 원미구 조마루로297번길 51",
+      "lat": 37.4999578,
+      "lng": 126.7760146,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2029476712"
     },
     {
       "id": "2057528256",
@@ -4994,23 +4994,8 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2057528256"
-    },
-    {
-      "id": "2030541255",
-      "place_id": "2030541255",
-      "brand": "러너펍",
-      "priority": "normal",
-      "name": "러너펍 파주야당점",
-      "address": "경기도 파주시 소리천로 25",
-      "lat": 37.7148478,
-      "lng": 126.7614804,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2030541255"
     },
     {
       "id": "2056497115",
@@ -5024,23 +5009,8 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2056497115"
-    },
-    {
-      "id": "1515166744",
-      "place_id": "1515166744",
-      "brand": "러너펍",
-      "priority": "normal",
-      "name": "러너펍 하남 미사점",
-      "address": "경기도 하남시 미사강변동로 95 힐스테이트 미사역그랑파사쥬",
-      "lat": 37.5637312,
-      "lng": 127.1917417,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/1515166744"
     },
     {
       "id": "2078247460",
@@ -5054,8 +5024,53 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2078247460"
+    },
+    {
+      "id": "2030541255",
+      "place_id": "2030541255",
+      "brand": "러너펍",
+      "priority": "normal",
+      "name": "러너펍 파주야당점",
+      "address": "경기도 파주시 소리천로 25",
+      "lat": 37.7148478,
+      "lng": 126.7614804,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2030541255"
+    },
+    {
+      "id": "1515166744",
+      "place_id": "1515166744",
+      "brand": "러너펍",
+      "priority": "normal",
+      "name": "러너펍 하남 미사점",
+      "address": "경기도 하남시 미사강변동로 95 힐스테이트 미사역그랑파사쥬",
+      "lat": 37.5637312,
+      "lng": 127.1917417,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/1515166744"
+    },
+    {
+      "id": "2009364533",
+      "place_id": "2009364533",
+      "brand": "러너펍",
+      "priority": "normal",
+      "name": "러너펍 목동점",
+      "address": "서울특별시 양천구 신정중앙로 90 지하",
+      "lat": 37.526334,
+      "lng": 126.8616551,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2009364533"
     },
     {
       "id": "2006586496",
@@ -5069,38 +5084,23 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2006586496"
     },
     {
-      "id": "2009364533",
-      "place_id": "2009364533",
+      "id": "2075447363",
+      "place_id": "2075447363",
       "brand": "러너펍",
       "priority": "normal",
-      "name": "러너펍 목동점",
-      "address": "서울특별시 양천구 신정중앙로 90 지하",
-      "lat": 37.526334,
-      "lng": 126.8616551,
+      "name": "러너펍 동탄점",
+      "address": "경기도 화성시 동탄구 동탄중심상가2길 15",
+      "lat": 37.2056514,
+      "lng": 127.0735241,
       "status": "lead",
       "source": "apify_naver",
-      "first_seen": "2026-09-13T22:10:53",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2009364533"
-    },
-    {
-      "id": "2067183173",
-      "place_id": "2067183173",
-      "brand": "러너펍",
-      "priority": "normal",
-      "name": "러너펍 정왕점",
-      "address": "경기도 시흥시 중심상가로 320",
-      "lat": 37.3371144,
-      "lng": 126.7476185,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2067183173"
+      "first_seen": "2026-09-16T22:42:02",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2075447363"
     },
     {
       "id": "2072628012",
@@ -5114,7 +5114,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2072628012"
     },
     {
@@ -5129,7 +5129,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1330698612"
     },
     {
@@ -5144,38 +5144,8 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2073795521"
-    },
-    {
-      "id": "1110063130",
-      "place_id": "1110063130",
-      "brand": "타코로",
-      "priority": "normal",
-      "name": "타코로 쌈바",
-      "address": "서울특별시 강남구 도산대로50길 27 지상",
-      "lat": 37.5206266,
-      "lng": 127.0377084,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/1110063130"
-    },
-    {
-      "id": "1128856823",
-      "place_id": "1128856823",
-      "brand": "타코로",
-      "priority": "normal",
-      "name": "타코로",
-      "address": "서울특별시 마포구 홍익로3길 39",
-      "lat": 37.5526202,
-      "lng": 126.9216145,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/1128856823"
     },
     {
       "id": "1437365081",
@@ -5189,7 +5159,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1437365081"
     },
     {
@@ -5204,7 +5174,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1500632190"
     },
     {
@@ -5219,23 +5189,8 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1284514515"
-    },
-    {
-      "id": "2042010519",
-      "place_id": "2042010519",
-      "brand": "타코로",
-      "priority": "normal",
-      "name": "타코로와 세종대점",
-      "address": "서울특별시 광진구 군자로 128",
-      "lat": 37.5535498,
-      "lng": 127.0738283,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2042010519"
     },
     {
       "id": "2058515911",
@@ -5249,7 +5204,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2058515911"
     },
     {
@@ -5264,23 +5219,8 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1154022433"
-    },
-    {
-      "id": "1067560329",
-      "place_id": "1067560329",
-      "brand": "타코로",
-      "priority": "normal",
-      "name": "타코로 수원경기대점",
-      "address": "경기도 수원시 장안구 창훈로60번길 24 105,",
-      "lat": 37.2984427,
-      "lng": 127.0300391,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/1067560329"
     },
     {
       "id": "1867341300",
@@ -5294,8 +5234,23 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1867341300"
+    },
+    {
+      "id": "1067560329",
+      "place_id": "1067560329",
+      "brand": "타코로",
+      "priority": "normal",
+      "name": "타코로 수원경기대점",
+      "address": "경기도 수원시 장안구 창훈로60번길 24 105,",
+      "lat": 37.2984427,
+      "lng": 127.0300391,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/1067560329"
     },
     {
       "id": "2029058017",
@@ -5309,7 +5264,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2029058017"
     },
     {
@@ -5324,23 +5279,8 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2091367024"
-    },
-    {
-      "id": "2059733897",
-      "place_id": "2059733897",
-      "brand": "타코로",
-      "priority": "normal",
-      "name": "타코로 루원시티점",
-      "address": "인천광역시 서해구 봉오재3로 96",
-      "lat": 37.5271963,
-      "lng": 126.6703604,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2059733897"
     },
     {
       "id": "1457046190",
@@ -5354,23 +5294,8 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1457046190"
-    },
-    {
-      "id": "2091171287",
-      "place_id": "2091171287",
-      "brand": "타코로",
-      "priority": "normal",
-      "name": "타코로 인천대입구점",
-      "address": "인천광역시 연수구 하모니로138번길 11 101동",
-      "lat": 37.3849626,
-      "lng": 126.6428,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2091171287"
     },
     {
       "id": "2022281552",
@@ -5384,8 +5309,23 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2022281552"
+    },
+    {
+      "id": "2059733897",
+      "place_id": "2059733897",
+      "brand": "타코로",
+      "priority": "normal",
+      "name": "타코로 루원시티점",
+      "address": "인천광역시 서해구 봉오재3로 96",
+      "lat": 37.5271963,
+      "lng": 126.6703604,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2059733897"
     },
     {
       "id": "1820074967",
@@ -5399,7 +5339,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1820074967"
     },
     {
@@ -5414,23 +5354,68 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1415326198"
     },
     {
-      "id": "1639024882",
-      "place_id": "1639024882",
+      "id": "2091171287",
+      "place_id": "2091171287",
       "brand": "타코로",
       "priority": "normal",
-      "name": "타코로 안동정하점",
-      "address": "경상북도 안동시 강남5길 37",
-      "lat": 36.5504841,
-      "lng": 128.7341197,
+      "name": "타코로 인천대입구점",
+      "address": "인천광역시 연수구 하모니로138번길 11 101동",
+      "lat": 37.3849626,
+      "lng": 126.6428,
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/1639024882"
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2091171287"
+    },
+    {
+      "id": "1110063130",
+      "place_id": "1110063130",
+      "brand": "타코로",
+      "priority": "normal",
+      "name": "타코로 쌈바",
+      "address": "서울특별시 강남구 도산대로50길 27 지상",
+      "lat": 37.5206266,
+      "lng": 127.0377084,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/1110063130"
+    },
+    {
+      "id": "1128856823",
+      "place_id": "1128856823",
+      "brand": "타코로",
+      "priority": "normal",
+      "name": "타코로",
+      "address": "서울특별시 마포구 홍익로3길 39",
+      "lat": 37.5526202,
+      "lng": 126.9216145,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/1128856823"
+    },
+    {
+      "id": "2042010519",
+      "place_id": "2042010519",
+      "brand": "타코로",
+      "priority": "normal",
+      "name": "타코로와 세종대점",
+      "address": "서울특별시 광진구 군자로 128",
+      "lat": 37.5535498,
+      "lng": 127.0738283,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2042010519"
     },
     {
       "id": "2089519073",
@@ -5444,8 +5429,23 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2089519073"
+    },
+    {
+      "id": "1639024882",
+      "place_id": "1639024882",
+      "brand": "타코로",
+      "priority": "normal",
+      "name": "타코로 안동정하점",
+      "address": "경상북도 안동시 강남5길 37",
+      "lat": 36.5504841,
+      "lng": 128.7341197,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/1639024882"
     },
     {
       "id": "2017814050",
@@ -5459,7 +5459,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2017814050"
     },
     {
@@ -5474,53 +5474,8 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1126070292"
-    },
-    {
-      "id": "1247705176",
-      "place_id": "1247705176",
-      "brand": "타코로",
-      "priority": "normal",
-      "name": "타코로 부산재송점",
-      "address": "부산광역시 해운대구 재반로 98",
-      "lat": 35.1872684,
-      "lng": 129.1257395,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/1247705176"
-    },
-    {
-      "id": "2029238891",
-      "place_id": "2029238891",
-      "brand": "타코로",
-      "priority": "normal",
-      "name": "타코로 청주서원대점",
-      "address": "충청북도 청주시 서원구 쌍샘로 37-2 201-",
-      "lat": 36.6264896,
-      "lng": 127.4798755,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2029238891"
-    },
-    {
-      "id": "2020353699",
-      "place_id": "2020353699",
-      "brand": "타코로",
-      "priority": "normal",
-      "name": "타코로 대구범어점",
-      "address": "대구광역시 수성구 동대구로59길 14-2",
-      "lat": 35.8574717,
-      "lng": 128.6241507,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2020353699"
     },
     {
       "id": "1274796039",
@@ -5534,8 +5489,53 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1274796039"
+    },
+    {
+      "id": "2029238891",
+      "place_id": "2029238891",
+      "brand": "타코로",
+      "priority": "normal",
+      "name": "타코로 청주서원대점",
+      "address": "충청북도 청주시 서원구 쌍샘로 37-2 201-",
+      "lat": 36.6264896,
+      "lng": 127.4798755,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2029238891"
+    },
+    {
+      "id": "1247705176",
+      "place_id": "1247705176",
+      "brand": "타코로",
+      "priority": "normal",
+      "name": "타코로 부산재송점",
+      "address": "부산광역시 해운대구 재반로 98",
+      "lat": 35.1872684,
+      "lng": 129.1257395,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/1247705176"
+    },
+    {
+      "id": "2020353699",
+      "place_id": "2020353699",
+      "brand": "타코로",
+      "priority": "normal",
+      "name": "타코로 대구범어점",
+      "address": "대구광역시 수성구 동대구로59길 14-2",
+      "lat": 35.8574717,
+      "lng": 128.6241507,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2020353699"
     },
     {
       "id": "1046637433",
@@ -5549,7 +5549,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1046637433"
     },
     {
@@ -5564,7 +5564,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2030712866"
     },
     {
@@ -5579,7 +5579,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1482651437"
     },
     {
@@ -5594,7 +5594,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2021335542"
     },
     {
@@ -5609,7 +5609,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2078171106"
     },
     {
@@ -5624,7 +5624,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1734923625"
     },
     {
@@ -5639,7 +5639,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2038537710"
     },
     {
@@ -5654,7 +5654,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1038242726"
     },
     {
@@ -5669,7 +5669,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2055641310"
     },
     {
@@ -5684,7 +5684,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1339546902"
     },
     {
@@ -5699,7 +5699,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2074257338"
     },
     {
@@ -5714,7 +5714,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1169388311"
     },
     {
@@ -5729,7 +5729,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2008091510"
     },
     {
@@ -5744,7 +5744,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2074040173"
     },
     {
@@ -5759,7 +5759,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2063362788"
     },
     {
@@ -5774,7 +5774,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2005038786"
     },
     {
@@ -5789,7 +5789,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1905486895"
     },
     {
@@ -5804,7 +5804,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1901647409"
     },
     {
@@ -5819,7 +5819,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1353843287"
     },
     {
@@ -5834,7 +5834,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2054161763"
     },
     {
@@ -5849,7 +5849,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1073207597"
     },
     {
@@ -5864,7 +5864,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2089825444"
     },
     {
@@ -5879,7 +5879,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1010376392"
     },
     {
@@ -5894,7 +5894,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2043172440"
     },
     {
@@ -5909,7 +5909,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1218117707"
     },
     {
@@ -5924,7 +5924,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2084552993"
     },
     {
@@ -5939,7 +5939,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2082448189"
     },
     {
@@ -5954,7 +5954,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1948205147"
     },
     {
@@ -5969,7 +5969,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1883815048"
     },
     {
@@ -5984,7 +5984,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2061933923"
     },
     {
@@ -5999,7 +5999,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2013477914"
     },
     {
@@ -6014,7 +6014,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2091524193"
     },
     {
@@ -6029,7 +6029,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2097765706"
     },
     {
@@ -6044,7 +6044,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2061882219"
     },
     {
@@ -6059,7 +6059,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2017560834"
     },
     {
@@ -6074,7 +6074,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2061450890"
     },
     {
@@ -6089,7 +6089,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2006186778"
     },
     {
@@ -6104,7 +6104,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2081993313"
     },
     {
@@ -6119,7 +6119,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2058004339"
     },
     {
@@ -6134,7 +6134,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2034496622"
     },
     {
@@ -6149,7 +6149,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2095972356"
     },
     {
@@ -6164,7 +6164,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2082456926"
     },
     {
@@ -6179,7 +6179,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2021210001"
     },
     {
@@ -6194,38 +6194,8 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2072136440"
-    },
-    {
-      "id": "2005434294",
-      "place_id": "2005434294",
-      "brand": "연막창",
-      "priority": "normal",
-      "name": "연막창 일산후곡점",
-      "address": "일산로 543",
-      "lat": 37.6775608,
-      "lng": 126.7674477,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2005434294"
-    },
-    {
-      "id": "2035049463",
-      "place_id": "2035049463",
-      "brand": "연막창",
-      "priority": "normal",
-      "name": "연막창 야당점",
-      "address": "소리천로 25",
-      "lat": 37.7147496,
-      "lng": 126.7616337,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2035049463"
     },
     {
       "id": "2070906479",
@@ -6239,7 +6209,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2070906479"
     },
     {
@@ -6254,7 +6224,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2030568805"
     },
     {
@@ -6269,8 +6239,38 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2079672038"
+    },
+    {
+      "id": "2035049463",
+      "place_id": "2035049463",
+      "brand": "연막창",
+      "priority": "normal",
+      "name": "연막창 야당점",
+      "address": "소리천로 25",
+      "lat": 37.7147496,
+      "lng": 126.7616337,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2035049463"
+    },
+    {
+      "id": "2005434294",
+      "place_id": "2005434294",
+      "brand": "연막창",
+      "priority": "normal",
+      "name": "연막창 일산후곡점",
+      "address": "일산로 543",
+      "lat": 37.6775608,
+      "lng": 126.7674477,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2005434294"
     },
     {
       "id": "2090185171",
@@ -6284,7 +6284,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2090185171"
     },
     {
@@ -6299,7 +6299,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2016447733"
     },
     {
@@ -6314,23 +6314,8 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2021729276"
-    },
-    {
-      "id": "2094354570",
-      "place_id": "2094354570",
-      "brand": "연막창",
-      "priority": "normal",
-      "name": "연막창 영종도점",
-      "address": "하늘중앙로225번길 16 102,",
-      "lat": 37.4872684,
-      "lng": 126.559074,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2094354570"
     },
     {
       "id": "2089447479",
@@ -6344,8 +6329,23 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2089447479"
+    },
+    {
+      "id": "2094354570",
+      "place_id": "2094354570",
+      "brand": "연막창",
+      "priority": "normal",
+      "name": "연막창 영종도점",
+      "address": "하늘중앙로225번길 16 102,",
+      "lat": 37.4872684,
+      "lng": 126.559074,
+      "status": "existing",
+      "source": "apify_naver",
+      "first_seen": "2026-09-12T19:54:50",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2094354570"
     },
     {
       "id": "2095826785",
@@ -6359,7 +6359,7 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2095826785"
     },
     {
@@ -6374,23 +6374,8 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2037808638"
-    },
-    {
-      "id": "2041282588",
-      "place_id": "2041282588",
-      "brand": "연막창",
-      "priority": "normal",
-      "name": "연막창 둔산점",
-      "address": "둔산남로 101",
-      "lat": 36.3493791,
-      "lng": 127.3887669,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2041282588"
     },
     {
       "id": "1029527025",
@@ -6404,23 +6389,8 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/1029527025"
-    },
-    {
-      "id": "2009530940",
-      "place_id": "2009530940",
-      "brand": "연막창",
-      "priority": "normal",
-      "name": "연막창 장유율하직영점",
-      "address": "율하뜰천길 23",
-      "lat": 35.1725071,
-      "lng": 128.8261235,
-      "status": "existing",
-      "source": "apify_naver",
-      "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2009530940"
     },
     {
       "id": "2088794316",
@@ -6434,23 +6404,53 @@
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
+      "detected_at": "2026-09-16T22:42:02",
       "raw_url": "https://map.naver.com/p/entry/place/2088794316"
     },
     {
-      "id": "2052087037",
-      "place_id": "2052087037",
+      "id": "2041282588",
+      "place_id": "2041282588",
       "brand": "연막창",
       "priority": "normal",
-      "name": "연막창 진평인동점",
-      "address": "인동28길 17 .",
-      "lat": 36.0945934,
-      "lng": 128.4281317,
+      "name": "연막창 둔산점",
+      "address": "둔산남로 101",
+      "lat": 36.3493791,
+      "lng": 127.3887669,
       "status": "existing",
       "source": "apify_naver",
       "first_seen": "2026-09-12T19:54:50",
-      "detected_at": "2026-09-13T22:10:53",
-      "raw_url": "https://map.naver.com/p/entry/place/2052087037"
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2041282588"
+    },
+    {
+      "id": "2011959872",
+      "place_id": "2011959872",
+      "brand": "연막창",
+      "priority": "normal",
+      "name": "연막창 동래점",
+      "address": "명륜로129번나길 16",
+      "lat": 35.2059331,
+      "lng": 129.0804255,
+      "status": "lead",
+      "source": "apify_naver",
+      "first_seen": "2026-09-16T22:42:02",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2011959872"
+    },
+    {
+      "id": "2016386199",
+      "place_id": "2016386199",
+      "brand": "연막창",
+      "priority": "normal",
+      "name": "연막창 서면점",
+      "address": "중앙대로680번가길 62",
+      "lat": 35.1561964,
+      "lng": 129.0608737,
+      "status": "lead",
+      "source": "apify_naver",
+      "first_seen": "2026-09-16T22:42:02",
+      "detected_at": "2026-09-16T22:42:02",
+      "raw_url": "https://map.naver.com/p/entry/place/2016386199"
     }
   ]
 }
