@@ -1,5 +1,5 @@
 // PWA Service Worker v17.22e — 업변 재개장·새오너 태그 (오끼 override) (canonical redirect, etag fresh check)
-const CACHE = 'sewang-pwa-v18_1-intelligence';
+const CACHE = 'sewang-pwa-v18_2-data-recovery';
 const SHELL = ['/manifest.json', '/icon.svg'];
 
 self.addEventListener('install', e => {
@@ -20,15 +20,7 @@ self.addEventListener('activate', e => {
         clients.forEach(c => {
           c.postMessage({
             type: 'SW_UPDATED_RELOAD',
-            forceClear: true,
-            version: 'v17_20',
-            clearKeys: [
-              'sewang_franchise_master',
-              'sewang_franchise_stats',
-              'sewang_sns_trend',
-              'sewang_sns_trend_v17_15',
-              'sewang-v12'
-            ]
+            version: 'v18_2'
           });
         });
       })

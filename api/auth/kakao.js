@@ -3,7 +3,7 @@
 import { SignJWT } from 'jose';
 import fs from 'node:fs';
 import path from 'node:path';
-import { snapshotResponse } from '../../lib/snapshots.mjs';
+import { snapshotResponse, snapshotChunks } from '../../lib/snapshots.mjs';
 import { sessionKey, privateResponse, cookies, readSession, requireUser, mutationAllowed,
   allowlist, currentRole, oauthState, validState, stateCookie, fileRoles,
   assertPrivateRepository, validPushEndpoint, ROLES, SESSION_OPTIONS } from '../../lib/security.mjs';
@@ -391,6 +391,11 @@ export default async function handler(req, res) {
       if (!roles.includes(session.r)) return res.status(403).json({ error: 'permission_required' });
       // Read server-bundled snapshots; these files are not in the public build directory.
       const raw = fs.readFileSync(path.join(process.cwd(), 'data', file), 'utf8');
+      if(req.query.transport==='chunks'){
+        const output=snapshotChunks(raw,req.query);
+        res.setHeader('Content-Type','application/json; charset=utf-8');
+        return output.json ? res.status(output.status).json(output.json) : res.status(output.status).end(output.body);
+      }
       const output = snapshotResponse(raw, req.headers['accept-encoding']);
       if (output.error) return res.status(output.status).json({ error: output.error });
       res.setHeader('Vary', 'Cookie, Accept-Encoding');

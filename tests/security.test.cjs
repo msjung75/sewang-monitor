@@ -11,7 +11,7 @@ before(async () => {
   process.env.GITHUB_TOKEN = 'fixture-only';
   process.env.ADMIN_KAKAO_ID = '';
 });
-function res() { return {code:200, headers:{}, setHeader(k,v){this.headers[k]=v;}, status(c){this.code=c;return this;}, json(body){this.body=body;return this;}, send(body){this.body=body;return this;}, redirect(code,url){this.code=code;this.url=url;}}; }
+function res() { return {code:200, headers:{}, setHeader(k,v){this.headers[k]=v;}, status(c){this.code=c;return this;}, json(body){this.body=body;return this;}, send(body){this.body=body;return this;}, end(body){this.body=body;return this;}, redirect(code,url){this.code=code;this.url=url;}}; }
 function list(users = [{id:'123',role:'staff'}], blocked = []) {return async () => ({ok:true,json:async()=>({content:Buffer.from(JSON.stringify({users,blocked})).toString('base64')})});}
 async function token(role='admin', options={}) {return new SignJWT({id:'123',r:role,n:'fixture'}).setProtectedHeader({alg:'HS256'}).setIssuer(S.SESSION_OPTIONS.issuer).setAudience(options.audience || S.SESSION_OPTIONS.audience).setIssuedAt().setExpirationTime('1h').sign(S.sessionKey());}
 async function request(extra={}) {return {method:'GET',query:{},headers:{cookie:'sewang_session='+await token()},...extra};}
@@ -98,4 +98,21 @@ test('large authenticated JSON snapshots preserve Korean data with bounded gzip 
   const raw=JSON.stringify({fixture:'서울 매장 '.repeat(500000)}),out=snapshotResponse(raw,'gzip, deflate, br');
   assert.equal(out.encoding,'gzip');assert.equal(gunzipSync(out.body).toString(),raw);assert.ok(out.body.length<3300000);
   assert.equal(snapshotResponse(raw,'gzip;q=0').status,406);
+});
+test('actual authenticated snapshot handler serves large data without gzip headers and protects every part',async()=>{
+  const handler=(await import('../api/auth/kakao.js')).default,saved=global.fetch;
+  try{
+    global.fetch=list();const query={action:'data',file:'ytd_2026_summary.json',transport:'chunks',encoding:'gzip'};
+    const manifest=res();await handler(await request({query}),manifest);
+    assert.equal(manifest.code,200);assert.equal(manifest.body._sewangSnapshot,1);
+    assert.match(manifest.headers['Cache-Control'],/no-store/);
+    const partQuery={...query,part:'0',revision:manifest.body.revision};
+    const part=res();await handler(await request({query:partQuery}),part);
+    assert.equal(part.code,200);assert.ok(Buffer.byteLength(JSON.stringify(part.body))<1500000);
+    assert.equal(part.headers['Content-Encoding'],undefined);
+    const anon=res();await handler({method:'GET',headers:{},query:partQuery},anon);assert.equal(anon.code,401);
+    global.fetch=list([]);const revoked=res();await handler(await request({query:partQuery}),revoked);assert.equal(revoked.code,403);
+    global.fetch=list();const stale=res();await handler(await request({query:{...partQuery,revision:'stale'}}),stale);assert.equal(stale.code,409);
+    const invalid=res();await handler(await request({query:{...partQuery,part:'999'}}),invalid);assert.equal(invalid.code,400);
+  }finally{global.fetch=saved;}
 });

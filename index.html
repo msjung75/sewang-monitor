@@ -447,9 +447,12 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 }
 @keyframes badgePulse{0%,100%{transform:scale(1);box-shadow:0 0 12px rgba(239,68,68,0.6)}50%{transform:scale(1.15);box-shadow:0 0 18px rgba(239,68,68,0.8)}}
 </style>
-<link rel="stylesheet" href="/assets/intelligence.css?v=18.1">
+<link rel="stylesheet" href="/assets/intelligence.css?v=18.2">
+<script src="/assets/storage-recovery.js?v=18.2"></script>
+<script src="/assets/data-client.js?v=18.2"></script>
+<script src="/assets/data-status.js?v=18.2"></script>
 <script src="/assets/intelligence-core.js?v=18.1"></script>
-<script src="/assets/intelligence-ui.js?v=18.1"></script>
+<script src="/assets/intelligence-ui.js?v=18.2"></script>
 </head>
 <body>
 <div id="auth-loading" role="status"><strong>세왕 영업 인텔리전스</strong><span>접근 권한을 확인하고 있습니다…</span></div>
@@ -1123,7 +1126,11 @@ function loadAccountState(){
   ST = { tracked: [], naver: {}, permits: [], lastFetch: null };
   try { var raw=appStorageGetItem(KEY); if(raw) ST=Object.assign(ST,JSON.parse(raw)); } catch(e){}
 }
-function save(){ try { appStorageSetItem(KEY, JSON.stringify(ST)); } catch (e) {} }
+function save(){
+  // Save irreplaceable work, not megabytes of reloadable government/search caches.
+  try { appStorageSetItem(KEY, JSON.stringify({tracked:ST.tracked,me:window.ME})); }
+  catch(e){ if(typeof showToast==='function')showToast('⚠️','기록 저장 실패','브라우저 저장공간을 확인해 주세요. 기존 자료는 지우지 않았습니다.'); }
+}
 
 var NAVER_TTL = 24 * 3600 * 1000; // 분석 캐시 24시간
 var ANALYZE_MAX = 100;            // 조회당 자동 분석 상한
@@ -2218,7 +2225,7 @@ async function loadBrandOverrides(){
     // 2회 시도 — 첫 응답이 옛 캐시이면 재요청 (Vercel CDN edge cache 회피)
     var d = null;
     for (var attempt = 0; attempt < 2; attempt++) {
-      var r = await fetch('/data/brand_overrides.json?v=' + Date.now() + '_' + attempt, {
+      var r = await fetchAppData('/data/brand_overrides.json?v=' + Date.now() + '_' + attempt, {
         cache: 'no-store',
         headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache' }
       });
@@ -2422,7 +2429,7 @@ async function loadFranchiseMaster(){
   } catch(e){}
   // 2) 정적 파일이 있으면 그거 (다음달 cron 이후)
   try {
-    var r = await fetch('/data/franchise_master.json', { cache: 'force-cache' });
+    var r = await fetchAppData('/data/franchise_master.json', { cache: 'force-cache' });
     if (r.ok) {
       var d = await r.json();
       if (d.lookup) {
@@ -2594,9 +2601,10 @@ function updateMonthRangeLabels(){
 }
 async function loadYTDSummary(){
   try {
-    var r = await fetch('/data/ytd_2026_summary.json?_=' + Date.now(), { cache: 'no-store' });
-    if (!r.ok) return;
-    window.YTD = await r.json();
+    var r = await fetchAppData('/data/ytd_2026_summary.json?_=' + Date.now(), { cache: 'no-store' });
+    var snapshot = await r.json();
+    if (!snapshot || !snapshot.by_brand || !Array.isArray(snapshot.months_loaded)) throw new Error('invalid_snapshot');
+    window.YTD = snapshot;
     await loadFranchiseMaster();  // 공정위 마스터 먼저
     try { if (typeof rebuildBrands === 'function') rebuildBrands(); } catch(e){}  // v17.21 접두어 매칭 반영
     buildSegmentAliases();
@@ -2631,7 +2639,7 @@ async function loadYTDSummary(){
     // 「프랜차이즈」 테이블 재렌더 (YTD 로드 후 BRANDS → YTD 데이터로 전환)
     try { renderFr(); } catch(e){}
     if (typeof renderIntelligence === 'function') renderIntelligence();
-  } catch(e) { console.warn('[YTD] load fail:', e.message); }
+  } catch(e) { setAppDataState('ytd_2026_summary.json',e.status===401?'session-expired':e.status===403?'denied':'error'); if(typeof renderIntelligence==='function')renderIntelligence(); console.warn('[YTD] load fail:', e.message); }
 }
 
 // 브랜드 표기 변형 합치기 (예: '야화 혼술바' + '야화혼술바')
@@ -4065,7 +4073,7 @@ var SNS_FOCUS_WEIGHT = { sool: 3.0, chicken: 2.5, meat: 2.5, korean: 1.5, japane
 window.SNS_BUZZ = null;  // v17.13 Phase 2: Apify 인스타 화제성 캐시
 async function loadSnsBuzz(){
   try {
-    var r = await fetch('/data/sns_buzz.json?t=' + Math.floor(Date.now()/3600000), { cache: 'no-store' });
+    var r = await fetchAppData('/data/sns_buzz.json?t=' + Math.floor(Date.now()/3600000), { cache: 'no-store' });
     if (r.ok) {
       window.SNS_BUZZ = await r.json();
       console.log('[sns_buzz] loaded:', Object.keys(window.SNS_BUZZ.brands||{}).length, 'brands @', window.SNS_BUZZ.at);
@@ -4174,7 +4182,7 @@ window.FRANCHISE_MASTER = null;
 window._franchiseSet = null;
 async function loadFranchiseMaster(){
   try {
-    var r = await fetch('/data/franchise_master.json?t=' + Math.floor(Date.now()/3600000), { cache:'no-store' });
+    var r = await fetchAppData('/data/franchise_master.json?t=' + Math.floor(Date.now()/3600000), { cache:'no-store' });
     if (!r.ok) return;
     window.FRANCHISE_MASTER = await r.json();
     // v17.14.3.1: compact key + 영문 alias 추출 (「비에이치씨(BHC)」 → 「비에이치씨」 + 「bhc」)
@@ -4237,7 +4245,7 @@ function franchiseStoreCount(brand){
 window.WS_DATA = null;
 async function loadWholesalers(){
   try {
-    var r = await fetch('/data/wholesalers.json?t=' + Math.floor(Date.now()/3600000), { cache: 'no-store' });
+    var r = await fetchAppData('/data/wholesalers.json?t=' + Math.floor(Date.now()/3600000), { cache: 'no-store' });
     if (!r.ok) return;
     window.WS_DATA = await r.json();
     console.log('[wholesalers] loaded:', window.WS_DATA.total, '사');
@@ -4282,7 +4290,7 @@ function renderWholesalers(){
 window.SUMTREND_BUZZ = null;
 async function loadSumtrendBuzz(){
   try {
-    var r = await fetch('/data/sumtrend_buzz.json?t=' + Math.floor(Date.now()/3600000), { cache: 'no-store' });
+    var r = await fetchAppData('/data/sumtrend_buzz.json?t=' + Math.floor(Date.now()/3600000), { cache: 'no-store' });
     if (r.ok) {
       window.SUMTREND_BUZZ = await r.json();
       console.log('[sumtrend_buzz] loaded:', Object.keys(window.SUMTREND_BUZZ.brands||{}).length, 'brands @', window.SUMTREND_BUZZ.updated);
@@ -4988,7 +4996,7 @@ function _renderMonthlyTrendOld(){
 // v15.14: N등록 cron 결과 로드 — naver_nstat_cache.json 머지
 async function loadNaverNstatCache(){
   try {
-    var r = await fetch('/data/naver_nstat_cache.json', { cache: 'no-store' });
+    var r = await fetchAppData('/data/naver_nstat_cache.json', { cache: 'no-store' });
     if (!r.ok) return;
     var d = await r.json();
     // 실제 구조: top-level이 { storeId: { nstat: 'registered'|'unregistered'|'locked', checked_at, name } }
@@ -5025,10 +5033,9 @@ async function loadNaverNstatCache(){
 }
 async function loadNightlyCache(){
   try {
-    var r = await fetch('/data/trend30_all.json', { cache: 'no-store' });
-    if (!r.ok) return; // 파일 없으면 무시
+    var r = await fetchAppData('/data/trend30_all.json', { cache: 'no-store' });
     var d = await r.json();
-    if (!d || !Array.isArray(d.stores)) return;
+    if (!d || !Array.isArray(d.stores)) throw new Error('invalid_snapshot');
     // 새벽 cron 결과(전국)가 더 신선하거나 더 크면 ST.trend30에 머지
     var existingAt = ST.trend30 && ST.trend30.at ? ST.trend30.at : 0;
     var nightlyAt = new Date(d.at || 0).getTime();
@@ -5077,9 +5084,10 @@ async function loadNightlyCache(){
       try { rebuildBrands(); renderCharts(); renderFr(); renderStats(); renderNew(); renderAll && renderAll(); } catch(e){ console.error('[nightly] render fail:', e); }
       console.log('[nightly] 전국 캐시 로드 — raw ' + rawTotal + '건, 제외 ' + excludedCount + '건, 잔여 ' + filtered.length + '건, 수집시각 ' + new Date(nightlyAt).toLocaleString('ko-KR'));
       var st = document.getElementById('nightly-stamp');
+      if(typeof renderIntelligence==='function')renderIntelligence();
       if (st) st.textContent = '🕐 마지막 새벽 수집: ' + new Date(nightlyAt).toLocaleString('ko-KR') + ' KST · 전국 ' + filtered.length + '건 (커피/빵 ' + excludedCount + '건 제외)';
     }
-  } catch(e) { console.warn('[nightly] 캐시 로드 실패 (정상 — 파일 없으면):', e.message); }
+  } catch(e) { setAppDataState('trend30_all.json',e.status===401?'session-expired':e.status===403?'denied':'error'); if(typeof renderIntelligence==='function')renderIntelligence(); console.warn('[nightly] 자료 로드 실패:', e.message); }
 }
 // ============================================================
 // 인증 게이트 (카카오 OAuth — v11)
@@ -5668,12 +5676,12 @@ function showBlockedScreen(){
 
 (async function bootstrap(){
   var ok = await checkAuth();
-  if (!ok) { showLoginScreen(); return; }
+  if (!ok) { setAppDataUser(null); showLoginScreen(); return; }
   // 🚨 보안 게이트 (v12.4) — pending/blocked는 메인 앱 차단
   var role = (window.ME && window.ME.role) || 'pending';
   var ALLOWED = ['admin','staff','owner','sales','viewer']; // sales/viewer는 백워드 호환
-  if (role === 'blocked') { showBlockedScreen(); return; }
-  if (ALLOWED.indexOf(role) < 0) { showPendingScreen(); return; }
+  if (role === 'blocked') { setAppDataUser(null); showBlockedScreen(); return; }
+  if (ALLOWED.indexOf(role) < 0) { setAppDataUser(null); showPendingScreen(); return; }
   if (role === 'admin') {
     var btn = document.getElementById('bnav-admin');
     if (btn) btn.style.display = '';
@@ -5697,6 +5705,8 @@ function showBlockedScreen(){
   }
   document.documentElement.classList.remove('auth-pending');
   ST.me = window.ME;
+  setAppDataUser(ME);
+  document.dispatchEvent(new CustomEvent('sewang:account-ready'));
   init();
 })();
 
@@ -6669,7 +6679,7 @@ function startPendingPolling(){
   function normName(s){ return String(s||'').toLowerCase().replace(/[\s()\[\]<>\-_.·:,'"`\/\\]/g,''); }
 
   function loadLeads(){
-    fetch('/data/franchise_leads.json?_=' + Date.now() + '', {cache:'no-store'}).then(function(r){ return r.json(); }).then(function(j){
+    fetchAppData('/data/franchise_leads.json?_=' + Date.now() + '', {cache:'no-store'}).then(function(r){ return r.json(); }).then(function(j){
       var leads = (j && j.leads) || [];
       STATE.leads = leads;
       STATE.byPermit = {}; STATE.byBrand = {}; STATE.hidden = {};
@@ -6790,15 +6800,27 @@ function startPendingPolling(){
   function fmtDur(sec){if(!sec||sec<0)return '-';if(sec<60)return sec+'초';var m=Math.floor(sec/60);if(m<60)return m+'분';return Math.floor(m/60)+'시간 '+(m%60)+'분';}
   function guessTab(){try{var on=document.querySelector('.bnav-btn.on');if(on){var lbl=on.textContent.replace(/\s+/g,'').trim();if(lbl)return lbl;}var pg=document.querySelector('.page.on');if(pg){var m={'pg-home':'대시보드','pg-new':'신규','pg-gold':'선점','pg-fr':'프랜차이즈','pg-track':'추적','pg-trend':'추이','pg-map':'지도','pg-insight':'인사이트','pg-admin':'관리'};return m[pg.id]||pg.id;}}catch(e){}return '';}
   function trackTab(){var t=guessTab();if(t)currentTabs.add(t);}
-  var state=safeLoad()||{visits:[],first_visit:NOW,total_count:0};
-  state=prune(state);
-  var lastVisit=state.visits.length?state.visits[state.visits.length-1]:null;
-  var todayCount=(function(){var t=new Date();t.setHours(0,0,0,0);var s=t.getTime();return state.visits.filter(function(v){return v.ts>=s;}).length;})();
-  var isFirst=state.total_count===0;
-  state.visits.push({ts:NOW,tabs:[],duration_sec:0});
-  state.total_count=(state.total_count||0)+1;
-  if(!state.first_visit)state.first_visit=NOW;
-  safeSave(state);
+  var state=null,lastVisit=null,todayCount=0,isFirst=false;
+  function initializeVisits(){
+    if(!window.ME || !['admin','staff','sales','viewer','owner'].includes(ME.role))return;
+    state=prune(safeLoad()||{visits:[],first_visit:NOW,total_count:0});
+    var earlier=state.visits.filter(function(v){return v.ts!==NOW;});
+    lastVisit=earlier.length?earlier[earlier.length-1]:null;
+    var day=new Date();day.setHours(0,0,0,0);
+    todayCount=earlier.filter(function(v){return v.ts>=day.getTime();}).length+1;
+    isFirst=state.total_count===0;
+    if(!state.visits.some(function(v){return v.ts===NOW;})){
+      state.visits.push({ts:NOW,tabs:[],duration_sec:0});
+      state.total_count=(state.total_count||0)+1;
+    }
+    if(!state.first_visit)state.first_visit=NOW;
+    safeSave(state);
+    var badge=document.getElementById('vh-badge');if(badge)badge.remove();
+    mountBadge();
+  }
+  document.addEventListener('sewang:account-ready',initializeVisits);
+  document.addEventListener('sewang:records-restored',initializeVisits);
+  if(window.ME)initializeVisits();
   trackTab();
   document.addEventListener('DOMContentLoaded',trackTab);
   document.addEventListener('click',function(e){if(e.target&&e.target.closest&&e.target.closest('.bnav-btn')){setTimeout(trackTab,60);}});
@@ -6807,7 +6829,7 @@ function startPendingPolling(){
   document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden')finalize();});
   function badgeText(){if(isFirst)return {t:'🎉 환영합니다 · 첫 방문',cls:'welcome'};var days=lastVisit?Math.floor((NOW-lastVisit.ts)/86400000):0;if(todayCount>=5)return {t:'오늘 '+todayCount+'번째 열람',cls:'frequent'};if(days>=3)return {t:days+'일 만에 다시 오셨네요 📅',cls:''};if(todayCount>=2)return {t:'오늘 '+todayCount+'번째 열람',cls:''};if(lastVisit)return {t:'이전 방문 '+fmtRel(lastVisit.ts),cls:''};return {t:'환영합니다',cls:''};}
   function mountBadge(retry){var host=document.querySelector('.hdr .hdr-meta');if(!host){if((retry||0)<20)return setTimeout(function(){mountBadge((retry||0)+1);},300);return;}if(document.getElementById('vh-badge'))return;var b=badgeText();var btn=document.createElement('button');btn.id='vh-badge';btn.className='vh-badge '+b.cls;btn.type='button';btn.title='방문 기록 보기';btn.textContent=b.t;btn.onclick=openModal;host.insertBefore(btn,host.firstChild);}
-  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',function(){mountBadge();});}else{mountBadge();}
+  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',function(){if(state)mountBadge();});}else if(state){mountBadge();}
   function tabRank(visits){var c={};visits.forEach(function(v){(v.tabs||[]).forEach(function(t){c[t]=(c[t]||0)+1;});});var arr=Object.keys(c).map(function(k){return {k:k,n:c[k]};});arr.sort(function(a,b){return b.n-a.n;});return arr.slice(0,3);}
   function avgDur(visits){var d=visits.filter(function(v){return v.duration_sec>0;});if(!d.length)return 0;return Math.round(d.reduce(function(s,v){return s+v.duration_sec;},0)/d.length);}
   function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
@@ -6846,6 +6868,7 @@ function startPendingPolling(){
 (function(){
   var KEY = 'sewang_customer_stores';
   var IDX = null;
+  ['sewang:account-ready','sewang:records-restored'].forEach(function(event){document.addEventListener(event,function(){IDX=null;renderCount();});});
   function compact(s){ return String(s||'').replace(/[\s\u00A0]/g,'').toLowerCase(); }
   function noParen(s){ return String(s||'').replace(/\([^)]*\)/g,''); }
   function loadStores(){
@@ -6978,7 +7001,8 @@ function startPendingPolling(){
     return (fnv(c, 2166136261) + fnv(c, 424242421)).slice(0, 12);
   }
   window._custHkey = hkey;
-  fetch('/data/customers_hash.json?v=' + Date.now(), { cache: 'no-store' })
+  function loadSharedCustomers(){
+  fetchAppData('/data/customers_hash.json?v=' + Date.now(), { cache: 'no-store' })
     .then(function(r){ return r.ok ? r.json() : null; })
     .then(function(d){
       if (!d || !Array.isArray(d.e) || !d.e.length) return;
@@ -7001,6 +7025,9 @@ function startPendingPolling(){
       try { if (typeof renderNew === 'function') renderNew(); } catch(e){}
       try { if (typeof renderGold === 'function') renderGold(); } catch(e){}
     }).catch(function(){});
+  }
+  loadSharedCustomers();
+  document.addEventListener('sewang:retry-data',loadSharedCustomers);
   var _prevICS = window.isCustomerStore;
   window.isCustomerStore = function(name, addr){
     if (HIDX) {
@@ -7076,7 +7103,8 @@ function startPendingPolling(){
     var m = ROAD.exec(String(addr||''));
     return m ? (m[1] + m[2]).replace(/\s/g,'').toLowerCase() : null;
   }
-  fetch('/data/customers_hash.json?v=' + Date.now(), { cache: 'no-store' })
+  function loadSharedCustomers(){
+  fetchAppData('/data/customers_hash.json?v=' + Date.now(), { cache: 'no-store' })
     .then(function(r){ return r.ok ? r.json() : null; })
     .then(function(d){
       if (!d || !Array.isArray(d.ea) || !d.ea.length || typeof window._custHkey !== 'function') return;
@@ -7090,6 +7118,9 @@ function startPendingPolling(){
       try { if (typeof renderNew === 'function') renderNew(); } catch(e){}
       try { if (typeof renderGold === 'function') renderGold(); } catch(e){}
     }).catch(function(){});
+  }
+  loadSharedCustomers();
+  document.addEventListener('sewang:retry-data',loadSharedCustomers);
   var CNT = null, CNT_LEN = -1;
   function hitCounts(){
     var list = (window.ST && ST.permits) ? ST.permits : [];
