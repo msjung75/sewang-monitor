@@ -21,6 +21,7 @@ jobs:
           python-version: '3.11'
       - name: Run recommend (metro, 14 days)
         env:
+          DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
           BASE_URL: 'https://sewang-monitor.vercel.app'
           OUTPUT: 'data/recommend_metro.json'
           DAYS: '14'

@@ -15,6 +15,7 @@
 import urllib.request, urllib.parse, json, sys, os, re, time, unicodedata
 from collections import Counter, defaultdict
 from datetime import datetime, timedelta
+from permit_client import collect_permits
 
 BASE = os.environ.get("BASE_URL", "https://sewang-monitor.vercel.app")
 MASTER_PATH = os.environ.get("MASTER_PATH", "data/franchise_master.json")
@@ -70,16 +71,7 @@ def canonical(name):
     return re.sub(r'[\s\(\)주식회사한시적]', '', name or '').lower()
 
 def fetch_region(region, days, max_pages=30, retries=2):
-    url = f"{BASE}/api/permits?region={region}&type=all&days={days}&maxPages={max_pages}"
-    for i in range(retries+1):
-        try:
-            req = urllib.request.Request(url, headers={'Accept':'application/json'})
-            with urllib.request.urlopen(req, timeout=60) as r:
-                return json.loads(r.read().decode()).get('items', [])
-        except Exception as e:
-            sys.stderr.write(f'[{region}] retry {i+1}/{retries+1}: {e}\n')
-            time.sleep(3)
-    return []
+    return collect_permits(region=region, type='all', days=days, maxPages=50)['items']
 
 def main():
     sys.stderr.write(f"[franchise] fetching {DAYS}d nationwide\n")

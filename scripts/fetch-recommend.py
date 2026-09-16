@@ -8,6 +8,7 @@
 출력: data/recommend_metro.json
 """
 import urllib.request, urllib.parse, json, sys, os, time
+from permit_client import collect_permits
 
 BASE = os.environ.get("BASE_URL", "https://sewang-monitor.vercel.app")
 OUTPUT = os.environ.get("OUTPUT", "data/recommend_metro.json")
@@ -87,10 +88,7 @@ def score_store(s):
     return score, reasons
 
 def fetch_permits(region, days, max_pages=30):
-    url = f"{BASE}/api/permits?region={region}&type=all&days={days}&maxPages={max_pages}"
-    req = urllib.request.Request(url, headers={'Accept':'application/json'})
-    with urllib.request.urlopen(req, timeout=90) as r:
-        return json.loads(r.read().decode())
+    return collect_permits(region=region, type='all', days=days, maxPages=50)
 
 def main():
     sys.stderr.write(f"[recommend] fetching metro {DAYS}days\n")

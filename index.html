@@ -449,7 +449,7 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 </style>
 <link rel="stylesheet" href="/assets/intelligence.css?v=18.2">
 <script src="/assets/storage-recovery.js?v=18.2"></script>
-<script src="/assets/data-client.js?v=18.2"></script>
+<script src="/assets/data-client.js?v=18.3"></script>
 <script src="/assets/data-status.js?v=18.2"></script>
 <script src="/assets/intelligence-core.js?v=18.1"></script>
 <script src="/assets/intelligence-ui.js?v=18.2"></script>
@@ -766,7 +766,7 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
   <div class="card">
     <div class="card-title">확장 중인 브랜드 (올해 누적 · 2건 이상 출점)</div>
     <table class="rtbl" id="tbl-brand">
-      <tr><td style="color:var(--txt3);text-align:center;padding:24px;font-size:12px">신규업장 탭에서 조회하면 자동 분석됩니다</td></tr>
+      <tr><td style="color:var(--txt3);text-align:center;padding:24px;font-size:12px">브랜드 자료를 불러오고 있습니다…</td></tr>
     </table>
   </div>
 
@@ -2162,24 +2162,21 @@ function renderFr(){
   var tbl = document.getElementById('tbl-brand');
   var kind = activeChip('chip-fr-kind');
   var isCafe = (kind === 'cafe');
-  var pool = isCafe ? CAFE_BRANDS : BRANDS;
+  // YTD brands are independent of the rolling 30-day snapshot.
+  var list = frFiltered();
   // 카드 제목 변경
   var cardTitleEl = document.querySelector('#pg-fr .card-title');
   if (cardTitleEl) cardTitleEl.textContent = isCafe
     ? '☕ 카페·빵 출점 (최근 30일 · 참고)'
     : '확장 중인 브랜드 (올해 누적 · 2건 이상 출점)';
-  if (!pool.length) {
-    tbl.innerHTML = '<tr><td style="color:var(--txt3);text-align:center;padding:24px;font-size:12px">' +
-      (ST.permits.length
-        ? (isCafe ? '기간 내 반복 출점 카페·빵 브랜드가 없습니다.' : '기간 내 반복 출점 브랜드가 없습니다.<br>기간을 14~30일로 늘려보세요.')
-        : '신규업장 탭에서 조회하면 자동 분석됩니다') + '</td></tr>';
-    document.getElementById('fr-detail').innerHTML = '';
-    document.getElementById('fr-detail-title').style.display = 'none';
-    return;
-  }
-  var list = frFiltered();
   if (!list.length) {
-    tbl.innerHTML = '<tr><td style="color:var(--txt3);text-align:center;padding:24px;font-size:12px">해당 계열의 반복 출점 브랜드가 없습니다</td></tr>';
+    var source = isCafe ? 'trend30_all.json' : 'ytd_2026_summary.json';
+    var state = (window.APP_DATA_STATE || {})[source];
+    var loaded = isCafe ? !!(ST.trend30 && ST.trend30.stores) : !!(window.YTD && YTD.by_brand);
+    var message = loaded ? '현재 조건의 반복 출점 브랜드가 없습니다.'
+      : ['error','denied','session-expired'].includes(state) ? '브랜드 자료를 불러오지 못했습니다. 상단에서 자료를 다시 불러와 주세요.'
+      : '브랜드 자료를 불러오고 있습니다…';
+    tbl.innerHTML = '<tr><td style="color:var(--txt3);text-align:center;padding:24px;font-size:12px">' + message + '</td></tr>';
     document.getElementById('fr-detail').innerHTML = '';
     document.getElementById('fr-detail-title').style.display = 'none';
     return;
@@ -5035,7 +5032,7 @@ async function loadNightlyCache(){
   try {
     var r = await fetchAppData('/data/trend30_all.json', { cache: 'no-store' });
     var d = await r.json();
-    if (!d || !Array.isArray(d.stores)) throw new Error('invalid_snapshot');
+    if (!d || !Array.isArray(d.stores) || (Array.isArray(d.failures) ? d.failures.length : Number(d.failures)||0) > 0) throw new Error('incomplete_snapshot');
     // 새벽 cron 결과(전국)가 더 신선하거나 더 크면 ST.trend30에 머지
     var existingAt = ST.trend30 && ST.trend30.at ? ST.trend30.at : 0;
     var nightlyAt = new Date(d.at || 0).getTime();

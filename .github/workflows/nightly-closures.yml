@@ -1,6 +1,6 @@
 name: Nightly Closures (CLSBIZ_YMD)
 # 폐업일자 기준 cron — 옛 인허가 매장의 최근 폐업까지 포착
-# v18: DATA_GO_KR_KEY secret 불필요 — Vercel /api/permits 프록시(dateField=closed) 경유로 재작성
+# 정부 인증키는 수집 작업에서만 사용하며 앱 사용자 인증과 분리한다.
 on:
   schedule:
     - cron: '40 19 * * *'   # 04:40 KST
@@ -28,7 +28,9 @@ jobs:
           echo "since=$SINCE" >> $GITHUB_OUTPUT
           echo "until=$UNTIL" >> $GITHUB_OUTPUT
           echo "Window: $SINCE ~ $UNTIL ($DAYS days)"
-      - name: Fetch closures via Vercel proxy (17 sido)
+      - name: Fetch closures from government source (17 sido)
+        env:
+          DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
         run: |
           BASE="https://sewang-monitor.vercel.app"
           SINCE="${{ steps.dates.outputs.since }}"
@@ -38,8 +40,8 @@ jobs:
           ok=0; fail=0
           for R in $REGIONS; do
             for i in 1 2 3; do
-              HTTP=$(curl -s -o /tmp/cls/$R.json -w '%{http_code}' --max-time 290 \
-                "$BASE/api/permits?dateField=closed&status=all&region=$R&type=all&from=$SINCE&to=$UNTIL&maxPages=40")
+              HTTP=failed
+              if node scripts/collect-permits.mjs "dateField=closed&status=all&region=$R&type=all&from=$SINCE&to=$UNTIL&maxPages=50" > /tmp/cls/$R.json; then HTTP=200; fi
               if [ "$HTTP" = "200" ] && jq -e '.items' /tmp/cls/$R.json >/dev/null 2>&1; then
                 n=$(jq '.items|length' /tmp/cls/$R.json); echo "$R: $n items"; ok=$((ok+1)); break
               fi
@@ -48,7 +50,7 @@ jobs:
             done
           done
           echo "regions ok=$ok fail=$fail"
-          if [ $ok -lt 10 ]; then echo "too many failures"; exit 1; fi
+          if [ $ok -ne 17 ]; then echo "too many failures"; exit 1; fi
           jq -s --arg at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --arg since "$SINCE" --arg until "$UNTIL" \
             '{at:$at, since:$since, until:$until,
               items:([.[].items[]] | unique_by(.mgtNo // (.name+(.addr//"")+(.closedDate//""))) | sort_by(.closedDate) | reverse | .[0:4000]),

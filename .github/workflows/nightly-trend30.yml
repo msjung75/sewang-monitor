@@ -1,5 +1,8 @@
 name: nightly-trend30
 on:
+  push:
+    branches: [main]
+    paths: ['scripts/nightly-fetch.sh', 'scripts/collect-permits.mjs', 'scripts/permit_client.py', 'lib/permit-source.mjs']
   schedule:
     # v16.8: 다중 schedule (silent skip 방어)
     # v17.14.4: 18:00/19:00 KST 추가 — 행안부 평일 publish (16~19시) 즉시 fetch
@@ -18,6 +21,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Fetch 17 시·도 30일치
+        env:
+          DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
         run: bash scripts/nightly-fetch.sh
       - name: Commit via GitHub Contents API (rebase 충돌 무관)
         env:

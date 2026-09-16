@@ -28,6 +28,7 @@ jobs:
         run: python3 scripts/fetch_apify_naver.py
       - name: Process leads
         env:
+          DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
           BASE_URL: 'https://sewang-monitor.vercel.app'
         run: python3 scripts/franchise_lead_processor.py
       - name: Commit outputs

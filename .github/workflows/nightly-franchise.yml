@@ -21,11 +21,12 @@ jobs:
           python-version: '3.11'
       - name: Run franchise auto-detect + trend30 update
         env:
+          DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
           BASE_URL: 'https://sewang-monitor.vercel.app'
           MASTER_PATH: 'data/franchise_master.json'
           TREND_PATH: 'data/trend30_all.json'
           DAYS: '14'
-        run: python3 scripts/detect_franchise.py | tee /tmp/franchise_result.json
+        run: python3 scripts/detect_franchise.py
       - name: Commit changes via GitHub Contents API
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
