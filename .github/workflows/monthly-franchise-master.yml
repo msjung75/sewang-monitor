@@ -13,20 +13,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Fetch franchise master via Vercel proxy (12 pages)
+      - name: Fetch complete franchise master from government source
+        env:
+          DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
         run: |
           python3 << 'PYEOF'
-          import json, urllib.request, time, re, os
+          import json, urllib.request, urllib.parse, time, re, os
+          key=os.environ.get("DATA_GO_KR_KEY")
+          if not key: raise SystemExit("Government key missing; previous master preserved")
+          complete=False
           all_brands = []
           all_compact = {}
-          for page in range(1, 13):
-              url = f'https://sewang-monitor.vercel.app/api/auth/kakao?action=franchise_stats&page={page}&rows=1000'
+          for page in range(1, 101):
+              url = 'https://apis.data.go.kr/1130000/FftcBrandFrcsStatsService/getBrandFrcsStats?' + urllib.parse.urlencode({'serviceKey':key,'pageNo':page,'numOfRows':1000,'resultType':'json','yr':'2024'})
               try:
                   r = urllib.request.urlopen(url, timeout=30)
                   d = json.loads(r.read())
-                  for it in d.get('items', []):
-                      name = (it.get('n') or '').strip()
-                      stores = it.get('f', 0) or 0
+                  if not isinstance(d.get('items'),list) or 'totalCount' not in d: raise ValueError('invalid_response')
+                  for it in d['items']:
+                      name = (it.get('brandNm') or '').strip()
+                      stores = int(it.get('frcsCnt') or 0) or 0
                       if not name: continue
                       name_clean = re.sub(r'\s*\d{4}\s*$', '', name).strip()
                       compact = re.sub(r'\s+', '', name_clean).lower()
@@ -34,9 +40,11 @@ jobs:
                           all_compact[compact] = True
                           all_brands.append({'name': name_clean, 'stores': stores})
                   print(f'page {page}: total unique {len(all_brands)}')
+                  if page*1000 >= int(d['totalCount']): complete=True; break
                   time.sleep(0.3)
               except Exception as e:
-                  print(f'page {page} err: {e}'); break
+                  raise SystemExit('Franchise source failed; previous master preserved') from None
+          if not complete or not all_brands: raise SystemExit('Incomplete master; previous data preserved')
           import datetime
           out = {
               'updated': datetime.datetime.utcnow().isoformat() + 'Z',

@@ -37,6 +37,7 @@ jobs:
           echo "Rolling window: $FROM ~ $TO (to는 미만조건 → 어제까지 포함)"
       - name: Fetch YTD rolling window
         env:
+          DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
           FROM_DATE: ${{ steps.dates.outputs.from }}
           TO_DATE: ${{ steps.dates.outputs.to }}
         run: bash scripts/fetch-ytd-range.sh

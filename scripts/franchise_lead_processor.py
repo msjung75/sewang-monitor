@@ -31,6 +31,7 @@ import os
 import re
 import shutil
 import urllib.request
+from permit_client import collect_permits
 from datetime import datetime, timedelta
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -72,17 +73,8 @@ def haversine(lat1, lon1, lat2, lon2):
 
 
 def fetch_permits():
-    url = f"{BASE_URL}/api/permits?days=30"
-    try:
-        with urllib.request.urlopen(url, timeout=30) as r:
-            data = json.loads(r.read().decode("utf-8"))
-        if isinstance(data, dict) and "rows" in data:
-            return data["rows"]
-        if isinstance(data, list):
-            return data
-    except Exception as e:  # noqa: BLE001
-        print(f"[franchise-proc] permits fetch failed: {e}")
-    return []
+    # An API/auth failure is not evidence that stores lack government permits.
+    return collect_permits(region='all', type='all', days=30, maxPages=50)['items']
 
 
 def match_brand(name, brands_cfg):

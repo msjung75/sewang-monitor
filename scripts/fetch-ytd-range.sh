@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # YTD 데이터 fetch — status=all (영업+폐업+휴업 모두)
 # FROM_DATE / TO_DATE 환경변수 받음 (yyyymmdd)
-set -uo pipefail
+set -euo pipefail
 BASE_URL="${BASE_URL:-https://sewang-monitor.vercel.app}"
 FROM_DATE="${FROM_DATE:-$(date -u -d 'yesterday' +%Y%m%d)}"
 TO_DATE="${TO_DATE:-$FROM_DATE}"
@@ -13,7 +13,7 @@ rm -f data/tmp/*.json
 
 for r in "${REGIONS[@]}"; do
   echo "::group::region $r"
-  curl -sS --max-time 120 "$BASE_URL/api/permits?from=$FROM_DATE&to=$TO_DATE&region=$r&type=all&status=all&maxPages=30" -o "data/tmp/$r.json" || echo "$r failed"
+  node scripts/collect-permits.mjs "from=$FROM_DATE&to=$TO_DATE&region=$r&type=all&status=all&maxPages=50" > "data/tmp/$r.json" || echo "$r failed"
   ls -la "data/tmp/$r.json" 2>/dev/null || true
   echo "::endgroup::"
   sleep 2
@@ -23,18 +23,12 @@ python3 << PYEOF
 import json, glob, datetime, os
 from collections import defaultdict
 
-new_items = {}
-failures = []
-for f in sorted(glob.glob('data/tmp/*.json')):
-    region = os.path.basename(f).replace('.json','')
-    try:
-        d = json.load(open(f))
-        items = d.get('items', [])
-        for it in items:
-            iid = it.get('id')
-            if iid: new_items[iid] = it
-    except Exception as e:
-        print(f'{region} parse fail: {e}'); failures.append(region)
+import sys
+sys.path.insert(0, 'scripts')
+from permit_client import read_complete_regions
+regions='seoul gyeonggi busan daegu incheon gwangju daejeon ulsan sejong gangwon chungbuk chungnam jeonbuk jeonnam gyeongbuk gyeongnam jeju'.split()
+new_items={it['id']:it for it in read_complete_regions('data/tmp',regions)}
+failures=[]
 
 # 월별로 분류
 by_month = defaultdict(dict)

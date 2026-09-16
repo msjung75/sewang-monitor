@@ -16,6 +16,7 @@ async function boot(role='staff',options={}){
   '/data/franchise_master.json':{brands:[],total:0},
   '/data/brand_overrides.json':{aliases:[],excluded:[],categories:{},store_excluded:[]}
  };
+ Object.assign(fixtures,options.fixtures||{});
  const requests=[],errors=[];const console=new VirtualConsole();console.on('jsdomError',e=>{if(!/Not implemented/.test(e.message))errors.push(e.message);});
  const dom=new JSDOM(fs.readFileSync('index.html','utf8'),{url:'https://fixture.invalid/',runScripts:'dangerously',resources,virtualConsole:console,pretendToBeVisual:true,beforeParse(w){
   w.Chart=class {destroy(){} resize(){}};
@@ -69,5 +70,37 @@ test('server data failure is visible and does not masquerade as zero stores',asy
   assert.match(w.document.getElementById('app-data-notices').textContent,/불러오지 못했습니다/);
   assert.match(w.document.getElementById('si-content').textContent,/0건이라는 뜻은 아닙니다/);
   assert.equal(w.document.querySelector('#si-content .si-kpis'),null);
+ }finally{w.close();}
+});
+test('year-to-date brands and branch details render even when the recent snapshot is empty',async()=>{
+ const {dom}=await boot('staff',{fixtures:{'/data/trend30_all.json':{at:new Date().toISOString(),stores:[],byDay:{},failures:[]}}});
+ const w=dom.window;
+ try{
+  w.switchPage('fr');w.renderFr();assert.equal(w.BRANDS.length,0);
+  assert.match(w.document.getElementById('fr-ytd-summary').textContent,/개점 3/);
+  assert.match(w.document.getElementById('tbl-brand').textContent,/테스트 주막/);
+  w.document.querySelector('#tbl-brand tr[onclick]').click();
+  assert.match(w.document.getElementById('fr-detail').textContent,/테스트 주막/);
+ }finally{w.close();}
+});
+test('failed collection snapshot cannot replace existing permits or hide YTD brands',async()=>{
+ const cached={id:'existing-permit',name:'기존 주막',addr:'서울특별시 강남구 테헤란로 12',permitDate:'20260910',type:'ilban',upte:'기타'};
+ const {dom}=await boot('staff',{storage:{'sewang-account-v18:fixture:sewang-v12':{tracked:[],permits:[cached]}},fixtures:{'/data/trend30_all.json':{at:new Date().toISOString(),stores:[],byDay:{},failures:['seoul','busan']}}});
+ const w=dom.window;
+ try{
+  assert.equal(w.ST.permits[0]?.id,'existing-permit');
+  assert.equal(w.APP_DATA_STATE['trend30_all.json'],'error');
+  w.switchPage('fr');w.renderFr();assert.match(w.document.getElementById('tbl-brand').textContent,/테스트 주막/);
+ }finally{w.close();}
+});
+test('real YTD snapshot renders brand rankings, category filtering and branch details with no recent records',async()=>{
+ const {dom}=await boot('staff',{fixtures:{'/data/trend30_all.json':{at:new Date().toISOString(),stores:[],byDay:{},failures:[]},'/data/ytd_2026_summary.json':JSON.parse(fs.readFileSync('data/ytd_2026_summary.json'))}});
+ const w=dom.window;
+ try{
+  w.switchPage('fr');w.renderFr();assert.ok(w.document.querySelectorAll('#tbl-brand tr[onclick]').length>0);
+  w.document.querySelector('#chip-fr-kind [data-v="sool"]').click();
+  const row=w.document.querySelector('#tbl-brand tr[onclick]');assert.ok(row);row.click();
+  assert.ok(w.document.getElementById('fr-detail').textContent.length>100);
+  assert.doesNotMatch(w.document.getElementById('tbl-brand').textContent,/신규업장 탭에서 조회/);
  }finally{w.close();}
 });

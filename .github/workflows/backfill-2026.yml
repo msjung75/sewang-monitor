@@ -67,6 +67,7 @@ jobs:
       - name: Fetch month
         if: steps.gate.outputs.run == 'true'
         env:
+          DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
           FROM_DATE: ${{ steps.dates.outputs.from }}
           TO_DATE: ${{ steps.dates.outputs.to }}
         run: bash scripts/fetch-ytd-range.sh
