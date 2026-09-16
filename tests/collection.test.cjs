@@ -14,9 +14,16 @@ test('encoded and decoded government credentials produce the same serviceKey wit
 test('government transport, permission, malformed response and partial service failures never become zero results',async()=>{
  const {collectPermits}=await import('../lib/permit-source.mjs');
  for(const fetcher of [async()=>({ok:false,status:403}),async()=>({ok:true,text:async()=>'<error>'}),async()=>({ok:true,text:async()=>JSON.stringify({error:'denied'})}),async()=>response([],1)]){
-  await assert.rejects(collectPermits({region:'seoul',type:'ilban'},'fixture',{fetcher}));
+  await assert.rejects(collectPermits({region:'seoul',type:'ilban'},'fixture',{fetcher,wait:async()=>{}}));
  }
- let calls=0;await assert.rejects(collectPermits({region:'seoul',type:'all'},'fixture',{fetcher:async()=>++calls===2?{ok:false}:response()}));
+ await assert.rejects(collectPermits({region:'seoul',type:'all'},'fixture',{fetcher:async url=>url.includes('rest_cafes')?{ok:false,status:503}:response(),wait:async()=>{}}));
+});
+test('temporary government failures retry, while invalid credentials fail without repeated calls',async()=>{
+ const {collectPermits}=await import('../lib/permit-source.mjs');let calls=0,waits=0;
+ const d=await collectPermits({region:'seoul',type:'ilban'},'fixture',{fetcher:async()=>++calls<3?{ok:false,status:503}:response(),wait:async()=>{waits++;}});
+ assert.equal(d.count,0);assert.equal(calls,3);assert.equal(waits,2);
+ calls=0;await assert.rejects(collectPermits({region:'seoul',type:'ilban'},'fixture',{fetcher:async()=>{calls++;return {ok:false,status:403};},wait:async()=>{throw Error('unexpected retry');}}));
+ assert.equal(calls,1);
 });
 test('valid empty government results and pagination are distinct from failure',async()=>{
  const {collectPermits}=await import('../lib/permit-source.mjs');

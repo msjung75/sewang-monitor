@@ -6,7 +6,7 @@ try{
   if(data.capped)throw new Error('collection_page_limit');
   process.stdout.write(JSON.stringify(data));
 }catch(error){
-  const reason=['government_key_missing','government_key_invalid','collection_page_limit','upstream_request_failed','upstream_invalid_response','upstream_incomplete_page'].includes(error.message)?error.message:'collection_failed';
+  const reason=/^(government_key_(missing|invalid)|collection_page_limit|upstream_(request_failed|invalid_response|incomplete_page|invalid_json|timeout|http_\d{3}))$/.test(error.message)?error.message:'collection_failed';
   console.error(reason+': previous data preserved. Check the configured government credential and provider availability.');
   process.exitCode=1;
 }
