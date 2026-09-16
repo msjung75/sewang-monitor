@@ -1,3 +1,4 @@
+import { requireReadUser, SALES_ROLES } from '../lib/security.mjs';
 // 업변(상호변경) 매장 데이터 서빙 프록시.
 // data/upbyeon_2026.json 을 읽어서 클라이언트가 쓰기 좋게 가공해서 반환.
 // nightly-upbyeon workflow가 매일 새벽 갱신.
@@ -45,13 +46,14 @@ function applyOverrides(items, overrides) {
   });
 }
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
+  if (!await requireReadUser(req, res, SALES_ROLES)) return;
   const file = path.join(process.cwd(), 'data', 'upbyeon_2026.json');
   let raw;
   try {
     raw = JSON.parse(fs.readFileSync(file, 'utf-8'));
   } catch (e) {
-    return res.status(500).json({ error: 'upbyeon data unavailable', detail: e.message });
+    return res.status(500).json({ error: 'upbyeon data unavailable' });
   }
 
   const overrides = loadOverrides();
@@ -127,7 +129,7 @@ export default function handler(req, res) {
   const byUpbyeon = [...rows].sort((a, b) => b.upbyeon - a.upbyeon).slice(0, 20);
   const specialists = rows.filter(r => r.is_specialist).sort((a, b) => b.upbyeon_ratio - a.upbyeon_ratio);
 
-  res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=600');
+  res.setHeader('Cache-Control', 'private, no-store');
   return res.status(200).json({
     updated: raw.updated,
     baseline_date: raw.baseline_date,

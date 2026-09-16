@@ -1,42 +1,76 @@
 {
-    "version": 2,
-    "headers": [
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "version": 2,
+  "buildCommand": "node scripts/build-static.cjs",
+  "outputDirectory": "dist",
+  "functions": {
+    "api/auth/kakao.js": {
+      "includeFiles": "data/**"
+    },
+    "api/recommend.js": {
+      "includeFiles": "data/recommend_metro.json"
+    },
+    "api/upbyeon.js": {
+      "includeFiles": "data/{upbyeon_2026,brand_overrides}.json"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/data/:file*",
+      "destination": "/api/auth/kakao?action=data&file=:file*"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
         {
-            "source": "/api/(.*)",
-            "headers": [
-                { "key": "Access-Control-Allow-Origin", "value": "*" },
-                { "key": "Access-Control-Allow-Methods", "value": "GET, OPTIONS" }
-            ]
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
         },
         {
-            "source": "/data/brand_overrides.json",
-            "headers": [
-                { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
-            ]
+          "key": "X-Frame-Options",
+          "value": "DENY"
         },
         {
-            "source": "/data/ytd_2026_summary.json",
-            "headers": [
-                { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate, no-cache" }
-            ]
+          "key": "Referrer-Policy",
+          "value": "no-referrer"
         },
         {
-            "source": "/data/franchise_master.json",
-            "headers": [
-                { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate, no-cache" }
-            ]
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=(self)"
         },
         {
-            "source": "/data/trend30_all.json",
-            "headers": [
-                { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate, no-cache" }
-            ]
-        },
-        {
-            "source": "/data/recommend_metro.json",
-            "headers": [
-                { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate, no-cache" }
-            ]
+          "key": "Content-Security-Policy",
+          "value": "frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self' https://kauth.kakao.com; upgrade-insecure-requests"
         }
-    ]
+      ]
+    },
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        },
+        {
+          "key": "Vercel-CDN-Cache-Control",
+          "value": "no-store"
+        }
+      ]
+    },
+    {
+      "source": "/data/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        },
+        {
+          "key": "Vercel-CDN-Cache-Control",
+          "value": "no-store"
+        }
+      ]
+    }
+  ]
 }

@@ -1,9 +1,13 @@
 // 카카오 OAuth + 사용자 관리 (callback / me / logout / login / list_users / approve / reject / update_role / remove)
 // v13: GitHub Contents API로 pending/allowlist 자동 commit
-import { SignJWT, jwtVerify } from 'jose';
+import { SignJWT } from 'jose';
+import fs from 'node:fs';
+import path from 'node:path';
+import { snapshotResponse } from '../../lib/snapshots.mjs';
+import { sessionKey, privateResponse, cookies, readSession, requireUser, mutationAllowed,
+  allowlist, currentRole, oauthState, validState, stateCookie, fileRoles,
+  assertPrivateRepository, validPushEndpoint, ROLES, SESSION_OPTIONS } from '../../lib/security.mjs';
 
-const JWT_SECRET_RAW = process.env.JWT_SECRET || 'dev-secret-change-me-please';
-const JWT_SECRET = new TextEncoder().encode(JWT_SECRET_RAW);
 const KAKAO_REST_KEY = process.env.KAKAO_REST_KEY;
 const ADMIN_KAKAO_ID = process.env.ADMIN_KAKAO_ID || '';
 const RESEND_API_KEY = process.env.RESEND_API_KEY || '';
@@ -55,6 +59,8 @@ async function ghGetFile(path) {
   return { sha: d.sha, content: JSON.parse(text) };
 }
 async function ghPutFile(path, content, sha, message) {
+  // This repository also holds user and customer records. Do not add private records to a public repo.
+  await assertPrivateRepository();
   const body = {
     message,
     content: Buffer.from(JSON.stringify(content, null, 2)).toString('base64'),
@@ -75,30 +81,16 @@ async function ghPutFile(path, content, sha, message) {
 // allowlist / pending 로드
 // ============================================================
 async function getAllowlist() {
-  try {
-    const r = await fetch(APP_BASE + '/data/allowlist.json', { cache: 'no-store' });
-    if (!r.ok) return { users: [], blocked: [], updated_at: '' };
-    const d = await r.json();
-    return {
-      users: Array.isArray(d) ? d : (d.users || []),
-      blocked: d.blocked || [],
-      updated_at: d.updated_at || '',
-    };
-  } catch (e) { return { users: [], blocked: [], updated_at: '' }; }
+  return allowlist();
 }
 async function getPending() {
-  try {
-    const r = await fetch(APP_BASE + '/data/pending_users.json', { cache: 'no-store' });
-    if (!r.ok) return { pending: [], updated_at: '' };
-    const d = await r.json();
-    return { pending: d.pending || [], updated_at: d.updated_at || '' };
-  } catch (e) { return { pending: [], updated_at: '' }; }
+  const d = (await ghGetFile('data/pending_users.json')).content || {};
+  return { pending: d.pending || [], updated_at: d.updated_at || '' };
 }
 function pickRole(kakaoId, users) {
   if (ADMIN_KAKAO_ID && String(kakaoId) === String(ADMIN_KAKAO_ID)) return 'admin';
   const u = (users || []).find(x => String(x.id) === String(kakaoId));
   if (u) return u.role || 'sales';
-  if (!ADMIN_KAKAO_ID && (!users || users.length === 0)) return 'bootstrap-admin';
   return 'pending';
 }
 async function isBlocked(kakaoId) {
@@ -112,10 +104,11 @@ async function isBlocked(kakaoId) {
 async function sendPendingNotice(kakaoId, nickname, profile) {
   if (!RESEND_API_KEY) return { skipped: true };
   try {
+    const safeNickname = String(nickname || '(미상)').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const html = `<div style="font-family:-apple-system,'Noto Sans KR',sans-serif;max-width:480px;margin:0 auto;padding:20px;color:#111">
       <h2 style="color:#0b3a8a;margin:0 0 16px">[세왕 모니터] 신규 가입 신청</h2>
       <table style="width:100%;border-collapse:collapse">
-        <tr><td style="padding:6px 0;color:#666;width:100px">닉네임</td><td><strong>${nickname || '(미상)'}</strong></td></tr>
+        <tr><td style="padding:6px 0;color:#666;width:100px">닉네임</td><td><strong>${safeNickname}</strong></td></tr>
         <tr><td style="padding:6px 0;color:#666">카카오 ID</td><td><code>${kakaoId}</code></td></tr>
         <tr><td style="padding:6px 0;color:#666">신청 시각</td><td>${new Date().toLocaleString('ko-KR')}</td></tr>
       </table>
@@ -133,7 +126,7 @@ async function sendPendingNotice(kakaoId, nickname, profile) {
     });
     const d = await r.json();
     return { ok: r.ok, id: d.id };
-  } catch (e) { return { error: e.message }; }
+  } catch (e) { return { error: 'service_unavailable' }; }
 }
 
 // ============================================================
@@ -155,7 +148,7 @@ async function savePending(kakaoId, nickname, profileImg) {
     content.updated_at = new Date().toISOString();
     await ghPutFile('data/pending_users.json', content, sha, `pending: ${nickname} (${kakaoId})`);
     return { ok: true };
-  } catch (e) { console.error('[pending] save fail:', e); return { error: e.message }; }
+  } catch (e) { console.error('[pending] save fail:', e); return { error: 'service_unavailable' }; }
 }
 
 // ============================================================
@@ -378,11 +371,41 @@ async function actRemove(kakaoId) {
 // 메인 핸들러
 // ============================================================
 export default async function handler(req, res) {
+  privateResponse(res);
   try {
     const { action, code } = req.query;
+    let session;
+    const publicActions = ['login', 'me', 'config', 'logout'];
+    const readActions = ['data', 'franchise_stats', 'naver_trend', 'franchise_page', 'geocode',
+      'list_users', 'pending_count', 'list_brand_overrides'];
+    if (!code && !publicActions.includes(action) && action !== 'send_push') {
+      session = await requireUser(req, res);
+      if (!session) return;
+      if (!readActions.includes(action) && !mutationAllowed(req, res)) return;
+      if (readActions.includes(action) && req.method !== 'GET') return res.status(405).json({ error: 'get_required' });
+    }
+    if (action === 'data' && !code) {
+      const file = req.query.file;
+      const roles = fileRoles(file);
+      if (!roles) return res.status(404).json({ error: 'not_found' });
+      if (!roles.includes(session.r)) return res.status(403).json({ error: 'permission_required' });
+      // Read server-bundled snapshots; these files are not in the public build directory.
+      const raw = fs.readFileSync(path.join(process.cwd(), 'data', file), 'utf8');
+      const output = snapshotResponse(raw, req.headers['accept-encoding']);
+      if (output.error) return res.status(output.status).json({ error: output.error });
+      res.setHeader('Vary', 'Cookie, Accept-Encoding');
+      res.setHeader('Content-Type', 'application/json; charset=utf-8');
+      if (output.encoding) res.setHeader('Content-Encoding', output.encoding);
+      return res.status(200).end(output.body);
+    }
 
     // ===== OAuth 콜백 =====
     if (code) {
+      if (req.method !== 'GET' || !validState(req.query.state, cookies(req.headers.cookie).sewang_oauth_state)) {
+        return res.status(403).json({ error: 'invalid_oauth_state' });
+      }
+      res.setHeader('Set-Cookie', stateCookie('', 0));
+      const key = sessionKey();
       if (!KAKAO_REST_KEY) return res.status(500).send('KAKAO_REST_KEY 미설정');
       const tokenRes = await fetch('https://kauth.kakao.com/oauth/token', {
         method: 'POST',
@@ -390,43 +413,32 @@ export default async function handler(req, res) {
         body: new URLSearchParams({ grant_type: 'authorization_code', client_id: KAKAO_REST_KEY, redirect_uri: REDIRECT_URI, code }).toString(),
       });
       const tokenData = await tokenRes.json();
-      if (!tokenData.access_token) return res.status(401).json({ error: 'token_exchange_failed', detail: tokenData });
+      if (!tokenRes.ok || !tokenData.access_token) return res.status(401).json({ error: 'token_exchange_failed' });
       const meRes = await fetch('https://kapi.kakao.com/v2/user/me', { headers: { Authorization: 'Bearer ' + tokenData.access_token } });
       const me = await meRes.json();
+      if (!meRes.ok || !me.id || !/^\d+$/.test(String(me.id))) return res.status(401).json({ error: 'profile_fetch_failed' });
       const kakaoId = String(me.id);
       const acct = me.kakao_account || {};
       const prof = acct.profile || {};
       const nickname = prof.nickname || (me.properties && me.properties.nickname) || '익명';
       const profileImg = prof.profile_image_url || (me.properties && me.properties.profile_image) || '';
 
-      // blocked 우선 체크
-      if (await isBlocked(kakaoId)) {
-        const jwt = await new SignJWT({ id: kakaoId, n: nickname, p: profileImg, r: 'blocked' })
-          .setProtectedHeader({ alg: 'HS256' }).setIssuedAt().setExpirationTime('24h').sign(JWT_SECRET);
-        res.setHeader('Set-Cookie', sessionCookie(jwt, COOKIE_MAX_AGE));
-        return res.redirect(302, '/?login=blocked');
-      }
-
       const list = await getAllowlist();
-      const rawRole = pickRole(kakaoId, list.users);
-      const role = rawRole === 'bootstrap-admin' ? 'admin' : rawRole;
-      const firstAdmin = rawRole === 'bootstrap-admin';
-
-      console.log('[KAKAO_LOGIN]', JSON.stringify({ at: new Date().toISOString(), kakaoId, nickname, role, firstAdmin }));
+      const role = currentRole(kakaoId, list);
 
       if (role === 'pending') {
-        const saved = await savePending(kakaoId, nickname, profileImg);
-        const mail = await sendPendingNotice(kakaoId, nickname, profileImg);
-        console.log('[PENDING_SAVE]', JSON.stringify({ kakaoId, saved, mail }));
+        await savePending(kakaoId, nickname, profileImg);
+        await sendPendingNotice(kakaoId, nickname, profileImg);
       }
 
       const jwt = await new SignJWT({ id: kakaoId, n: nickname, p: profileImg, r: role })
-        .setProtectedHeader({ alg: 'HS256' }).setIssuedAt().setExpirationTime('24h').sign(JWT_SECRET);
-      res.setHeader('Set-Cookie', sessionCookie(jwt, COOKIE_MAX_AGE));
+        .setProtectedHeader({ alg: 'HS256' }).setIssuer(SESSION_OPTIONS.issuer).setAudience(SESSION_OPTIONS.audience)
+        .setIssuedAt().setExpirationTime('24h').sign(key);
+      res.setHeader('Set-Cookie', [sessionCookie(jwt, COOKIE_MAX_AGE), stateCookie('', 0)]);
 
       let target = '/?login=ok&role=' + encodeURIComponent(role);
-      if (firstAdmin) target += '&first_admin=1&my_id=' + encodeURIComponent(kakaoId);
       if (role === 'pending') target = '/?login=pending';
+      if (role === 'blocked') target = '/?login=blocked';
       return res.redirect(302, target);
     }
 
@@ -451,14 +463,14 @@ export default async function handler(req, res) {
           f: parseInt(it.frcsCnt || '0', 10) || 0,      // 가맹점수
           a: parseInt(it.avrgSlsAmt || '0', 10) || 0,    // 평균매출(천원)
         }));
-        res.setHeader('Cache-Control', 'public, s-maxage=86400, stale-while-revalidate=3600');
+        res.setHeader('Cache-Control', 'private, no-store');
         return res.status(200).json({
           page: pageNo,
           total: parseInt(d.totalCount || '0', 10),
           items: items,
         });
       } catch (e) {
-        return res.status(500).json({ error: e.message });
+        return res.status(500).json({ error: 'service_unavailable' });
       }
     }
 
@@ -506,14 +518,14 @@ export default async function handler(req, res) {
               fallback = { total: sj.total || 0, sample: (sj.items || []).slice(0, 3).map(i => ({ title: (i.title||'').replace(/<[^>]+>/g,''), address: i.address })) };
             }
           } catch(e) {}
-          res.setHeader('Cache-Control', 'no-store');
+          res.setHeader('Cache-Control', 'private, no-store');
           return res.status(200).json({ keyword, data: [], _ok: false, _status: r.status, _reason: reason, _hint: reason === 'scope_disabled' ? 'NAVER 개발자센터 → 애플리케이션 → API 설정에서 「데이터랩 (검색어 트렌드)」 추가 활성화 필요' : '', fallback });
         }
         const data = (d.results && d.results[0] && d.results[0].data) || [];
-        res.setHeader('Cache-Control', 'public, s-maxage=86400, stale-while-revalidate=3600');
+        res.setHeader('Cache-Control', 'private, no-store');
         return res.status(200).json({ keyword, data, _ok: true });
       } catch (e) {
-        return res.status(500).json({ error: e.message });
+        return res.status(500).json({ error: 'service_unavailable' });
       }
     }
 
@@ -540,20 +552,20 @@ export default async function handler(req, res) {
           l: it.indutyLclasNm || '', // 업종대분류
           m: it.indutyMlsfcNm || '', // 업종중분류
         }));
-        res.setHeader('Cache-Control', 'public, s-maxage=86400, stale-while-revalidate=3600');
+        res.setHeader('Cache-Control', 'private, no-store');
         return res.status(200).json({
           page: pageNo,
           total: parseInt(d.totalCount || '0', 10),
           items: items,
         });
       } catch (e) {
-        return res.status(500).json({ error: e.message });
+        return res.status(500).json({ error: 'service_unavailable' });
       }
     }
 
     // ===== 클라이언트 안전 설정 (Kakao JS SDK 키 — 도메인 제한 적용) =====
     if (action === 'config') {
-      res.setHeader('Cache-Control', 'public, s-maxage=600, stale-while-revalidate=60');
+      res.setHeader('Cache-Control', 'private, no-store');
       return res.status(200).json({
         kakaoJsKey: process.env.KAKAO_JS_KEY || process.env.KAKAO_JS_APP_KEY || '',
         vapidPublicKey: process.env.VAPID_PUBLIC_KEY || '',  // v17.12: PWA Push
@@ -567,15 +579,12 @@ export default async function handler(req, res) {
         const sub = body.subscription;
         const types = body.types || ['new_store', 'closed', 'buzz', 'user'];
         if (!sub || !sub.endpoint) return res.status(400).json({ error: 'subscription required' });
-        // 인증된 user 추출 (간단)
-        let userId = 'anon';
-        try {
-          const sess = (req.cookies && req.cookies.sewang_session) || '';
-          if (sess) { const tok = JSON.parse(Buffer.from(sess, 'base64').toString('utf8')); userId = tok.kakaoId || tok.email || userId; }
-        } catch(e){}
+        if (!validPushEndpoint(sub.endpoint) || !sub.keys || !/^[A-Za-z0-9_-]{20,200}$/.test(sub.keys.p256dh || '') || !/^[A-Za-z0-9_-]{16,100}$/.test(sub.keys.auth || '')) return res.status(400).json({ error: 'invalid_subscription' });
+        const userId = String(session.id);
         const pat = process.env.GITHUB_PAT || process.env.GH_PAT;
         const repo = process.env.GH_REPO || 'msjung75/sewang-monitor';
         if (!pat) return res.status(500).json({ error: 'GITHUB_PAT 미설정' });
+        await assertPrivateRepository(repo, pat);
         const api = 'https://api.github.com/repos/' + repo + '/contents/data/push_subscriptions.json';
         let current = { subscriptions: [] }; let sha = '';
         try {
@@ -587,12 +596,12 @@ export default async function handler(req, res) {
         current.subscriptions.push({ endpoint: sub.endpoint, keys: sub.keys, userId, types, at: new Date().toISOString() });
         current.updated = new Date().toISOString();
         const newContent = Buffer.from(JSON.stringify(current)).toString('base64');
-        const putBody = { message: 'push: register ' + userId, content: newContent };
+        const putBody = { message: 'push: register subscription', content: newContent };
         if (sha) putBody.sha = sha;
         const p = await fetch(api, { method: 'PUT', headers: { 'Authorization': 'Bearer ' + pat, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json', 'User-Agent': 'sewang-push' }, body: JSON.stringify(putBody) });
-        if (!p.ok) { const t = await p.text(); return res.status(500).json({ error: 'commit failed: ' + p.status, detail: t.slice(0,200) }); }
+        if (!p.ok) { const t = await p.text(); return res.status(500).json({ error: 'commit failed: ' + p.status, detail: 'upstream_write_failed' }); }
         return res.status(200).json({ ok: true, total: current.subscriptions.length });
-      } catch(e) { return res.status(500).json({ error: e.message }); }
+      } catch(e) { return res.status(500).json({ error: 'service_unavailable' }); }
     }
     // v17.12 Phase 2: 서버 → 전체 구독자에게 push 발송 (cron에서 호출)
     if (action === 'send_push' && req.method === 'POST') {
@@ -606,7 +615,7 @@ export default async function handler(req, res) {
         const vapidPrivate = process.env.VAPID_PRIVATE_KEY;
         const vapidSubject = process.env.VAPID_SUBJECT || 'mailto:msjung75@gmail.com';
         if (!vapidPublic || !vapidPrivate) return res.status(500).json({ error: 'VAPID 키 미설정' });
-        const webpush = require('web-push');
+        const { default: webpush } = await import('web-push');
         webpush.setVapidDetails(vapidSubject, vapidPublic, vapidPrivate);
         const body = req.body || {};
         const type = body.type || 'generic';
@@ -621,12 +630,13 @@ export default async function handler(req, res) {
         const pat = process.env.GITHUB_PAT || process.env.GH_PAT;
         const repo = process.env.GH_REPO || 'msjung75/sewang-monitor';
         if (!pat) return res.status(500).json({ error: 'GITHUB_PAT 미설정' });
+        await assertPrivateRepository(repo, pat);
         const api = 'https://api.github.com/repos/' + repo + '/contents/data/push_subscriptions.json';
         const g = await fetch(api, { headers: { 'Authorization': 'Bearer ' + pat, 'Accept': 'application/vnd.github+json', 'User-Agent': 'sewang-push' } });
         if (!g.ok) return res.status(200).json({ ok: true, sent: 0, total: 0, note: 'no subscriptions yet' });
         const j = await g.json();
         const data = JSON.parse(Buffer.from(j.content, 'base64').toString('utf8'));
-        const subs = (data.subscriptions || []).filter(s => !s.types || s.types.includes(type));
+        const subs = (data.subscriptions || []).filter(s => validPushEndpoint(s.endpoint) && (!s.types || s.types.includes(type)));
         // 각 구독자에게 발송
         let sent = 0, failed = 0, deadEndpoints = [];
         for (const s of subs) {
@@ -646,7 +656,7 @@ export default async function handler(req, res) {
           await fetch(api, { method: 'PUT', headers: { 'Authorization': 'Bearer ' + pat, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json', 'User-Agent': 'sewang-push' }, body: JSON.stringify({ message: 'push: cleanup dead', content: newContent, sha: j.sha }) });
         }
         return res.status(200).json({ ok: true, sent, failed, total: subs.length, deadCleaned: deadEndpoints.length });
-      } catch(e) { return res.status(500).json({ error: e.message }); }
+      } catch(e) { return res.status(500).json({ error: 'service_unavailable' }); }
     }
     if (action === 'unregister_push' && req.method === 'POST') {
       try {
@@ -656,17 +666,18 @@ export default async function handler(req, res) {
         const pat = process.env.GITHUB_PAT || process.env.GH_PAT;
         const repo = process.env.GH_REPO || 'msjung75/sewang-monitor';
         if (!pat) return res.status(500).json({ error: 'GITHUB_PAT 미설정' });
+        await assertPrivateRepository(repo, pat);
         const api = 'https://api.github.com/repos/' + repo + '/contents/data/push_subscriptions.json';
         const g = await fetch(api, { headers: { 'Authorization': 'Bearer ' + pat, 'Accept': 'application/vnd.github+json', 'User-Agent': 'sewang-push' } });
         if (!g.ok) return res.status(200).json({ ok: true, total: 0 });
         const j = await g.json();
         const current = JSON.parse(Buffer.from(j.content, 'base64').toString('utf8'));
-        current.subscriptions = (current.subscriptions || []).filter(s => s.endpoint !== endpoint);
+        current.subscriptions = (current.subscriptions || []).filter(s => s.endpoint !== endpoint || String(s.userId) !== String(session.id));
         current.updated = new Date().toISOString();
         const newContent = Buffer.from(JSON.stringify(current)).toString('base64');
         const p = await fetch(api, { method: 'PUT', headers: { 'Authorization': 'Bearer ' + pat, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json', 'User-Agent': 'sewang-push' }, body: JSON.stringify({ message: 'push: unregister', content: newContent, sha: j.sha }) });
         return res.status(200).json({ ok: p.ok, total: current.subscriptions.length });
-      } catch(e) { return res.status(500).json({ error: e.message }); }
+      } catch(e) { return res.status(500).json({ error: 'service_unavailable' }); }
     }
 
     // ===== 지오코딩 (주소 → 좌표) — 카카오 REST API 프록시 (키 보호) =====
@@ -689,50 +700,52 @@ export default async function handler(req, res) {
           const d2 = await r2.json();
           const doc2 = (d2.documents || [])[0];
           if (!doc2) return res.status(200).json({ ok: false });
-          res.setHeader('Cache-Control', 'public, s-maxage=86400');
+          res.setHeader('Cache-Control', 'private, no-store');
           return res.status(200).json({ ok: true, lat: parseFloat(doc2.y), lng: parseFloat(doc2.x), source: 'keyword' });
         }
-        res.setHeader('Cache-Control', 'public, s-maxage=86400');
+        res.setHeader('Cache-Control', 'private, no-store');
         return res.status(200).json({ ok: true, lat: parseFloat(doc.y), lng: parseFloat(doc.x), source: 'address' });
       } catch (e) {
-        return res.status(500).json({ error: e.message });
+        return res.status(500).json({ error: 'service_unavailable' });
       }
     }
 
     // ===== 로그인 redirect =====
     if (action === 'login') {
+      if (req.method !== 'GET') return res.status(405).json({ error: 'get_required' });
+      sessionKey();
       if (!KAKAO_REST_KEY) return res.status(500).send('KAKAO_REST_KEY 미설정');
+      const state = oauthState();
+      res.setHeader('Set-Cookie', stateCookie(state));
       const url = 'https://kauth.kakao.com/oauth/authorize?' + new URLSearchParams({
-        response_type: 'code', client_id: KAKAO_REST_KEY, redirect_uri: REDIRECT_URI,
+        response_type: 'code', client_id: KAKAO_REST_KEY, redirect_uri: REDIRECT_URI, state,
       }).toString();
       return res.redirect(302, url);
     }
 
     // ===== 세션 확인 =====
     if (action === 'me') {
-      const cookies = parseCookie(req.headers.cookie || '');
-      const token = cookies[COOKIE_NAME];
-      if (!token) return res.status(200).json({ authenticated: false });
-      try {
-        const { payload } = await jwtVerify(token, JWT_SECRET);
-        return res.status(200).json({ authenticated: true, user: { id: payload.id, nickname: payload.n, profile: payload.p, role: payload.r } });
-      } catch (e) { return res.status(200).json({ authenticated: false, expired: true }); }
+      const payload = await readSession(req);
+      if (!payload) return res.status(200).json({ authenticated: false });
+      return res.status(200).json({ authenticated: true, user: { id: payload.id, nickname: payload.n, profile: payload.p, role: payload.r } });
     }
 
     // ===== 로그아웃 =====
     if (action === 'logout') {
+      if (!mutationAllowed(req, res)) return;
       res.setHeader('Set-Cookie', COOKIE_NAME + '=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0');
-      return res.redirect(302, '/');
+      return res.status(200).json({ ok: true });
     }
 
     // ===== admin actions =====
-    const cookies = parseCookie(req.headers.cookie || '');
-    const token = cookies[COOKIE_NAME];
-    if (!token) return res.status(401).json({ ok: false, error: 'no_session' });
-    let payload;
-    try { ({ payload } = await jwtVerify(token, JWT_SECRET)); }
-    catch (e) { return res.status(401).json({ ok: false, error: 'invalid_session' }); }
+    const payload = session;
+    if (!payload) return res.status(401).json({ error: 'login_required' });
     if (payload.r !== 'admin') return res.status(403).json({ ok: false, error: 'admin_only' });
+    if (['approve', 'add_user', 'update_role'].includes(action)) {
+      const input = await readBody(req);
+      if (input.role && !ROLES.includes(input.role)) return res.status(400).json({ error: 'invalid_role' });
+      req.body = input;
+    }
 
     if (action === 'list_users') {
       const list = await getAllowlist();
@@ -880,7 +893,8 @@ export default async function handler(req, res) {
 
     return res.status(400).json({ error: 'unknown_action', hint: 'action=login|me|logout|list_users|pending_count|add_user|approve|reject|update_role|update_user|remove' });
   } catch (err) {
-    console.error('[auth_handler_failed]', err);
-    return res.status(500).json({ error: 'auth_handler_failed', message: err.message });
+    console.error('[auth_handler_failed]', err.name);
+    const known = ['private_repository_required', 'auth_configuration_required'];
+    return res.status(503).json({ error: known.includes(err.message) ? err.message : 'service_unavailable' });
   }
 }

@@ -10,6 +10,7 @@
 // KV 미연결(env 없음) 시 graceful: connected:false + 빈 응답
 
 import { GITHUB_HEADERS } from './_github.js';
+import { requireUser, mutationAllowed, assertPrivateRepository } from '../lib/security.mjs';
 
 // ── Vercel KV (Upstash REST) ──────────────────────────────────────
 const KV_URL   = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL || '';
@@ -72,10 +73,9 @@ async function writeJsonToRepo(path, content, sha, message) {
 
 // ── Handler ─────────────────────────────────────────────────────────
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  if (req.method === 'OPTIONS') return res.status(200).end();
+  const user = await requireUser(req, res, req.method === 'GET' ? ['admin'] : undefined);
+  if (!user) return;
+  if (req.method !== 'GET' && !mutationAllowed(req, res)) return;
 
   // ─── GET: last_seen 조회 ─────────────────────────────────────────
   if (req.method === 'GET') {
@@ -98,8 +98,8 @@ export default async function handler(req, res) {
   if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
   body = body || {};
 
-  const userId = (body.user_id || 'unknown').toString().substring(0, 30);
-  const role   = (body.role   || 'unknown').toString().substring(0, 20);
+  const userId = String(user.id);
+  const role = user.r;
   const event  = (body.event  || 'visit'  ).toString().substring(0, 20);
   const tab    = (body.tab    || '').toString().substring(0, 30);
   const nowIso = new Date().toISOString();
@@ -117,6 +117,8 @@ export default async function handler(req, res) {
   }
 
   const today = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
+  try { await assertPrivateRepository(process.env.REPO || 'msjung75/sewang-monitor'); }
+  catch { return res.status(200).json({ ok: true, kv: kvOk, gh: false }); }
   const path = 'data/usage_log.json';
   for (let attempt = 0; attempt < 3; attempt++) {
     const { content, sha } = await readJsonFromRepo(path);
@@ -131,7 +133,7 @@ export default async function handler(req, res) {
     log.updated = new Date().toISOString();
     const cutoff = new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
     Object.keys(log.days).forEach(k => { if (k < cutoff) delete log.days[k]; });
-    const ok = await writeJsonToRepo(path, log, sha, `[skip ci] usage log ${today} ${userId}/${role}/${event}`);
+    const ok = await writeJsonToRepo(path, log, sha, `[skip ci] update activity aggregate ${today}`);
     if (ok) return res.status(200).json({ ok: true, kv: kvOk, gh: true, today, total: day.total });
     await new Promise(r => setTimeout(r, 500 + attempt * 500));
   }

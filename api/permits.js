@@ -1,3 +1,4 @@
+import { requireReadUser, SALES_ROLES } from '../lib/security.mjs';
 // 행안부 지방행정 인허가 데이터(data.go.kr) 신규/폐업/변경 조회 프록시
 // 일반음식점 / 휴게음식점 / 단란주점 / 유흥주점 인허가 조회
 // 데이터는 매일 갱신, 2일 전 기준 현행화
@@ -51,6 +52,7 @@ const DATE_COLS = {
 };
 
 export default async function handler(req, res) {
+  if (!await requireReadUser(req, res)) return;
   const key = process.env.DATA_GO_KR_KEY;
   if (!key) return res.status(500).json({ error: 'DATA_GO_KR_KEY 미설정' });
 
@@ -106,7 +108,7 @@ export default async function handler(req, res) {
     const sortKey = dateField === 'modified' ? 'modifiedDate' : (dateField === 'closed' ? 'closedDate' : 'permitDate');
     items.sort((a, b) => (b[sortKey] || '').localeCompare(a[sortKey] || ''));
 
-    res.setHeader('Cache-Control', debug ? 'no-store' : 's-maxage=1800, stale-while-revalidate=300');
+    res.setHeader('Cache-Control', 'private, no-store');
     const out = { since, until, dateField, count: items.length, capped, items };
     if (debug) {
       const dbg = results.find(r => r.rawKeys) || {};
@@ -117,7 +119,7 @@ export default async function handler(req, res) {
     }
     return res.status(200).json(out);
   } catch (e) {
-    return res.status(500).json({ error: e.message });
+    return res.status(500).json({ error: 'upstream_request_failed' });
   }
 }
 

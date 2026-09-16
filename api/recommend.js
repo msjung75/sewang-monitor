@@ -1,3 +1,4 @@
+import { requireReadUser, SALES_ROLES } from '../lib/security.mjs';
 // 영업 추천 매장 데이터 서빙 프록시.
 // data/recommend_metro.json 을 읽어서 view별로 가공해 반환.
 // nightly-recommend workflow가 매일 새벽 갱신.
@@ -5,13 +6,14 @@
 import fs from 'fs';
 import path from 'path';
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
+  if (!await requireReadUser(req, res, SALES_ROLES)) return;
   const file = path.join(process.cwd(), 'data', 'recommend_metro.json');
   let raw;
   try {
     raw = JSON.parse(fs.readFileSync(file, 'utf-8'));
   } catch (e) {
-    return res.status(500).json({ error: 'recommend data unavailable', detail: e.message });
+    return res.status(500).json({ error: 'recommend data unavailable' });
   }
 
   const items = raw.items || [];
@@ -22,7 +24,7 @@ export default function handler(req, res) {
   let filtered = items.filter(x => (x.score || 0) >= minScore);
   if (typeKey) filtered = filtered.filter(x => x.type_key === typeKey);
 
-  res.setHeader('Cache-Control', 's-maxage=1800, stale-while-revalidate=300');
+  res.setHeader('Cache-Control', 'private, no-store');
   return res.status(200).json({
     updated: raw.updated,
     baseline: raw.baseline,

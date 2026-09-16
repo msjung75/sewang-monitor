@@ -1,10 +1,10 @@
 {
-  "name": "세왕상사 신규업장 모니터",
+  "name": "세왕 영업 인텔리전스",
   "short_name": "세왕 모니터",
-  "description": "전국 신규 오픈 주류 업장 모니터링 (세왕상사)",
+  "description": "신규 매장 영업 · 창업 트렌드 · 브랜드 유치와 확장 분석",
   "start_url": "./",
   "display": "standalone",
-  "orientation": "portrait",
+  "orientation": "any",
   "background_color": "#090d1a",
   "theme_color": "#090d1a",
   "lang": "ko-KR",

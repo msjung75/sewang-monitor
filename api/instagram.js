@@ -1,3 +1,4 @@
+import { requireUser, mutationAllowed } from '../lib/security.mjs';
 // api/instagram.js
 // 인스타그램 해시태그 → 게시물 수집 + 매장(위치태그) 단위 집계
 // ⚠️ Apify 토큰은 절대 이 파일에 넣지 마세요. Vercel 환경변수(APIFY_TOKEN)에만 저장합니다.
@@ -9,6 +10,7 @@
 export const config = { maxDuration: 60 }; // 인스타 actor는 보통 20~40초
 
 export default async function handler(req, res) {
+  if (!await requireUser(req, res, ['admin']) || !mutationAllowed(req, res)) return;
   const token = process.env.APIFY_TOKEN;
   if (!token) {
     return res.status(500).json({ error: 'APIFY_TOKEN 환경변수가 설정되지 않았습니다. Vercel 프로젝트 설정에서 추가하세요.' });
@@ -60,7 +62,7 @@ export default async function handler(req, res) {
     );
 
     // CDN 캐시 30분 (같은 키워드 반복 호출 시 Apify 비용 절약)
-    res.setHeader('Cache-Control', 's-maxage=1800, stale-while-revalidate=600');
+    res.setHeader('Cache-Control', 'private, no-store');
     return res.status(200).json({
       count: posts.length,
       ranking,
@@ -76,6 +78,6 @@ export default async function handler(req, res) {
       })),
     });
   } catch (e) {
-    return res.status(500).json({ error: String(e) });
+    return res.status(500).json({ error: 'upstream_request_failed' });
   }
 }
