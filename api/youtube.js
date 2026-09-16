@@ -1,5 +1,7 @@
+import { requireReadUser, SALES_ROLES } from '../lib/security.mjs';
 // YouTube Data API v3 검색 + 통계 합본 프록시
 export default async function handler(req, res) {
+  if (!await requireReadUser(req, res)) return;
   const { query, order = 'date', max_results = 12 } = req.query;
   if (!query) return res.status(400).json({ error: 'query required' });
   const key = process.env.YOUTUBE_API_KEY;
@@ -45,7 +47,7 @@ export default async function handler(req, res) {
       } catch (e) {}
     }
 
-    res.setHeader('Cache-Control', 's-maxage=600, stale-while-revalidate=60');
+    res.setHeader('Cache-Control', 'private, no-store');
     return res.status(200).json({ items });
   } catch (e) {
     return res.status(500).json({ error: e.message, items: [] });

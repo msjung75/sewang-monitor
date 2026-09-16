@@ -1,5 +1,5 @@
 // PWA Service Worker v17.22e — 업변 재개장·새오너 태그 (오끼 override) (canonical redirect, etag fresh check)
-const CACHE = 'sewang-pwa-v17_22e-upbyeon-tags';
+const CACHE = 'sewang-pwa-v18_1-intelligence';
 const SHELL = ['/manifest.json', '/icon.svg'];
 
 self.addEventListener('install', e => {

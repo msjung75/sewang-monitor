@@ -1,7 +1,9 @@
+import { requireReadUser, SALES_ROLES } from '../lib/security.mjs';
 // 네이버 블로그 검색 프록시
 // Vercel 환경변수: NAVER_CLIENT_ID, NAVER_CLIENT_SECRET
 // since=YYYYMMDD 파라미터로 인허가일 이후 발행 글만 필터링 가능
 export default async function handler(req, res) {
+  if (!await requireReadUser(req, res)) return;
   const { query, sort = 'date', display = 10, start = 1, since } = req.query;
   if (!query) return res.status(400).json({ error: 'query required' });
 
@@ -30,9 +32,9 @@ export default async function handler(req, res) {
       data.filteredItems = filtered;
     }
 
-    res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=60');
+    res.setHeader('Cache-Control', 'private, no-store');
     return res.status(200).json(data);
   } catch (e) {
-    return res.status(500).json({ error: e.message });
+    return res.status(500).json({ error: 'upstream_request_failed' });
   }
 }

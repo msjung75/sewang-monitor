@@ -1,3 +1,4 @@
+import { requireUser, mutationAllowed } from '../lib/security.mjs';
 // api/apify_naver_start.js
 // 네이버 플레이스 정밀 스캔 "시작" 엔드포인트 (비동기)
 // 네이버 actor는 1~3분 걸려 서버리스 1회 호출 제한을 넘기므로,
@@ -9,6 +10,7 @@
 export const config = { maxDuration: 30 };
 
 export default async function handler(req, res) {
+  if (!await requireUser(req, res, ['admin']) || !mutationAllowed(req, res)) return;
   const token = process.env.APIFY_TOKEN;
   if (!token) {
     return res.status(500).json({ error: 'APIFY_TOKEN 환경변수가 설정되지 않았습니다.' });
@@ -17,8 +19,8 @@ export default async function handler(req, res) {
   const keywords = String(req.query.keywords || '')
     .split(',')
     .map((s) => s.trim())
-    .filter(Boolean);
-  const max = Math.min(parseInt(req.query.max || '6', 10) || 6, 20);
+    .filter(Boolean).slice(0, 3).map(s => s.slice(0, 100));
+  const max = Math.max(1, Math.min(parseInt(req.query.max || '6', 10) || 6, 20));
 
   if (!keywords.length) {
     return res.status(400).json({ error: 'keywords 파라미터가 필요합니다.' });
@@ -44,6 +46,6 @@ export default async function handler(req, res) {
       status: run.status,
     });
   } catch (e) {
-    return res.status(500).json({ error: String(e) });
+    return res.status(500).json({ error: 'upstream_request_failed' });
   }
 }

@@ -1,3 +1,4 @@
+import { requireReadUser, SALES_ROLES } from '../lib/security.mjs';
 // api/apify_naver_result.js
 // 네이버 정밀 스캔 "결과 조회" 엔드포인트 (폴링용)
 // /api/apify_naver_start 가 돌려준 runId, datasetId 로 호출한다.
@@ -11,12 +12,13 @@ export const config = { maxDuration: 30 };
 const ALCOHOL = ['사케','니혼슈','와인','샴페인','위스키','버번','싱글몰트','맥주','생맥주','수제맥주','크래프트','하이볼','진토닉','보드카','데킬라','럼','칵테일','막걸리','청주','소주','전통주','우메슈','매실주'];
 
 export default async function handler(req, res) {
+  if (!await requireReadUser(req, res, ['admin'])) return;
   const token = process.env.APIFY_TOKEN;
   if (!token) return res.status(500).json({ error: 'APIFY_TOKEN 미설정' });
 
   const runId = String(req.query.runId || '');
   const datasetId = String(req.query.datasetId || '');
-  if (!runId) return res.status(400).json({ error: 'runId 필요' });
+  if (!/^[A-Za-z0-9]{1,64}$/.test(runId)) return res.status(400).json({ error: 'runId 필요' });
 
   try {
     // 1) run 상태 확인
@@ -29,7 +31,8 @@ export default async function handler(req, res) {
     }
 
     // 2) 완료됐으면 데이터셋에서 필요한 필드만 가져옴
-    const dsId = datasetId || runData.defaultDatasetId;
+    const dsId = runData.defaultDatasetId;
+    if (!/^[A-Za-z0-9]{1,64}$/.test(dsId || '')) return res.status(502).json({ error: 'invalid_result' });
     const fields = 'name,category,roadAddress,visitorReviewsTotal,blogReviewTotal,reviewMenus';
     const dsR = await fetch(
       `https://api.apify.com/v2/datasets/${dsId}/items?token=${token}&clean=true&limit=200&fields=${fields}`
@@ -55,6 +58,6 @@ export default async function handler(req, res) {
 
     return res.status(200).json({ status: 'SUCCEEDED', count: items.length, items });
   } catch (e) {
-    return res.status(500).json({ error: String(e) });
+    return res.status(500).json({ error: 'upstream_request_failed' });
   }
 }
