@@ -9,10 +9,12 @@ name: Nightly YTD Incremental
 # v17.24 (2026-09-02): Contents API PUT 재시도 강화 — attempts 3→6 + exponential backoff(3·6·12·24·48·96s),
 #          5xx/403/429에서도 SHA 재조회 (부분 성공 후 HEAD 이동 방어). 원인: 2026-09-01 14:02 UTC run에서
 #          summary PUT 502→403→502 연속 발생 → 3회 소진 후 실패. 후속 run이 자동 복구했으나 알림 소음 감소 목적.
+# 2026-09-17: 4일 범위에서 정부 응답 시간 초과가 반복되어, 전국 수집으로 검증한
+# 30일 범위를 사용한다. 매장 ID로 병합하므로 중복 없이 지연·상태 변경도 다시 반영한다.
 on:
   push:
     branches: [main]
-    paths: ['scripts/fetch-ytd-range.sh', 'scripts/collect-permits.mjs', 'scripts/permit_client.py', 'scripts/government-transport.*', 'lib/permit-source.mjs']
+    paths: ['.github/workflows/nightly-ytd-incremental.yml', 'scripts/fetch-ytd-range.sh', 'scripts/collect-permits.mjs', 'scripts/permit_client.py', 'scripts/government-transport.*', 'lib/permit-source.mjs']
   schedule:
     - cron: '15 19 * * *'   # 04:15 KST (메인)
     - cron: '0 21 * * *'    # 06:00 KST (1차 재시도)
@@ -34,7 +36,7 @@ jobs:
       - name: Compute rolling window (KST)
         id: dates
         run: |
-          FROM=$(TZ=Asia/Seoul date -d "4 days ago" +%Y%m%d)
+          FROM=$(TZ=Asia/Seoul date -d "30 days ago" +%Y%m%d)
           TO=$(TZ=Asia/Seoul date +%Y%m%d)
           echo "from=$FROM" >> $GITHUB_OUTPUT
           echo "to=$TO" >> $GITHUB_OUTPUT
