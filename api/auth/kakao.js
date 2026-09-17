@@ -153,6 +153,13 @@ async function savePending(kakaoId, nickname, profileImg) {
   return { ok: true };
 }
 
+async function ensurePendingRegistration(kakaoId, nickname, profileImg) {
+  const saved = await savePending(kakaoId, nickname, profileImg);
+  // 새로 등록된 경우에만 알림을 보낸다. 새로고침마다 같은 알림이 반복되지 않는다.
+  if (saved.ok) await sendPendingNotice(kakaoId, nickname, profileImg);
+  return saved;
+}
+
 // ============================================================
 // admin 액션: approve / reject / update_role / remove
 // ============================================================
@@ -415,8 +422,7 @@ export default async function handler(req, res) {
       const role = currentRole(kakaoId, list);
 
       if (role === 'pending') {
-        await savePending(kakaoId, nickname, profileImg);
-        await sendPendingNotice(kakaoId, nickname, profileImg);
+        await ensurePendingRegistration(kakaoId, nickname, profileImg);
       }
 
       const jwt = await new SignJWT({ id: kakaoId, n: nickname, p: profileImg, r: role })
@@ -722,6 +728,10 @@ export default async function handler(req, res) {
     if (action === 'me') {
       const payload = await readSession(req);
       if (!payload) return res.status(200).json({ authenticated: false });
+      // 과거 배포에서 대기 세션만 발급되고 신청 기록 저장이 누락된 경우를 자동 복구한다.
+      if (payload.r === 'pending') {
+        await ensurePendingRegistration(String(payload.id), payload.n || '익명', payload.p || '');
+      }
       return res.status(200).json({ authenticated: true, user: { id: payload.id, nickname: payload.n, profile: payload.p, role: payload.r } });
     }
 

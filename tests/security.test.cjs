@@ -84,6 +84,34 @@ test('actual auth handler enforces admin and owner data boundaries',async()=>{
     global.fetch=list([{id:'123',role:'admin'}]);out=res();await handler(await request({query:{action:'approve'}}),out);assert.equal(out.code,405);
   }finally{global.fetch=saved;}
 });
+test('pending session repairs a missing private application on me',async()=>{
+  const handler=(await import('../api/auth/kakao.js')).default;
+  const savedFetch=global.fetch,savedUrl=process.env.UPSTASH_REDIS_REST_URL,savedToken=process.env.UPSTASH_REDIS_REST_TOKEN;
+  const values=new Map();
+  process.env.UPSTASH_REDIS_REST_URL='https://fixture.upstash.io';
+  process.env.UPSTASH_REDIS_REST_TOKEN='fixture-secret';
+  global.fetch=async(url,options={})=>{
+    if(String(url).startsWith('https://api.github.com/'))return {ok:true,json:async()=>({content:Buffer.from(JSON.stringify({users:[],blocked:[]})).toString('base64')})};
+    if(url==='https://fixture.upstash.io'){
+      const [command,key,value]=JSON.parse(options.body);
+      let result=null;
+      if(command==='GET')result=values.has(key)?values.get(key):null;
+      if(command==='SET'){values.set(key,value);result='OK';}
+      return {ok:true,json:async()=>({result})};
+    }
+    throw Error('unexpected network '+url);
+  };
+  try{
+    const out=res();await handler(await request({query:{action:'me'}}),out);
+    assert.equal(out.code,200);assert.equal(out.body.user.role,'pending');
+    const stored=JSON.parse(values.get('sewang:auth:pending:v1'));
+    assert.equal(stored.pending.length,1);assert.equal(stored.pending[0].id,'123');
+  }finally{
+    global.fetch=savedFetch;
+    if(savedUrl===undefined)delete process.env.UPSTASH_REDIS_REST_URL;else process.env.UPSTASH_REDIS_REST_URL=savedUrl;
+    if(savedToken===undefined)delete process.env.UPSTASH_REDIS_REST_TOKEN;else process.env.UPSTASH_REDIS_REST_TOKEN=savedToken;
+  }
+});
 test('static build only publishes the explicit browser asset allowlist',()=>{
   const {build,files}=require('../scripts/build-static.cjs');const root=fs.mkdtempSync(path.join(os.tmpdir(),'sewang-static-test-'));
   try{
