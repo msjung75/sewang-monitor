@@ -4,6 +4,8 @@ import { SignJWT } from 'jose';
 import fs from 'node:fs';
 import path from 'node:path';
 import { snapshotResponse, snapshotChunks } from '../../lib/snapshots.mjs';
+import { privateAccessConfigured, privateAccessHealth, readPrivatePending,
+  writePrivateAccess, writePrivatePending } from '../../lib/access-store.mjs';
 import { sessionKey, privateResponse, cookies, readSession, requireUser, mutationAllowed,
   allowlist, currentRole, oauthState, validState, stateCookie, fileRoles,
   assertPrivateRepository, validPushEndpoint, ROLES, SESSION_OPTIONS } from '../../lib/security.mjs';
@@ -84,8 +86,14 @@ async function getAllowlist() {
   return allowlist();
 }
 async function getPending() {
+  if (privateAccessConfigured()) {
+    const stored = await readPrivatePending();
+    if (stored) return { pending: stored.pending || [], updated_at: stored.updated_at || '' };
+  }
   const d = (await ghGetFile('data/pending_users.json')).content || {};
-  return { pending: d.pending || [], updated_at: d.updated_at || '' };
+  const state = { pending: d.pending || [], updated_at: d.updated_at || '' };
+  if (privateAccessConfigured()) await writePrivatePending(state);
+  return state;
 }
 function pickRole(kakaoId, users) {
   if (ADMIN_KAKAO_ID && String(kakaoId) === String(ADMIN_KAKAO_ID)) return 'admin';
@@ -133,40 +141,24 @@ async function sendPendingNotice(kakaoId, nickname, profile) {
 // pending 자동 저장 (GitHub commit)
 // ============================================================
 async function savePending(kakaoId, nickname, profileImg) {
-  if (!GITHUB_TOKEN) { console.warn('[pending] GITHUB_TOKEN 미설정 — 저장 skip'); return { skipped: true }; }
-  try {
-    let { sha, content } = await ghGetFile('data/pending_users.json');
-    if (!content) content = { pending: [], updated_at: '' };
-    const exists = content.pending.some(p => String(p.id) === String(kakaoId));
-    if (exists) return { skipped: 'already_pending' };
-    content.pending.push({
-      id: kakaoId,
-      nickname,
-      profile: profileImg,
-      applied_at: new Date().toISOString(),
-    });
-    content.updated_at = new Date().toISOString();
-    await ghPutFile('data/pending_users.json', content, sha, `pending: ${nickname} (${kakaoId})`);
-    return { ok: true };
-  } catch (e) { console.error('[pending] save fail:', e); return { error: 'service_unavailable' }; }
+  const content = await getPending();
+  const exists = content.pending.some(p => String(p.id) === String(kakaoId));
+  if (exists) return { skipped: 'already_pending' };
+  content.pending.push({ id: kakaoId, nickname, profile: profileImg, applied_at: new Date().toISOString() });
+  content.updated_at = new Date().toISOString();
+  await writePrivatePending(content);
+  return { ok: true };
 }
 
 // ============================================================
 // admin 액션: approve / reject / update_role / remove
 // ============================================================
 async function actApprove(kakaoId, role, memo, nickname, profileImg) {
-  if (!GITHUB_TOKEN) throw new Error('GITHUB_TOKEN 미설정');
-  // 1) pending에서 제거
-  const pf = await ghGetFile('data/pending_users.json');
-  let pcontent = pf.content || { pending: [], updated_at: '' };
+  let pcontent = await getPending();
   const pIdx = pcontent.pending.findIndex(p => String(p.id) === String(kakaoId));
   let snap = null;
   if (pIdx >= 0) { snap = pcontent.pending[pIdx]; pcontent.pending.splice(pIdx, 1); pcontent.updated_at = new Date().toISOString(); }
-  // 2) allowlist에 추가
-  const af = await ghGetFile('data/allowlist.json');
-  let acontent = af.content;
-  if (!acontent) acontent = { users: [], blocked: [], updated_at: '' };
-  if (Array.isArray(acontent)) acontent = { users: acontent, blocked: [], updated_at: '' };
+  let acontent = await getAllowlist();
   if (!acontent.blocked) acontent.blocked = [];
   const exists = acontent.users.some(u => String(u.id) === String(kakaoId));
   if (!exists) {
@@ -180,22 +172,17 @@ async function actApprove(kakaoId, role, memo, nickname, profileImg) {
     });
     acontent.updated_at = new Date().toISOString();
   }
-  // 3) commit 두 번
-  if (pIdx >= 0) await ghPutFile('data/pending_users.json', pcontent, pf.sha, `approve(pending del): ${kakaoId}`);
-  await ghPutFile('data/allowlist.json', acontent, af.sha, `approve(add): ${kakaoId} as ${role}`);
+  // 승인 권한을 먼저 저장한다. 대기 목록 정리가 실패해도 사용자는 로그인할 수 있다.
+  await writePrivateAccess(acontent);
+  if (pIdx >= 0) await writePrivatePending(pcontent);
   return { ok: true, kakaoId, role };
 }
 async function actReject(kakaoId, reason) {
-  if (!GITHUB_TOKEN) throw new Error('GITHUB_TOKEN 미설정');
-  const pf = await ghGetFile('data/pending_users.json');
-  let pcontent = pf.content || { pending: [], updated_at: '' };
+  let pcontent = await getPending();
   const pIdx = pcontent.pending.findIndex(p => String(p.id) === String(kakaoId));
   let snap = null;
   if (pIdx >= 0) { snap = pcontent.pending[pIdx]; pcontent.pending.splice(pIdx, 1); pcontent.updated_at = new Date().toISOString(); }
-  const af = await ghGetFile('data/allowlist.json');
-  let acontent = af.content;
-  if (!acontent) acontent = { users: [], blocked: [], updated_at: '' };
-  if (Array.isArray(acontent)) acontent = { users: acontent, blocked: [], updated_at: '' };
+  let acontent = await getAllowlist();
   if (!acontent.blocked) acontent.blocked = [];
   const exists = acontent.blocked.some(b => String(b.id) === String(kakaoId));
   if (!exists) {
@@ -207,44 +194,34 @@ async function actReject(kakaoId, reason) {
     });
     acontent.updated_at = new Date().toISOString();
   }
-  if (pIdx >= 0) await ghPutFile('data/pending_users.json', pcontent, pf.sha, `reject(pending del): ${kakaoId}`);
-  await ghPutFile('data/allowlist.json', acontent, af.sha, `reject(block): ${kakaoId}`);
+  await writePrivateAccess(acontent);
+  if (pIdx >= 0) await writePrivatePending(pcontent);
   return { ok: true, kakaoId };
 }
 async function actUpdateRole(kakaoId, role, memo) {
-  if (!GITHUB_TOKEN) throw new Error('GITHUB_TOKEN 미설정');
-  const af = await ghGetFile('data/allowlist.json');
-  let acontent = af.content;
-  if (!acontent || Array.isArray(acontent)) throw new Error('allowlist 형식 오류');
+  const acontent = await getAllowlist();
   const u = acontent.users.find(x => String(x.id) === String(kakaoId));
   if (!u) throw new Error('user not found');
   u.role = role || u.role;
   if (memo !== undefined) u.memo = memo;
   u.updated_at = new Date().toISOString();
   acontent.updated_at = new Date().toISOString();
-  await ghPutFile('data/allowlist.json', acontent, af.sha, `update_role: ${kakaoId} -> ${role}`);
+  await writePrivateAccess(acontent);
   return { ok: true };
 }
 async function actUpdateUser(kakaoId, nickname, memo) {
-  if (!GITHUB_TOKEN) throw new Error('GITHUB_TOKEN 미설정');
-  const af = await ghGetFile('data/allowlist.json');
-  let acontent = af.content;
-  if (!acontent || Array.isArray(acontent)) throw new Error('allowlist 형식 오류');
+  const acontent = await getAllowlist();
   const u = acontent.users.find(x => String(x.id) === String(kakaoId));
   if (!u) throw new Error('user not found');
   if (nickname !== undefined) u.nickname = nickname;
   if (memo !== undefined) u.memo = memo;
   u.updated_at = new Date().toISOString();
   acontent.updated_at = new Date().toISOString();
-  await ghPutFile('data/allowlist.json', acontent, af.sha, `update_user: ${kakaoId} -> ${nickname || '(no name change)'}`);
+  await writePrivateAccess(acontent);
   return { ok: true };
 }
 async function actAddUser(kakaoId, role, nickname, memo) {
-  if (!GITHUB_TOKEN) throw new Error('GITHUB_TOKEN 미설정');
-  const af = await ghGetFile('data/allowlist.json');
-  let acontent = af.content;
-  if (!acontent) acontent = { users: [], blocked: [], updated_at: '' };
-  if (Array.isArray(acontent)) acontent = { users: acontent, blocked: [], updated_at: '' };
+  const acontent = await getAllowlist();
   if (!acontent.blocked) acontent.blocked = [];
   const exists = acontent.users.some(u => String(u.id) === String(kakaoId));
   if (exists) throw new Error('이미 등록된 사용자');
@@ -256,19 +233,11 @@ async function actAddUser(kakaoId, role, nickname, memo) {
     approved_at: new Date().toISOString(),
   });
   acontent.updated_at = new Date().toISOString();
-  // pending에서 같은 ID 있으면 같이 정리
-  try {
-    const pf = await ghGetFile('data/pending_users.json');
-    if (pf.content) {
-      const before = pf.content.pending.length;
-      pf.content.pending = pf.content.pending.filter(p => String(p.id) !== String(kakaoId));
-      if (pf.content.pending.length !== before) {
-        pf.content.updated_at = new Date().toISOString();
-        await ghPutFile('data/pending_users.json', pf.content, pf.sha, `add_user(pending cleanup): ${kakaoId}`);
-      }
-    }
-  } catch (e) { /* ignore */ }
-  await ghPutFile('data/allowlist.json', acontent, af.sha, `add_user: ${nickname || kakaoId} as ${role}`);
+  await writePrivateAccess(acontent);
+  const pending = await getPending();
+  const before = pending.pending.length;
+  pending.pending = pending.pending.filter(p => String(p.id) !== String(kakaoId));
+  if (pending.pending.length !== before) { pending.updated_at = new Date().toISOString(); await writePrivatePending(pending); }
   return { ok: true, kakaoId, role };
 }
 // ============================================================
@@ -355,15 +324,12 @@ async function actSetBrandCategory(brandName, category) {
 }
 
 async function actRemove(kakaoId) {
-  if (!GITHUB_TOKEN) throw new Error('GITHUB_TOKEN 미설정');
-  const af = await ghGetFile('data/allowlist.json');
-  let acontent = af.content;
-  if (!acontent || Array.isArray(acontent)) throw new Error('allowlist 형식 오류');
+  const acontent = await getAllowlist();
   const before = acontent.users.length;
   acontent.users = acontent.users.filter(u => String(u.id) !== String(kakaoId));
   if (acontent.users.length === before) throw new Error('user not found');
   acontent.updated_at = new Date().toISOString();
-  await ghPutFile('data/allowlist.json', acontent, af.sha, `remove: ${kakaoId}`);
+  await writePrivateAccess(acontent);
   return { ok: true };
 }
 
@@ -375,7 +341,7 @@ export default async function handler(req, res) {
   try {
     const { action, code } = req.query;
     let session;
-    const publicActions = ['login', 'me', 'config', 'logout'];
+    const publicActions = ['login', 'me', 'config', 'logout', 'registration_health'];
     const readActions = ['data', 'franchise_stats', 'naver_trend', 'franchise_page', 'geocode',
       'list_users', 'pending_count', 'list_brand_overrides'];
     if (!code && !publicActions.includes(action) && action !== 'send_push') {
@@ -577,6 +543,18 @@ export default async function handler(req, res) {
       });
     }
 
+    // 공개 상태에는 개인정보를 포함하지 않는다. 운영 가입 저장소 연결 확인용이다.
+    if (action === 'registration_health') {
+      if (req.method !== 'GET') return res.status(405).json({ error: 'get_required' });
+      const storage = await privateAccessHealth();
+      if (storage.connected) {
+        // 첫 확인에서 기존 승인자와 대기자를 비공개 저장소에 안전하게 초기화한다.
+        await getAllowlist();
+        await getPending();
+      }
+      return res.status(storage.connected ? 200 : 503).json({ ready: storage.connected });
+    }
+
     // v17.12: PWA Push 구독 등록 — GitHub Contents API로 data/push_subscriptions.json 저장
     if (action === 'register_push' && req.method === 'POST') {
       try {
@@ -762,6 +740,7 @@ export default async function handler(req, res) {
         admin_env: !!ADMIN_KAKAO_ID,
         github_env: !!GITHUB_TOKEN,
         resend_env: !!RESEND_API_KEY,
+        private_storage: privateAccessConfigured(),
       });
     }
 
@@ -898,7 +877,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'unknown_action', hint: 'action=login|me|logout|list_users|pending_count|add_user|approve|reject|update_role|update_user|remove' });
   } catch (err) {
     console.error('[auth_handler_failed]', err.name);
-    const known = ['private_repository_required', 'auth_configuration_required'];
+    const known = ['private_repository_required', 'auth_configuration_required', 'auth_storage_unavailable'];
     return res.status(503).json({ error: known.includes(err.message) ? err.message : 'service_unavailable' });
   }
 }
