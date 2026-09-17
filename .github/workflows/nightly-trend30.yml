@@ -2,7 +2,7 @@ name: nightly-trend30
 on:
   push:
     branches: [main]
-    paths: ['scripts/nightly-fetch.sh', 'scripts/collect-permits.mjs', 'scripts/permit_client.py', 'lib/permit-source.mjs']
+    paths: ['scripts/nightly-fetch.sh', 'scripts/collect-permits.mjs', 'scripts/permit_client.py', 'scripts/government-transport.*', 'lib/permit-source.mjs']
   schedule:
     # v16.8: 다중 schedule (silent skip 방어)
     # v17.14.4: 18:00/19:00 KST 추가 — 행안부 평일 publish (16~19시) 즉시 fetch
@@ -16,6 +16,7 @@ on:
 jobs:
   fetch:
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     permissions:
       contents: write
     steps:

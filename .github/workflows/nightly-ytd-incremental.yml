@@ -10,6 +10,9 @@ name: Nightly YTD Incremental
 #          5xx/403/429에서도 SHA 재조회 (부분 성공 후 HEAD 이동 방어). 원인: 2026-09-01 14:02 UTC run에서
 #          summary PUT 502→403→502 연속 발생 → 3회 소진 후 실패. 후속 run이 자동 복구했으나 알림 소음 감소 목적.
 on:
+  push:
+    branches: [main]
+    paths: ['scripts/fetch-ytd-range.sh', 'scripts/collect-permits.mjs', 'scripts/permit_client.py', 'scripts/government-transport.*', 'lib/permit-source.mjs']
   schedule:
     - cron: '15 19 * * *'   # 04:15 KST (메인)
     - cron: '0 21 * * *'    # 06:00 KST (1차 재시도)
@@ -25,6 +28,7 @@ permissions:
 jobs:
   fetch-rolling:
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - name: Compute rolling window (KST)

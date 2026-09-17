@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 BASE_URL="${BASE_URL:-https://sewang-monitor.vercel.app}"
-FROM_DATE=$(date -u -d "30 days ago" +%Y%m%d)
-TO_DATE=$(date -u +%Y%m%d)
+FROM_DATE=$(TZ=Asia/Seoul date -d "30 days ago" +%Y%m%d)
+TO_DATE=$(TZ=Asia/Seoul date +%Y%m%d)
+export FROM_DATE TO_DATE
 REGIONS=(seoul gyeonggi busan daegu incheon gwangju daejeon ulsan sejong gangwon chungbuk chungnam jeonbuk jeonnam gyeongbuk gyeongnam jeju)
 mkdir -p data/tmp
 rm -f data/tmp/*.json
@@ -25,7 +26,8 @@ byDay={}; failures=[]
 for it in all_items:
     pd=it.get('permitDate')
     if pd: byDay[pd]=byDay.get(pd,0)+1
-out={'at':datetime.datetime.utcnow().isoformat()+'Z','stores':all_items,'byDay':byDay,'count':len(all_items),'failures':failures}
+out={'at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'stores':all_items,'byDay':byDay,'count':len(all_items),'failures':failures,
+     'coverage':{'complete':True,'regions':regions,'from':os.environ['FROM_DATE'],'toExclusive':os.environ['TO_DATE']}}
 os.makedirs('data',exist_ok=True)
 with open('data/trend30_all.json.tmp','w',encoding='utf-8') as f:
     json.dump(out,f,ensure_ascii=False,separators=(',',':'))

@@ -19,7 +19,10 @@ def read_complete_regions(directory, regions):
     """Validate every region before touching an existing output file."""
     items = {}
     for region in regions:
-        data = json.loads((Path(directory) / (region + '.json')).read_text())
+        try:
+            data = json.loads((Path(directory) / (region + '.json')).read_text())
+        except (OSError, ValueError):
+            raise RuntimeError('Incomplete region: ' + region + '; previous snapshot preserved') from None
         if not isinstance(data.get('items'), list) or data.get('error') or data.get('capped') or data.get('count') != len(data['items']):
             raise RuntimeError('Incomplete region: ' + region)
         for row in data['items']:

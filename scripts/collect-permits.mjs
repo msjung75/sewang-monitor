@@ -1,12 +1,13 @@
 // CI reads the government source using its existing encrypted secret.
 // Browser API access remains authenticated; no user cookie or secret in URLs/logs.
 import { collectPermits } from '../lib/permit-source.mjs';
+import { governmentFetch } from './government-transport.mjs';
 try{
-  const data=await collectPermits(Object.fromEntries(new URLSearchParams(process.argv[2]||'')),process.env.DATA_GO_KR_KEY);
+  const data=await collectPermits(Object.fromEntries(new URLSearchParams(process.argv[2]||'')),process.env.DATA_GO_KR_KEY,{fetcher:governmentFetch});
   if(data.capped)throw new Error('collection_page_limit');
   process.stdout.write(JSON.stringify(data));
 }catch(error){
-  const reason=/^(government_key_(missing|invalid)|collection_page_limit|upstream_(request_failed|invalid_response|incomplete_page|invalid_json|timeout|http_\d{3}))$/.test(error.message)?error.message:'collection_failed';
+  const reason=/^(government_key_(missing|invalid)|collection_page_limit|upstream_(request_failed|connection_failed|dns_failed|tls_failed|invalid_response|incomplete_page|invalid_json|timeout|http_\d{3}))$/.test(error.message)?error.message:'collection_failed';
   console.error(reason+': previous data preserved. Check the configured government credential and provider availability.');
   process.exitCode=1;
 }

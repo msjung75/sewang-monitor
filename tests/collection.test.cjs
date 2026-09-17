@@ -33,6 +33,45 @@ test('valid empty government results and pagination are distinct from failure',a
  assert.equal(capped.capped,true);
  let pages=0;const all=await collectPermits({region:'seoul',type:'ilban',maxPages:'2'},'fixture',{fetcher:async()=>++pages===1?response(rows,101):response([{...rows[0],MNG_NO:'100'}],101)});
  assert.equal(all.count,101);assert.equal(all.capped,false);
+ await assert.rejects(collectPermits({region:'seoul',type:'ilban'},'fixture',{fetcher:async()=>response(rows.slice(0,10),101)}),/upstream_incomplete_page/);
+});
+test('CI transport restricts destinations and redirects without exposing request credentials',()=>{
+ const script=`
+import contextlib, io, json, runpy, urllib.request
+scope=runpy.run_path('scripts/government-transport.py')
+for url in ['http://apis.data.go.kr/1741000/test?serviceKey=SECRET', 'https://example.com/1741000/test?serviceKey=SECRET', 'https://apis.data.go.kr:444/1741000/test?serviceKey=SECRET']:
+ with contextlib.redirect_stdin(io.StringIO(json.dumps({'url':url}))) if hasattr(contextlib,'redirect_stdin') else contextlib.nullcontext():
+  import sys
+  sys.stdin=io.StringIO(json.dumps({'url':url}))
+  try: scope['main'](); raise AssertionError('accepted invalid destination')
+  except ValueError as error: assert str(error)=='invalid_target'
+assert scope['NoRedirect']().redirect_request(None,None,302,'',{},'https://example.com') is None
+`;
+ const r=spawnSync('python3',['-c',script],{encoding:'utf8'});
+ assert.equal(r.status,0,r.stderr);
+});
+test('CI transport sends credentials through stdin, sanitizes failures and terminates on timeout',async()=>{
+ const {governmentFetch}=await import('../scripts/government-transport.mjs');
+ const root=fs.mkdtempSync(path.join(os.tmpdir(),'sewang-transport-'));const previous=process.env.PATH;
+ try{
+  fs.writeFileSync(path.join(root,'python3'),`#!/usr/bin/env node
+const fs=require('fs');
+if(process.argv.some(x=>x.includes('SECRET'))) process.exit(2);
+let input='';process.stdin.on('data',b=>input+=b);process.stdin.on('end',()=>{
+ const url=JSON.parse(input).url;
+ if(url.includes('delay')){setTimeout(()=>process.exit(0),60000);return;}
+ if(url.includes('failure')){console.log(JSON.stringify({error:'SECRET request URL'}));return;}
+ console.log(JSON.stringify({status:200,body:JSON.stringify({keyReceived:new URL(url).searchParams.get('serviceKey')==='SECRET'})}));
+});
+`,{mode:0o755});
+  process.env.PATH=root+':'+previous;
+  const r=await governmentFetch('https://apis.data.go.kr/1741000/test?serviceKey=SECRET');
+  assert.equal(r.status,200);assert.equal(JSON.parse(await r.text()).keyReceived,true);
+  await assert.rejects(governmentFetch('https://apis.data.go.kr/1741000/failure?serviceKey=SECRET'),/^Error: upstream_connection_failed$/);
+  const controller=new AbortController();
+  const request=governmentFetch('https://apis.data.go.kr/1741000/delay?serviceKey=SECRET',{signal:controller.signal});
+  controller.abort();await assert.rejects(request,/upstream_timeout/);
+ }finally{process.env.PATH=previous;fs.rmSync(root,{recursive:true,force:true});}
 });
 function runCollector(script,mode){
  const root=fs.mkdtempSync(path.join(os.tmpdir(),'sewang-collector-'));
