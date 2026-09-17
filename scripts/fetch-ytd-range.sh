@@ -3,8 +3,8 @@
 # FROM_DATE / TO_DATE 환경변수 받음 (yyyymmdd)
 set -euo pipefail
 BASE_URL="${BASE_URL:-https://sewang-monitor.vercel.app}"
-FROM_DATE="${FROM_DATE:-$(date -u -d 'yesterday' +%Y%m%d)}"
-TO_DATE="${TO_DATE:-$FROM_DATE}"
+FROM_DATE="${FROM_DATE:-$(TZ=Asia/Seoul date -d 'yesterday' +%Y%m%d)}"
+TO_DATE="${TO_DATE:-$(TZ=Asia/Seoul date +%Y%m%d)}"
 REGIONS=(seoul gyeonggi busan daegu incheon gwangju daejeon ulsan sejong gangwon chungbuk chungnam jeonbuk jeonnam gyeongbuk gyeongnam jeju)
 
 echo "YTD fetch (영업+폐업 통합): $FROM_DATE -> $TO_DATE"
@@ -13,7 +13,10 @@ rm -f data/tmp/*.json
 
 for r in "${REGIONS[@]}"; do
   echo "::group::region $r"
-  node scripts/collect-permits.mjs "from=$FROM_DATE&to=$TO_DATE&region=$r&type=all&status=all&maxPages=50" > "data/tmp/$r.json" || echo "$r failed"
+  if ! node scripts/collect-permits.mjs "from=$FROM_DATE&to=$TO_DATE&region=$r&type=all&status=all&maxPages=50" > "data/tmp/$r.json"; then
+    echo "::error::YTD collection failed in $r; all existing monthly data preserved."
+    exit 1
+  fi
   ls -la "data/tmp/$r.json" 2>/dev/null || true
   echo "::endgroup::"
   sleep 2
