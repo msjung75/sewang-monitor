@@ -39,8 +39,8 @@ test('missing, insecure and failed private storage report unavailable without fa
  assert.deepEqual(await store.privateAccessHealth(options),{configured:true,connected:false});
 });
 
-test('legacy approved users are copied once into private storage before authorization switches over',async()=>{
- const S=await import('../lib/security.mjs');const f=fixture();
+test('legacy approved users stay in place while private changes overlay only affected users',async()=>{
+ const S=await import('../lib/security.mjs');const store=await import('../lib/access-store.mjs');const f=fixture();
  process.env.GITHUB_TOKEN='fixture-only';
  const legacy={users:[{id:'123',role:'staff'}],blocked:[{id:'999'}]};
  const fetcher=async(url,options)=>{
@@ -49,7 +49,9 @@ test('legacy approved users are copied once into private storage before authoriz
  };
  const options={...f.options,fetcher};
  assert.deepEqual(await S.allowlist(options),legacy);
- assert.deepEqual(await S.allowlist(options),legacy);
- const sets=f.calls.filter(call=>JSON.parse(call.options.body)[0]==='SET');
- assert.equal(sets.length,1);
+ assert.equal(f.calls.filter(call=>JSON.parse(call.options.body)[0]==='SET').length,0);
+ await store.writePrivateAccess({users:[{id:'123',role:'admin'},{id:'456',role:'viewer'}],blocked:[],removed:['999']},f.options);
+ const merged=await S.allowlist(options);
+ assert.deepEqual(merged.users,[{id:'123',role:'admin'},{id:'456',role:'viewer'}]);
+ assert.deepEqual(merged.blocked,[{id:'999'}]);
 });

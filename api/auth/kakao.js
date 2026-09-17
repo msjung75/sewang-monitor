@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { snapshotResponse, snapshotChunks } from '../../lib/snapshots.mjs';
 import { privateAccessConfigured, privateAccessHealth, readPrivatePending,
-  writePrivateAccess, writePrivatePending } from '../../lib/access-store.mjs';
+  readPrivateAccess, writePrivateAccess, writePrivatePending } from '../../lib/access-store.mjs';
 import { sessionKey, privateResponse, cookies, readSession, requireUser, mutationAllowed,
   allowlist, currentRole, oauthState, validState, stateCookie, fileRoles,
   assertPrivateRepository, validPushEndpoint, ROLES, SESSION_OPTIONS } from '../../lib/security.mjs';
@@ -86,14 +86,17 @@ async function getAllowlist() {
   return allowlist();
 }
 async function getPending() {
-  if (privateAccessConfigured()) {
-    const stored = await readPrivatePending();
-    if (stored) return { pending: stored.pending || [], updated_at: stored.updated_at || '' };
-  }
+  const stored = privateAccessConfigured() ? await readPrivatePending() : null;
   const d = (await ghGetFile('data/pending_users.json')).content || {};
-  const state = { pending: d.pending || [], updated_at: d.updated_at || '' };
-  if (privateAccessConfigured()) await writePrivatePending(state);
-  return state;
+  const merged = new Map((d.pending || []).map(p => [String(p.id), p]));
+  for (const p of stored?.pending || []) merged.set(String(p.id), p);
+  return { pending: [...merged.values()], updated_at: stored?.updated_at || d.updated_at || '' };
+}
+async function getPrivatePending() {
+  return await readPrivatePending() || { pending: [], updated_at: '' };
+}
+async function getPrivateAccess() {
+  return await readPrivateAccess() || { users: [], blocked: [], removed: [], updated_at: '' };
 }
 function pickRole(kakaoId, users) {
   if (ADMIN_KAKAO_ID && String(kakaoId) === String(ADMIN_KAKAO_ID)) return 'admin';
@@ -141,7 +144,7 @@ async function sendPendingNotice(kakaoId, nickname, profile) {
 // pending 자동 저장 (GitHub commit)
 // ============================================================
 async function savePending(kakaoId, nickname, profileImg) {
-  const content = await getPending();
+  const content = await getPrivatePending();
   const exists = content.pending.some(p => String(p.id) === String(kakaoId));
   if (exists) return { skipped: 'already_pending' };
   content.pending.push({ id: kakaoId, nickname, profile: profileImg, applied_at: new Date().toISOString() });
@@ -154,12 +157,14 @@ async function savePending(kakaoId, nickname, profileImg) {
 // admin 액션: approve / reject / update_role / remove
 // ============================================================
 async function actApprove(kakaoId, role, memo, nickname, profileImg) {
-  let pcontent = await getPending();
+  let pcontent = await getPrivatePending();
   const pIdx = pcontent.pending.findIndex(p => String(p.id) === String(kakaoId));
   let snap = null;
   if (pIdx >= 0) { snap = pcontent.pending[pIdx]; pcontent.pending.splice(pIdx, 1); pcontent.updated_at = new Date().toISOString(); }
-  let acontent = await getAllowlist();
+  let acontent = await getPrivateAccess();
   if (!acontent.blocked) acontent.blocked = [];
+  acontent.blocked = acontent.blocked.filter(u => String(u.id) !== String(kakaoId));
+  acontent.removed = (acontent.removed || []).filter(id => String(id) !== String(kakaoId));
   const exists = acontent.users.some(u => String(u.id) === String(kakaoId));
   if (!exists) {
     acontent.users.push({
@@ -178,11 +183,11 @@ async function actApprove(kakaoId, role, memo, nickname, profileImg) {
   return { ok: true, kakaoId, role };
 }
 async function actReject(kakaoId, reason) {
-  let pcontent = await getPending();
+  let pcontent = await getPrivatePending();
   const pIdx = pcontent.pending.findIndex(p => String(p.id) === String(kakaoId));
   let snap = null;
   if (pIdx >= 0) { snap = pcontent.pending[pIdx]; pcontent.pending.splice(pIdx, 1); pcontent.updated_at = new Date().toISOString(); }
-  let acontent = await getAllowlist();
+  let acontent = await getPrivateAccess();
   if (!acontent.blocked) acontent.blocked = [];
   const exists = acontent.blocked.some(b => String(b.id) === String(kakaoId));
   if (!exists) {
@@ -194,14 +199,19 @@ async function actReject(kakaoId, reason) {
     });
     acontent.updated_at = new Date().toISOString();
   }
+  acontent.users = (acontent.users || []).filter(u => String(u.id) !== String(kakaoId));
+  acontent.removed = [...new Set([...(acontent.removed || []).map(String), String(kakaoId)])];
   await writePrivateAccess(acontent);
   if (pIdx >= 0) await writePrivatePending(pcontent);
   return { ok: true, kakaoId };
 }
 async function actUpdateRole(kakaoId, role, memo) {
-  const acontent = await getAllowlist();
-  const u = acontent.users.find(x => String(x.id) === String(kakaoId));
-  if (!u) throw new Error('user not found');
+  const combined = await getAllowlist();
+  const existing = combined.users.find(x => String(x.id) === String(kakaoId));
+  if (!existing) throw new Error('user not found');
+  const acontent = await getPrivateAccess();
+  let u = acontent.users.find(x => String(x.id) === String(kakaoId));
+  if (!u) { u = { ...existing }; acontent.users.push(u); }
   u.role = role || u.role;
   if (memo !== undefined) u.memo = memo;
   u.updated_at = new Date().toISOString();
@@ -210,9 +220,12 @@ async function actUpdateRole(kakaoId, role, memo) {
   return { ok: true };
 }
 async function actUpdateUser(kakaoId, nickname, memo) {
-  const acontent = await getAllowlist();
-  const u = acontent.users.find(x => String(x.id) === String(kakaoId));
-  if (!u) throw new Error('user not found');
+  const combined = await getAllowlist();
+  const existing = combined.users.find(x => String(x.id) === String(kakaoId));
+  if (!existing) throw new Error('user not found');
+  const acontent = await getPrivateAccess();
+  let u = acontent.users.find(x => String(x.id) === String(kakaoId));
+  if (!u) { u = { ...existing }; acontent.users.push(u); }
   if (nickname !== undefined) u.nickname = nickname;
   if (memo !== undefined) u.memo = memo;
   u.updated_at = new Date().toISOString();
@@ -221,10 +234,13 @@ async function actUpdateUser(kakaoId, nickname, memo) {
   return { ok: true };
 }
 async function actAddUser(kakaoId, role, nickname, memo) {
-  const acontent = await getAllowlist();
+  const combined = await getAllowlist();
+  const acontent = await getPrivateAccess();
   if (!acontent.blocked) acontent.blocked = [];
-  const exists = acontent.users.some(u => String(u.id) === String(kakaoId));
+  const exists = combined.users.some(u => String(u.id) === String(kakaoId));
   if (exists) throw new Error('이미 등록된 사용자');
+  acontent.blocked = (acontent.blocked || []).filter(u => String(u.id) !== String(kakaoId));
+  acontent.removed = (acontent.removed || []).filter(id => String(id) !== String(kakaoId));
   acontent.users.push({
     id: kakaoId,
     nickname: nickname || '',
@@ -234,7 +250,7 @@ async function actAddUser(kakaoId, role, nickname, memo) {
   });
   acontent.updated_at = new Date().toISOString();
   await writePrivateAccess(acontent);
-  const pending = await getPending();
+  const pending = await getPrivatePending();
   const before = pending.pending.length;
   pending.pending = pending.pending.filter(p => String(p.id) !== String(kakaoId));
   if (pending.pending.length !== before) { pending.updated_at = new Date().toISOString(); await writePrivatePending(pending); }
@@ -324,10 +340,11 @@ async function actSetBrandCategory(brandName, category) {
 }
 
 async function actRemove(kakaoId) {
-  const acontent = await getAllowlist();
-  const before = acontent.users.length;
+  const combined = await getAllowlist();
+  if (!combined.users.some(u => String(u.id) === String(kakaoId))) throw new Error('user not found');
+  const acontent = await getPrivateAccess();
   acontent.users = acontent.users.filter(u => String(u.id) !== String(kakaoId));
-  if (acontent.users.length === before) throw new Error('user not found');
+  acontent.removed = [...new Set([...(acontent.removed || []).map(String), String(kakaoId)])];
   acontent.updated_at = new Date().toISOString();
   await writePrivateAccess(acontent);
   return { ok: true };
@@ -547,11 +564,6 @@ export default async function handler(req, res) {
     if (action === 'registration_health') {
       if (req.method !== 'GET') return res.status(405).json({ error: 'get_required' });
       const storage = await privateAccessHealth();
-      if (storage.connected) {
-        // 첫 확인에서 기존 승인자와 대기자를 비공개 저장소에 안전하게 초기화한다.
-        await getAllowlist();
-        await getPending();
-      }
       return res.status(storage.connected ? 200 : 503).json({ ready: storage.connected });
     }
 
