@@ -959,7 +959,7 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 <div class="page" id="pg-admin">
   <div class="alert-banner">
     <span class="aico">👥</span>
-    <div><strong style="color:var(--c1)">사용자 관리 (v13)</strong> — 승인·거부 즉시 자동 GitHub commit. (admin 전용)</div>
+    <div><strong style="color:var(--c1)">사용자 관리</strong> — 승인·거부 즉시 비공개 저장소 반영 (관리자 전용)</div>
   </div>
   <div class="card" style="margin-bottom:12px">
     <div class="card-title">📊 사용자 현황</div>
@@ -5916,7 +5916,7 @@ async function approveUser(kakaoId){
   var role = document.getElementById('prole-' + kakaoId).value;
   var memo = document.getElementById('pmemo-' + kakaoId).value.trim();
   if (!memo) { if(!confirm('메모 없이 승인할까요? (회사·직책 메모 권장)')) return; }
-  if (!confirm(p.nickname + '님을 ' + role + ' 권한으로 승인?\n자동 GitHub commit됩니다.')) return;
+  if (!confirm(p.nickname + '님을 ' + role + ' 권한으로 승인할까요?\n비공개 저장소에 즉시 반영됩니다.')) return;
   var res = await adminPost('approve', { kakao_id: kakaoId, role: role, memo: memo, nickname: p.nickname, profile: p.profile });
   if (res.ok) { alert('✅ 승인 완료 (~30초 후 라이브 반영)'); setTimeout(loadAdminPanel, 1500); }
   else { alert('실패 (' + res.status + '): ' + (res.data && res.data.message || res.data && res.data.error || 'unknown')); }
@@ -6539,7 +6539,7 @@ async function adminAddUserDirect(){
   var memo = (document.getElementById('adm-input-memo').value || '').trim();
   if (!/^\d+$/.test(id)) { alert('카카오 ID는 숫자만 입력하세요.'); return; }
   if (!name) { alert('이름을 입력하세요.'); return; }
-  if (!confirm(name + ' (' + id + ')를 ' + role + '로 추가? 자동 GitHub commit됩니다.')) return;
+  if (!confirm(name + ' (' + id + ')를 ' + role + '로 추가할까요? 비공개 저장소에 즉시 반영됩니다.')) return;
   var res = await adminPost('add_user', { kakao_id: id, nickname: name, role: role, memo: memo });
   if (res.ok) {
     showToast('✅', '사용자 추가 완료', name + ' · ' + role + ' (자동 commit)');
