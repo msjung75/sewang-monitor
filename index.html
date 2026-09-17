@@ -5815,6 +5815,7 @@ async function loadAdminPanel(){
           + '<button onclick="editUserInfo(\'' + jsEsc(u.id) + '\', \'' + jsEsc((u.nickname||'').replace(/\047/g,"\\'")) + '\', \'' + esc((u.memo||'').replace(/\047/g,"\\'")) + '\')" style="flex:1;min-width:30%;padding:8px;background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.3);color:#6ee7b7;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">✏️ 이름 수정</button>'
           + '<button onclick="changeRoleUser(\'' + jsEsc(u.id) + '\', \'' + jsEsc(u.role||'viewer') + '\')" style="flex:1;min-width:30%;padding:8px;background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.3);color:#7dd3fc;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">🔄 역할</button>'
           + '<button onclick="blockUser(\'' + jsEsc(u.id) + '\', \'' + jsEsc(u.nickname||'') + '\')" style="flex:1;min-width:30%;padding:8px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#fca5a5;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">🚫 차단</button>'
+          + '<button onclick="removeUser(\'' + jsEsc(u.id) + '\', \'' + jsEsc(u.nickname||'') + '\')" style="flex:1;min-width:30%;padding:8px;background:rgba(148,163,184,.12);border:1px solid rgba(148,163,184,.3);color:#cbd5e1;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">🗑️ 제거</button>'
           + '</div></div>';
       }).join('');
     }
@@ -6528,6 +6529,13 @@ async function blockUser(kakaoId, nickname){
   // remove from active + add to blocked. 간단하게 reject 사용
   var res = await adminPost('reject', { kakao_id: kakaoId, reason: reason || '관리자 차단' });
   if (res.ok) { alert('차단 완료'); setTimeout(loadAdminPanel, 1500); }
+  else { alert('실패: ' + (res.data && res.data.error || res.status)); }
+}
+
+async function removeUser(kakaoId, nickname){
+  if (!confirm(nickname + '님을 명단에서 완전 제거할까요?\n\n• 활성 사용자 목록에서 삭제\n• 다시 카카오로 로그인하면 신규 신청자로 승인 대기에 뜹니다\n• 실수로 넣은 분·본인이 나가고자 하는 경우에 사용')) return;
+  var res = await adminPost('remove', { kakao_id: kakaoId });
+  if (res.ok) { showToast('🗑️','제거 완료', nickname + ' (자동 commit)'); setTimeout(loadAdminPanel, 1500); }
   else { alert('실패: ' + (res.data && res.data.error || res.status)); }
 }
 
