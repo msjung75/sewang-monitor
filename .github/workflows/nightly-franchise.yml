@@ -26,7 +26,21 @@ jobs:
           MASTER_PATH: 'data/franchise_master.json'
           TREND_PATH: 'data/trend30_all.json'
           DAYS: '14'
-        run: python3 scripts/detect_franchise.py
+        run: |
+          set +e
+          for attempt in 1 2 3; do
+            echo "==== detect_franchise attempt $attempt/3 ===="
+            python3 scripts/detect_franchise.py
+            rc=$?
+            if [ $rc -eq 0 ]; then
+              echo "success on attempt $attempt"
+              exit 0
+            fi
+            echo "attempt $attempt failed (rc=$rc); sleeping 45s..."
+            sleep 45
+          done
+          echo "::warning::nightly-franchise: detect 3회 실패 - 이전 스냅샷 유지"
+          exit 0
       - name: Commit changes via GitHub Contents API
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
