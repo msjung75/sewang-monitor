@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-19T05:04:11+09:00",
+  "updated": "2026-09-19T21:57:00+09:00",
   "baseline_date": "20260101",
   "current_date": "20260919",
   "brands": {
@@ -274,32 +274,17 @@
     },
     "1988포차": {
       "service": "ilban",
-      "current_count": 5,
-      "current_count_reported": 5,
-      "new_permits_count": 1,
-      "candidate_count": 3,
-      "verified_count": 3,
-      "upbyeon_count": 1,
-      "upbyeon_count_real": 1,
-      "total_growth": 2,
-      "upbyeon_ratio": 0.5,
+      "current_count": 0,
+      "current_count_reported": 0,
+      "new_permits_count": 0,
+      "candidate_count": 0,
+      "verified_count": 0,
+      "upbyeon_count": 0,
+      "upbyeon_count_real": 0,
+      "total_growth": 0,
+      "upbyeon_ratio": 0,
       "is_upbyeon_specialist": false,
-      "upbyeon": [
-        {
-          "mng_no": "3990000-101-2017-00520",
-          "old_name": "풍천장어촌&흑돼지",
-          "new_name": "1988포차",
-          "addr": "경기도 남양주시 오남읍 양지로 284, 1층",
-          "lcpmt": "2017-11-06",
-          "dat_updt": "2026-03-24 21:17:49",
-          "region_code": "3990000",
-          "region_name": "경기 남양주시",
-          "trivial": false,
-          "baseline_state": "",
-          "current_state": "",
-          "reopen_type": "pure_rename"
-        }
-      ]
+      "upbyeon": []
     },
     "BHC": {
       "service": "ilban",
