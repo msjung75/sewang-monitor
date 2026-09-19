@@ -50,7 +50,7 @@ jobs:
             done
           done
           echo "regions ok=$ok fail=$fail"
-          if [ $ok -ne 17 ]; then echo "too many failures"; exit 1; fi
+          if [ $ok -ne 17 ]; then echo "::warning::nightly-closures: $fail개 지역 gov API 실패 — 이전 스냅샷 유지"; exit 0; fi
           jq -s --arg at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --arg since "$SINCE" --arg until "$UNTIL" \
             '{at:$at, since:$since, until:$until,
               items:([.[].items[]] | unique_by(.mgtNo // (.name+(.addr//"")+(.closedDate//""))) | sort_by(.closedDate) | reverse | .[0:4000]),
