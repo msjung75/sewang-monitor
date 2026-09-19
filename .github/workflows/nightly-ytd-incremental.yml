@@ -46,7 +46,21 @@ jobs:
           DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
           FROM_DATE: ${{ steps.dates.outputs.from }}
           TO_DATE: ${{ steps.dates.outputs.to }}
-        run: bash scripts/fetch-ytd-range.sh
+        run: |
+          set +e
+          for attempt in 1 2 3; do
+            echo "==== fetch-ytd attempt $attempt/3 ===="
+            bash scripts/fetch-ytd-range.sh
+            rc=$?
+            if [ $rc -eq 0 ]; then
+              echo "success on attempt $attempt"
+              exit 0
+            fi
+            echo "attempt $attempt failed (rc=$rc); sleeping 60s..."
+            sleep 60
+          done
+          echo "::warning::nightly-ytd: fetch 3회 실패 - 이전 스냅샷 유지, 다음 스케줄에 재시도"
+          exit 0
       - name: Aggregate YTD
         run: python3 scripts/aggregate-ytd.py
       - name: Commit via GitHub Contents API (rebase 충돌 무관)
@@ -110,5 +124,6 @@ jobs:
                       else:
                           time.sleep(backoff)
               else:
-                  raise SystemExit(1)
+                  print(f"::warning::nightly-ytd: {path} 커밋 6회 실패 - 다음 스케줄에 재시도")
+                  # soft exit — 이전 스냅샷은 이미 저장돼 있음
           PYEOF
