@@ -3,7 +3,16 @@ import { requireReadUser, SALES_ROLES } from '../lib/security.mjs';
 // Vercel 환경변수: NAVER_CLIENT_ID, NAVER_CLIENT_SECRET
 // since=YYYYMMDD 파라미터로 인허가일 이후 발행 글만 필터링 가능
 export default async function handler(req, res) {
-  if (!await requireReadUser(req, res)) return;
+  // Bot token bypass — scheduled tasks (e.g., sewang-newshop-kakao-v2)
+  const botToken = process.env.BLOG_BOT_TOKEN;
+  const authed = botToken && (req.query.token === botToken || req.headers['x-bot-token'] === botToken);
+  if (!authed) {
+    if (!await requireReadUser(req, res)) return;
+  } else {
+    // Bot: still apply GET-only + no-cache response headers
+    if (req.method !== 'GET') { res.status(405).json({ error: 'get_required' }); return; }
+    res.setHeader('Cache-Control', 'private, no-store');
+  }
   const { query, sort = 'date', display = 10, start = 1, since } = req.query;
   if (!query) return res.status(400).json({ error: 'query required' });
 
