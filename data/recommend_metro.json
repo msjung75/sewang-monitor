@@ -1,12 +1,12 @@
 {
-  "updated": "2026-09-20T09:39:02+09:00",
-  "baseline": "20260906",
+  "updated": "2026-09-21T05:59:09+09:00",
+  "baseline": "20260907",
   "days": 14,
   "region": "metro",
   "score_threshold": 2.0,
-  "total_input": 1896,
-  "recommended_count": 1276,
-  "excluded_count": 620,
+  "total_input": 1884,
+  "recommended_count": 1266,
+  "excluded_count": 618,
   "items": [
     {
       "score": 7.0,
@@ -368,23 +368,6 @@
         "ilban+1.0",
         "호프/통닭+2.0",
         "+치킨"
-      ]
-    },
-    {
-      "score": 5.5,
-      "name": "또봉이통닭 가평목동점",
-      "addr": "경기도 가평군 북면 가화로 999, 북면생활체육공원 내",
-      "type": "일반음식점",
-      "type_key": "ilban",
-      "bzstat": "호프/통닭",
-      "permitDate": "20260916",
-      "mng_no": "4160000-101-2026-00094",
-      "tel": "",
-      "reasons": [
-        "수도권",
-        "ilban+1.0",
-        "호프/통닭+2.0",
-        "+통닭"
       ]
     },
     {
@@ -3375,6 +3358,22 @@
         "수도권",
         "ilban+1.0",
         "+포차"
+      ]
+    },
+    {
+      "score": 4.0,
+      "name": "고요 GOYO",
+      "addr": "서울특별시 송파구 오금로11길 30-16, 지하1층 (방이동)",
+      "type": "일반음식점",
+      "type_key": "ilban",
+      "bzstat": "감성주점",
+      "permitDate": "20260908",
+      "mng_no": "3230000-101-2026-00567",
+      "tel": "",
+      "reasons": [
+        "수도권",
+        "ilban+1.0",
+        "감성주점+2.0"
       ]
     }
   ]
