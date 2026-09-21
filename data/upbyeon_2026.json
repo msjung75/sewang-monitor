@@ -1,7 +1,7 @@
 {
-  "updated": "2026-09-20T22:03:03+09:00",
+  "updated": "2026-09-21T05:25:46+09:00",
   "baseline_date": "20260101",
-  "current_date": "20260920",
+  "current_date": "20260921",
   "brands": {
     "88포차": {
       "service": "ilban",
@@ -588,10 +588,10 @@
     },
     "노랑통닭": {
       "service": "ilban",
-      "current_count": 1162,
+      "current_count": 1062,
       "current_count_reported": 1162,
       "new_permits_count": 58,
-      "candidate_count": 721,
+      "candidate_count": 664,
       "verified_count": 80,
       "upbyeon_count": 7,
       "upbyeon_count_real": 7,
