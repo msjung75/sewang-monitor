@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-29T00:29:50+09:00",
+  "updated": "2026-09-29T06:13:39+09:00",
   "baseline_date": "20260101",
   "current_date": "20260929",
   "brands": {
@@ -857,10 +857,10 @@
     },
     "호식이두마리치킨": {
       "service": "ilban",
-      "current_count": 1180,
+      "current_count": 1280,
       "current_count_reported": 1280,
       "new_permits_count": 20,
-      "candidate_count": 715,
+      "candidate_count": 781,
       "verified_count": 80,
       "upbyeon_count": 3,
       "upbyeon_count_real": 2,
