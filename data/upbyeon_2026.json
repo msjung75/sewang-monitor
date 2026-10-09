@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-09T06:39:50+09:00",
+  "updated": "2026-10-09T23:40:29+09:00",
   "baseline_date": "20260101",
   "current_date": "20261009",
   "brands": {
@@ -431,14 +431,14 @@
     "BBQ": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 1951,
-      "new_permits_count": 62,
-      "candidate_count": 894,
+      "current_count_reported": 1953,
+      "new_permits_count": 63,
+      "candidate_count": 895,
       "verified_count": 80,
       "upbyeon_count": 4,
       "upbyeon_count_real": 4,
-      "total_growth": 66,
-      "upbyeon_ratio": 0.061,
+      "total_growth": 67,
+      "upbyeon_ratio": 0.06,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -617,7 +617,7 @@
     "처갓집양념치킨": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 1550,
+      "current_count_reported": 1551,
       "new_permits_count": 49,
       "candidate_count": 854,
       "verified_count": 80,
@@ -914,10 +914,10 @@
     },
     "호식이두마리치킨": {
       "service": "ilban",
-      "current_count": 1183,
+      "current_count": 1283,
       "current_count_reported": 1283,
       "new_permits_count": 22,
-      "candidate_count": 716,
+      "candidate_count": 783,
       "verified_count": 80,
       "upbyeon_count": 4,
       "upbyeon_count_real": 3,
@@ -985,10 +985,10 @@
     },
     "보드람치킨": {
       "service": "ilban",
-      "current_count": 359,
-      "current_count_reported": 359,
+      "current_count": 360,
+      "current_count_reported": 360,
       "new_permits_count": 22,
-      "candidate_count": 204,
+      "candidate_count": 205,
       "verified_count": 80,
       "upbyeon_count": 5,
       "upbyeon_count_real": 5,
@@ -1766,7 +1766,7 @@
       "current_count": 647,
       "current_count_reported": 647,
       "new_permits_count": 1,
-      "candidate_count": 400,
+      "candidate_count": 401,
       "verified_count": 80,
       "upbyeon_count": 3,
       "upbyeon_count_real": 3,
