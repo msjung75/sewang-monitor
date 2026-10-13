@@ -14,6 +14,8 @@
 
 ## 운영
 
+`/api/password`는 Vercel rewrite로 기존 `/api/auth/kakao` 함수의 로그인 핸들러에 연결한다. 별도의 서버 함수를 추가하지 않는다.
+
 기존 `KV_REST_API_URL`/`KV_REST_API_TOKEN`(또는 Upstash REST 변수), `JWT_SECRET`, `GITHUB_TOKEN`, `RESEND_API_KEY`를 사용한다. 비밀번호·인증번호·기기·세션은 Redis의 별도 `sewang:auth:password:v1:{auth}:` 키에 저장하며 공개 저장소에 기록하지 않는다.
 
 `AUTH_EMAIL_FROM`으로 Resend에 검증된 발신 주소를 지정할 수 있다. 지정하지 않으면 기존 앱과 같은 `onboarding@resend.dev` 테스트 발신자를 사용한다. 테스트 발신자는 Resend 계정 소유자 이메일로만 발송 가능하므로 다른 사용자의 이메일 인증에는 검증된 도메인의 발신 주소가 필요하다. 상태 API의 ready는 설정 존재를 뜻하며 실제 이메일 전달 성공을 보증하지 않는다. 발송 실패 시 계정을 만들거나 세션을 발급하지 않는다.

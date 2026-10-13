@@ -16,6 +16,10 @@
   },
   "rewrites": [
     {
+      "source": "/api/password",
+      "destination": "/api/auth/kakao?password_route=1"
+    },
+    {
       "source": "/data/:file*",
       "destination": "/api/auth/kakao?action=data&file=:file*"
     }

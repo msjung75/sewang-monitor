@@ -21,7 +21,7 @@ async function enroll(){const a=await seed(new Browser());const r=await a.reques
 async function second(){const b=new Browser();const r=await b.request('login',{username:'fixture.user',password,deviceName:'두 번째 휴대폰'});assert.equal(r.body.verification_required,true);assert.ok(!b.jar.sewang_session);const v=await b.request('verify',{code:code()});assert.equal(v.code,200,JSON.stringify(v.body));return b;}
 before(async()=>{
  process.env.JWT_SECRET='fixture-secret-'.repeat(4);process.env.GITHUB_TOKEN='fixture';process.env.KAKAO_REST_KEY='fixture';process.env.ADMIN_KAKAO_ID='';
- S=await import('../lib/security.mjs');P=await import('../lib/password-auth.mjs');C=await import('../lib/credential-store.mjs');({SignJWT}=await import('jose'));handler=(await import('../api/password.js')).default;kakao=(await import('../api/auth/kakao.js')).default;
+ S=await import('../lib/security.mjs');P=await import('../lib/password-auth.mjs');C=await import('../lib/credential-store.mjs');({SignJWT}=await import('jose'));kakao=(await import('../api/auth/kakao.js')).default;handler=(req,res)=>kakao({...req,query:{...req.query,password_route:'1'}},res);
  if(!integration)return;
  const socket=require('node:net').createServer();await new Promise(r=>socket.listen(0,'127.0.0.1',r));port=socket.address().port;await new Promise(r=>socket.close(r));
  dir=fs.mkdtempSync(path.join(os.tmpdir(),'sewang-auth-redis-'));server=spawn(serverPath,['--port',String(port),'--bind','127.0.0.1','--protected-mode','yes','--save','','--appendonly','no','--dir',dir],{stdio:'ignore'});

@@ -1,6 +1,7 @@
 // 카카오 OAuth + 사용자 관리 (callback / me / logout / login / list_users / approve / reject / update_role / remove)
 // v13: GitHub Contents API로 pending/allowlist 자동 commit
 import { SignJWT } from 'jose';
+import passwordHandler from '../../lib/password-handler.mjs';
 import { managedKakaoLogin } from '../../lib/password-auth.mjs';
 import { revokeDevice } from '../../lib/credential-store.mjs';
 import fs from 'node:fs';
@@ -369,6 +370,7 @@ async function actRemove(kakaoId) {
 // ============================================================
 export default async function handler(req, res) {
   privateResponse(res);
+  if(req.query?.password_route==='1')return passwordHandler(req,res);
   try {
     const { action, code } = req.query;
     let session;
