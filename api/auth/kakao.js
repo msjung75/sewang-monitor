@@ -7,7 +7,7 @@ import { snapshotResponse, snapshotChunks } from '../../lib/snapshots.mjs';
 import { privateAccessConfigured, privateAccessHealth, readPrivatePending,
   readPrivateAccess, writePrivateAccess, writePrivatePending } from '../../lib/access-store.mjs';
 import { sessionKey, privateResponse, cookies, readSession, requireUser, mutationAllowed,
-  allowlist, currentRole, oauthState, validState, stateCookie, fileRoles,
+  allowlist, currentRole, oauthState, validOAuthState, stateCookie, fileRoles,
   assertPrivateRepository, validPushEndpoint, ROLES, SESSION_OPTIONS } from '../../lib/security.mjs';
 
 const KAKAO_REST_KEY = process.env.KAKAO_REST_KEY;
@@ -35,6 +35,11 @@ function parseCookie(header) {
 }
 function sessionCookie(value, maxAge) {
   return [COOKIE_NAME + '=' + value, 'Path=/', 'HttpOnly', 'Secure', 'SameSite=Lax', 'Max-Age=' + maxAge].join('; ');
+}
+function loginRecovery(res) {
+  // Never exchange an unverified code. Restart in the browser that received the callback.
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  return res.status(403).send(`<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>세왕 로그인 다시 시작</title><style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b1220;color:#fff;font-family:system-ui,sans-serif}main{max-width:360px;padding:28px;text-align:center}h1{font-size:23px}p{color:#cbd5e1;line-height:1.7}a{display:block;padding:16px;margin-top:24px;border-radius:12px;background:#fee500;color:#111;font-weight:700;text-decoration:none}.home{background:transparent;color:#cbd5e1;font-weight:400}</style></head><body><main><h1>로그인을 다시 시작해 주세요</h1><p>로그인 시간이 지났거나 앱과 브라우저가 바뀌어 로그인 정보를 확인하지 못했습니다.</p><p>아래 버튼을 누르면 현재 브라우저에서 안전하게 다시 로그인할 수 있습니다. 로그인 중에는 이 창을 유지해 주세요.</p><a href="/api/auth/kakao?action=login">카카오로 다시 로그인</a><a class="home" href="/">앱 첫 화면으로</a></main></body></html>`);
 }
 async function readBody(req) {
   if (req.body) return typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
@@ -396,10 +401,10 @@ export default async function handler(req, res) {
 
     // ===== OAuth 콜백 =====
     if (code) {
-      if (req.method !== 'GET' || !validState(req.query.state, cookies(req.headers.cookie).sewang_oauth_state)) {
-        return res.status(403).json({ error: 'invalid_oauth_state' });
-      }
-      res.setHeader('Set-Cookie', stateCookie('', 0));
+      if (req.method !== 'GET') return res.status(403).json({ error: 'invalid_oauth_state' });
+      if (!validOAuthState(req.query.state, req.headers.cookie)) return loginRecovery(res);
+      const clearedState = [stateCookie('', 0, req.query.state), stateCookie('', 0)];
+      res.setHeader('Set-Cookie', clearedState);
       const key = sessionKey();
       if (!KAKAO_REST_KEY) return res.status(500).send('KAKAO_REST_KEY 미설정');
       const tokenRes = await fetch('https://kauth.kakao.com/oauth/token', {
@@ -428,7 +433,7 @@ export default async function handler(req, res) {
       const jwt = await new SignJWT({ id: kakaoId, n: nickname, p: profileImg, r: role })
         .setProtectedHeader({ alg: 'HS256' }).setIssuer(SESSION_OPTIONS.issuer).setAudience(SESSION_OPTIONS.audience)
         .setIssuedAt().setExpirationTime('24h').sign(key);
-      res.setHeader('Set-Cookie', [sessionCookie(jwt, COOKIE_MAX_AGE), stateCookie('', 0)]);
+      res.setHeader('Set-Cookie', [sessionCookie(jwt, COOKIE_MAX_AGE), ...clearedState]);
 
       let target = '/?login=ok&role=' + encodeURIComponent(role);
       if (role === 'pending') target = '/?login=pending';

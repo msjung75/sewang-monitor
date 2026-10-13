@@ -9,6 +9,7 @@ before(async () => {
   ({SignJWT} = await import('jose'));
   process.env.JWT_SECRET = 'fixture-only-'.repeat(4);
   process.env.GITHUB_TOKEN = 'fixture-only';
+  process.env.KAKAO_REST_KEY = 'fixture-only';
   process.env.ADMIN_KAKAO_ID = '';
 });
 function res() { return {code:200, headers:{}, setHeader(k,v){this.headers[k]=v;}, status(c){this.code=c;return this;}, json(body){this.body=body;return this;}, send(body){this.body=body;return this;}, end(body){this.body=body;return this;}, redirect(code,url){this.code=code;this.url=url;}}; }
@@ -54,6 +55,63 @@ test('OAuth state requires matching random nonce; malformed cookies are safe',()
   for(const x of [undefined,'',b,'abc'])assert.equal(S.validState(a,x),false);
   assert.doesNotThrow(()=>S.cookies('sewang_session=%invalid'));
   assert.match(S.stateCookie(a),/HttpOnly; Secure; SameSite=Lax; Max-Age=600/);
+});
+test('concurrent OAuth attempts remain bound to their own browser cookies',()=>{
+  const a=S.oauthState(),b=S.oauthState(),c=S.oauthState();
+  const header=S.stateCookie(a).split(';')[0]+'; '+S.stateCookie(b).split(';')[0];
+  assert.equal(S.validOAuthState(a,header),true);
+  assert.equal(S.validOAuthState(b,header),true);
+  assert.equal(S.validOAuthState(c,header),false);
+  assert.equal(S.validOAuthState(a,''),false);
+  assert.equal(S.validOAuthState(a,S.stateCookieName(a)+'='+b),false);
+  assert.equal(S.validOAuthState(a,'sewang_oauth_state='+a),true);
+  assert.ok(S.stateCookie('',0,a).startsWith(S.stateCookieName(a)+'=;'));
+  assert.ok(!S.stateCookie('',0,a).includes(S.stateCookieName(b)));
+});
+test('expired, missing and mismatched OAuth cookies show recovery without exchanging a code or setting a session',async()=>{
+  const handler=(await import('../api/auth/kakao.js')).default,saved=global.fetch;
+  global.fetch=()=>{throw Error('unverified code must never reach Kakao');};
+  try {
+    const a=S.oauthState(),b=S.oauthState();
+    for(const [state,cookie] of [[a,''],[a,S.stateCookieName(a)+'='+b],[b,S.stateCookie(a).split(';')[0]],['<script>','']]){
+      const out=res();await handler({method:'GET',headers:{cookie},query:{code:'unverified',state}},out);
+      assert.equal(out.code,403);assert.match(out.headers['Content-Type'],/text\/html/);
+      assert.match(out.body,/카카오로 다시 로그인/);assert.match(out.body,/name="viewport"/);
+      assert.ok(!out.body.includes('unverified'));assert.ok(!out.body.includes('<script>'));
+      assert.equal(out.headers['Set-Cookie'],undefined);
+    }
+  } finally {global.fetch=saved;}
+});
+test('real login and callback preserve concurrent attempts and consume only the completed nonce',async()=>{
+  const handler=(await import('../api/auth/kakao.js')).default,saved=global.fetch;
+  global.fetch=async(url,options)=>{
+    if(String(url)==='https://kauth.kakao.com/oauth/token') {
+      assert.equal(new URLSearchParams(options.body).get('redirect_uri'),S.APP_ORIGIN+'/api/auth/kakao');
+      return {ok:true,json:async()=>({access_token:'fixture'})};
+    }
+    if(String(url)==='https://kapi.kakao.com/v2/user/me')return {ok:true,json:async()=>({id:123,properties:{nickname:'fixture'}})};
+    if(String(url).startsWith('https://api.github.com/'))return list()();
+    throw Error('unexpected upstream');
+  };
+  try {
+    const starts=[];
+    for(let i=0;i<2;i++){
+      const out=res();await handler({method:'GET',headers:{},query:{action:'login'}},out);
+      assert.equal(out.code,302);
+      const state=new URL(out.url).searchParams.get('state');
+      assert.ok(out.headers['Set-Cookie'].startsWith(S.stateCookieName(state)+'='+state));
+      starts.push({state,cookie:out.headers['Set-Cookie'].split(';')[0]});
+    }
+    const cookie=starts.map(x=>x.cookie).join('; ');
+    for(const start of starts){
+      const out=res();await handler({method:'GET',headers:{cookie},query:{code:'fixture',state:start.state}},out);
+      assert.equal(out.code,302);assert.equal(out.url,'/?login=ok&role=staff');
+      assert.ok(out.headers['Set-Cookie'][0].startsWith('sewang_session='));
+      assert.ok(out.headers['Set-Cookie'].includes(S.stateCookie('',0,start.state)));
+      const other=starts.find(x=>x!==start);
+      assert.ok(!out.headers['Set-Cookie'].some(x=>x.startsWith(S.stateCookieName(other.state)+'=')));
+    }
+  } finally {global.fetch=saved;}
 });
 test('data access is allowlisted and roles exclude owner from customer records',()=>{
   for(const f of ['../package.json','%2e%2e/package.json','allowlist.json/other','push_subscriptions.json','missing.json'])assert.equal(S.fileRoles(f),null,f);
