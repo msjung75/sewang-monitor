@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-13T07:10:26+09:00",
+  "updated": "2026-10-13T23:38:28+09:00",
   "baseline_date": "20260101",
   "current_date": "20261013",
   "brands": {
@@ -431,9 +431,9 @@
     "BBQ": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 1953,
+      "current_count_reported": 1952,
       "new_permits_count": 63,
-      "candidate_count": 895,
+      "candidate_count": 896,
       "verified_count": 80,
       "upbyeon_count": 4,
       "upbyeon_count_real": 4,
@@ -587,15 +587,15 @@
     },
     "깐부치킨": {
       "service": "ilban",
-      "current_count": 320,
-      "current_count_reported": 320,
-      "new_permits_count": 13,
+      "current_count": 321,
+      "current_count_reported": 321,
+      "new_permits_count": 14,
       "candidate_count": 164,
       "verified_count": 80,
       "upbyeon_count": 1,
       "upbyeon_count_real": 1,
-      "total_growth": 14,
-      "upbyeon_ratio": 0.071,
+      "total_growth": 15,
+      "upbyeon_ratio": 0.067,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -914,15 +914,15 @@
     },
     "호식이두마리치킨": {
       "service": "ilban",
-      "current_count": 1283,
-      "current_count_reported": 1283,
-      "new_permits_count": 22,
+      "current_count": 1284,
+      "current_count_reported": 1284,
+      "new_permits_count": 23,
       "candidate_count": 783,
       "verified_count": 80,
       "upbyeon_count": 4,
       "upbyeon_count_real": 3,
-      "total_growth": 25,
-      "upbyeon_ratio": 0.12,
+      "total_growth": 26,
+      "upbyeon_ratio": 0.115,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -1423,14 +1423,14 @@
     "투다리": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 3140,
-      "new_permits_count": 17,
+      "current_count_reported": 3141,
+      "new_permits_count": 18,
       "candidate_count": 908,
       "verified_count": 80,
       "upbyeon_count": 2,
       "upbyeon_count_real": 2,
-      "total_growth": 19,
-      "upbyeon_ratio": 0.105,
+      "total_growth": 20,
+      "upbyeon_ratio": 0.1,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -1834,10 +1834,10 @@
     },
     "명륜진사갈비": {
       "service": "ilban",
-      "current_count": 594,
-      "current_count_reported": 594,
+      "current_count": 593,
+      "current_count_reported": 593,
       "new_permits_count": 6,
-      "candidate_count": 356,
+      "candidate_count": 355,
       "verified_count": 80,
       "upbyeon_count": 2,
       "upbyeon_count_real": 1,
