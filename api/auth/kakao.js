@@ -1,6 +1,8 @@
 // 카카오 OAuth + 사용자 관리 (callback / me / logout / login / list_users / approve / reject / update_role / remove)
 // v13: GitHub Contents API로 pending/allowlist 자동 commit
 import { SignJWT } from 'jose';
+import { managedKakaoLogin } from '../../lib/password-auth.mjs';
+import { revokeDevice } from '../../lib/credential-store.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { snapshotResponse, snapshotChunks } from '../../lib/snapshots.mjs';
@@ -430,7 +432,16 @@ export default async function handler(req, res) {
         await ensurePendingRegistration(kakaoId, nickname, profileImg);
       }
 
-      const jwt = await new SignJWT({ id: kakaoId, n: nickname, p: profileImg, r: role })
+      if (ROLES.includes(role) && privateAccessConfigured()) {
+        const managed=await managedKakaoLogin(req,res,{id:kakaoId,n:nickname,p:profileImg,r:role});
+        if(managed) {
+          const issued=res.getHeader('Set-Cookie') || [];
+          res.setHeader('Set-Cookie',[...(Array.isArray(issued)?issued:[issued]),...clearedState]);
+          return res.redirect(302,managed==='verify'?'/account.html?mode=verify':'/?login=ok');
+        }
+      }
+
+      const jwt = await new SignJWT({ id: kakaoId, n: nickname, p: profileImg, r: role, auth_method:'kakao' })
         .setProtectedHeader({ alg: 'HS256' }).setIssuer(SESSION_OPTIONS.issuer).setAudience(SESSION_OPTIONS.audience)
         .setIssuedAt().setExpirationTime('24h').sign(key);
       res.setHeader('Set-Cookie', [sessionCookie(jwt, COOKIE_MAX_AGE), ...clearedState]);
@@ -743,7 +754,9 @@ export default async function handler(req, res) {
     // ===== 로그아웃 =====
     if (action === 'logout') {
       if (!mutationAllowed(req, res)) return;
-      res.setHeader('Set-Cookie', COOKIE_NAME + '=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0');
+      const user=await readSession(req);
+      if(user?.sid)await revokeDevice(user.id,user.did);
+      res.setHeader('Set-Cookie', [COOKIE_NAME + '=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0', 'sewang_device=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0']);
       return res.status(200).json({ ok: true });
     }
 

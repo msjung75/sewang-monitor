@@ -176,7 +176,7 @@ test('static build only publishes the explicit browser asset allowlist',()=>{
     for(const file of files){fs.mkdirSync(path.dirname(path.join(root,file)),{recursive:true});fs.writeFileSync(path.join(root,file),'fixture');}
     fs.mkdirSync(path.join(root,'data'));fs.writeFileSync(path.join(root,'data','allowlist.json'),'private fixture');
     build(root);assert.equal(fs.existsSync(path.join(root,'dist','data')),false);assert.equal(fs.existsSync(path.join(root,'dist','api')),false);
-    assert.deepEqual(fs.readdirSync(path.join(root,'dist')).sort(),['assets','icon.svg','index.html','manifest.json','sw.js']);
+    assert.deepEqual(fs.readdirSync(path.join(root,'dist')).sort(),['account.html','assets','icon.svg','index.html','manifest.json','sw.js']);
   }finally{fs.rmSync(root,{recursive:true,force:true});}
 });
 test('large authenticated JSON snapshots preserve Korean data with bounded gzip responses',async()=>{

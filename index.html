@@ -480,6 +480,7 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
         <button onclick="hardReload()" style="display:flex;width:100%;align-items:center;gap:8px;padding:11px 14px;background:transparent;border:0;color:#7dd3fc;font-size:12.5px;font-weight:600;cursor:pointer;text-align:left;border-bottom:1px solid var(--border)">🔄 강제 새로고침 (캐시 클리어)</button>
         <!-- v17.12: PWA Push 토글 -->
         <button id="push-toggle-btn" onclick="togglePushSubscription()" style="display:flex;width:100%;align-items:center;gap:8px;padding:11px 14px;background:transparent;border:0;color:#fbbf24;font-size:12.5px;font-weight:600;cursor:pointer;text-align:left;border-bottom:1px solid var(--border)">🔔 알림 받기</button>
+        <a href="/account.html" style="display:block;padding:11px 14px;color:#7dd3fc;font-size:12.5px;text-decoration:none">🔐 로그인·기기 관리</a>
         <button onclick="logoutUser()" style="display:flex;width:100%;align-items:center;gap:8px;padding:11px 14px;background:transparent;border:0;color:#f87171;font-size:12.5px;font-weight:600;cursor:pointer;text-align:left">⤴️ 로그아웃</button>
       </div>
     </div>
@@ -5288,6 +5289,7 @@ function showLoginScreen(){
     + '<a href="/api/auth/kakao?action=login" style="display:flex;align-items:center;gap:10px;background:#fee500;color:#000;padding:14px 28px;border-radius:12px;font-weight:700;font-size:15px;text-decoration:none;box-shadow:0 4px 24px rgba(254,229,0,0.35);transition:transform .15s">'
     + '<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 3C6.48 3 2 6.48 2 10.8c0 2.74 1.79 5.15 4.5 6.5l-1 3.4c-.1.35.3.6.6.4l4-2.7c.6.1 1.2.1 1.9.1 5.52 0 10-3.48 10-7.7S17.52 3 12 3z" fill="#000"/></svg>'
     + '카카오로 로그인</a>'
+    + '<a href="/account.html?mode=login" style="display:block;margin-top:18px;padding:14px 28px;background:#24344f;color:#fff;border:1px solid #64748b;border-radius:12px;font-weight:700;text-decoration:none">아이디·비밀번호로 로그인</a>'
     + '<div style="font-size:11px;color:#475569;margin-top:32px;text-align:center;line-height:1.6;max-width:300px">이 앱은 세왕상사 영업·관리 도구입니다.<br>사전 승인된 분만 접근 가능합니다.</div>'
     + pendingHtml + firstAdminHtml
     + '</div>';

@@ -1,7 +1,7 @@
 // Only browser assets are public. Repository data, tests and server source stay out of dist.
 const fs = require('node:fs');
 const path = require('node:path');
-const files = ['index.html', 'manifest.json', 'icon.svg', 'sw.js',
+const files = ['index.html', 'account.html', 'assets/account.js', 'assets/account.css', 'manifest.json', 'icon.svg', 'sw.js',
   'assets/intelligence-core.js', 'assets/intelligence-ui.js', 'assets/intelligence.css',
   'assets/storage-recovery.js', 'assets/data-client.js', 'assets/data-status.js'];
 function build(root = path.resolve(__dirname, '..')) {
