@@ -1162,6 +1162,12 @@ function regionOf(addr){
   if (!addr) return '-';
   if (addr.indexOf('서울') === 0) return '서울';
   if (addr.indexOf('경기') === 0) return '경기';
+  // [2026-10-15] 전남광주통합특별시(행정통합) 주소 — 광주 5개 구는 '광주', 나머지 시·군은 '전남'으로 분리
+  //   (기존 코드는 '전남광주통합'으로 잘라 광주 칩이 0건, 전부 전남으로 흡수되던 버그)
+  if (addr.indexOf('전남광주통합특별시') === 0 || addr.indexOf('광주특별시') === 0) {
+    var g2 = addr.split(' ')[1] || '';
+    return /^(동구|서구|남구|북구|광산구)$/.test(g2) ? '광주' : '전남';
+  }
   return addr.split(' ')[0].replace(/(특별시|광역시|특별자치시|특별자치도)$/, '');
 }
 function guOf(addr){
@@ -6240,6 +6246,11 @@ function renderMapMarkers(map){
         if (isExcluded(s)) continue;
         if (cat !== 'all' && !isCatStore(s, cat)) continue;
         var match = (s.addr||'').match(/^([가-힣]+(?:특별시|광역시|특별자치도|특별자치시|도))/);
+        // [2026-10-15] 전남광주통합특별시 주소를 지도 집계에서 광주/전남으로 분리 (중심 좌표 키에 맞춤)
+        if (match && (match[1] === '전남광주통합특별시' || match[1] === '광주특별시')) {
+          var g2m = (s.addr||'').split(' ')[1] || '';
+          match[1] = /^(동구|서구|남구|북구|광산구)$/.test(g2m) ? '광주광역시' : '전라남도';
+        }
         if (match) {
           sidoCnt[match[1]] = (sidoCnt[match[1]]||0) + 1;
           var c = categoryColor(s);
