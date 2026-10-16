@@ -26,21 +26,31 @@ jobs:
           NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
           NAVER_DAILY_LIMIT: ${{ inputs.limit || '5000' }}
         run: python3 scripts/naver-nstat-check.py
-      - name: Commit via git (캐시 파일 40MB+ — Contents API 업로드 한도 초과로 실패하던 것을 git push로 교체, 2026-10-13)
+      # v19.1: Contents API는 ~40MB 이상 파일에서 422 "file is too large" → git push로 전환 (10/3~ 매일 실패 원인)
+      - name: Commit & push (git — 대용량 캐시 안전)
         run: |
           if [ ! -f data/naver_nstat_cache.json ]; then
             echo "No cache file generated"
             exit 0
           fi
-          git config user.name 'github-actions[bot]'
-          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/naver_nstat_cache.json
-          if git diff --cached --quiet; then echo 'no changes'; exit 0; fi
-          git commit -m "N-check $(TZ=Asia/Seoul date +%Y-%m-%d): cache updated [skip ci]"
-          for t in 1 2 3 4 5; do
-            if git pull --rebase -X theirs origin main && git push origin HEAD:main; then
-              echo "✅ pushed (attempt $t)"; exit 0
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git commit -q -m "N-check $(TZ=Asia/Seoul date +%F): cache updated [skip ci]"
+          for attempt in 1 2 3 4 5; do
+            if git push origin HEAD:main; then
+              echo "✅ pushed (attempt $attempt)"
+              exit 0
             fi
-            echo "push retry $t"; git rebase --abort 2>/dev/null || true; sleep $((t*5))
+            echo "push rejected (attempt $attempt) — 다른 커밋이 먼저 들어감, rebase 후 재시도"
+            git fetch -q origin main
+            # 충돌 시 이번 실행 결과(캐시) 우선
+            git rebase -X theirs origin/main || { git rebase --abort; echo "rebase failed"; exit 1; }
+            sleep $((attempt * 5))
           done
-          echo "All push attempts failed"; exit 1
+          echo "::error::N-check: push 5회 실패"
+          exit 1
