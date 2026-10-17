@@ -1,11 +1,11 @@
 {
-  "updated": "2026-10-17T09:03:59+09:00",
-  "baseline": "20261003",
+  "updated": "2026-10-17T22:31:50+09:00",
+  "baseline": "20261004",
   "days": 14,
   "region": "metro",
   "score_threshold": 2.0,
-  "total_input": 1649,
-  "recommended_count": 1094,
+  "total_input": 1650,
+  "recommended_count": 1095,
   "excluded_count": 555,
   "items": [
     {
@@ -2846,6 +2846,21 @@
     },
     {
       "score": 3.5,
+      "name": "베트남 KTV",
+      "addr": "경기도 광주시 중앙로 108-9, 지1층 (경안동)",
+      "type": "유흥주점",
+      "type_key": "yuheung",
+      "bzstat": "룸살롱",
+      "permitDate": "20261016",
+      "mng_no": "5540000-102-2026-00001",
+      "tel": "",
+      "reasons": [
+        "수도권",
+        "yuheung+2.5"
+      ]
+    },
+    {
+      "score": 3.5,
       "name": "청춘수산",
       "addr": "서울특별시 강동구 성안로25길 55, 현대아파트 상가동 201호 (천호동)",
       "type": "일반음식점",
@@ -3316,22 +3331,6 @@
       "bzstat": "기타",
       "permitDate": "20261013",
       "mng_no": "4090000-101-2026-00411",
-      "tel": "",
-      "reasons": [
-        "수도권",
-        "ilban+1.0",
-        "+곱창"
-      ]
-    },
-    {
-      "score": 3.3,
-      "name": "뚱이네황소곱창",
-      "addr": "경기도 시흥시 거북섬로 219, 2층 204호 (정왕동)",
-      "type": "일반음식점",
-      "type_key": "ilban",
-      "bzstat": "기타",
-      "permitDate": "20261013",
-      "mng_no": "4010000-101-2026-00460",
       "tel": "",
       "reasons": [
         "수도권",
