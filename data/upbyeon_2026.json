@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-25T05:16:19+09:00",
+  "updated": "2026-10-25T22:23:51+09:00",
   "baseline_date": "20260101",
   "current_date": "20261025",
   "brands": {
@@ -650,26 +650,12 @@
       "new_permits_count": 65,
       "candidate_count": 728,
       "verified_count": 80,
-      "upbyeon_count": 8,
-      "upbyeon_count_real": 8,
-      "total_growth": 73,
-      "upbyeon_ratio": 0.11,
+      "upbyeon_count": 7,
+      "upbyeon_count_real": 7,
+      "total_growth": 72,
+      "upbyeon_ratio": 0.097,
       "is_upbyeon_specialist": false,
       "upbyeon": [
-        {
-          "mng_no": "3200000-101-2025-00588",
-          "old_name": "만복뼈다귀해장국",
-          "new_name": "노랑통닭 봉천현대시장점",
-          "addr": "서울특별시 관악구 은천로25길 4, 1층 103호 (봉천동)",
-          "lcpmt": "2025-12-02",
-          "dat_updt": "2026-10-22 22:17:52",
-          "region_code": "3200000",
-          "region_name": "서울 동작구",
-          "trivial": false,
-          "baseline_state": "",
-          "current_state": "",
-          "reopen_type": "pure_rename"
-        },
         {
           "mng_no": "3370000-101-2025-00091",
           "old_name": "노랑통닭 연산9동점",
