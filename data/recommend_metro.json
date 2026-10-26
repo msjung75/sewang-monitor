@@ -1,12 +1,12 @@
 {
-  "updated": "2026-10-25T22:42:28+09:00",
+  "updated": "2026-10-26T05:51:13+09:00",
   "baseline": "20261012",
   "days": 14,
   "region": "metro",
   "score_threshold": 2.0,
-  "total_input": 2159,
+  "total_input": 2156,
   "recommended_count": 1398,
-  "excluded_count": 761,
+  "excluded_count": 758,
   "items": [
     {
       "score": 7.5,
