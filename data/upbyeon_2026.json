@@ -1,7 +1,7 @@
 {
-  "updated": "2026-10-27T23:17:48+09:00",
+  "updated": "2026-10-28T06:27:28+09:00",
   "baseline_date": "20260101",
-  "current_date": "20261027",
+  "current_date": "20261028",
   "brands": {
     "88포차": {
       "service": "ilban",
@@ -274,11 +274,11 @@
     },
     "생마차": {
       "service": "ilban",
-      "current_count": 143,
+      "current_count": 100,
       "current_count_reported": 143,
       "new_permits_count": 4,
-      "candidate_count": 97,
-      "verified_count": 80,
+      "candidate_count": 62,
+      "verified_count": 62,
       "upbyeon_count": 0,
       "upbyeon_count_real": 0,
       "total_growth": 4,
@@ -1216,10 +1216,10 @@
       "new_permits_count": 34,
       "candidate_count": 922,
       "verified_count": 80,
-      "upbyeon_count": 16,
-      "upbyeon_count_real": 16,
-      "total_growth": 50,
-      "upbyeon_ratio": 0.32,
+      "upbyeon_count": 15,
+      "upbyeon_count_real": 15,
+      "total_growth": 49,
+      "upbyeon_ratio": 0.306,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -1329,20 +1329,6 @@
           "dat_updt": "2026-03-11 01:43:51",
           "region_code": "3460000",
           "region_name": "기타 시도",
-          "trivial": false,
-          "baseline_state": "",
-          "current_state": "",
-          "reopen_type": "pure_rename"
-        },
-        {
-          "mng_no": "3910000-101-2024-00073",
-          "old_name": "멕시카나 평택1호점",
-          "new_name": "멕시카나 평택점",
-          "addr": "경기도 평택시 원평로52번길 49-3, 1층 (평택동)",
-          "lcpmt": "2024-03-13",
-          "dat_updt": "2026-02-21 21:51:15",
-          "region_code": "3910000",
-          "region_name": "경기 과천시",
           "trivial": false,
           "baseline_state": "",
           "current_state": "",
@@ -1493,10 +1479,10 @@
     },
     "봉구비어": {
       "service": "ilban",
-      "current_count": 466,
+      "current_count": 366,
       "current_count_reported": 466,
       "new_permits_count": 1,
-      "candidate_count": 270,
+      "candidate_count": 214,
       "verified_count": 80,
       "upbyeon_count": 0,
       "upbyeon_count_real": 0,
