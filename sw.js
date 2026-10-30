@@ -1,5 +1,5 @@
-// PWA Service Worker v17.22e — 업변 재개장·새오너 태그 (오끼 override) (canonical redirect, etag fresh check)
-const CACHE = 'sewang-pwa-v18_3-brand-data';
+// PWA Service Worker v17.22f — admin KV diag + cache-bust (canonical redirect, etag fresh check)
+const CACHE = 'sewang-pwa-v18_4-cachebust';
 const SHELL = ['/manifest.json', '/icon.svg'];
 
 self.addEventListener('install', e => {
@@ -20,7 +20,7 @@ self.addEventListener('activate', e => {
         clients.forEach(c => {
           c.postMessage({
             type: 'SW_UPDATED_RELOAD',
-            version: 'v18_3'
+            version: 'v18_4'
           });
         });
       })
@@ -66,7 +66,7 @@ self.addEventListener('notificationclick', e => {
 
 self.addEventListener('fetch', e => {
   const u = new URL(e.request.url);
-  // API: 항상 원래 request 그대로 (쿠키·세션 보존 필수, 카카오 OAuth 등)
+  // API: 핤상 원래 request 그대로 (쿠키·세션 보존 필수, 카카오 OAuth 등)
   if (u.pathname.startsWith('/api/')) {
     e.respondWith(fetch(e.request, { cache: 'no-store' }));
     return;
