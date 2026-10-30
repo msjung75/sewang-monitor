@@ -1,18 +1,11 @@
-// 사용자 활동 로깅 endpoint (v18: last_seen via Vercel KV + GitHub daily aggregate)
+// 사용자 활동 로깅 endpoint (v19: public repo + PII 해싱)
 //
-// POST body: { event, user_id, role, tab, ts }
-//   - Vercel KV(HSET last_seen)에 사용자별 최근 방문 timestamp 저장
-//   - GITHUB_TOKEN 있으면 data/usage_log.json에 일별 aggregate 누적 (기존 동작)
-//
-// GET ?userId=all              → { ok, connected, last_seen:{userId:ISO,...} }
-// GET ?userId=<kakao_id>       → { ok, connected, last_seen:ISO|null }
-//
-// KV 미연결(env 없음) 시 graceful: connected:false + 빈 응답
+// 2026-10-30 변경: 레포 public 전환에 따라 assertPrivateRepository 가드 제거,
+// userId를 anonymizePII로 해싱해서 저장. LOG_SALT env 설정 권장.
 
 import { GITHUB_HEADERS } from './_github.js';
-import { requireUser, mutationAllowed, assertPrivateRepository } from '../lib/security.mjs';
+import { requireUser, mutationAllowed, anonymizePII } from '../lib/security.mjs';
 
-// ── Vercel KV (Upstash REST) ──────────────────────────────────────
 const KV_URL   = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL || '';
 const KV_TOKEN = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN || '';
 const KV_ON    = !!(KV_URL && KV_TOKEN);
@@ -44,7 +37,6 @@ async function kvHGetAll(hash) {
   return {};
 }
 
-// ── GitHub Contents API (기존 aggregate 로그) ────────────────────────
 async function readJsonFromRepo(path) {
   try {
     const r = await fetch(`https://api.github.com/repos/${process.env.REPO || 'msjung75/sewang-monitor'}/contents/${path}`, {
@@ -71,13 +63,11 @@ async function writeJsonToRepo(path, content, sha, message) {
   return r.ok;
 }
 
-// ── Handler ─────────────────────────────────────────────────────────
 export default async function handler(req, res) {
   const user = await requireUser(req, res, req.method === 'GET' ? ['admin'] : undefined);
   if (!user) return;
   if (req.method !== 'GET' && !mutationAllowed(req, res)) return;
 
-  // ─── GET: last_seen 조회 ─────────────────────────────────────────
   if (req.method === 'GET') {
     const userId = ((req.query && req.query.userId) || '').toString().trim();
     if (!userId) return res.status(400).json({ error: 'userId required (or "all")' });
@@ -104,31 +94,30 @@ export default async function handler(req, res) {
   const tab    = (body.tab    || '').toString().substring(0, 30);
   const nowIso = new Date().toISOString();
 
-  // ── 1) KV 최근 방문 기록 (visit 이벤트만) ──
+  // KV last_seen: 원본 userId 유지 (KV는 private, 관리자 조회용)
   let kvOk = false;
   if (KV_ON && userId !== 'unknown' && event === 'visit') {
     const r = await kvCmd('HSET', LAST_SEEN_KEY, userId, nowIso);
     kvOk = (r !== null);
   }
 
-  // ── 2) GitHub aggregate 로그 (선택) ──
   if (!process.env.GITHUB_TOKEN) {
     return res.status(200).json({ ok: true, kv: kvOk, gh: false });
   }
 
   const today = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
-  try { await assertPrivateRepository(process.env.REPO || 'msjung75/sewang-monitor'); }
-  catch { return res.status(200).json({ ok: true, kv: kvOk, gh: false }); }
+  // 공개 레포 → GitHub aggregate 파일의 userId는 해싱해서 저장. LOG_SALT 유지 시 통계 연속성 보존.
+  const userKey = anonymizePII(userId);
   const path = 'data/usage_log.json';
   for (let attempt = 0; attempt < 3; attempt++) {
     const { content, sha } = await readJsonFromRepo(path);
     const log = content || { updated: '', days: {} };
     const day = log.days[today] = log.days[today] || { users: {}, total: 0 };
-    day.users[userId] = day.users[userId] || { role, visits: 0, last_event: '', last_ts: 0, tabs: {} };
-    day.users[userId].visits += 1;
-    day.users[userId].last_event = event;
-    day.users[userId].last_ts = Date.now();
-    if (tab) day.users[userId].tabs[tab] = (day.users[userId].tabs[tab] || 0) + 1;
+    day.users[userKey] = day.users[userKey] || { role, visits: 0, last_event: '', last_ts: 0, tabs: {} };
+    day.users[userKey].visits += 1;
+    day.users[userKey].last_event = event;
+    day.users[userKey].last_ts = Date.now();
+    if (tab) day.users[userKey].tabs[tab] = (day.users[userKey].tabs[tab] || 0) + 1;
     day.total += 1;
     log.updated = new Date().toISOString();
     const cutoff = new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
