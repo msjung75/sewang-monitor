@@ -1,8 +1,4 @@
-// 사용자 활동 로깅 endpoint (v19: public repo + PII 해싱)
-//
-// 2026-10-30 변경: 레포 public 전환에 따라 assertPrivateRepository 가드 제거,
-// userId를 anonymizePII로 해싱해서 저장. LOG_SALT env 설정 권장.
-
+// Activity logging endpoint (v20: public repo + hashed PII + envMissing diag)
 import { GITHUB_HEADERS } from './_github.js';
 import { requireUser, mutationAllowed, anonymizePII } from '../lib/security.mjs';
 
@@ -10,6 +6,20 @@ const KV_URL   = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_U
 const KV_TOKEN = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN || '';
 const KV_ON    = !!(KV_URL && KV_TOKEN);
 const LAST_SEEN_KEY = 'sewang:last_seen';
+
+function envMissingList() {
+  const miss = [];
+  if (!process.env.KV_REST_API_URL && !process.env.UPSTASH_REDIS_REST_URL) miss.push('KV_REST_API_URL');
+  if (!process.env.KV_REST_API_TOKEN && !process.env.UPSTASH_REDIS_REST_TOKEN) miss.push('KV_REST_API_TOKEN');
+  if (!process.env.LOG_SALT) miss.push('LOG_SALT');
+  if (!process.env.GITHUB_TOKEN) miss.push('GITHUB_TOKEN');
+  return miss;
+}
+
+function noStore(res) {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+  res.setHeader('Pragma', 'no-cache');
+}
 
 async function kvCmd() {
   if (!KV_ON) return null;
@@ -64,6 +74,17 @@ async function writeJsonToRepo(path, content, sha, message) {
 }
 
 export default async function handler(req, res) {
+  noStore(res);
+
+  if (req.method === 'GET' && (req.url || '').indexOf('diag=1') >= 0) {
+    return res.status(200).json({
+      ok: true,
+      kv_on: KV_ON,
+      envMissing: envMissingList(),
+      hint: envMissingList().length ? 'Vercel Env Vars missing (Settings > Env Vars, or Storage > KV connect)' : 'all env present',
+    });
+  }
+
   const user = await requireUser(req, res, req.method === 'GET' ? ['admin'] : undefined);
   if (!user) return;
   if (req.method !== 'GET' && !mutationAllowed(req, res)) return;
@@ -72,14 +93,14 @@ export default async function handler(req, res) {
     const userId = ((req.query && req.query.userId) || '').toString().trim();
     if (!userId) return res.status(400).json({ error: 'userId required (or "all")' });
     if (!KV_ON) {
-      return res.status(200).json({ ok: true, connected: false, last_seen: userId === 'all' ? {} : null });
+      return res.status(200).json({ ok: true, connected: false, last_seen: userId === 'all' ? {} : null, envMissing: envMissingList() });
     }
     if (userId === 'all') {
       const map = await kvHGetAll(LAST_SEEN_KEY);
-      return res.status(200).json({ ok: true, connected: true, last_seen: map });
+      return res.status(200).json({ ok: true, connected: true, last_seen: map, envMissing: envMissingList() });
     }
     const v = await kvCmd('HGET', LAST_SEEN_KEY, userId);
-    return res.status(200).json({ ok: true, connected: true, last_seen: v || null });
+    return res.status(200).json({ ok: true, connected: true, last_seen: v || null, envMissing: envMissingList() });
   }
 
   if (req.method !== 'POST') return res.status(405).json({ error: 'GET or POST only' });
@@ -94,7 +115,6 @@ export default async function handler(req, res) {
   const tab    = (body.tab    || '').toString().substring(0, 30);
   const nowIso = new Date().toISOString();
 
-  // KV last_seen: 원본 userId 유지 (KV는 private, 관리자 조회용)
   let kvOk = false;
   if (KV_ON && userId !== 'unknown' && event === 'visit') {
     const r = await kvCmd('HSET', LAST_SEEN_KEY, userId, nowIso);
@@ -102,11 +122,10 @@ export default async function handler(req, res) {
   }
 
   if (!process.env.GITHUB_TOKEN) {
-    return res.status(200).json({ ok: true, kv: kvOk, gh: false });
+    return res.status(200).json({ ok: true, kv: kvOk, gh: false, envMissing: envMissingList() });
   }
 
   const today = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
-  // 공개 레포 → GitHub aggregate 파일의 userId는 해싱해서 저장. LOG_SALT 유지 시 통계 연속성 보존.
   const userKey = anonymizePII(userId);
   const path = 'data/usage_log.json';
   for (let attempt = 0; attempt < 3; attempt++) {
@@ -123,8 +142,8 @@ export default async function handler(req, res) {
     const cutoff = new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
     Object.keys(log.days).forEach(k => { if (k < cutoff) delete log.days[k]; });
     const ok = await writeJsonToRepo(path, log, sha, `[skip ci] update activity aggregate ${today}`);
-    if (ok) return res.status(200).json({ ok: true, kv: kvOk, gh: true, today, total: day.total });
+    if (ok) return res.status(200).json({ ok: true, kv: kvOk, gh: true, today, total: day.total, envMissing: envMissingList() });
     await new Promise(r => setTimeout(r, 500 + attempt * 500));
   }
-  return res.status(200).json({ ok: true, kv: kvOk, gh: false, note: 'commit retry exhausted' });
+  return res.status(200).json({ ok: true, kv: kvOk, gh: false, note: 'commit retry exhausted', envMissing: envMissingList() });
 }
