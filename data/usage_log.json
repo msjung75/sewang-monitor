@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-02T17:48:22.729Z",
+  "updated": "2026-11-02T22:43:21.454Z",
   "days": {
     "2026-10-31": {
       "users": {
@@ -25,9 +25,18 @@
           "tabs": {
             "home": 1
           }
+        },
+        "u_c26a4abb53ff3d3a": {
+          "role": "staff",
+          "visits": 1,
+          "last_event": "visit",
+          "last_ts": 1793659401454,
+          "tabs": {
+            "home": 1
+          }
         }
       },
-      "total": 1
+      "total": 2
     }
   },
   "_note": "2026-10-30: public 레포 전환 시 기존 평문 kakao_id 노출 방지 위해 초기화. 신규 기록은 anonymizePII로 해싱되어 들어감."
