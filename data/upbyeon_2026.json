@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-07T00:13:58+09:00",
+  "updated": "2026-11-07T06:36:32+09:00",
   "baseline_date": "20260101",
   "current_date": "20261107",
   "brands": {
@@ -460,12 +460,12 @@
       "service": "ilban",
       "current_count": 1500,
       "current_count_reported": 1957,
-      "new_permits_count": 67,
+      "new_permits_count": 68,
       "candidate_count": 902,
       "verified_count": 80,
       "upbyeon_count": 4,
       "upbyeon_count_real": 4,
-      "total_growth": 71,
+      "total_growth": 72,
       "upbyeon_ratio": 0.056,
       "is_upbyeon_specialist": false,
       "upbyeon": [
@@ -530,14 +530,14 @@
     "교촌치킨": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 2041,
-      "new_permits_count": 31,
+      "current_count_reported": 2042,
+      "new_permits_count": 32,
       "candidate_count": 860,
       "verified_count": 80,
       "upbyeon_count": 2,
       "upbyeon_count_real": 2,
-      "total_growth": 33,
-      "upbyeon_ratio": 0.061,
+      "total_growth": 34,
+      "upbyeon_ratio": 0.059,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -647,7 +647,7 @@
       "current_count": 1500,
       "current_count_reported": 1558,
       "new_permits_count": 55,
-      "candidate_count": 853,
+      "candidate_count": 854,
       "verified_count": 80,
       "upbyeon_count": 2,
       "upbyeon_count_real": 2,
@@ -687,10 +687,10 @@
     },
     "노랑통닭": {
       "service": "ilban",
-      "current_count": 1175,
-      "current_count_reported": 1175,
+      "current_count": 1176,
+      "current_count_reported": 1176,
       "new_permits_count": 66,
-      "candidate_count": 733,
+      "candidate_count": 734,
       "verified_count": 80,
       "upbyeon_count": 8,
       "upbyeon_count_real": 8,
@@ -1254,14 +1254,14 @@
     "멕시카나": {
       "service": "ilban",
       "current_count": 1500,
-      "current_count_reported": 2095,
-      "new_permits_count": 36,
-      "candidate_count": 922,
+      "current_count_reported": 2096,
+      "new_permits_count": 37,
+      "candidate_count": 921,
       "verified_count": 80,
       "upbyeon_count": 16,
       "upbyeon_count_real": 16,
-      "total_growth": 52,
-      "upbyeon_ratio": 0.308,
+      "total_growth": 53,
+      "upbyeon_ratio": 0.302,
       "is_upbyeon_specialist": false,
       "upbyeon": [
         {
@@ -1549,11 +1549,60 @@
     },
     "79대포": {
       "service": "ilban",
-      "error": ""
+      "current_count": 176,
+      "current_count_reported": 176,
+      "new_permits_count": 9,
+      "candidate_count": 108,
+      "verified_count": 80,
+      "upbyeon_count": 2,
+      "upbyeon_count_real": 2,
+      "total_growth": 11,
+      "upbyeon_ratio": 0.182,
+      "is_upbyeon_specialist": false,
+      "upbyeon": [
+        {
+          "mng_no": "4201000-101-2023-00001",
+          "old_name": "안주가강릉교동점",
+          "new_name": "79대포강릉교동점",
+          "addr": "강원특별자치도 강릉시 하슬라로206번길 20-5, 1층 (교동)",
+          "lcpmt": "2023-01-02",
+          "dat_updt": "2026-03-07 21:18:54",
+          "region_code": "4201000",
+          "region_name": "기타 도",
+          "trivial": false,
+          "baseline_state": "",
+          "current_state": "",
+          "reopen_type": "pure_rename"
+        },
+        {
+          "mng_no": "3990000-101-2019-00141",
+          "old_name": "누구나 홀딱 반한닭 별내별가람역점",
+          "new_name": "79대포 별내별가람역점",
+          "addr": "경기도 남양주시 덕송1로55번길 14, 별내프라자-3 104,105호 (별내동)",
+          "lcpmt": "2019-03-19",
+          "dat_updt": "2026-08-06 21:17:49",
+          "region_code": "3990000",
+          "region_name": "경기 남양주시",
+          "trivial": false,
+          "baseline_state": "",
+          "current_state": "",
+          "reopen_type": "pure_rename"
+        }
+      ]
     },
     "청담이상": {
       "service": "ilban",
-      "error": ""
+      "current_count": 82,
+      "current_count_reported": 82,
+      "new_permits_count": 1,
+      "candidate_count": 44,
+      "verified_count": 44,
+      "upbyeon_count": 0,
+      "upbyeon_count_real": 0,
+      "total_growth": 1,
+      "upbyeon_ratio": 0.0,
+      "is_upbyeon_specialist": false,
+      "upbyeon": []
     },
     "야화혼술바": {
       "service": "ilban",
@@ -1784,15 +1833,15 @@
     },
     "홍콩반점": {
       "service": "ilban",
-      "current_count": 647,
-      "current_count_reported": 647,
-      "new_permits_count": 1,
+      "current_count": 648,
+      "current_count_reported": 648,
+      "new_permits_count": 2,
       "candidate_count": 403,
       "verified_count": 80,
       "upbyeon_count": 3,
       "upbyeon_count_real": 3,
-      "total_growth": 4,
-      "upbyeon_ratio": 0.75,
+      "total_growth": 5,
+      "upbyeon_ratio": 0.6,
       "is_upbyeon_specialist": true,
       "upbyeon": [
         {
