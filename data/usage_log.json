@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-08T13:42:40.519Z",
+  "updated": "2026-11-11T19:47:52.990Z",
   "days": {
     "2026-10-31": {
       "users": {
@@ -73,6 +73,20 @@
           "visits": 1,
           "last_event": "visit",
           "last_ts": 1794145360519,
+          "tabs": {
+            "home": 1
+          }
+        }
+      },
+      "total": 1
+    },
+    "2026-11-12": {
+      "users": {
+        "u_5c5ee1e2f1460412": {
+          "role": "admin",
+          "visits": 1,
+          "last_event": "visit",
+          "last_ts": 1794426472990,
           "tabs": {
             "home": 1
           }
