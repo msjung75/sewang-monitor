@@ -63,12 +63,18 @@ jobs:
           exit 0
       - name: Aggregate YTD
         run: python3 scripts/aggregate-ytd.py
+      # 2026-11-20: 행안부 API 지연으로 nightly-trend30 별도 fetch가 타임아웃 → YTD 월별 파일로 trend30 재구성 (신규 매장 탭 최신 유지)
+      - name: Rebuild trend30 from YTD
+        env:
+          FROM_DATE: ${{ steps.dates.outputs.from }}
+          TO_DATE: ${{ steps.dates.outputs.to }}
+        run: python3 scripts/trend30-from-ytd.py
       # 2026-11-20: summary(41MB+)가 Contents API 한도 초과 → 422로 10/30부터 미갱신. N-check와 동일하게 git push로 교체
       - name: Commit via git (대용량 summary 안전)
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
-          git add data/ytd_2026/*.json data/ytd_2026_summary.json 2>/dev/null || true
+          git add data/ytd_2026/*.json data/ytd_2026_summary.json data/trend30_all.json 2>/dev/null || true
           if git diff --cached --quiet; then echo 'No changes to commit'; exit 0; fi
           git diff --cached --stat | tail -5
           FILES=$(git diff --cached --name-only | xargs -n1 basename | tr '\n' ' ')
