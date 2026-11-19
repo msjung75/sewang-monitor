@@ -63,67 +63,21 @@ jobs:
           exit 0
       - name: Aggregate YTD
         run: python3 scripts/aggregate-ytd.py
-      - name: Commit via GitHub Contents API (rebase 충돌 무관)
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO: ${{ github.repository }}
-          DATE_FROM: ${{ steps.dates.outputs.from }}
+      # 2026-11-20: summary(41MB+)가 Contents API 한도 초과 → 422로 10/30부터 미갱신. N-check와 동일하게 git push로 교체
+      - name: Commit via git (대용량 summary 안전)
         run: |
-          python3 << 'PYEOF'
-          import base64, json, os, subprocess, time, urllib.request, urllib.error
-          token = os.environ['GH_TOKEN']
-          repo = os.environ['REPO']
-          date_from = os.environ['DATE_FROM']
-          headers = {'Authorization': f'Bearer {token}', 'Accept': 'application/vnd.github+json', 'User-Agent': 'ytd-cron'}
-          # 변경·신규된 월별 파일 + summary 자동 감지
-          st = subprocess.check_output(['git', 'status', '--porcelain', 'data/']).decode()
-          files = []
-          for line in st.splitlines():
-              path = line[3:].strip()
-              if path.startswith('data/ytd_2026/') and path.endswith('.json'):
-                  files.append(path)
-              elif path == 'data/ytd_2026_summary.json':
-                  files.append(path)
-          if not files:
-              print('No changes to commit')
-              raise SystemExit(0)
-          MAX_ATTEMPTS = 6
-          for path in files:
-              api = f'https://api.github.com/repos/{repo}/contents/{path}'
-              with open(path, 'rb') as f:
-                  content_b64 = base64.b64encode(f.read()).decode('ascii')
-              msg = f'YTD nightly: {date_from}~ — {path.split("/")[-1]}'
-              def get_sha():
-                  try:
-                      req = urllib.request.Request(api, headers=headers)
-                      with urllib.request.urlopen(req) as r:
-                          return json.loads(r.read()).get('sha', '')
-                  except Exception:
-                      return ''
-              sha = get_sha()
-              for attempt in range(MAX_ATTEMPTS):
-                  body = {'message': msg, 'content': content_b64}
-                  if sha: body['sha'] = sha
-                  data = json.dumps(body).encode()
-                  req = urllib.request.Request(api, data=data, headers={**headers, 'Content-Type': 'application/json'}, method='PUT')
-                  try:
-                      with urllib.request.urlopen(req) as r:
-                          print(f'OK {path} (attempt {attempt+1})')
-                          break
-                  except urllib.error.HTTPError as e:
-                      print(f'  {path} attempt {attempt+1}: {e.code}')
-                      # exponential backoff: 3·6·12·24·48·96s (attempt=0..5)
-                      backoff = 3 * (2 ** attempt)
-                      if e.code == 409:
-                          time.sleep(backoff)
-                          sha = get_sha()
-                      elif e.code in (403, 429, 500, 502, 503, 504):
-                          # 5xx·rate-limit: 이전 시도가 실제로 성공했을 수 있으므로 SHA 재조회
-                          time.sleep(backoff)
-                          sha = get_sha()
-                      else:
-                          time.sleep(backoff)
-              else:
-                  print(f"::warning::nightly-ytd: {path} 커밋 6회 실패 - 다음 스케줄에 재시도")
-                  # soft exit — 이전 스냅샷은 이미 저장돼 있음
-          PYEOF
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add data/ytd_2026/*.json data/ytd_2026_summary.json 2>/dev/null || true
+          if git diff --cached --quiet; then echo 'No changes to commit'; exit 0; fi
+          git diff --cached --stat | tail -5
+          FILES=$(git diff --cached --name-only | xargs -n1 basename | tr '\n' ' ')
+          git commit -q -m "YTD nightly: ${{ steps.dates.outputs.from }}~ — ${FILES}[skip ci]"
+          for t in 1 2 3 4 5; do
+            if git pull --rebase -X theirs origin main && git push origin HEAD:main; then
+              echo "✅ pushed (attempt $t)"; exit 0
+            fi
+            echo "push retry $t"; git rebase --abort 2>/dev/null || true; sleep $((t*5))
+          done
+          echo "::warning::nightly-ytd: push 5회 실패 - 다음 스케줄에 재시도"
+          exit 0
