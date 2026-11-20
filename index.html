@@ -7186,3 +7186,29 @@ function startPendingPolling(){
   }
 })();
 </script>
+<!-- v19.1 (2026-11-20) 사장님 요청: SNS 관련 기능 전부 숨김 — 신규 매장 중심. 기존 코드 0줄 수정, 이 블록만 지우면 원복 -->
+<style>
+#card-sns-trend,#sns-rationale-modal,.sc-track-btn[data-act="insta"],.insta-box,
+#chip-nstat .chip[data-v="buzz"],#chip-track-sort .chip[data-v="buzz"]{display:none!important}
+</style>
+<script>
+(function(){
+  var noop = function(){};
+  // SNS 데이터 로드·렌더 중지 (Apify 인스타 / 썸트렌드 / SNS 화제성 / 인사이트 SNS 카드)
+  ['loadSnsBuzz','loadSumtrendBuzz','loadSnsTrend','renderSnsTrendList','openSnsModal','renderBuzz','renderInsightBrands','renderInsightConsumer','loadInsta']
+    .forEach(function(f){ try { window[f] = noop; } catch(e){} });
+  function hideSns(){
+    ['tbl-buzz','card-sns-trend','ins-brand-rank','ins-consumer'].forEach(function(id){
+      var el = document.getElementById(id); if (!el) return;
+      var card = el.id === 'card-sns-trend' ? el : el.closest('.card');
+      if (card) card.style.display = 'none';
+    });
+    var ab = document.querySelector('#pg-insight .alert-banner span[style]');
+    if (ab) ab.textContent = '확실히 뜨는 트렌드를 한눈에 (최근 30일 전국 인허가 기준)';
+    document.querySelectorAll('#pg-track .card div').forEach(function(d){
+      if (d.innerHTML.indexOf('화제성 추이') >= 0 && d.children.length <= 2) d.innerHTML = d.innerHTML.replace(/<br>\s*재분석하면[^<]*/, '');
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', hideSns); else hideSns();
+})();
+</script>
