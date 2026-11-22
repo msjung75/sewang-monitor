@@ -109,6 +109,27 @@ export default async function handler(req, res) {
     });
   }
 
+  // v3 (2026-11-22): 프랜차이즈 탭 집계용 — 승계·상호변경으로 브랜드 전환해 연 매장 전체
+  if (view === 'fr') {
+    const items = [];
+    for (const [name, b] of Object.entries(brands)) {
+      if (b.error) continue;
+      for (const u of (b.upbyeon || [])) {
+        if (u.trivial) continue;
+        const ov = overrides[u.mng_no];
+        if (ov && ov.type === 'not_upbyeon') continue;
+        items.push({
+          brand: b.ytd_brand || name, src_brand: name,
+          mng_no: u.mng_no, new_name: u.new_name, old_name: u.old_name, addr: u.addr,
+          lcpmt: u.lcpmt, dat_updt: u.dat_updt, upte: u.upte || '',
+          kind: ov ? ov.type : (u.reopen_type || 'pure_rename'),
+        });
+      }
+    }
+    res.setHeader('Cache-Control', 'private, no-store');
+    return res.status(200).json({ updated: raw.updated, baseline_date: raw.baseline_date, count: items.length, items });
+  }
+
   if (view === 'cases' && req.query.brand) {
     const b = brands[req.query.brand];
     if (!b) return res.status(404).json({ error: 'brand not found' });
