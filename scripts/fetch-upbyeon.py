@@ -12,14 +12,23 @@
   3. /history BASE_DATE=BASELINE + 자치단체 + 동일 인허가일 → 1월 1일 BPLC_NM
   4. old_name != new_name → 업변 확정
 
+v3 (2026-11-22): 자동 브랜드 확장 — 고정 29개 + YTD 주점 브랜드(2건 이상) 순환 점검.
+  · 검색어는 브랜드 앞 3글자(띄어쓰기 변형 흡수) → 결과를 상호 접두어로 로컬 필터
+  · 1회 API 호출 예산(UPBYEON_BUDGET) 안에서 오래 안 본 브랜드부터 점검, 결과는 기존 파일에 병합
+  · 에러 난 브랜드는 직전 결과 유지
+
 출력: data/upbyeon_2026.json
 """
-import asyncio, aiohttp, json, time, sys, os, urllib.parse
+import asyncio, aiohttp, json, time, sys, os, re, urllib.parse
 
 KEY = os.environ.get("DATA_GO_KR_KEY", "")
 BASELINE = os.environ.get("UPBYEON_BASELINE", "20260101")
 OUTPUT = os.environ.get("OUTPUT", "data/upbyeon_2026.json")
 CONCURRENCY = int(os.environ.get("CONCURRENCY", "6"))
+BUDGET = int(os.environ.get("UPBYEON_BUDGET", "3000"))   # 1회 실행 API 호출 상한
+AUTO_MIN = int(os.environ.get("UPBYEON_AUTO_MIN", "2"))  # 자동 브랜드 최소 올해 건수
+CALLS = 0
+TERM_CACHE = {}
 
 # 모니터링 대상 브랜드: (이름, 서비스key)
 # svc: ilban=일반음식점, hyuge=휴게음식점, danran=단란주점, yuheung=유흥주점
@@ -98,18 +107,21 @@ def is_trivial_rename(old, new):
 async def fetch(sess, svc, ep, params, sem):
     qs = "&".join([f"{k}={urllib.parse.quote(str(v))}" for k,v in params.items()])
     url = f"https://apis.data.go.kr/1741000/{svc}/{ep}?serviceKey={KEY}&{qs}"
+    global CALLS
     async with sem:
+        CALLS += 1
         for attempt in range(4):
             try:
                 async with sess.get(url, timeout=aiohttp.ClientTimeout(total=20),
                                      headers={"Accept":"application/json"}) as r:
                     text = await r.text()
                     return json.loads(text)
-            except Exception:
-                if attempt == 3: raise
+            except Exception as e:
+                if attempt == 3: raise RuntimeError(f"{type(e).__name__}: {e}")
                 await asyncio.sleep((2**attempt) * 0.5)
 
 async def page_info(sess, svc_key, brand, sem, max_pages=15):
+    """brand = 검색어 (BPLC_NM LIKE)."""
     svc = SERVICES[svc_key]
     j = await fetch(sess, svc, "info",
         {"pageNo":"1","numOfRows":"100","returnType":"json",
@@ -150,9 +162,30 @@ async def verify(sess, svc_key, cand, sem):
         if it.get("MNG_NO") == mng: return it
     return None
 
-async def process_brand(sess, brand, svc_key, sem):
+
+def compact(s):
+    s = re.sub(r"\((주|유|합)\)|주\)|㈜|주식회사|농업회사법인|유한회사", "", s or "")
+    return re.sub(r"[\s\(\)\[\]\-_.·:,'\"]", "", s).lower()
+
+def search_term(brand):
+    b = re.sub(r"\((주|유|합)\)|주\)|㈜|주식회사|농업회사법인|유한회사", " ", brand or "").strip()
+    tok = b.split()[0] if b else ""
+    if re.match(r"^[가-힣]", tok) and len(tok) > 3: return tok[:3]
+    return tok
+
+async def process_brand(sess, spec, sem):
+    """spec: {brand, svc, term, prefixes(None=검색 결과 전부 인정), ytd_brand, source}"""
+    brand, svc_key = spec["brand"], spec["svc"]
     t0 = time.time()
-    items, total = await page_info(sess, svc_key, brand, sem)
+    ck = (svc_key, spec["term"])
+    if ck not in TERM_CACHE:
+        TERM_CACHE[ck] = await page_info(sess, svc_key, spec["term"], sem)
+    items, total = TERM_CACHE[ck]
+    items = list(items)
+    if spec.get("prefixes"):
+        pfx = spec["prefixes"]
+        items = [it for it in items if any(compact(it.get("BPLC_NM","")).startswith(p) for p in pfx)]
+        total = len(items)
     candidates, new_perm = [], 0
     for it in items:
         lcp = (it.get("LCPMT_YMD","") or "").replace("-","")[:8]
@@ -161,10 +194,11 @@ async def process_brand(sess, brand, svc_key, sem):
         if lcp >= BASELINE: new_perm += 1
         elif upd >= BASELINE: candidates.append(it)
 
-    cap = min(len(candidates), 80)
+    cap = min(len(candidates), 40 if spec.get("source") == "auto" else 80)
     verify_tasks = [verify(sess, svc_key, c, sem) for c in candidates[:cap]]
     verified = await asyncio.gather(*verify_tasks, return_exceptions=True)
 
+    own = [compact(brand)] + list(spec.get("prefixes") or [])
     upbyeon, upbyeon_real = [], []
     for cand, old in zip(candidates[:cap], verified):
         if isinstance(old, Exception) or old is None: continue
@@ -172,14 +206,13 @@ async def process_brand(sess, brand, svc_key, sem):
         new_name = cand.get("BPLC_NM","")
         if old_name and old_name != new_name:
             code = cand.get("OPN_ATMY_GRP_CD") or cand.get("MNG_NO","").split("-")[0]
-            # v2 (2026-08-08): baseline 시점 영업상태 저장 → 재개장 detection
-            #   - baseline_state == '폐업'/'말소' 이었다면 "공실 후 재개장" 신호
-            #   - baseline_state == '영업'/'정상' 이면 순수 재간판
-            baseline_state = old.get("TRDSTATE_NM","") or old.get("DTL_STATE_NM","")
-            current_state = cand.get("TRDSTATE_NM","") or cand.get("DTL_STATE_NM","")
-            reopen_type = "pure_rename"  # default
+            baseline_state = old.get("TRDSTATE_NM","") or old.get("DTL_STATE_NM","") or old.get("DTL_SALS_STTS_NM","") or old.get("SALS_STTS_NM","")
+            current_state = cand.get("TRDSTATE_NM","") or cand.get("DTL_STATE_NM","") or cand.get("DTL_SALS_STTS_NM","") or cand.get("SALS_STTS_NM","")
+            reopen_type = "pure_rename"
             if baseline_state and any(x in baseline_state for x in ["폐업","말소","취소"]):
-                reopen_type = "reopened"  # 폐업/말소 이었는데 지금 영업 = 재개장
+                reopen_type = "reopened"
+            oc = compact(old_name)
+            same_brand_before = any(p and oc.startswith(p) for p in own)  # 원래 같은 브랜드였던 지점명 변경
             entry = {
                 "mng_no": cand.get("MNG_NO"),
                 "old_name": old_name,
@@ -189,21 +222,27 @@ async def process_brand(sess, brand, svc_key, sem):
                 "dat_updt": cand.get("DAT_UPDT_PNT"),
                 "region_code": code,
                 "region_name": region_name(code),
-                "trivial": is_trivial_rename(old_name, new_name),
+                "trivial": is_trivial_rename(old_name, new_name) or same_brand_before,
                 "baseline_state": baseline_state,
                 "current_state": current_state,
                 "reopen_type": reopen_type,
+                "upte": cand.get("SNTTN_BZSTAT_NM",""),
             }
+            if any(x in (current_state or "") for x in ["폐업","말소","취소"]):
+                entry["trivial"] = True  # 지금 폐업 상태면 전환 출점으로 안 봄
             upbyeon.append(entry)
-            # 순수 재간판만 real upbyeon으로 카운트 (재개장·인수신규는 별도)
             if not entry["trivial"] and reopen_type == "pure_rename":
                 upbyeon_real.append(entry)
 
     total_growth = new_perm + len(upbyeon_real)
     ratio = (len(upbyeon_real)/total_growth) if total_growth else 0
-    log(f"{brand}: 매장 {len(items)}/{total} | 신규 {new_perm} | 업변 {len(upbyeon)} (real {len(upbyeon_real)}) | 비율 {ratio*100:.0f}% | {time.time()-t0:.1f}s")
+    log(f"{brand} [{spec['term']}]: 매장 {len(items)}/{total} | 신규 {new_perm} | 업변 {len(upbyeon)} (real {len(upbyeon_real)}) | {time.time()-t0:.1f}s | calls {CALLS}")
     return brand, {
         "service": svc_key,
+        "source": spec.get("source","fixed"),
+        "ytd_brand": spec.get("ytd_brand"),
+        "search_term": spec["term"],
+        "checked": time.strftime("%Y%m%d"),
         "current_count": len(items),
         "current_count_reported": total,
         "new_permits_count": new_perm,
@@ -217,33 +256,110 @@ async def process_brand(sess, brand, svc_key, sem):
         "upbyeon": upbyeon,
     }
 
+def _js_regex(html, name):
+    m = re.search(r"var " + name + r" = /(.*)/([a-z]*);", html)
+    if not m: return None
+    return re.compile(m.group(1), re.I if "i" in m.group(2) else 0)
+
+def auto_brand_specs():
+    """YTD 요약에서 주점 브랜드(올해 AUTO_MIN건 이상)를 뽑아 점검 대상으로."""
+    try:
+        y = json.load(open("data/ytd_2026_summary.json", encoding="utf-8")).get("by_brand", {})
+        bo = json.load(open("data/brand_overrides.json", encoding="utf-8"))
+        html = open("index.html", encoding="utf-8").read()
+    except Exception as e:
+        log(f"auto brand load fail: {e}"); return []
+    sool = _js_regex(html, "SOOL_RE"); excl = _js_regex(html, "EXCLUDE_NAME"); corp = _js_regex(html, "EXCLUDE_CORP")
+    corp_name = re.compile(r"주식회사|농업회사법인|유한회사|\(주\)|㈜|^주\)")
+    excluded = {x.get("name") for x in bo.get("excluded", [])}
+    aliases = {re.sub(r"\s", "", k).lower(): v for k, v in (bo.get("brand_aliases") or {}).items()}
+    catov = bo.get("category_overrides") or {}
+    groups = {}
+    for k, v in y.items():
+        if k in excluded or (excl and excl.search(k)): continue
+        if corp_name.search(k) or (corp and corp.search(re.sub(r"\s", "", k))): continue  # 법인명 = 위탁·운영사, 브랜드 아님
+        can = aliases.get(re.sub(r"\s", "", k).lower(), k)
+        g = groups.setdefault(re.sub(r"\s", "", can).lower(), {"brand": can, "n": 0, "sool": False, "keys": []})
+        g["n"] += (v.get("total_open", 0) or 0) + (v.get("total_closed", 0) or 0)
+        g["keys"].append(k)
+        if not g["sool"] and sool:
+            for m in (v.get("monthly") or {}).values():
+                for st in m.get("stores", []):
+                    if sool.search(st.get("upte", "") or "") or sool.search(re.sub(r"\s", "", st.get("name", ""))):
+                        g["sool"] = True; break
+                if g["sool"]: break
+    specs = []
+    for g in groups.values():
+        ov = catov.get(g["brand"])
+        is_sool = (ov == "sool") if ov else g["sool"]
+        if g["n"] < AUTO_MIN or not is_sool: continue
+        cb = compact(g["brand"])
+        if len(cb) < 3: continue
+        # 접두어: 브랜드 + 묶인 YTD 키들에서 지점명 뗀 앞부분(3글자 이상)
+        pfx = {cb}
+        for k in g["keys"]:
+            ck = compact(k)[:len(cb)]
+            if len(ck) >= 4 and ck[:3] == cb[:3]: pfx.add(ck)
+        term = search_term(g["brand"])
+        if len(term) < 2: continue
+        specs.append({"brand": g["brand"], "svc": "ilban", "term": term, "prefixes": sorted(pfx),
+                      "ytd_brand": g["brand"], "source": "auto", "n": g["n"]})
+    specs.sort(key=lambda s: -s["n"])
+    return specs
+
 async def main():
     if not KEY: raise RuntimeError("DATA_GO_KR_KEY 환경변수 미설정")
     sem = asyncio.Semaphore(CONCURRENCY)
     connector = aiohttp.TCPConnector(limit=CONCURRENCY)
-    results = {}
     out_dir = os.path.dirname(OUTPUT) or "."
     os.makedirs(out_dir, exist_ok=True)
+    prev = {}
+    try:
+        prev = json.load(open(OUTPUT, encoding="utf-8")).get("brands", {}) or {}
+    except Exception:
+        prev = {}
+    results = dict(prev)
 
+    fixed = [{"brand": b, "svc": s, "term": b, "prefixes": None, "ytd_brand": None, "source": "fixed"} for b, s in BRANDS]
+    fixed_names = {compact(b) for b, _ in BRANDS}
+    auto = [a for a in auto_brand_specs() if compact(a["brand"]) not in fixed_names]
+    # 오래 안 본 순 (미점검=0) → 같은 날이면 건수 많은 순
+    def last_checked(spec):
+        p = prev.get(spec["brand"]) or {}
+        return p.get("checked", "0") if not p.get("error") else "0"
+    queue = sorted(fixed + auto, key=lambda s: (last_checked(s), -s.get("n", 999)))
+    log(f"대상: 고정 {len(fixed)} + 자동 {len(auto)} = {len(queue)} | 예산 {BUDGET} calls")
+
+    done = 0
     async with aiohttp.ClientSession(connector=connector) as sess:
-        for i, (brand, svc) in enumerate(BRANDS, 1):
-            log(f"[{i}/{len(BRANDS)}] {brand}")
+        for i, spec in enumerate(queue, 1):
+            if CALLS >= BUDGET:
+                log(f"예산 소진 — {done}개 점검 후 중단 (나머지는 다음 실행)"); break
             try:
-                name, data = await process_brand(sess, brand, svc, sem)
+                name, data = await process_brand(sess, spec, sem)
                 results[name] = data
             except Exception as e:
-                log(f"  ERROR: {e}")
-                results[brand] = {"service": svc, "error": str(e)}
-            # 증분 저장 (실패해도 부분 결과는 남김)
-            out = {
-                "updated": time.strftime("%Y-%m-%dT%H:%M:%S+09:00", time.localtime()),
-                "baseline_date": BASELINE,
-                "current_date": time.strftime("%Y%m%d"),
-                "brands": results,
-            }
-            with open(OUTPUT, "w", encoding="utf-8") as f:
-                json.dump(out, f, ensure_ascii=False, indent=2)
-    log(f"DONE → {OUTPUT}")
+                log(f"  ERROR {spec['brand']}: {e}")
+                p = prev.get(spec["brand"])
+                if p and not p.get("error"):
+                    p = dict(p); p["last_error"] = str(e)[:200]; results[spec["brand"]] = p
+                else:
+                    results[spec["brand"]] = {"service": spec["svc"], "source": spec.get("source"), "error": str(e)[:200] or "unknown"}
+            done += 1
+            if done % 10 == 0 or i == len(queue):
+                _save(results)
+    _save(results)
+    log(f"DONE → {OUTPUT} | 점검 {done} | calls {CALLS}")
+
+def _save(results):
+    out = {
+        "updated": time.strftime("%Y-%m-%dT%H:%M:%S+09:00", time.localtime()),
+        "baseline_date": BASELINE,
+        "current_date": time.strftime("%Y%m%d"),
+        "brands": results,
+    }
+    with open(OUTPUT, "w", encoding="utf-8") as f:
+        json.dump(out, f, ensure_ascii=False, indent=1)
 
 if __name__ == "__main__":
     asyncio.run(main())
