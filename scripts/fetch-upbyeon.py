@@ -194,7 +194,7 @@ async def process_brand(sess, spec, sem):
         if lcp >= BASELINE: new_perm += 1
         elif upd >= BASELINE: candidates.append(it)
 
-    cap = min(len(candidates), 40 if spec.get("source") == "auto" else 80)
+    cap = min(len(candidates), 20 if spec.get("source") == "auto" else 80)
     verify_tasks = [verify(sess, svc_key, c, sem) for c in candidates[:cap]]
     verified = await asyncio.gather(*verify_tasks, return_exceptions=True)
 
@@ -327,7 +327,8 @@ async def main():
     def last_checked(spec):
         p = prev.get(spec["brand"]) or {}
         return p.get("checked", "0") if not p.get("error") else "0"
-    queue = sorted(fixed + auto, key=lambda s: (last_checked(s), -s.get("n", 999)))
+    # 오래 안 본 순 → 같은 날짜면 작은 브랜드부터(호출 적음 → 한 번에 많이 커버)
+    queue = sorted(fixed + auto, key=lambda s: (last_checked(s), s.get("n", 999)))
     log(f"대상: 고정 {len(fixed)} + 자동 {len(auto)} = {len(queue)} | 예산 {BUDGET} calls")
 
     done = 0
