@@ -7212,3 +7212,76 @@ function startPendingPolling(){
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', hideSns); else hideSns();
 })();
 </script>
+<script>
+// v19.1 (2026-11-22): 승계·상호변경 전환 매장을 프랜차이즈 집계에 합산 (사장님: 달맞이광장바베큐 분당정자점 누락 건)
+// 신규 인허가가 아니라 기존 업장을 인수해 간판만 바꾼 매장 → /api/upbyeon?view=fr 에서 받아 YTD by_brand에 '전환' 매장으로 주입
+(function(){
+  var CONV = null, loading = false;
+  function ymd(s){ return String(s || '').replace(/\D/g, '').slice(0, 8); }
+  async function loadConv(){
+    if (loading || CONV) return; loading = true;
+    try {
+      var r = await fetch('/api/upbyeon?view=fr', { credentials: 'same-origin', cache: 'no-store' });
+      if (r.ok) { var j = await r.json(); CONV = j.items || []; }
+    } catch(e) {}
+    loading = false;
+  }
+  function inject(){
+    var Y = window.YTD;
+    if (!Y || !Y.by_brand || !CONV || Y._convInjected) return false;
+    Y._convInjected = true;
+    var seen = {};
+    for (var b in Y.by_brand) {
+      var mo = Y.by_brand[b].monthly || {};
+      for (var m in mo) (mo[m].stores || []).forEach(function(s){ if (s.id) seen[s.id] = 1; });
+    }
+    var n = 0;
+    CONV.forEach(function(c){
+      if (!c.mng_no || seen[c.mng_no]) return;
+      var d = ymd(c.dat_updt); if (d.length < 6 || d.slice(0,4) !== String(Y.year || '2026')) return;
+      var key = c.brand;
+      if (!Y.by_brand[key]) Y.by_brand[key] = { total_open: 0, total_closed: 0, monthly: {} };
+      var g = Y.by_brand[key]; g.monthly = g.monthly || {};
+      var mk = d.slice(0, 6);
+      if (!g.monthly[mk]) g.monthly[mk] = { open: 0, closed: 0, stores: [] };
+      var st = { id: c.mng_no, name: c.new_name, addr: c.addr || '', permitDate: d, closedDate: '', status: '영업', closed: false,
+                 type: 'ilban', typeLabel: '일반음식점', upte: c.upte || '', conv: true, convFrom: c.old_name || '', convKind: c.kind || '' };
+      if (typeof isExcluded === 'function' && isExcluded(st)) return;
+      g.monthly[mk].stores.push(st); g.monthly[mk].open += 1; g.total_open = (g.total_open || 0) + 1;
+      g.total_conv = (g.total_conv || 0) + 1;
+      seen[c.mng_no] = 1; n++;
+    });
+    window._frSoolSubCache = {};
+    try { console.log('[conv] 전환 매장 주입:', n); } catch(e){}
+    try { renderFr(); } catch(e){}
+    return true;
+  }
+  // 표에 '전환 N' 표시
+  if (typeof renderFr === 'function' && !window._convRenderWrapped) {
+    window._convRenderWrapped = true;
+    var orig = renderFr;
+    renderFr = function(){
+      orig.apply(this, arguments);
+      try {
+        if (!window.YTD || !window.YTD._convInjected) return;
+        var list = frFiltered().slice(0, 30);
+        var rows = document.querySelectorAll('#tbl-brand tr');
+        list.forEach(function(g, i){
+          var cnt = 0;
+          for (var m in (g.monthly || {})) (g.monthly[m].stores || []).forEach(function(s){ if (s.conv && !s.closed) cnt++; });
+          var tr = rows[i + 1]; if (!cnt || !tr || !tr.children[2]) return;
+          tr.children[2].insertAdjacentHTML('beforeend', '<div style="font-size:9.5px;color:#fbbf24;font-weight:700;white-space:nowrap" title="기존 업장 인수·간판 교체">전환 ' + cnt + '</div>');
+        });
+      } catch(e){}
+    };
+  }
+  var tries = 0;
+  var iv = setInterval(function(){
+    tries++;
+    if (window.ME && !CONV) loadConv();
+    if (window.YTD && window.YTD._convInjected) { if (tries > 600) clearInterval(iv); return; }
+    inject();
+    if (tries > 1800) clearInterval(iv);  // 최대 30분 감시 (YTD 재로드 시 재주입)
+  }, 1000);
+})();
+</script>
